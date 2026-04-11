@@ -1,14 +1,18 @@
 using UnityEngine;
 
+using System;
+
 [System.Serializable]
 public struct WIObscuredFloat
 {
+    private static System.Random rng = new System.Random();
+
     [SerializeField] private float cryptoKey;
     [SerializeField] private float hiddenValue;
 
     public WIObscuredFloat(float value)
     {
-        cryptoKey = UnityEngine.Random.Range(-1000f, 1000f);
+        cryptoKey = (float)(rng.NextDouble() * 2000.0 - 1000.0);
         hiddenValue = value + cryptoKey;
     }
 
@@ -19,7 +23,7 @@ public struct WIObscuredFloat
 
     public void SetValue(float value)
     {
-        cryptoKey = UnityEngine.Random.Range(-1000f, 1000f);
+        cryptoKey = (float)(rng.NextDouble() * 2000.0 - 1000.0);
         hiddenValue = value + cryptoKey;
     }
 }

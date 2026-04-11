@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class WIAdventurer : WICharacterBase
 {
-    [Header("Adventurer Specific")]
     // 추가적인 모험가 고유 프로퍼티가 들어갑니다.
     
     private void Awake()

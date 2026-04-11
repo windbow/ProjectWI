@@ -6,6 +6,17 @@ public class WICharacterBase : MonoBehaviour
     [SerializeField] protected string characterName;
     [SerializeField] protected WIJob currentJob;
     
+    protected WIObscuredInt maxHp = new WIObscuredInt(100);
+    protected WIObscuredInt currentHp = new WIObscuredInt(100);
+
+    public string Name { get { return characterName; } set { characterName = value; } }
+    public WIJob Job { get { return currentJob; } set { currentJob = value; } }
+    
+    public int MaxHp { get { return maxHp.GetValue(); } set { maxHp.SetValue(value); } }
+    public int CurrentHp { get { return currentHp.GetValue(); } set { currentHp.SetValue(value); } }
+    public int AttackPower { get { return attackPower.GetValue(); } set { attackPower.SetValue(value); } }
+    public float Speed { get { return speed.GetValue(); } set { speed.SetValue(value); } }
+    
     // 메모리 조작 방지를 위한 Obscured 타입 변수들 적용
     protected WIObscuredInt level = new WIObscuredInt(1);
     protected WIObscuredInt str = new WIObscuredInt(5);
@@ -35,7 +46,9 @@ public class WICharacterBase : MonoBehaviour
     
     public virtual void TakeDamage(int damage)
     {
-        // 공통 데미지 처리
+        int nextHp = currentHp.GetValue() - damage;
+        if (nextHp < 0) nextHp = 0;
+        currentHp.SetValue(nextHp);
     }
     
     public virtual void OnTurnStart()
