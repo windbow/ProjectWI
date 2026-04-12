@@ -7,30 +7,48 @@ namespace ProjectWI.SubSystem
 {
     public class WIBattleSession
     {
+        /// <summary>전투가 벌어지고 있는 현재 던전의 이름 (로그 출력용)</summary>
         public string DungeonName { get; private set; }
         
+        /// <summary>현재 전투에 참여 중인 아군(모험가) 캐릭터 목록</summary>
         public List<WICharacterBase> Adventurers { get; private set; } = new List<WICharacterBase>();
+        /// <summary>현재 전투에 참여 중인 적군(몬스터) 캐릭터 목록</summary>
         public List<WICharacterBase> Monsters { get; private set; } = new List<WICharacterBase>();
         
+        /// <summary>전투에 참여하는 모든 캐릭터의 현재 행동력 누적 수치를 관리하는 매핑 테이블</summary>
         public Dictionary<WICharacterBase, float> ActionValues { get; private set; } = new Dictionary<WICharacterBase, float>();
         
+        /// <summary>다음 행동이 발생하기까지 차오르고 있는 공용 턴 대기 타이머</summary>
         public float TurnWaitTimer = 0f;
-        public float TurnWaitTimeMax = 1.0f; // 고정된 턴 대기시간 (게이지 쿨타임)
+        /// <summary>게이지가 100%가 되기 위해 필요한 고정 목표 시간 (기본값 1초)</summary>
+        public float TurnWaitTimeMax = 1.0f; 
         
-        public Action<string> OnLogAdded; 
+        /// <summary>전투 로그가 추가될 때 UI 구독자들에게 알리는 델리게이트 이벤트</summary>
+        public Action<string> OnLogAdded;
+        /// <summary>매 틱마다 행동력 갱신 후 발생하는 이벤트 (행동력 바 갱신용)</summary>
+        public Action OnBattleTick;
+        /// <summary>UI를 나갔다가 들어와도 볼 수 있도록 보관해두는 전투 로그 히스토리 리스트</summary>
         private List<string> battleLogs = new List<string>();
         
-        private float delayAfterAction = 0f;
 
+
+        /// <summary>모험가 전멸 또는 몬스터 전멸로 인해 현재 몬스터 웨이브와의 전투가 끝났음을 나타내는 플래그</summary>
         public bool IsBattleEnded { get; private set; } = false;
 
         public void ResetBattleState()
         {
             IsBattleEnded = false;
             TurnWaitTimer = 0f;
-            foreach (var ch in Adventurers) { ActionValues[ch] = 0f; }
-            foreach (var ch in Monsters) { 
-                if (ch.CurrentHp <= 0) ch.CurrentHp = ch.MaxHp; 
+            foreach (var ch in Adventurers) 
+            { 
+                ActionValues[ch] = 0f; 
+            }
+            foreach (var ch in Monsters) 
+            { 
+                if (ch.CurrentHp <= 0) 
+                {
+                    ch.CurrentHp = ch.MaxHp; 
+                }
                 ActionValues[ch] = 0f; 
             } 
             AddLog("------------------------------------");
@@ -54,8 +72,14 @@ namespace ProjectWI.SubSystem
             System.Random rand = new System.Random();
             
             // 전투 시작 시 초기 행동력을 다르게 주어(Initiative Roll) 턴이 동시에 오지 않도록 분산시킵니다.
-            foreach (var adv in Adventurers) ActionValues[adv] = (float)rand.NextDouble() * 20f;
-            foreach (var mon in Monsters) ActionValues[mon] = (float)rand.NextDouble() * 20f;
+            foreach (var adv in Adventurers) 
+            {
+                ActionValues[adv] = (float)rand.NextDouble() * 20f;
+            }
+            foreach (var mon in Monsters) 
+            {
+                ActionValues[mon] = (float)rand.NextDouble() * 20f;
+            }
             
             TurnWaitTimer = 0f;
         }
@@ -66,7 +90,10 @@ namespace ProjectWI.SubSystem
         public void AddLog(string log)
         {
             battleLogs.Add(log);
-            if(battleLogs.Count > 50) battleLogs.RemoveAt(0); 
+            if(battleLogs.Count > 50) 
+            {
+                battleLogs.RemoveAt(0); 
+            }
             
             if (OnLogAdded != null)
             {
@@ -97,6 +124,29 @@ namespace ProjectWI.SubSystem
         {
             return Mathf.Clamp01(TurnWaitTimer / TurnWaitTimeMax);
         }
+
+        /// <summary>
+        /// 특정 캐릭터의 현재 누적 행동력을 0~1 비율로 반환합니다.
+        /// 기준값은 캐릭터 스피드 × 5초로, 속도에 비례해 게이지가 차오르는 체감을 유지합니다.
+        /// 행동 후 행동력이 초기화(0)되므로 게이지도 함께 리셋됩니다.
+        /// </summary>
+        public float GetActionValueRatio(WICharacterBase character)
+        {
+            if (false == ActionValues.ContainsKey(character))
+            {
+                return 0f;
+            }
+
+            float value = ActionValues[character];
+
+            if (value < 0f)
+            {
+                return 0f; // 사망 처리된 캐릭터
+            }
+
+            float normalizedMax = Mathf.Max(character.Speed * TurnWaitTimeMax * 5f, 1f);
+            return Mathf.Clamp01(value / normalizedMax);
+        }
         
         /// <summary>
         /// 프레임마다 공용 대기열 게이지(TurnWaitTimer)를 채웁니다. 속도에 따른 행동력 누적은 백그라운드에서 진행됩니다.
@@ -114,6 +164,12 @@ namespace ProjectWI.SubSystem
                 {
                     ActionValues[key] += key.GetSpeed() * deltaTime;
                 }
+            }
+
+            // 행동력 갱신 이벤트 발생 (UI 행동력 바 갱신용)
+            if (OnBattleTick != null)
+            {
+                OnBattleTick.Invoke();
             }
 
             // 게이지가 100%(TurnWaitTimeMax)에 도달하면 무조건 1명 행동!
@@ -183,7 +239,7 @@ namespace ProjectWI.SubSystem
             
             if (usedSkill != null)
             {
-                finalDamage = attacker.AttackPower * usedSkill.DamageMultiplier;
+                finalDamage = Mathf.RoundToInt(attacker.AttackPower * usedSkill.DamageMultiplier);
                 logText = $"[{attacker.Name}] -> [{defender.Name}] {usedSkill.SkillName} 사용! ({finalDamage} 피해)";
             }
             
@@ -225,16 +281,30 @@ namespace ProjectWI.SubSystem
             if (isAdvWiped)
             {
                 AddLog("[시스템] 모험가 파티 전멸! (부활 중...)");
-                foreach (var adv in Adventurers) { adv.CurrentHp = adv.MaxHp; ActionValues[adv] = 0f; }
-                foreach (var mon in Monsters) { ActionValues[mon] = 0f; }
+                foreach (var adv in Adventurers) 
+                { 
+                    adv.CurrentHp = adv.MaxHp; 
+                    ActionValues[adv] = 0f; 
+                }
+                foreach (var mon in Monsters) 
+                { 
+                    ActionValues[mon] = 0f; 
+                }
                 anyDead = true;
                 IsBattleEnded = true;
             }
             else if (isMonWiped)
             {
                 AddLog("[시스템] 파티 승리!");
-                foreach (var mon in Monsters) { mon.CurrentHp = mon.MaxHp; ActionValues[mon] = 0f; }
-                foreach (var adv in Adventurers) { ActionValues[adv] = 0f; }
+                foreach (var mon in Monsters) 
+                { 
+                    mon.CurrentHp = mon.MaxHp; 
+                    ActionValues[mon] = 0f; 
+                }
+                foreach (var adv in Adventurers) 
+                { 
+                    ActionValues[adv] = 0f; 
+                }
                 anyDead = true;
                 IsBattleEnded = true;
             }

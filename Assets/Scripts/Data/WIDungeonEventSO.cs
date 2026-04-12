@@ -14,6 +14,7 @@ namespace ProjectWI.Data
     public class WIDungeonEventSO : ScriptableObject
     {
         [Header("Event Settings")]
+        public string id;
         public WIDungeonEventType eventType = WIDungeonEventType.None;
         
         [TextArea(2, 4)]

@@ -13,17 +13,23 @@ namespace ProjectWI.SubSystem
 
     public class WIDungeonSession
     {
+        /// <summary>현재 탐험 중인 던전의 기본 정보와 발생할 수 있는 이벤트 풀(Pool)을 담고 있는 에셋 데이터</summary>
         public WIDungeonDataSO DungeonData { get; private set; }
+        /// <summary>현재 던전 세션의 상태 (탐험 중인지, 전투 중인지)</summary>
         public WIDungeonState CurrentState { get; private set; }
         
+        /// <summary>전투 돌입 시 턴제 전투 로직을 전담하여 처리하는 하위 배틀 세션</summary>
         public WIBattleSession BattlePhase { get; private set; }
         
+        /// <summary>탐험 중 새 이벤트 로그가 발생했음을 UI 등에 알리는 델리게이트</summary>
         public Action<string> OnDungeonLogAdded;
+        /// <summary>탐험을 통해 모인 텍스트 로그들을 보관하여 늦게 접속한 UI도 렌더링할 수 있도록 돕는 리스트</summary>
         private List<string> dungeonLogs = new List<string>();
 
-        // 탐험 관련 타이머
+        /// <summary>다음 탐험 이벤트 룰렛을 돌리기 위해 차오르고 있는 타이머 값 (0 ~ exploreInterval)</summary>
         private float exploreTimer = 0f;
-        private float exploreInterval = 2.0f; // 2초마다 1번씩 이벤트 굴림
+        /// <summary>탐험 이벤트를 한 번 굴리기 위해 필요한 쿨다운 시간 (기본 2초)</summary>
+        private float exploreInterval = 2.0f; 
         
         public WIDungeonSession(WIDungeonDataSO data)
         {
