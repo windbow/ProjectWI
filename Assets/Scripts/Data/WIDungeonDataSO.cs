@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ProjectWI.Data
 {
-    [CreateAssetMenu(fileName = "NewDungeonData", menuName = "WI/Dungeon/Dungeon Data", order = 0)]
+    [CreateAssetMenu(fileName = "NewDungeonData", menuName = "WIData/DungeonData", order = 1)]
     public class WIDungeonDataSO : ScriptableObject
     {
         public int dungeonId;

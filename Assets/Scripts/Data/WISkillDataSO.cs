@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ProjectWI.Data
 {
-    [CreateAssetMenu(fileName = "NewSkillData", menuName = "WI/Data/Skill Data", order = 0)]
+    [CreateAssetMenu(fileName = "NewSkillData", menuName = "WIData/SkillData", order = 1)]
     public class WISkillDataSO : ScriptableObject
     {
         [Tooltip("고유 식별자 (임포터 맵핑용)")]

@@ -29,89 +29,86 @@ namespace ProjectWI.SubSystem
         /// </summary>
         private void Start()
         {
-#if UNITY_EDITOR
-            // 1. 저장된 던전 데이터를 에셋에서 불러옵니다.
+            // 이제 하드코딩된 초기화 대신 UI와 연동하여 동적으로 전투를 시작합니다.
+        }
+
+        /// <summary>
+        /// 선택된 파티 멤버들을 기반으로 특정 던전의 전투를 시작합니다.
+        /// </summary>
+        public void StartBattle(int dungeonId, List<WIAdventurerInstance> partyMembers)
+        {
+            // 1. 던전 데이터 로드
             ProjectWI.Data.WIDungeonDataSO dunSO = UnityEditor.AssetDatabase.LoadAssetAtPath<ProjectWI.Data.WIDungeonDataSO>("Assets/Data/ScriptableObject/DungeonData/DUN_Beginner.asset");
             if (dunSO == null)
             {
-                Debug.LogError("던전 더미 데이터가 없습니다! 관리자 창에서 에셋 생성 또는 경로를 확인해주세요.");
+                Debug.LogError("던전 데이터를 찾을 수 없습니다.");
                 return;
             }
 
-            WIDungeonSession session = CreateSession(dunSO.dungeonId, dunSO);
+            // 2. 세션 생성 또는 가져오기
+            WIDungeonSession session = CreateSession(dungeonId, dunSO);
             
-            // 2. 사전에 스크립트로 생성해둔 직업/몬스터/스킬 데이터를 불러옵니다.
-            var warriorSO = UnityEditor.AssetDatabase.LoadAssetAtPath<ProjectWI.Data.WIJobDataSO>("Assets/Data/ScriptableObject/JobData/JOB_Warrior.asset");
-            var mageSO = UnityEditor.AssetDatabase.LoadAssetAtPath<ProjectWI.Data.WIJobDataSO>("Assets/Data/ScriptableObject/JobData/JOB_Mage.asset");
+            // 3. 기존에 생성된 캐릭터 오브젝트가 있다면 제거 (새로운 전투 시작을 위해)
+            foreach (Transform child in this.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            // 4. 파티 멤버(모험가) 생성 및 데이터 설정
+            List<WICharacterBase> adventurerCombatants = new List<WICharacterBase>();
+            foreach (var member in partyMembers)
+            {
+                GameObject advObj = new GameObject($"Adv_{member.Name}");
+                advObj.transform.SetParent(this.transform);
+                WIAdventurer adv = advObj.AddComponent<WIAdventurer>();
+                
+                // 데이터 주입
+                adv.Name = member.Name;
+                adv.MaxHp = (int)member.JobData.baseHp;
+                adv.CurrentHp = adv.MaxHp;
+                adv.AttackPower = (int)member.JobData.baseAttack;
+                adv.Speed = member.JobData.baseSpeed;
+                
+                int jid = 0;
+                int.TryParse(member.JobData.id, out jid);
+                WIJob job = new WIJob() { JobID = jid, JobName = member.JobData.jobName };
+                // 스킬이 있다면 첫 번째 스킬 연동 (더미 데이터 구조 유지)
+                if (member.JobData.skills != null && member.JobData.skills.Length > 0)
+                {
+                    var skillSO = member.JobData.skills[0];
+                    job.Skills[0] = new WISkill() 
+                    { 
+                        SkillID = skillSO.skillId, 
+                        SkillName = skillSO.skillName, 
+                        Cooldown = skillSO.cooldown, 
+                        DamageMultiplier = skillSO.damageMultiplier 
+                    };
+                }
+                adv.Job = job;
+                
+                adventurerCombatants.Add(adv);
+            }
+
+            // 5. 몬스터 생성 (현재는 고블린/슬라임 고정 테스트 유지, 추후 던전 데이터 연동)
             var slimeSO = UnityEditor.AssetDatabase.LoadAssetAtPath<ProjectWI.Data.WIMonsterDataSO>("Assets/Data/ScriptableObject/MonsterData/MON_Slime.asset");
             var goblinSO = UnityEditor.AssetDatabase.LoadAssetAtPath<ProjectWI.Data.WIMonsterDataSO>("Assets/Data/ScriptableObject/MonsterData/MON_Goblin.asset");
             
-            var pStrikeSO = UnityEditor.AssetDatabase.LoadAssetAtPath<ProjectWI.Data.WISkillDataSO>("Assets/Data/ScriptableObject/SkillData/SKL_PowerStrike.asset");
-            var fBallSO = UnityEditor.AssetDatabase.LoadAssetAtPath<ProjectWI.Data.WISkillDataSO>("Assets/Data/ScriptableObject/SkillData/SKL_Fireball.asset");
-            var tackleSO = UnityEditor.AssetDatabase.LoadAssetAtPath<ProjectWI.Data.WISkillDataSO>("Assets/Data/ScriptableObject/SkillData/SKL_Tackle.asset");
-            var stabSO = UnityEditor.AssetDatabase.LoadAssetAtPath<ProjectWI.Data.WISkillDataSO>("Assets/Data/ScriptableObject/SkillData/SKL_Stab.asset");
-
-            // 더미 모험가 1 (전사)
-            GameObject advObj1 = new GameObject("DummyAdv_Warrior");
-            advObj1.transform.SetParent(this.transform);
-            WIAdventurer adv1 = advObj1.AddComponent<WIAdventurer>();
-            adv1.Name = "김철수(" + warriorSO.jobName + ")";
-            adv1.MaxHp = (int)warriorSO.baseHp;
-            adv1.CurrentHp = adv1.MaxHp;
-            adv1.AttackPower = (int)warriorSO.baseAttack;
-            adv1.Speed = warriorSO.baseSpeed;
+            List<WICharacterBase> monsterCombatants = new List<WICharacterBase>();
             
-            WIJob warriorJob = new WIJob() { JobID = 1, JobName = warriorSO.jobName };
-            warriorJob.Skills[0] = new WISkill() { SkillID = 101, SkillName = pStrikeSO.skillName, Cooldown = pStrikeSO.cooldown, DamageMultiplier = pStrikeSO.damageMultiplier };
-            adv1.Job = warriorJob;
-
-            // 더미 모험가 2 (마법사)
-            GameObject advObj2 = new GameObject("DummyAdv_Mage");
-            advObj2.transform.SetParent(this.transform);
-            WIAdventurer adv2 = advObj2.AddComponent<WIAdventurer>();
-            adv2.Name = "이영희(" + mageSO.jobName + ")";
-            adv2.MaxHp = (int)mageSO.baseHp;
-            adv2.CurrentHp = adv2.MaxHp;
-            adv2.AttackPower = (int)mageSO.baseAttack;
-            adv2.Speed = mageSO.baseSpeed;
-            
-            WIJob mageJob = new WIJob() { JobID = 2, JobName = mageSO.jobName };
-            mageJob.Skills[0] = new WISkill() { SkillID = 201, SkillName = fBallSO.skillName, Cooldown = fBallSO.cooldown, DamageMultiplier = fBallSO.damageMultiplier }; 
-            adv2.Job = mageJob;
-            
-            // 더미 몬스터 1 (슬라임)
-            GameObject monObj1 = new GameObject("DummyMon_Slime");
-            monObj1.transform.SetParent(this.transform);
-            WIMonster mon1 = monObj1.AddComponent<WIMonster>();
+            // 슬라임 추가
+            GameObject mon1Obj = new GameObject("Mon_Slime");
+            mon1Obj.transform.SetParent(this.transform);
+            WIMonster mon1 = mon1Obj.AddComponent<WIMonster>();
             mon1.Name = slimeSO.monsterName;
             mon1.MaxHp = (int)slimeSO.maxHp;
             mon1.CurrentHp = mon1.MaxHp;
             mon1.AttackPower = (int)slimeSO.attackPower;
             mon1.Speed = slimeSO.speed;
-            
-            WIJob slimeJob = new WIJob() { JobID = 99, JobName = "슬라임" };
-            slimeJob.Skills[0] = new WISkill() { SkillID = 901, SkillName = tackleSO.skillName, Cooldown = tackleSO.cooldown, DamageMultiplier = tackleSO.damageMultiplier };
-            mon1.Job = slimeJob;
+            monsterCombatants.Add(mon1);
 
-            // 더미 몬스터 2 (고블린)
-            GameObject monObj2 = new GameObject("DummyMon_Goblin");
-            monObj2.transform.SetParent(this.transform);
-            WIMonster mon2 = monObj2.AddComponent<WIMonster>();
-            mon2.Name = goblinSO.monsterName;
-            mon2.MaxHp = (int)goblinSO.maxHp;
-            mon2.CurrentHp = mon2.MaxHp;
-            mon2.AttackPower = (int)goblinSO.attackPower;
-            mon2.Speed = goblinSO.speed;
-            
-            WIJob goblinJob = new WIJob() { JobID = 100, JobName = "고블린" };
-            goblinJob.Skills[0] = new WISkill() { SkillID = 902, SkillName = stabSO.skillName, Cooldown = stabSO.cooldown, DamageMultiplier = stabSO.damageMultiplier };
-            mon2.Job = goblinJob;
-            
-            List<WICharacterBase> advs = new List<WICharacterBase>() { adv1, adv2 };
-            List<WICharacterBase> mons = new List<WICharacterBase>() { mon1, mon2 };
-
-            session.BindCombatants(advs, mons);
-#endif
+            // 6. 세션에 전투원 바인딩 및 초기화
+            session.BindCombatants(adventurerCombatants, monsterCombatants);
+            session.BattlePhase.ResetBattleState();
         }
 
         /// <summary>

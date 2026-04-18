@@ -15,6 +15,7 @@ namespace ProjectWI.SubSystem
     {
         /// <summary>현재 탐험 중인 던전의 기본 정보와 발생할 수 있는 이벤트 풀(Pool)을 담고 있는 에셋 데이터</summary>
         public WIDungeonDataSO DungeonData { get; private set; }
+        
         /// <summary>현재 던전 세션의 상태 (탐험 중인지, 전투 중인지)</summary>
         public WIDungeonState CurrentState { get; private set; }
         
@@ -23,11 +24,13 @@ namespace ProjectWI.SubSystem
         
         /// <summary>탐험 중 새 이벤트 로그가 발생했음을 UI 등에 알리는 델리게이트</summary>
         public Action<string> OnDungeonLogAdded;
+        
         /// <summary>탐험을 통해 모인 텍스트 로그들을 보관하여 늦게 접속한 UI도 렌더링할 수 있도록 돕는 리스트</summary>
         private List<string> dungeonLogs = new List<string>();
 
         /// <summary>다음 탐험 이벤트 룰렛을 돌리기 위해 차오르고 있는 타이머 값 (0 ~ exploreInterval)</summary>
         private float exploreTimer = 0f;
+        
         /// <summary>탐험 이벤트를 한 번 굴리기 위해 필요한 쿨다운 시간 (기본 2초)</summary>
         private float exploreInterval = 2.0f; 
         
@@ -37,6 +40,7 @@ namespace ProjectWI.SubSystem
             CurrentState = WIDungeonState.Exploring;
             
             BattlePhase = new WIBattleSession(data.dungeonName);
+            
             // 전투 로그도 던전 로그와 통합할 수 있도록 이벤트 라우팅
             BattlePhase.OnLogAdded += AddLog;
             
@@ -53,10 +57,16 @@ namespace ProjectWI.SubSystem
         public void AddLog(string msg)
         {
             dungeonLogs.Add(msg);
-            if (dungeonLogs.Count > 100) dungeonLogs.RemoveAt(0);
             
+            if (dungeonLogs.Count > 100)
+            {
+                dungeonLogs.RemoveAt(0);
+            }
+
             if (OnDungeonLogAdded != null)
+            {
                 OnDungeonLogAdded.Invoke(msg);
+            }
         }
         
         public List<string> GetLogs()
@@ -69,8 +79,10 @@ namespace ProjectWI.SubSystem
         {
             // 탐험 상태일 때는 탐험 타이머(2초) 비율
             if (CurrentState == WIDungeonState.Exploring)
+            {
                 return Mathf.Clamp01(exploreTimer / exploreInterval);
-                
+            }
+
             // 전투 중일 때는 턴 대기시간(1초) 비율
             return BattlePhase.GetTurnProgressRatio();
         }
@@ -104,24 +116,32 @@ namespace ProjectWI.SubSystem
         {
             if (DungeonData == null)
             {
-                AddLog("어두운 통로를 걷고 있습니다...");
+                AddLog("던전 데이터 없음");
                 return;
             }
 
             WIDungeonEventSO evt = DungeonData.RollRandomEvent();
             if (evt == null)
             {
-                AddLog("어두운 통로를 걷고 있습니다...");
+                AddLog("던전 이벤트 없음");
                 return;
             }
 
-            AddLog($"[이벤트] {evt.logMessage}");
+            AddLog($"{evt.logMessage}");
             
             switch (evt.eventType)
             {
+                // @todo : 골드 획득, 경험치 획득 등의 텍스트는 직접 입력하면 안됨
                 case WIDungeonEventType.Treasure:
-                    if(evt.rewardGold > 0) AddLog($"+ {evt.rewardGold} 골드 획득!");
-                    if(evt.rewardExp > 0) AddLog($"+ {evt.rewardExp} 경험치 획득!");
+                    if (evt.rewardGold > 0)
+                    {
+                        AddLog($"+ {evt.rewardGold} 골드 획득!");
+                    }
+
+                    if (evt.rewardExp > 0)
+                    {
+                        AddLog($"+ {evt.rewardExp} 경험치 획득!");
+                    }
                     break;
                     
                 case WIDungeonEventType.Story:
@@ -130,8 +150,11 @@ namespace ProjectWI.SubSystem
                     
                 case WIDungeonEventType.MonsterEncounter:
                     AddLog("[던전] 몬스터 무리와 조우하여 전투에 돌입합니다!");
+                    
                     CurrentState = WIDungeonState.Battling;
-                    BattlePhase.ResetBattleState(); // 새로 전투 진입시 타이머 등 초기화
+                    
+                    // 새로 전투 진입시 타이머 등 초기화
+                    BattlePhase.ResetBattleState(); 
                     break;
             }
         }

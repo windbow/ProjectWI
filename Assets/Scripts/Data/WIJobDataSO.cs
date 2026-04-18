@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ProjectWI.Data
 {
-    [CreateAssetMenu(fileName = "NewJobData", menuName = "WI Data/Job Data")]
+    [CreateAssetMenu(fileName = "NewJobData", menuName = "WIData/JobData", order = 1)]
     public class WIJobDataSO : ScriptableObject
     {
         public string id;
@@ -13,5 +13,7 @@ namespace ProjectWI.Data
         public float baseHp;
         public float baseSpeed;
         public float baseAttack;
+
+        public WISkillDataSO[] skills;
     }
 }

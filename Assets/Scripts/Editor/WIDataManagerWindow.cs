@@ -6,18 +6,27 @@ using ProjectWI.Data;
 
 namespace ProjectWI.Editor
 {
+    public enum WIDataType
+    {
+        Dungeon,
+        DungeonEvent,
+        Job,
+        Skill,
+        Monster
+    }
+    
     public class WIDataManagerWindow : EditorWindow
     {
         private int selectedTab = 0;
-        private string[] tabNames = new string[] { "Dungeon Events", "Monster Data", "Job Data", "Dungeon Data", "Skill Data" };
+        private string[] tabNames = new string[] { "Dungeon Data", "Dungeon Events", "Job Data", "Skill Data", "Monster Data" };
         private Vector2 scrollPos;
 
         // 에셋 캐시 리스트
-        private List<WIDungeonEventSO> dungeonEvents = new List<WIDungeonEventSO>();
-        private List<WIMonsterDataSO> monsters = new List<WIMonsterDataSO>();
-        private List<WIJobDataSO> jobs = new List<WIJobDataSO>();
         private List<WIDungeonDataSO> dungeons = new List<WIDungeonDataSO>();
+        private List<WIDungeonEventSO> dungeonEvents = new List<WIDungeonEventSO>();
+        private List<WIJobDataSO> jobs = new List<WIJobDataSO>();
         private List<WISkillDataSO> skills = new List<WISkillDataSO>();
+        private List<WIMonsterDataSO> monsters = new List<WIMonsterDataSO>();
 
         [MenuItem("WI Tools/통합 데이터 관리자 (Table Viewer)")]
         public static void ShowWindow()
@@ -45,13 +54,13 @@ namespace ProjectWI.Editor
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 dungeonEvents.Add(AssetDatabase.LoadAssetAtPath<WIDungeonEventSO>(path));
             }
-
-            // Load Monsters
-            string[] monsterGuids = AssetDatabase.FindAssets("t:WIMonsterDataSO");
-            foreach (string guid in monsterGuids)
+            
+            // Load Dungeons
+            string[] dungeonGuids = AssetDatabase.FindAssets("t:WIDungeonDataSO");
+            foreach (string guid in dungeonGuids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
-                monsters.Add(AssetDatabase.LoadAssetAtPath<WIMonsterDataSO>(path));
+                dungeons.Add(AssetDatabase.LoadAssetAtPath<WIDungeonDataSO>(path));
             }
 
             // Load Jobs
@@ -61,21 +70,21 @@ namespace ProjectWI.Editor
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 jobs.Add(AssetDatabase.LoadAssetAtPath<WIJobDataSO>(path));
             }
-
-            // Load Dungeons
-            string[] dungeonGuids = AssetDatabase.FindAssets("t:WIDungeonDataSO");
-            foreach (string guid in dungeonGuids)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                dungeons.Add(AssetDatabase.LoadAssetAtPath<WIDungeonDataSO>(path));
-            }
-
+            
             // Load Skills
             string[] skillGuids = AssetDatabase.FindAssets("t:WISkillDataSO");
             foreach (string guid in skillGuids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 skills.Add(AssetDatabase.LoadAssetAtPath<WISkillDataSO>(path));
+            }
+            
+            // Load Monsters
+            string[] monsterGuids = AssetDatabase.FindAssets("t:WIMonsterDataSO");
+            foreach (string guid in monsterGuids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                monsters.Add(AssetDatabase.LoadAssetAtPath<WIMonsterDataSO>(path));
             }
         }
 
@@ -86,6 +95,7 @@ namespace ProjectWI.Editor
             // 상단 툴바 및 새로고침 버튼
             GUILayout.BeginHorizontal();
             int newTab = GUILayout.Toolbar(selectedTab, tabNames, GUILayout.Height(30));
+            WIDataType dataType = (WIDataType)newTab;
             if (newTab != selectedTab)
             {
                 selectedTab = newTab;
@@ -103,22 +113,22 @@ namespace ProjectWI.Editor
 
             scrollPos = GUILayout.BeginScrollView(scrollPos);
 
-            switch (selectedTab)
+            switch (dataType)
             {
-                case 0:
-                    DrawDungeonEventsGrid();
-                    break;
-                case 1:
-                    DrawMonstersGrid();
-                    break;
-                case 2:
-                    DrawJobsGrid();
-                    break;
-                case 3:
+                case WIDataType.Dungeon:
                     DrawDungeonDataGrid();
                     break;
-                case 4:
+                case WIDataType.DungeonEvent:
+                    DrawDungeonEventsGrid();
+                    break;
+                case WIDataType.Job:
+                    DrawJobsGrid();
+                    break;
+                case WIDataType.Skill:
                     DrawSkillsGrid();
+                    break;
+                case WIDataType.Monster:
+                    DrawMonstersGrid();
                     break;
             }
 
@@ -127,12 +137,52 @@ namespace ProjectWI.Editor
             GUILayout.Space(10);
             if (GUILayout.Button("선택된 타입의 임시 데이터 하나 강제 생성하기", GUILayout.Height(30)))
             {
-                CreateDummyData(selectedTab);
+                CreateDummyData(dataType);
             }
         }
 
         // ===========================================
-        // [1] Dungeon Events Grid
+        // Dungeon Data Grid
+        // ===========================================
+        private void DrawDungeonDataGrid()
+        {
+            GUILayout.BeginHorizontal("box");
+            GUILayout.Label("Asset Name", EditorStyles.boldLabel, GUILayout.Width(150));
+            GUILayout.Label("Dungeon ID", EditorStyles.boldLabel, GUILayout.Width(80));
+            GUILayout.Label("Dungeon Name", EditorStyles.boldLabel, GUILayout.Width(200));
+            GUILayout.Label("Events (Items)", EditorStyles.boldLabel, GUILayout.Width(100)); // List count only mapping
+            GUILayout.EndHorizontal();
+
+            foreach (var so in dungeons)
+            {
+                if (so == null) continue;
+
+                EditorGUI.BeginChangeCheck();
+                GUILayout.BeginHorizontal();
+
+                if (GUILayout.Button(so.name, EditorStyles.label, GUILayout.Width(150)))
+                {
+                    Selection.activeObject = so;
+                }
+
+                so.dungeonId = EditorGUILayout.IntField(so.dungeonId, GUILayout.Width(80));
+                so.dungeonName = EditorGUILayout.TextField(so.dungeonName, GUILayout.Width(200));
+                
+                // Show count of events
+                int eventCount = so.eventPool != null ? so.eventPool.Count : 0;
+                GUILayout.Label($"({eventCount} Events)", GUILayout.Width(100));
+
+                GUILayout.EndHorizontal();
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EditorUtility.SetDirty(so);
+                }
+            }
+        }
+        
+        // ===========================================
+        // Dungeon Events Grid
         // ===========================================
         private void DrawDungeonEventsGrid()
         {
@@ -178,7 +228,93 @@ namespace ProjectWI.Editor
         }
 
         // ===========================================
-        // [2] Monster Data Grid
+        // Job Data Grid
+        // ===========================================
+        private void DrawJobsGrid()
+        {
+            GUILayout.BeginHorizontal("box");
+            GUILayout.Label("Asset Name", EditorStyles.boldLabel, GUILayout.Width(150));
+            GUILayout.Label("ID", EditorStyles.boldLabel, GUILayout.Width(80));
+            GUILayout.Label("Job Name", EditorStyles.boldLabel, GUILayout.Width(120));
+            GUILayout.Label("Description", EditorStyles.boldLabel, GUILayout.Width(250));
+            GUILayout.Label("Base HP", EditorStyles.boldLabel, GUILayout.Width(60));
+            GUILayout.Label("Speed", EditorStyles.boldLabel, GUILayout.Width(60));
+            GUILayout.Label("Atk", EditorStyles.boldLabel, GUILayout.Width(60));
+            GUILayout.EndHorizontal();
+
+            foreach (var so in jobs)
+            {
+                if (so == null) continue;
+
+                EditorGUI.BeginChangeCheck();
+                GUILayout.BeginHorizontal();
+
+                if (GUILayout.Button(so.name, EditorStyles.label, GUILayout.Width(150)))
+                {
+                    Selection.activeObject = so;
+                }
+
+                so.id = EditorGUILayout.TextField(so.id, GUILayout.Width(80));
+                so.jobName = EditorGUILayout.TextField(so.jobName, GUILayout.Width(120));
+                so.description = EditorGUILayout.TextField(so.description, GUILayout.Width(250));
+                so.baseHp = EditorGUILayout.FloatField(so.baseHp, GUILayout.Width(60));
+                so.baseSpeed = EditorGUILayout.FloatField(so.baseSpeed, GUILayout.Width(60));
+                so.baseAttack = EditorGUILayout.FloatField(so.baseAttack, GUILayout.Width(60));
+
+                GUILayout.EndHorizontal();
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EditorUtility.SetDirty(so);
+                }
+            }
+        }
+
+        // ===========================================
+        // Skill Data Grid
+        // ===========================================
+        private void DrawSkillsGrid()
+        {
+            GUILayout.BeginHorizontal("box");
+            GUILayout.Label("Asset Name", EditorStyles.boldLabel, GUILayout.Width(150));
+            GUILayout.Label("ID", EditorStyles.boldLabel, GUILayout.Width(80));
+            GUILayout.Label("Skill Name", EditorStyles.boldLabel, GUILayout.Width(120));
+            GUILayout.Label("Description", EditorStyles.boldLabel, GUILayout.Width(200));
+            GUILayout.Label("Cooldown", EditorStyles.boldLabel, GUILayout.Width(70));
+            GUILayout.Label("Multiplier", EditorStyles.boldLabel, GUILayout.Width(70));
+            GUILayout.Label("Mana Cost", EditorStyles.boldLabel, GUILayout.Width(70));
+            GUILayout.EndHorizontal();
+
+            foreach (var so in skills)
+            {
+                if (so == null) continue;
+
+                EditorGUI.BeginChangeCheck();
+                GUILayout.BeginHorizontal();
+
+                if (GUILayout.Button(so.name, EditorStyles.label, GUILayout.Width(150)))
+                {
+                    Selection.activeObject = so;
+                }
+
+                so.id = EditorGUILayout.TextField(so.id, GUILayout.Width(80));
+                so.skillName = EditorGUILayout.TextField(so.skillName, GUILayout.Width(120));
+                so.description = EditorGUILayout.TextField(so.description, GUILayout.Width(200));
+                so.cooldown = EditorGUILayout.FloatField(so.cooldown, GUILayout.Width(70));
+                so.damageMultiplier = EditorGUILayout.FloatField(so.damageMultiplier, GUILayout.Width(70));
+                so.manaCost = EditorGUILayout.IntField(so.manaCost, GUILayout.Width(70));
+
+                GUILayout.EndHorizontal();
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EditorUtility.SetDirty(so);
+                }
+            }
+        }
+        
+        // ===========================================
+        // Monster Data Grid
         // ===========================================
         private void DrawMonstersGrid()
         {
@@ -222,161 +358,11 @@ namespace ProjectWI.Editor
             }
         }
 
-        // ===========================================
-        // [3] Job Data Grid
-        // ===========================================
-        private void DrawJobsGrid()
-        {
-            GUILayout.BeginHorizontal("box");
-            GUILayout.Label("Asset Name", EditorStyles.boldLabel, GUILayout.Width(150));
-            GUILayout.Label("ID", EditorStyles.boldLabel, GUILayout.Width(80));
-            GUILayout.Label("Job Name", EditorStyles.boldLabel, GUILayout.Width(120));
-            GUILayout.Label("Description", EditorStyles.boldLabel, GUILayout.Width(250));
-            GUILayout.Label("Base HP", EditorStyles.boldLabel, GUILayout.Width(60));
-            GUILayout.Label("Speed", EditorStyles.boldLabel, GUILayout.Width(60));
-            GUILayout.Label("Atk", EditorStyles.boldLabel, GUILayout.Width(60));
-            GUILayout.EndHorizontal();
-
-            foreach (var so in jobs)
-            {
-                if (so == null) continue;
-
-                EditorGUI.BeginChangeCheck();
-                GUILayout.BeginHorizontal();
-
-                if (GUILayout.Button(so.name, EditorStyles.label, GUILayout.Width(150)))
-                {
-                    Selection.activeObject = so;
-                }
-
-                so.id = EditorGUILayout.TextField(so.id, GUILayout.Width(80));
-                so.jobName = EditorGUILayout.TextField(so.jobName, GUILayout.Width(120));
-                so.description = EditorGUILayout.TextField(so.description, GUILayout.Width(250));
-                so.baseHp = EditorGUILayout.FloatField(so.baseHp, GUILayout.Width(60));
-                so.baseSpeed = EditorGUILayout.FloatField(so.baseSpeed, GUILayout.Width(60));
-                so.baseAttack = EditorGUILayout.FloatField(so.baseAttack, GUILayout.Width(60));
-
-                GUILayout.EndHorizontal();
-
-                if (EditorGUI.EndChangeCheck())
-                {
-                    EditorUtility.SetDirty(so);
-                }
-            }
-        }
-
-        // ===========================================
-        // [4] Dungeon Data Grid
-        // ===========================================
-        private void DrawDungeonDataGrid()
-        {
-            GUILayout.BeginHorizontal("box");
-            GUILayout.Label("Asset Name", EditorStyles.boldLabel, GUILayout.Width(150));
-            GUILayout.Label("Dungeon ID", EditorStyles.boldLabel, GUILayout.Width(80));
-            GUILayout.Label("Dungeon Name", EditorStyles.boldLabel, GUILayout.Width(200));
-            GUILayout.Label("Events (Items)", EditorStyles.boldLabel, GUILayout.Width(100)); // List count only mapping
-            GUILayout.EndHorizontal();
-
-            foreach (var so in dungeons)
-            {
-                if (so == null) continue;
-
-                EditorGUI.BeginChangeCheck();
-                GUILayout.BeginHorizontal();
-
-                if (GUILayout.Button(so.name, EditorStyles.label, GUILayout.Width(150)))
-                {
-                    Selection.activeObject = so;
-                }
-
-                so.dungeonId = EditorGUILayout.IntField(so.dungeonId, GUILayout.Width(80));
-                so.dungeonName = EditorGUILayout.TextField(so.dungeonName, GUILayout.Width(200));
-                
-                // Show count of events
-                int eventCount = so.eventPool != null ? so.eventPool.Count : 0;
-                GUILayout.Label($"({eventCount} Events)", GUILayout.Width(100));
-
-                GUILayout.EndHorizontal();
-
-                if (EditorGUI.EndChangeCheck())
-                {
-                    EditorUtility.SetDirty(so);
-                }
-            }
-        }
-
-        // ===========================================
-        // [5] Skill Data Grid
-        // ===========================================
-        private void DrawSkillsGrid()
-        {
-            GUILayout.BeginHorizontal("box");
-            GUILayout.Label("Asset Name", EditorStyles.boldLabel, GUILayout.Width(150));
-            GUILayout.Label("ID", EditorStyles.boldLabel, GUILayout.Width(80));
-            GUILayout.Label("Skill Name", EditorStyles.boldLabel, GUILayout.Width(120));
-            GUILayout.Label("Description", EditorStyles.boldLabel, GUILayout.Width(200));
-            GUILayout.Label("Cooldown", EditorStyles.boldLabel, GUILayout.Width(70));
-            GUILayout.Label("Multiplier", EditorStyles.boldLabel, GUILayout.Width(70));
-            GUILayout.Label("Mana Cost", EditorStyles.boldLabel, GUILayout.Width(70));
-            GUILayout.EndHorizontal();
-
-            foreach (var so in skills)
-            {
-                if (so == null) continue;
-
-                EditorGUI.BeginChangeCheck();
-                GUILayout.BeginHorizontal();
-
-                if (GUILayout.Button(so.name, EditorStyles.label, GUILayout.Width(150)))
-                {
-                    Selection.activeObject = so;
-                }
-
-                so.id = EditorGUILayout.TextField(so.id, GUILayout.Width(80));
-                so.skillName = EditorGUILayout.TextField(so.skillName, GUILayout.Width(120));
-                so.description = EditorGUILayout.TextField(so.description, GUILayout.Width(200));
-                so.cooldown = EditorGUILayout.FloatField(so.cooldown, GUILayout.Width(70));
-                so.damageMultiplier = EditorGUILayout.FloatField(so.damageMultiplier, GUILayout.Width(70));
-                so.manaCost = EditorGUILayout.IntField(so.manaCost, GUILayout.Width(70));
-
-                GUILayout.EndHorizontal();
-
-                if (EditorGUI.EndChangeCheck())
-                {
-                    EditorUtility.SetDirty(so);
-                }
-            }
-        }
-
-        private void CreateDummyData(int tabIndex)
+        private void CreateDummyData(WIDataType dataType)
         {
             string timeStamp = System.DateTime.Now.ToString("HHmmss");
             
-            if (tabIndex == 0)
-            {
-                string path = $"Assets/Data/ScriptableObject/Events/DummyEvent_{timeStamp}.asset";
-                EnsureFolderExists("Assets/Data/ScriptableObject/Events");
-                var so = CreateInstance<WIDungeonEventSO>();
-                so.id = "E_DUMMY";
-                AssetDatabase.CreateAsset(so, path);
-            }
-            else if (tabIndex == 1)
-            {
-                string path = $"Assets/Data/ScriptableObject/Monsters/DummyMonster_{timeStamp}.asset";
-                EnsureFolderExists("Assets/Data/ScriptableObject/Monsters");
-                var so = CreateInstance<WIMonsterDataSO>();
-                so.id = "M_DUMMY";
-                AssetDatabase.CreateAsset(so, path);
-            }
-            else if (tabIndex == 2)
-            {
-                string path = $"Assets/Data/ScriptableObject/Jobs/DummyJob_{timeStamp}.asset";
-                EnsureFolderExists("Assets/Data/ScriptableObject/Jobs");
-                var so = CreateInstance<WIJobDataSO>();
-                so.id = "J_DUMMY";
-                AssetDatabase.CreateAsset(so, path);
-            }
-            else if (tabIndex == 3)
+            if (dataType == WIDataType.Dungeon)
             {
                 string path = $"Assets/Data/ScriptableObject/Dungeons/DummyDungeon_{timeStamp}.asset";
                 EnsureFolderExists("Assets/Data/ScriptableObject/Dungeons");
@@ -385,12 +371,36 @@ namespace ProjectWI.Editor
                 so.dungeonName = "Dummy Dungeon";
                 AssetDatabase.CreateAsset(so, path);
             }
-            else if (tabIndex == 4)
+            else if (dataType == WIDataType.DungeonEvent)
+            {
+                string path = $"Assets/Data/ScriptableObject/Events/DummyEvent_{timeStamp}.asset";
+                EnsureFolderExists("Assets/Data/ScriptableObject/Events");
+                var so = CreateInstance<WIDungeonEventSO>();
+                so.id = "E_DUMMY";
+                AssetDatabase.CreateAsset(so, path);
+            }
+            else if (dataType == WIDataType.Job)
+            {
+                string path = $"Assets/Data/ScriptableObject/Jobs/DummyJob_{timeStamp}.asset";
+                EnsureFolderExists("Assets/Data/ScriptableObject/Jobs");
+                var so = CreateInstance<WIJobDataSO>();
+                so.id = "J_DUMMY";
+                AssetDatabase.CreateAsset(so, path);
+            }
+            else if (dataType == WIDataType.Skill)
             {
                 string path = $"Assets/Data/ScriptableObject/Skills/DummySkill_{timeStamp}.asset";
                 EnsureFolderExists("Assets/Data/ScriptableObject/Skills");
                 var so = CreateInstance<WISkillDataSO>();
                 so.id = "S_DUMMY";
+                AssetDatabase.CreateAsset(so, path);
+            }
+            else if (dataType == WIDataType.Monster)
+            {
+                string path = $"Assets/Data/ScriptableObject/Monsters/DummyMonster_{timeStamp}.asset";
+                EnsureFolderExists("Assets/Data/ScriptableObject/Monsters");
+                var so = CreateInstance<WIMonsterDataSO>();
+                so.id = "M_DUMMY";
                 AssetDatabase.CreateAsset(so, path);
             }
             

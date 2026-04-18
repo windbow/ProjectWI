@@ -21,8 +21,6 @@ namespace ProjectWI.SubSystem
         [Header("Gauges")]
         /// <summary>탐험 진척도 또는 전투 턴 대기시간을 표시할 게이지 슬라이더</summary>
         public Slider advGauge;
-        /// <summary>(현재 단일 게이지 구조로 미사용) 적군용 게이지 슬라이더</summary>
-        public Slider monGauge;
 
         [Header("Logs")]
         /// <summary>로그 텍스트들이 세로로 쌓일 뷰포트 내 Content 레이아웃</summary>
@@ -247,11 +245,6 @@ namespace ProjectWI.SubSystem
             if (advGauge != null)
             {
                 advGauge.value = boundSession.GetExploreProgressRatio();
-            }
-
-            if (monGauge != null && monGauge.gameObject.activeSelf)
-            {
-                monGauge.gameObject.SetActive(false);
             }
         }
 

@@ -12,6 +12,7 @@ namespace ProjectWI.SubSystem
         
         /// <summary>현재 전투에 참여 중인 아군(모험가) 캐릭터 목록</summary>
         public List<WICharacterBase> Adventurers { get; private set; } = new List<WICharacterBase>();
+        
         /// <summary>현재 전투에 참여 중인 적군(몬스터) 캐릭터 목록</summary>
         public List<WICharacterBase> Monsters { get; private set; } = new List<WICharacterBase>();
         
@@ -20,17 +21,22 @@ namespace ProjectWI.SubSystem
         
         /// <summary>다음 행동이 발생하기까지 차오르고 있는 공용 턴 대기 타이머</summary>
         public float TurnWaitTimer = 0f;
+        
         /// <summary>게이지가 100%가 되기 위해 필요한 고정 목표 시간 (기본값 1초)</summary>
         public float TurnWaitTimeMax = 1.0f; 
         
+        /// <summary>캐릭터가 행동하기 위해 필요한 최소 행동력 수치 (기본값 100)</summary>
+        public const float ActionValueThreshold = 100f;
+        
         /// <summary>전투 로그가 추가될 때 UI 구독자들에게 알리는 델리게이트 이벤트</summary>
         public Action<string> OnLogAdded;
+        
         /// <summary>매 틱마다 행동력 갱신 후 발생하는 이벤트 (행동력 바 갱신용)</summary>
         public Action OnBattleTick;
+        
         /// <summary>UI를 나갔다가 들어와도 볼 수 있도록 보관해두는 전투 로그 히스토리 리스트</summary>
         private List<string> battleLogs = new List<string>();
         
-
 
         /// <summary>모험가 전멸 또는 몬스터 전멸로 인해 현재 몬스터 웨이브와의 전투가 끝났음을 나타내는 플래그</summary>
         public bool IsBattleEnded { get; private set; } = false;
@@ -132,7 +138,7 @@ namespace ProjectWI.SubSystem
         /// </summary>
         public float GetActionValueRatio(WICharacterBase character)
         {
-            if (false == ActionValues.ContainsKey(character))
+            if (ActionValues.ContainsKey(character) == false)
             {
                 return 0f;
             }
@@ -144,8 +150,8 @@ namespace ProjectWI.SubSystem
                 return 0f; // 사망 처리된 캐릭터
             }
 
-            float normalizedMax = Mathf.Max(character.Speed * TurnWaitTimeMax * 5f, 1f);
-            return Mathf.Clamp01(value / normalizedMax);
+            // 모든 캐릭터가 동일한 Threshold(100)를 기준으로 게이지가 표시되도록 수정
+            return Mathf.Clamp01(value / ActionValueThreshold);
         }
         
         /// <summary>
@@ -154,10 +160,17 @@ namespace ProjectWI.SubSystem
         /// </summary>
         public void Tick(float deltaTime)
         {
-            // 공용 턴 게이지 상승
-            TurnWaitTimer += deltaTime;
+            // 1. 공용 턴 게이지 상승 (최대치까지만 차오름)
+            if (TurnWaitTimer < TurnWaitTimeMax)
+            {
+                TurnWaitTimer += deltaTime;
+                if (TurnWaitTimer > TurnWaitTimeMax)
+                {
+                    TurnWaitTimer = TurnWaitTimeMax;
+                }
+            }
             
-            // 게이지가 오르는 동안 각 캐릭터는 스피드에 맞춰 행동력 누적
+            // 2. 캐릭터들은 상태와 상관없이 스피드에 맞춰 행동력(ActionValue) 누적
             foreach (var key in ActionValues.Keys.ToList())
             {
                 if (key.CurrentHp > 0)
@@ -172,28 +185,33 @@ namespace ProjectWI.SubSystem
                 OnBattleTick.Invoke();
             }
 
-            // 게이지가 100%(TurnWaitTimeMax)에 도달하면 무조건 1명 행동!
+            // 3. 게이지가 가득 찼을(TurnWaitTimeMax) 때만 행동 여부 판단
             if (TurnWaitTimer >= TurnWaitTimeMax)
             {
-                TurnWaitTimer = 0f; // 즉시 0으로 떨어뜨리고 다시 차오르게 함
-
                 WICharacterBase actingCharacter = null;
                 float highestAv = -1f;
 
-                // 살아있는 대상 중 가장 행동력이 높은 1인 색출
+                // 살아있는 대상 중 행동력이 Threshold 이상이면서 가장 높은 1인 색출
                 foreach (var kvp in ActionValues)
                 {
-                    if (kvp.Key.CurrentHp > 0 && kvp.Value > highestAv)
+                    if (kvp.Key.CurrentHp > 0 && kvp.Value >= ActionValueThreshold)
                     {
-                        highestAv = kvp.Value;
-                        actingCharacter = kvp.Key;
+                        if (kvp.Value > highestAv)
+                        {
+                            highestAv = kvp.Value;
+                            actingCharacter = kvp.Key;
+                        }
                     }
                 }
 
-                // 선정된 단 1명만 공격 실행
+                // 4. 행동 가능한 캐릭터가 있을 경우에만 행동을 수행하고 게이지를 리셋
                 if (actingCharacter != null)
                 {
-                    ActionValues[actingCharacter] = 0f; // 행동력 소모
+                    // 게이지 리셋 (다시 0부터 차오르기 시작함)
+                    TurnWaitTimer = 0f;
+                    
+                    // 해당 캐릭터의 행동력 소모
+                    ActionValues[actingCharacter] = 0f; 
                     
                     WICharacterBase target = GetAutoTarget(actingCharacter);
                     if (target != null)
@@ -202,6 +220,7 @@ namespace ProjectWI.SubSystem
                         CheckDead();
                     }
                 }
+                // 행동 가능한 캐릭터가 없다면 TurnWaitTimer는 Max 상태를 유지하며 행동력이 찰 때까지 대기
             }
         }
 

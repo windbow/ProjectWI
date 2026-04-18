@@ -10,7 +10,7 @@ namespace ProjectWI.Data
         MonsterEncounter
     }
 
-    [CreateAssetMenu(fileName = "NewDungeonEvent", menuName = "WI/Dungeon/Dungeon Event", order = 1)]
+    [CreateAssetMenu(fileName = "NewDungeonEvent", menuName = "WIData/DungeonEventData", order = 1)]
     public class WIDungeonEventSO : ScriptableObject
     {
         [Header("Event Settings")]

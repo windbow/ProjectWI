@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ProjectWI.Data
 {
-    [CreateAssetMenu(fileName = "NewMonsterData", menuName = "WI Data/Monster Data")]
+    [CreateAssetMenu(fileName = "NewMonsterData", menuName = "WIData/MonsterData", order = 1)]
     public class WIMonsterDataSO : ScriptableObject
     {
         public string id;
