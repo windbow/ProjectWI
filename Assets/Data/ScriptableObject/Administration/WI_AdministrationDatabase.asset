@@ -1,0 +1,3281 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073e6fb2e70dc0c49a88575d9785bffa, type: 3}
+  m_Name: WI_AdministrationDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Administration.WIAdministrationDatabaseSO
+  useEnglish: 0
+  gameTitle:
+    uid: UI_GAME_TITLE
+    korean: "ProjectWI \uB0B4\uC815"
+    english: ProjectWI Administration
+  globalMapImage: {fileID: -2760775103018455177, guid: b8d5cb0d5422061459fcf32820cbbdf7, type: 3}
+  uiStrings:
+  - uid: UI_EMPTY_HERO
+    korean: "\uBE48 \uC601\uC6C5 \uC2AC\uB86F"
+    english: Empty Hero Slot
+  - uid: UI_EMPTY_BUILDING
+    korean: "\uBE48 \uC2DC\uC124 \uC2AC\uB86F"
+    english: Empty Facility Slot
+  - uid: UI_BUILD
+    korean: "\uC2DC\uC124 \uAC74\uC124"
+    english: Build Facility
+  - uid: UI_MARCH
+    korean: "\uC9C4\uACA9 / \uCD9C\uC815"
+    english: March
+  - uid: UI_ASSIGN_HERO
+    korean: "\uC601\uC6C5 \uBC30\uCE58"
+    english: Assign Hero
+  - uid: UI_TAVERN
+    korean: "\uC120\uC220\uC9D1 \uBC29\uBB38"
+    english: Visit Tavern
+  - uid: UI_RECRUIT
+    korean: "\uB4F1\uC6A9\uD558\uAE30"
+    english: Recruit
+  - uid: UI_ALL_HEROES
+    korean: "\uC804\uCCB4 \uC601\uC6C5 \uBAA9\uB85D"
+    english: All Heroes
+  - uid: UI_CLOSE
+    korean: "\uB2EB\uAE30"
+    english: Close
+  - uid: UI_PORTRAIT_PLACEHOLDER
+    korean: "\uCD08\uC0C1\uD654 \uC774\uBBF8\uC9C0 \uC2AC\uB86F"
+    english: Portrait Placeholder
+  - uid: UI_TURN_PROCESSING
+    korean: "\uD134 \uC5F0\uC0B0 \uC911..."
+    english: Processing Turn...
+  - uid: UI_TURN_SUMMARY
+    korean: "\uD134 \uACB0\uACFC \uC694\uC57D"
+    english: Turn Summary
+  - uid: UI_NO_BUILDING_SLOT
+    korean: "\uBE48 \uC2DC\uC124 \uC2AC\uB86F\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+    english: No empty facility slot.
+  - uid: UI_NOT_ENOUGH_RESOURCE
+    korean: "\uC790\uC6D0\uC774 \uBD80\uC871\uD569\uB2C8\uB2E4."
+    english: Not enough resources.
+  - uid: UI_NO_MARCH_TARGET
+    korean: "\uC778\uC811\uD55C \uC801 \uC131\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+    english: No adjacent enemy castle.
+  - uid: UI_BATTLE_HANDOFF
+    korean: "\uC804\uD22C \uC2DC\uC2A4\uD15C \uC5F0\uACB0 \uC9C0\uC810\uC785\uB2C8\uB2E4."
+    english: Battle handoff point.
+  - uid: UI_NO_IDLE_HERO
+    korean: "\uBC30\uCE58 \uAC00\uB2A5\uD55C \uB300\uAE30 \uC601\uC6C5\uC774 \uC5C6\uC2B5\uB2C8\uB2E4."
+    english: No idle hero available.
+  - uid: UI_RESEARCH_COMING
+    korean: "\uAE30\uC220/\uB9C8\uBC95 \uC5F0\uAD6C\uB294 \uB2E4\uC74C \uB2E8\uACC4\uC5D0\uC11C
+      \uC5F0\uACB0\uB429\uB2C8\uB2E4."
+    english: Research next phase.
+  - uid: UI_FACTION_COMING
+    korean: "\uC138\uB825 \uC815\uBCF4\uB294 \uB2E4\uC74C \uB2E8\uACC4\uC5D0\uC11C
+      \uC5F0\uACB0\uB429\uB2C8\uB2E4."
+    english: Faction details next phase.
+  - uid: UI_PROJECT_ALREADY_ASSIGNED
+    korean: "\uC774\uBBF8 \uC774\uBC88 \uB2EC \uC911\uC810 \uC0AC\uC5C5\uC774 \uC9C0\uC815\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+    english: A focus project is already assigned this month.
+  - uid: UI_NO_PROJECT_MANAGER
+    korean: "\uC774 \uC131\uC5D0 \uC0AC\uC5C5\uC744 \uB9E1\uAE38 \uC8FC\uB454 \uC778\uBB3C\uC774
+      \uC5C6\uC2B5\uB2C8\uB2E4."
+    english: No stationed character can manage this project.
+  - uid: UI_NO_MANAGER
+    korean: "\uB2F4\uB2F9\uC790 \uC5C6\uC74C"
+    english: No manager
+  factions:
+  - id: avalon
+    displayName:
+      uid: FACTION_AVALON
+      korean: "\uC544\uBC1C\uB860 \uBC31\uC791\uAD6D"
+      english: Avalon County
+    color: {r: 0.17, g: 0.48, b: 0.76, a: 1}
+    emblem: {fileID: 21300000, guid: a1111111111111111111111111111111, type: 3}
+    playerFaction: 1
+    aiStrategy: 0
+    startingGold: 1200
+    startingManaCrystal: 300
+    startingInfluence: 100
+  - id: valdor
+    displayName:
+      uid: FACTION_VALDOR
+      korean: "\uBC1C\uB3C4\uB974 \uAD70\uC0AC \uC81C\uAD6D"
+      english: Valdor Empire
+    color: {r: 0.72, g: 0.18, b: 0.16, a: 1}
+    emblem: {fileID: 21300000, guid: b2222222222222222222222222222222, type: 3}
+    playerFaction: 0
+    aiStrategy: 3
+    startingGold: 1200
+    startingManaCrystal: 300
+    startingInfluence: 100
+  - id: ironheart
+    displayName:
+      uid: FACTION_IRONHEART
+      korean: "\uCCA0\uBCBD\uC758 \uC5F0\uB9F9 \uC544\uC774\uC5B8\uD558\uD2B8"
+      english: Ironheart Alliance
+    color: {r: 0.62, g: 0.43, b: 0.2, a: 1}
+    emblem: {fileID: 21300000, guid: c3333333333333333333333333333333, type: 3}
+    playerFaction: 0
+    aiStrategy: 2
+    startingGold: 1200
+    startingManaCrystal: 300
+    startingInfluence: 100
+  - id: sylvanroad
+    displayName:
+      uid: FACTION_SYLVANROAD
+      korean: "\uC138\uACC4\uC218 \uC758\uD68C \uC2E4\uBC18\uB85C\uB4DC"
+      english: Sylvanroad Council
+    color: {r: 0.18, g: 0.58, b: 0.3, a: 1}
+    emblem: {fileID: 21300000, guid: d4444444444444444444444444444444, type: 3}
+    playerFaction: 0
+    aiStrategy: 1
+    startingGold: 1200
+    startingManaCrystal: 300
+    startingInfluence: 100
+  - id: necropolis
+    displayName:
+      uid: FACTION_NECROPOLIS
+      korean: "\uD669\uD63C\uC758 \uC758\uC2DD \uB124\uD06C\uB85C\uD3F4\uB9AC\uC2A4"
+      english: Necropolis
+    color: {r: 0.43, g: 0.24, b: 0.58, a: 1}
+    emblem: {fileID: 21300000, guid: e5555555555555555555555555555555, type: 3}
+    playerFaction: 0
+    aiStrategy: 4
+    startingGold: 1200
+    startingManaCrystal: 300
+    startingInfluence: 100
+  castles:
+  - id: castle_00
+    displayName:
+      uid: CASTLE_00
+      korean: "\uC544\uBC1C\uB860"
+      english: Avalon
+    castleSize: 1
+    factionId: avalon
+    terrainTrait:
+      uid: CASTLE_00_TERRAIN
+      korean: "\uC11C\uBD80 \uBCC4\uBE5B \uD638\uBC18 \xB7 \uC218\uB3C4"
+      english: "Western Starlit Lakeshore \xB7 Capital"
+    specialty:
+      uid: CASTLE_00_SPECIALTY
+      korean: "\uBCC4\uBE5B \uD638\uC218 \xB7 \uBAA8\uB4E0 \uC0AC\uC5C5\uC758 \uCD5C\uC18C
+        \uC131\uACF5\uB960\uC774 \uBCF4\uC7A5\uB418\uBA70 \uC601\uC6C5 \uBC29\uBB38
+        \uC0AC\uAC74\uC774 \uC790\uC8FC \uBC1C\uC0DD"
+      english: "\uBCC4\uBE5B \uD638\uC218 \xB7 \uBAA8\uB4E0 \uC0AC\uC5C5\uC758 \uCD5C\uC18C
+        \uC131\uACF5\uB960\uC774 \uBCF4\uC7A5\uB418\uBA70 \uC601\uC6C5 \uBC29\uBB38
+        \uC0AC\uAC74\uC774 \uC790\uC8FC \uBC1C\uC0DD"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.18, y: 0.48}
+    adjacentCastleIds:
+    - castle_01
+    - castle_38
+    initialProsperity: 45
+    initialTechnology: 35
+    initialStability: 50
+    initialDefense: 40
+    castleImage: {fileID: 21300000, guid: 59f703bc2ae8dcb4a927014affb3741e, type: 3}
+  - id: castle_01
+    displayName:
+      uid: CASTLE_01
+      korean: "\uBC1C\uB3C4\uB974"
+      english: Valdor
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_01_TERRAIN
+      korean: "\uC81C\uAD6D \uBD81\uBD80 \uAD6C\uB989 \xB7 \uC218\uB3C4"
+      english: "Northern Imperial Highlands \xB7 Capital"
+    specialty:
+      uid: CASTLE_01_SPECIALTY
+      korean: "\uD669\uAE08 \uC625\uC88C \xB7 \uC601\uD5A5\uB825 \uC218\uC785\uACFC
+        \uAE30\uC0AC \uACC4\uC5F4 \uC778\uC7AC\uC758 \uACF5\uC801 \uD68D\uB4DD \uC99D\uAC00"
+      english: "\uD669\uAE08 \uC625\uC88C \xB7 \uC601\uD5A5\uB825 \uC218\uC785\uACFC
+        \uAE30\uC0AC \uACC4\uC5F4 \uC778\uC7AC\uC758 \uACF5\uC801 \uD68D\uB4DD \uC99D\uAC00"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.27, y: 0.43}
+    adjacentCastleIds:
+    - castle_00
+    - castle_02
+    - castle_10
+    - castle_11
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: e3b96ba3388b90b439ce0006a86ad983, type: 3}
+  - id: castle_02
+    displayName:
+      uid: CASTLE_02
+      korean: "\uC194\uAC00\uB4DC"
+      english: Solgard
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_02_TERRAIN
+      korean: "\uC81C\uAD6D \uBD81\uBD80 \uAD6C\uB989 \xB7 \uC694\uC0C8"
+      english: "Northern Imperial Highlands \xB7 Fortress"
+    specialty:
+      uid: CASTLE_02_SPECIALTY
+      korean: "\uD0DC\uC591 \uC131\uBCBD \xB7 \uC8FC\uAC04 \uC804\uD22C\uC640 \uC131\uCC44
+        \uC815\uBE44\uC5D0 \uC720\uB9AC"
+      english: "\uD0DC\uC591 \uC131\uBCBD \xB7 \uC8FC\uAC04 \uC804\uD22C\uC640 \uC131\uCC44
+        \uC815\uBE44\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.36, y: 0.38}
+    adjacentCastleIds:
+    - castle_01
+    - castle_03
+    - castle_11
+    - castle_12
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_03
+    displayName:
+      uid: CASTLE_03
+      korean: "\uB808\uC624\uB2C8\uC2A4"
+      english: Leonis
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_03_TERRAIN
+      korean: "\uC81C\uAD6D \uBD81\uBD80 \uAD6C\uB989 \xB7 \uB3C4\uC2DC"
+      english: "Northern Imperial Highlands \xB7 City"
+    specialty:
+      uid: CASTLE_03_SPECIALTY
+      korean: "\uC0AC\uC790 \uB300\uAD11\uC7A5 \xB7 \uC120\uC220\uC9D1 \uC758\uB8B0\uC640
+        \uC778\uAC04 \uC601\uC6C5 \uBC29\uBB38 \uC99D\uAC00"
+      english: "\uC0AC\uC790 \uB300\uAD11\uC7A5 \xB7 \uC120\uC220\uC9D1 \uC758\uB8B0\uC640
+        \uC778\uAC04 \uC601\uC6C5 \uBC29\uBB38 \uC99D\uAC00"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.46, y: 0.34}
+    adjacentCastleIds:
+    - castle_02
+    - castle_12
+    - castle_29
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 7a3c8038ca1f25b4a8dab9dafd96f641, type: 3}
+  - id: castle_04
+    displayName:
+      uid: CASTLE_04
+      korean: "\uCE74\uB974\uB514\uC544"
+      english: Cardia
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_04_TERRAIN
+      korean: "\uC81C\uAD6D \uBD81\uBD80 \uAD6C\uB989 \xB7 \uB3C4\uC2DC"
+      english: "Northern Imperial Highlands \xB7 City"
+    specialty:
+      uid: CASTLE_04_SPECIALTY
+      korean: "\uD669\uAE08 \uACE1\uCC3D \xB7 \uC601\uC9C0 \uC9C4\uD765 \uC2DC \uBCF4\uAE09
+        \uC0C1\uD0DC\uB3C4 \uD568\uAED8 \uAC1C\uC120"
+      english: "\uD669\uAE08 \uACE1\uCC3D \xB7 \uC601\uC9C0 \uC9C4\uD765 \uC2DC \uBCF4\uAE09
+        \uC0C1\uD0DC\uB3C4 \uD568\uAED8 \uAC1C\uC120"
+    specialtyEffectType: 1
+    specialtyProjectType: 0
+    specialtyEffectValue: 12
+    normalizedMapPosition: {x: 0.57, y: 0.32}
+    adjacentCastleIds:
+    - castle_05
+    - castle_13
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_05
+    displayName:
+      uid: CASTLE_05
+      korean: "\uBE0C\uB780\uD2B8"
+      english: Brandt
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_05_TERRAIN
+      korean: "\uC81C\uAD6D \uBD81\uBD80 \uAD6C\uB989 \xB7 \uC694\uC0C8"
+      english: "Northern Imperial Highlands \xB7 Fortress"
+    specialty:
+      uid: CASTLE_05_SPECIALTY
+      korean: "\uAC80\uC740 \uCCA0\uBB38 \xB7 \uADFC\uC811 \uC7A5\uBE44 \uC81C\uC791
+        \uBE44\uC6A9 \uAC10\uC18C"
+      english: "\uAC80\uC740 \uCCA0\uBB38 \xB7 \uADFC\uC811 \uC7A5\uBE44 \uC81C\uC791
+        \uBE44\uC6A9 \uAC10\uC18C"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.68, y: 0.31}
+    adjacentCastleIds:
+    - castle_04
+    - castle_06
+    - castle_14
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_06
+    displayName:
+      uid: CASTLE_06
+      korean: "\uC544\uB974\uCF04"
+      english: Arken
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_06_TERRAIN
+      korean: "\uC81C\uAD6D \uBD81\uBD80 \uAD6C\uB989 \xB7 \uB9C8\uB3C4\uC131"
+      english: "Northern Imperial Highlands \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_06_SPECIALTY
+      korean: "\uC81C\uAD6D \uB9C8\uB3C4\uC6D0 \xB7 \uC778\uAC04 \uB9C8\uBC95\uC0AC
+        \uD6C8\uB828\uACFC \uB9C8\uB098 \uC815\uC81C\uC5D0 \uC720\uB9AC"
+      english: "\uC81C\uAD6D \uB9C8\uB3C4\uC6D0 \xB7 \uC778\uAC04 \uB9C8\uBC95\uC0AC
+        \uD6C8\uB828\uACFC \uB9C8\uB098 \uC815\uC81C\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.78, y: 0.33}
+    adjacentCastleIds:
+    - castle_05
+    - castle_07
+    - castle_15
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 7a3c8038ca1f25b4a8dab9dafd96f641, type: 3}
+  - id: castle_07
+    displayName:
+      uid: CASTLE_07
+      korean: "\uB85C\uC820\uD558\uC784"
+      english: Rosenheim
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_07_TERRAIN
+      korean: "\uC81C\uAD6D \uBD81\uBD80 \uAD6C\uB989 \xB7 \uB3C4\uC2DC"
+      english: "Northern Imperial Highlands \xB7 City"
+    specialty:
+      uid: CASTLE_07_SPECIALTY
+      korean: "\uC7A5\uBBF8 \uC2DC\uC7A5 \xB7 \uC120\uBB3C\uACFC \uAD50\uC5ED \uBB3C\uD488\uC758
+        \uAC00\uACA9 \uAC10\uC18C"
+      english: "\uC7A5\uBBF8 \uC2DC\uC7A5 \xB7 \uC120\uBB3C\uACFC \uAD50\uC5ED \uBB3C\uD488\uC758
+        \uAC00\uACA9 \uAC10\uC18C"
+    specialtyEffectType: 1
+    specialtyProjectType: 0
+    specialtyEffectValue: 12
+    normalizedMapPosition: {x: 0.86, y: 0.38}
+    adjacentCastleIds:
+    - castle_06
+    - castle_08
+    - castle_16
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_08
+    displayName:
+      uid: CASTLE_08
+      korean: "\uBCA8\uADF8\uB77C\uB4DC"
+      english: Belgrad
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_08_TERRAIN
+      korean: "\uC81C\uAD6D \uBD81\uBD80 \uAD6C\uB989 \xB7 \uC694\uC0C8"
+      english: "Northern Imperial Highlands \xB7 Fortress"
+    specialty:
+      uid: CASTLE_08_SPECIALTY
+      korean: "\uBC31\uC0AC\uC790 \uC131\uCC44 \xB7 \uC131 \uBC29\uC5B4\uC804 \uC2DC\uC791
+        \uC2DC \uC804\uC704\uC5D0\uAC8C \uBC29\uC5B4 \uBC84\uD504 \uBD80\uC5EC"
+      english: "\uBC31\uC0AC\uC790 \uC131\uCC44 \xB7 \uC131 \uBC29\uC5B4\uC804 \uC2DC\uC791
+        \uC2DC \uC804\uC704\uC5D0\uAC8C \uBC29\uC5B4 \uBC84\uD504 \uBD80\uC5EC"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.89, y: 0.46}
+    adjacentCastleIds:
+    - castle_07
+    - castle_09
+    - castle_16
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_09
+    displayName:
+      uid: CASTLE_09
+      korean: "\uB8E8\uBBF8\uB098"
+      english: Lumina
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_09_TERRAIN
+      korean: "\uC81C\uAD6D \uBD81\uBD80 \uAD6C\uB989 \xB7 \uC131\uC5ED"
+      english: "Northern Imperial Highlands \xB7 Sanctuary"
+    specialty:
+      uid: CASTLE_09_SPECIALTY
+      korean: "\uAD11\uBA85\uC758 \uB300\uC131\uB2F9 \xB7 \uBD80\uC0C1 \uD68C\uBCF5\uACFC
+        \uC8FC\uBBFC \uC548\uC815\uC5D0 \uC720\uB9AC"
+      english: "\uAD11\uBA85\uC758 \uB300\uC131\uB2F9 \xB7 \uBD80\uC0C1 \uD68C\uBCF5\uACFC
+        \uC8FC\uBBFC \uC548\uC815\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 0
+    specialtyProjectType: 6
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.86, y: 0.54}
+    adjacentCastleIds:
+    - castle_08
+    - castle_16
+    - castle_17
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 7a3c8038ca1f25b4a8dab9dafd96f641, type: 3}
+  - id: castle_10
+    displayName:
+      uid: CASTLE_10
+      korean: "\uC5D0\uBC84\uB780"
+      english: Everan
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_10_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uB3C4\uC2DC"
+      english: "Central Imperial Plains \xB7 City"
+    specialty:
+      uid: CASTLE_10_SPECIALTY
+      korean: "\uC655\uB3C4 \uB300\uB85C \xB7 \uC778\uC811 \uC131 \uC774\uB3D9\uACFC
+        \uC9C0\uC6D0\uC774 \uBE60\uB984"
+      english: "\uC655\uB3C4 \uB300\uB85C \xB7 \uC778\uC811 \uC131 \uC774\uB3D9\uACFC
+        \uC9C0\uC6D0\uC774 \uBE60\uB984"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.25, y: 0.52}
+    adjacentCastleIds:
+    - castle_01
+    - castle_11
+    - castle_20
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_11
+    displayName:
+      uid: CASTLE_11
+      korean: "\uADF8\uB780\uB378"
+      english: Grandel
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_11_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uB3C4\uC2DC"
+      english: "Central Imperial Plains \xB7 City"
+    specialty:
+      uid: CASTLE_11_SPECIALTY
+      korean: "\uB300\uC81C\uAD6D \uC740\uD589 \xB7 \uC6D4\uAC04 \uAE08\uD654 \uC218\uC785\uC774
+        \uB192\uC9C0\uB9CC \uC801 \uACC4\uB7B5\uC758 \uD45C\uC801\uC774 \uB418\uAE30
+        \uC26C\uC6C0"
+      english: "\uB300\uC81C\uAD6D \uC740\uD589 \xB7 \uC6D4\uAC04 \uAE08\uD654 \uC218\uC785\uC774
+        \uB192\uC9C0\uB9CC \uC801 \uACC4\uB7B5\uC758 \uD45C\uC801\uC774 \uB418\uAE30
+        \uC26C\uC6C0"
+    specialtyEffectType: 1
+    specialtyProjectType: 0
+    specialtyEffectValue: 12
+    normalizedMapPosition: {x: 0.34, y: 0.48}
+    adjacentCastleIds:
+    - castle_01
+    - castle_02
+    - castle_10
+    - castle_21
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_12
+    displayName:
+      uid: CASTLE_12
+      korean: "\uC138\uB974\uBC18"
+      english: Servan
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_12_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uC694\uC0C8"
+      english: "Central Imperial Plains \xB7 Fortress"
+    specialty:
+      uid: CASTLE_12_SPECIALTY
+      korean: "\uAD70\uB2E8 \uD6C8\uB828\uC7A5 \xB7 `[\uC77C\uBC18]`\uC758 \uD569\uB3D9
+        \uD6C8\uB828 \uD6A8\uACFC \uC99D\uAC00"
+      english: "\uAD70\uB2E8 \uD6C8\uB828\uC7A5 \xB7 `[\uC77C\uBC18]`\uC758 \uD569\uB3D9
+        \uD6C8\uB828 \uD6A8\uACFC \uC99D\uAC00"
+    specialtyEffectType: 0
+    specialtyProjectType: 5
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.44, y: 0.44}
+    adjacentCastleIds:
+    - castle_02
+    - castle_03
+    - castle_13
+    - castle_22
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 7a3c8038ca1f25b4a8dab9dafd96f641, type: 3}
+  - id: castle_13
+    displayName:
+      uid: CASTLE_13
+      korean: "\uC54C\uD14C\uC544"
+      english: Althea
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_13_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uC131\uC5ED"
+      english: "Central Imperial Plains \xB7 Sanctuary"
+    specialty:
+      uid: CASTLE_13_SPECIALTY
+      korean: "\uC21C\uB840\uC790\uC758 \uAE38 \xB7 \uB9E4\uB825 \uACC4\uC5F4 \uC784\uBB34\uC640
+        \uC678\uAD50\uC5D0 \uC720\uB9AC"
+      english: "\uC21C\uB840\uC790\uC758 \uAE38 \xB7 \uB9E4\uB825 \uACC4\uC5F4 \uC784\uBB34\uC640
+        \uC678\uAD50\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.54, y: 0.42}
+    adjacentCastleIds:
+    - castle_04
+    - castle_12
+    - castle_14
+    - castle_23
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_14
+    displayName:
+      uid: CASTLE_14
+      korean: "\uBCA0\uB974\uD06C"
+      english: Berg
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_14_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uC694\uC0C8"
+      english: "Central Imperial Plains \xB7 Fortress"
+    specialty:
+      uid: CASTLE_14_SPECIALTY
+      korean: "\uBD81\uBD80 \uAD00\uBB38 \xB7 \uD5D8\uC9C0 \uC774\uB3D9 \uD398\uB110\uD2F0
+        \uAC10\uC18C"
+      english: "\uBD81\uBD80 \uAD00\uBB38 \xB7 \uD5D8\uC9C0 \uC774\uB3D9 \uD398\uB110\uD2F0
+        \uAC10\uC18C"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.64, y: 0.41}
+    adjacentCastleIds:
+    - castle_05
+    - castle_13
+    - castle_15
+    - castle_24
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_15
+    displayName:
+      uid: CASTLE_15
+      korean: "\uC624\uB974\uD154"
+      english: Ortel
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_15_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uB3C4\uC2DC"
+      english: "Central Imperial Plains \xB7 City"
+    specialty:
+      uid: CASTLE_15_SPECIALTY
+      korean: "\uD478\uB978 \uD3EC\uB3C4\uC6D0 \xB7 \uC5F0\uD68C\uC640 \uC778\uBB3C
+        \uAD50\uB958 \uD6A8\uACFC \uC99D\uAC00"
+      english: "\uD478\uB978 \uD3EC\uB3C4\uC6D0 \xB7 \uC5F0\uD68C\uC640 \uC778\uBB3C
+        \uAD50\uB958 \uD6A8\uACFC \uC99D\uAC00"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.74, y: 0.43}
+    adjacentCastleIds:
+    - castle_06
+    - castle_14
+    - castle_16
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 7a3c8038ca1f25b4a8dab9dafd96f641, type: 3}
+  - id: castle_16
+    displayName:
+      uid: CASTLE_16
+      korean: "\uB77C\uB514\uC628"
+      english: Radion
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_16_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uB9C8\uB3C4\uC131"
+      english: "Central Imperial Plains \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_16_SPECIALTY
+      korean: "\uD0DC\uC591\uC11D \uCCA8\uD0D1 \xB7 \uBE5B \uC18D\uC131 \uC7A5\uBE44\uC640
+        \uACB0\uACC4 \uC5F0\uAD6C\uC5D0 \uC720\uB9AC"
+      english: "\uD0DC\uC591\uC11D \uCCA8\uD0D1 \xB7 \uBE5B \uC18D\uC131 \uC7A5\uBE44\uC640
+        \uACB0\uACC4 \uC5F0\uAD6C\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.81, y: 0.48}
+    adjacentCastleIds:
+    - castle_07
+    - castle_08
+    - castle_09
+    - castle_15
+    - castle_17
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_17
+    displayName:
+      uid: CASTLE_17
+      korean: "\uCE7C\uB3C4\uB974"
+      english: Kaldor
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_17_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uC694\uC0C8"
+      english: "Central Imperial Plains \xB7 Fortress"
+    specialty:
+      uid: CASTLE_17_SPECIALTY
+      korean: "\uBD89\uC740 \uBCD1\uAE30\uCC3D \xB7 \uC131\uCC44 \uC815\uBE44 \uB300\uC131\uACF5
+        \uC2DC \uBC29\uC5B4 \uC7A5\uCE58 \uD68D\uB4DD"
+      english: "\uBD89\uC740 \uBCD1\uAE30\uCC3D \xB7 \uC131\uCC44 \uC815\uBE44 \uB300\uC131\uACF5
+        \uC2DC \uBC29\uC5B4 \uC7A5\uCE58 \uD68D\uB4DD"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.8, y: 0.57}
+    adjacentCastleIds:
+    - castle_09
+    - castle_16
+    - castle_18
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_18
+    displayName:
+      uid: CASTLE_18
+      korean: "\uBA54\uB974\uC2DC\uC544"
+      english: Mercia
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_18_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uB3C4\uC2DC"
+      english: "Central Imperial Plains \xB7 City"
+    specialty:
+      uid: CASTLE_18_SPECIALTY
+      korean: "\uB0A8\uBD80 \uAD50\uC5ED\uC18C \xB7 \uD0C0 \uC885\uC871 \uC778\uC7AC
+        \uB4F1\uC6A9 \uBD88\uC774\uC775 \uAC10\uC18C"
+      english: "\uB0A8\uBD80 \uAD50\uC5ED\uC18C \xB7 \uD0C0 \uC885\uC871 \uC778\uC7AC
+        \uB4F1\uC6A9 \uBD88\uC774\uC775 \uAC10\uC18C"
+    specialtyEffectType: 1
+    specialtyProjectType: 0
+    specialtyEffectValue: 12
+    normalizedMapPosition: {x: 0.72, y: 0.61}
+    adjacentCastleIds:
+    - castle_17
+    - castle_19
+    - castle_25
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 7a3c8038ca1f25b4a8dab9dafd96f641, type: 3}
+  - id: castle_19
+    displayName:
+      uid: CASTLE_19
+      korean: "\uD558\uC77C\uB80C"
+      english: Hylen
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_19_TERRAIN
+      korean: "\uC81C\uAD6D \uC911\uC559 \uD3C9\uC6D0 \xB7 \uB3C4\uC2DC"
+      english: "Central Imperial Plains \xB7 City"
+    specialty:
+      uid: CASTLE_19_SPECIALTY
+      korean: "\uD770\uBC00 \uD3C9\uC57C \xB7 \uC810\uB839 \uD53C\uD574\uC5D0\uC11C
+        \uBC88\uC601 \uD68C\uBCF5\uC774 \uBE60\uB984"
+      english: "\uD770\uBC00 \uD3C9\uC57C \xB7 \uC810\uB839 \uD53C\uD574\uC5D0\uC11C
+        \uBC88\uC601 \uD68C\uBCF5\uC774 \uBE60\uB984"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.62, y: 0.61}
+    adjacentCastleIds:
+    - castle_18
+    - castle_23
+    - castle_25
+    - castle_57
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_20
+    displayName:
+      uid: CASTLE_20
+      korean: "\uD2B8\uB9AC\uC628"
+      english: Trion
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_20_TERRAIN
+      korean: "\uC81C\uAD6D \uB0A8\uBD80 \uBCC0\uACBD \xB7 \uC694\uC0C8"
+      english: "Southern Imperial Border \xB7 Fortress"
+    specialty:
+      uid: CASTLE_20_SPECIALTY
+      korean: "\uC0BC\uC911 \uC131\uBB38 \xB7 \uBC29\uC5B4 \uC0AC\uC5C5\uC758 \uCD5C\uB300
+        \uD6A8\uACFC \uC99D\uAC00"
+      english: "\uC0BC\uC911 \uC131\uBB38 \xB7 \uBC29\uC5B4 \uC0AC\uC5C5\uC758 \uCD5C\uB300
+        \uD6A8\uACFC \uC99D\uAC00"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.28, y: 0.6}
+    adjacentCastleIds:
+    - castle_10
+    - castle_21
+    - castle_49
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_21
+    displayName:
+      uid: CASTLE_21
+      korean: "\uC544\uC6B0\uB810"
+      english: Aurel
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_21_TERRAIN
+      korean: "\uC81C\uAD6D \uB0A8\uBD80 \uBCC0\uACBD \xB7 \uB3C4\uC2DC"
+      english: "Southern Imperial Border \xB7 City"
+    specialty:
+      uid: CASTLE_21_SPECIALTY
+      korean: "\uD669\uC81C\uC758 \uC8FC\uC870\uC18C \xB7 \uAE08\uD654 \uC218\uC785\uACFC
+        \uC7A5\uBE44 \uAC70\uB798\uB7C9 \uC99D\uAC00"
+      english: "\uD669\uC81C\uC758 \uC8FC\uC870\uC18C \xB7 \uAE08\uD654 \uC218\uC785\uACFC
+        \uC7A5\uBE44 \uAC70\uB798\uB7C9 \uC99D\uAC00"
+    specialtyEffectType: 1
+    specialtyProjectType: 0
+    specialtyEffectValue: 12
+    normalizedMapPosition: {x: 0.38, y: 0.57}
+    adjacentCastleIds:
+    - castle_11
+    - castle_20
+    - castle_22
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 7a3c8038ca1f25b4a8dab9dafd96f641, type: 3}
+  - id: castle_22
+    displayName:
+      uid: CASTLE_22
+      korean: "\uD3A0\uB9AC\uC628"
+      english: Pellion
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_22_TERRAIN
+      korean: "\uC81C\uAD6D \uB0A8\uBD80 \uBCC0\uACBD \xB7 \uC131\uC5ED"
+      english: "Southern Imperial Border \xB7 Sanctuary"
+    specialty:
+      uid: CASTLE_22_SPECIALTY
+      korean: "\uC2B9\uB9AC\uC758 \uAE30\uB150\uBE44 \xB7 \uC2B9\uC804 \uD6C4 \uCE58\uC548\uACFC
+        \uC601\uD5A5\uB825 \uC0C1\uC2B9"
+      english: "\uC2B9\uB9AC\uC758 \uAE30\uB150\uBE44 \xB7 \uC2B9\uC804 \uD6C4 \uCE58\uC548\uACFC
+        \uC601\uD5A5\uB825 \uC0C1\uC2B9"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.48, y: 0.54}
+    adjacentCastleIds:
+    - castle_12
+    - castle_21
+    - castle_23
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_23
+    displayName:
+      uid: CASTLE_23
+      korean: "\uB378\uCE74\uC2A4"
+      english: Delcas
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_23_TERRAIN
+      korean: "\uC81C\uAD6D \uB0A8\uBD80 \uBCC0\uACBD \xB7 \uC694\uC0C8"
+      english: "Southern Imperial Border \xB7 Fortress"
+    specialty:
+      uid: CASTLE_23_SPECIALTY
+      korean: "\uB0A8\uBD80 \uAC10\uC2DC\uD0D1 \xB7 \uC778\uC811 \uC801 \uC131\uC758
+        \uBD80\uB300 \uC815\uBCF4\uB97C \uD55C \uB2E8\uACC4 \uB354 \uACF5\uAC1C"
+      english: "\uB0A8\uBD80 \uAC10\uC2DC\uD0D1 \xB7 \uC778\uC811 \uC801 \uC131\uC758
+        \uBD80\uB300 \uC815\uBCF4\uB97C \uD55C \uB2E8\uACC4 \uB354 \uACF5\uAC1C"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.57, y: 0.51}
+    adjacentCastleIds:
+    - castle_13
+    - castle_19
+    - castle_22
+    - castle_24
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_24
+    displayName:
+      uid: CASTLE_24
+      korean: "\uC138\uB77C\uB518"
+      english: Seradin
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_24_TERRAIN
+      korean: "\uC81C\uAD6D \uB0A8\uBD80 \uBCC0\uACBD \xB7 \uB9C8\uB3C4\uC131"
+      english: "Southern Imperial Border \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_24_SPECIALTY
+      korean: "\uC720\uB9AC \uCC9C\uBB38\uB300 \xB7 \uC801 \uB9C8\uBC95\uACFC \uB0A0\uC528
+        \uAD00\uB828 \uC815\uBCF4\uB97C \uBBF8\uB9AC \uD655\uC778"
+      english: "\uC720\uB9AC \uCC9C\uBB38\uB300 \xB7 \uC801 \uB9C8\uBC95\uACFC \uB0A0\uC528
+        \uAD00\uB828 \uC815\uBCF4\uB97C \uBBF8\uB9AC \uD655\uC778"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.66, y: 0.5}
+    adjacentCastleIds:
+    - castle_14
+    - castle_23
+    - castle_25
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 7a3c8038ca1f25b4a8dab9dafd96f641, type: 3}
+  - id: castle_25
+    displayName:
+      uid: CASTLE_25
+      korean: "\uBCA8\uB85C\uC544"
+      english: Velloa
+    castleSize: 0
+    factionId: valdor
+    terrainTrait:
+      uid: CASTLE_25_TERRAIN
+      korean: "\uC81C\uAD6D \uB0A8\uBD80 \uBCC0\uACBD \xB7 \uB3C4\uC2DC"
+      english: "Southern Imperial Border \xB7 City"
+    specialty:
+      uid: CASTLE_25_SPECIALTY
+      korean: "\uC740\uBE5B \uC218\uB85C \xB7 \uC601\uC9C0 \uC9C4\uD765\uC758 \uCE58\uC548
+        \uAC10\uC18C\uB97C \uC77C\uBD80 \uC0C1\uC1C4"
+      english: "\uC740\uBE5B \uC218\uB85C \xB7 \uC601\uC9C0 \uC9C4\uD765\uC758 \uCE58\uC548
+        \uAC10\uC18C\uB97C \uC77C\uBD80 \uC0C1\uC1C4"
+    specialtyEffectType: 0
+    specialtyProjectType: 2
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.7, y: 0.56}
+    adjacentCastleIds:
+    - castle_18
+    - castle_19
+    - castle_24
+    initialProsperity: 55
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3936080cf81f961478bcbf654706f4cf, type: 3}
+  - id: castle_26
+    displayName:
+      uid: CASTLE_26
+      korean: "\uC544\uC774\uC5B8\uD640\uB4DC"
+      english: Ironhold
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_26_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uC218\uB3C4"
+      english: "Northern Mountain Range \xB7 Capital"
+    specialty:
+      uid: CASTLE_26_SPECIALTY
+      korean: "\uAC15\uCCA0 \uC758\uC11D \xB7 \uB4DC\uC6CC\uD504\uC640 \uC218\uC778
+        \uC778\uC7AC\uB97C \uD568\uAED8 \uBC30\uCE58\uD560 \uB54C \uD611\uB825 \uBCF4\uB108\uC2A4"
+      english: "\uAC15\uCCA0 \uC758\uC11D \xB7 \uB4DC\uC6CC\uD504\uC640 \uC218\uC778
+        \uC778\uC7AC\uB97C \uD568\uAED8 \uBC30\uCE58\uD560 \uB54C \uD611\uB825 \uBCF4\uB108\uC2A4"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.72, y: 0.23}
+    adjacentCastleIds:
+    - castle_27
+    - castle_35
+    - castle_36
+    - castle_37
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: dc99c7bf53bb0f34cb9d429cb332084b, type: 3}
+  - id: castle_27
+    displayName:
+      uid: CASTLE_27
+      korean: "\uCE74\uB77D\uB460"
+      english: Karak-Dum
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_27_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uC694\uC0C8"
+      english: "Northern Mountain Range \xB7 Fortress"
+    specialty:
+      uid: CASTLE_27_SPECIALTY
+      korean: "\uC9C0\uD558 \uB300\uC131\uBB38 \xB7 \uC131 \uBC29\uC5B4\uC804\uC5D0\uC11C
+        \uC6D0\uAC70\uB9AC \uD53C\uD574 \uAC10\uC18C"
+      english: "\uC9C0\uD558 \uB300\uC131\uBB38 \xB7 \uC131 \uBC29\uC5B4\uC804\uC5D0\uC11C
+        \uC6D0\uAC70\uB9AC \uD53C\uD574 \uAC10\uC18C"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.63, y: 0.2}
+    adjacentCastleIds:
+    - castle_26
+    - castle_34
+    - castle_35
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_28
+    displayName:
+      uid: CASTLE_28
+      korean: "\uD504\uB85C\uC2A4\uD2B8\uD63C"
+      english: Frosthorn
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_28_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uC694\uC0C8"
+      english: "Northern Mountain Range \xB7 Fortress"
+    specialty:
+      uid: CASTLE_28_SPECIALTY
+      korean: "\uC11C\uB9AC\uBFD4 \uBD09\uC6B0\uB9AC \xB7 \uCD94\uC704\uC640 \uC124\uC6D0
+        \uC774\uB3D9 \uD398\uB110\uD2F0 \uBB34\uC2DC"
+      english: "\uC11C\uB9AC\uBFD4 \uBD09\uC6B0\uB9AC \xB7 \uCD94\uC704\uC640 \uC124\uC6D0
+        \uC774\uB3D9 \uD398\uB110\uD2F0 \uBB34\uC2DC"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.54, y: 0.18}
+    adjacentCastleIds:
+    - castle_29
+    - castle_33
+    - castle_34
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_29
+    displayName:
+      uid: CASTLE_29
+      korean: "\uC570\uBC84\uB525"
+      english: Amberdeep
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_29_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uB9C8\uB3C4\uC131"
+      english: "Northern Mountain Range \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_29_SPECIALTY
+      korean: "\uD638\uBC15 \uAD11\uB9E5 \xB7 \uB9C8\uB098 \uD06C\uB9AC\uC2A4\uD0C8\uACFC
+        \uC81C\uC791 \uC7AC\uB8CC \uB3D9\uC2DC \uD68D\uB4DD \uAC00\uB2A5"
+      english: "\uD638\uBC15 \uAD11\uB9E5 \xB7 \uB9C8\uB098 \uD06C\uB9AC\uC2A4\uD0C8\uACFC
+        \uC81C\uC791 \uC7AC\uB8CC \uB3D9\uC2DC \uD68D\uB4DD \uAC00\uB2A5"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.45, y: 0.19}
+    adjacentCastleIds:
+    - castle_03
+    - castle_28
+    - castle_31
+    - castle_32
+    - castle_33
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_30
+    displayName:
+      uid: CASTLE_30
+      korean: "\uC2A4\uD1A4\uBCA8\uB85C"
+      english: Stonebellow
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_30_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uB3C4\uC2DC"
+      english: "Northern Mountain Range \xB7 City"
+    specialty:
+      uid: CASTLE_30_SPECIALTY
+      korean: "\uC6B8\uB9BC \uB300\uC7A5\uAC04 \xB7 \uC911\uAC11\uACFC \uB454\uAE30
+        \uC81C\uC791\uC5D0 \uC720\uB9AC"
+      english: "\uC6B8\uB9BC \uB300\uC7A5\uAC04 \xB7 \uC911\uAC11\uACFC \uB454\uAE30
+        \uC81C\uC791\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.25, y: 0.29}
+    adjacentCastleIds:
+    - castle_31
+    - castle_32
+    - castle_38
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_31
+    displayName:
+      uid: CASTLE_31
+      korean: "\uB808\uB4DC\uD074\uB85C"
+      english: Redclaw
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_31_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uC694\uC0C8"
+      english: "Northern Mountain Range \xB7 Fortress"
+    specialty:
+      uid: CASTLE_31_SPECIALTY
+      korean: "\uBD89\uC740 \uBC1C\uD1B1 \uD611\uACE1 \xB7 \uC218\uC778 \uADFC\uC811
+        \uC778\uC7AC \uBAA8\uC9D1\uACFC \uD6C8\uB828\uC5D0 \uC720\uB9AC"
+      english: "\uBD89\uC740 \uBC1C\uD1B1 \uD611\uACE1 \xB7 \uC218\uC778 \uADFC\uC811
+        \uC778\uC7AC \uBAA8\uC9D1\uACFC \uD6C8\uB828\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.32, y: 0.23}
+    adjacentCastleIds:
+    - castle_29
+    - castle_30
+    - castle_32
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_32
+    displayName:
+      uid: CASTLE_32
+      korean: "\uADF8\uB808\uC774\uBA54\uC778"
+      english: Greymane
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_32_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uC131\uC5ED"
+      english: "Northern Mountain Range \xB7 Sanctuary"
+    specialty:
+      uid: CASTLE_32_SPECIALTY
+      korean: "\uC120\uC870\uC758 \uB3CC\uBB34\uB364 \xB7 \uC804\uD22C \uBD88\uB2A5
+        \uC778\uBB3C\uC758 \uC0AC\uB9DD \uD655\uB960 \uAC10\uC18C"
+      english: "\uC120\uC870\uC758 \uB3CC\uBB34\uB364 \xB7 \uC804\uD22C \uBD88\uB2A5
+        \uC778\uBB3C\uC758 \uC0AC\uB9DD \uD655\uB960 \uAC10\uC18C"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.4, y: 0.16}
+    adjacentCastleIds:
+    - castle_29
+    - castle_30
+    - castle_31
+    - castle_33
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_33
+    displayName:
+      uid: CASTLE_33
+      korean: "\uB8EC\uD3EC\uC9C0"
+      english: Runeforge
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_33_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uB9C8\uB3C4\uC131"
+      english: "Northern Mountain Range \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_33_SPECIALTY
+      korean: "\uACE0\uB300 \uB8EC \uD654\uB85C \xB7 \uC7A5\uBE44\uC5D0 \uB8EC \uD6A8\uACFC\uB97C
+        \uBD80\uC5EC\uD560 \uC218 \uC788\uC74C"
+      english: "\uACE0\uB300 \uB8EC \uD654\uB85C \xB7 \uC7A5\uBE44\uC5D0 \uB8EC \uD6A8\uACFC\uB97C
+        \uBD80\uC5EC\uD560 \uC218 \uC788\uC74C"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.49, y: 0.12}
+    adjacentCastleIds:
+    - castle_28
+    - castle_29
+    - castle_32
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_34
+    displayName:
+      uid: CASTLE_34
+      korean: "\uBE0C\uB860\uC988\uAC8C\uC774\uD2B8"
+      english: Bronzegate
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_34_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uC694\uC0C8"
+      english: "Northern Mountain Range \xB7 Fortress"
+    specialty:
+      uid: CASTLE_34_SPECIALTY
+      korean: "\uCCAD\uB3D9 \uB300\uBB38 \xB7 \uC131\uCC44 \uC815\uBE44 \uBE44\uC6A9
+        \uAC10\uC18C"
+      english: "\uCCAD\uB3D9 \uB300\uBB38 \xB7 \uC131\uCC44 \uC815\uBE44 \uBE44\uC6A9
+        \uAC10\uC18C"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.59, y: 0.13}
+    adjacentCastleIds:
+    - castle_27
+    - castle_28
+    - castle_35
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_35
+    displayName:
+      uid: CASTLE_35
+      korean: "\uC708\uD130\uD33D"
+      english: Winterfang
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_35_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uB3C4\uC2DC"
+      english: "Northern Mountain Range \xB7 City"
+    specialty:
+      uid: CASTLE_35_SPECIALTY
+      korean: "\uC124\uC6D0 \uC0AC\uB0E5\uD130 \xB7 \uBCF4\uAE09\uC774 \uBD80\uC871\uD560
+        \uB54C \uBC1B\uB294 \uBD88\uC774\uC775 \uAC10\uC18C"
+      english: "\uC124\uC6D0 \uC0AC\uB0E5\uD130 \xB7 \uBCF4\uAE09\uC774 \uBD80\uC871\uD560
+        \uB54C \uBC1B\uB294 \uBD88\uC774\uC775 \uAC10\uC18C"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.68, y: 0.16}
+    adjacentCastleIds:
+    - castle_26
+    - castle_27
+    - castle_34
+    - castle_36
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_36
+    displayName:
+      uid: CASTLE_36
+      korean: "\uC36C\uB354\uD06C\uB799"
+      english: Thundercrag
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_36_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uB9C8\uB3C4\uC131"
+      english: "Northern Mountain Range \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_36_SPECIALTY
+      korean: "\uCC9C\uB465 \uADE0\uC5F4 \xB7 \uBC88\uAC1C \uC18D\uC131 \uC601\uC6C5
+        \uC2A4\uD0AC \uC5F0\uAD6C\uC5D0 \uC720\uB9AC"
+      english: "\uCC9C\uB465 \uADE0\uC5F4 \xB7 \uBC88\uAC1C \uC18D\uC131 \uC601\uC6C5
+        \uC2A4\uD0AC \uC5F0\uAD6C\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.77, y: 0.2}
+    adjacentCastleIds:
+    - castle_26
+    - castle_35
+    - castle_37
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_37
+    displayName:
+      uid: CASTLE_37
+      korean: "\uC6B8\uD504\uB374"
+      english: Wolfden
+    castleSize: 0
+    factionId: ironheart
+    terrainTrait:
+      uid: CASTLE_37_TERRAIN
+      korean: "\uBD81\uBD80 \uC0B0\uC545 \uC9C0\uB300 \xB7 \uB3C4\uC2DC"
+      english: "Northern Mountain Range \xB7 City"
+    specialty:
+      uid: CASTLE_37_SPECIALTY
+      korean: "\uB300\uC871\uC7A5 \uC2DC\uC7A5 \xB7 `[\uC77C\uBC18]` \uD6C4\uBCF4\uAC00
+        \uD55C \uBA85 \uB354 \uC81C\uC2DC\uB428"
+      english: "\uB300\uC871\uC7A5 \uC2DC\uC7A5 \xB7 `[\uC77C\uBC18]` \uD6C4\uBCF4\uAC00
+        \uD55C \uBA85 \uB354 \uC81C\uC2DC\uB428"
+    specialtyEffectType: 1
+    specialtyProjectType: 0
+    specialtyEffectValue: 12
+    normalizedMapPosition: {x: 0.83, y: 0.26}
+    adjacentCastleIds:
+    - castle_26
+    - castle_36
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 60
+    castleImage: {fileID: 21300000, guid: e4043b1a4a565454da2f07c09bb0df80, type: 3}
+  - id: castle_38
+    displayName:
+      uid: CASTLE_38
+      korean: "\uC2E4\uBC14\uB9AC\uC628"
+      english: Sylvarion
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_38_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uC218\uB3C4"
+      english: "Western Ancient Forest \xB7 Capital"
+    specialty:
+      uid: CASTLE_38_SPECIALTY
+      korean: "\uC758\uD68C\uC758 \uC138\uACC4\uC218 \xB7 \uC5D8\uD504\uC640 \uB4DC\uB8E8\uC774\uB4DC
+        \uC601\uC6C5\uC758 \uCDA9\uC131\uC774 \uD754\uB4E4\uB9AC\uAE30 \uC5B4\uB824\uC6C0"
+      english: "\uC758\uD68C\uC758 \uC138\uACC4\uC218 \xB7 \uC5D8\uD504\uC640 \uB4DC\uB8E8\uC774\uB4DC
+        \uC601\uC6C5\uC758 \uCDA9\uC131\uC774 \uD754\uB4E4\uB9AC\uAE30 \uC5B4\uB824\uC6C0"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.16, y: 0.39}
+    adjacentCastleIds:
+    - castle_00
+    - castle_30
+    - castle_39
+    - castle_40
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 91f1092bd84209043802abbdbfe57fda, type: 3}
+  - id: castle_39
+    displayName:
+      uid: CASTLE_39
+      korean: "\uC5D0\uC77C\uB85C\uB80C"
+      english: Aeloren
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_39_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uC131\uC5ED"
+      english: "Western Ancient Forest \xB7 Sanctuary"
+    specialty:
+      uid: CASTLE_39_SPECIALTY
+      korean: "\uC740\uC78E \uC131\uC18C \xB7 \uD68C\uBCF5 \uC0AC\uC5C5\uACFC \uC790\uC5F0
+        \uB9C8\uBC95\uC5D0 \uC720\uB9AC"
+      english: "\uC740\uC78E \uC131\uC18C \xB7 \uD68C\uBCF5 \uC0AC\uC5C5\uACFC \uC790\uC5F0
+        \uB9C8\uBC95\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.11, y: 0.46}
+    adjacentCastleIds:
+    - castle_38
+    - castle_40
+    - castle_41
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_40
+    displayName:
+      uid: CASTLE_40
+      korean: "\uBB38\uC170\uC774\uB4DC"
+      english: Moonshade
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_40_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uB9C8\uB3C4\uC131"
+      english: "Western Ancient Forest \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_40_SPECIALTY
+      korean: "\uB2EC\uADF8\uB298 \uC5F0\uBABB \xB7 \uC57C\uAC04 \uC804\uD22C\uC640
+        \uD658\uC601 \uB9C8\uBC95 \uC5F0\uAD6C\uC5D0 \uC720\uB9AC"
+      english: "\uB2EC\uADF8\uB298 \uC5F0\uBABB \xB7 \uC57C\uAC04 \uC804\uD22C\uC640
+        \uD658\uC601 \uB9C8\uBC95 \uC5F0\uAD6C\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.12, y: 0.55}
+    adjacentCastleIds:
+    - castle_38
+    - castle_39
+    - castle_41
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_41
+    displayName:
+      uid: CASTLE_41
+      korean: "\uC708\uB4DC\uC1A1"
+      english: Windsong
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_41_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uB3C4\uC2DC"
+      english: "Western Ancient Forest \xB7 City"
+    specialty:
+      uid: CASTLE_41_SPECIALTY
+      korean: "\uB178\uB798\uD558\uB294 \uC218\uAD00 \xB7 \uC778\uBB3C \uAD50\uB958\uC640
+        \uBA85\uC131 \uD68D\uB4DD \uC99D\uAC00"
+      english: "\uB178\uB798\uD558\uB294 \uC218\uAD00 \xB7 \uC778\uBB3C \uAD50\uB958\uC640
+        \uBA85\uC131 \uD68D\uB4DD \uC99D\uAC00"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.18, y: 0.58}
+    adjacentCastleIds:
+    - castle_39
+    - castle_40
+    - castle_42
+    - castle_49
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_42
+    displayName:
+      uid: CASTLE_42
+      korean: "\uADF8\uB9B0\uBCA0\uC77C"
+      english: Greenvale
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_42_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uB3C4\uC2DC"
+      english: "Western Ancient Forest \xB7 City"
+    specialty:
+      uid: CASTLE_42_SPECIALTY
+      korean: "\uC601\uC6D0\uC758 \uACFC\uC218\uC6D0 \xB7 \uBC88\uC601\uACFC \uBCF4\uAE09
+        \uC0C1\uD0DC \uD68C\uBCF5\uC5D0 \uC720\uB9AC"
+      english: "\uC601\uC6D0\uC758 \uACFC\uC218\uC6D0 \xB7 \uBC88\uC601\uACFC \uBCF4\uAE09
+        \uC0C1\uD0DC \uD68C\uBCF5\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 0
+    specialtyProjectType: 6
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.23, y: 0.64}
+    adjacentCastleIds:
+    - castle_41
+    - castle_43
+    - castle_47
+    - castle_48
+    - castle_49
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_43
+    displayName:
+      uid: CASTLE_43
+      korean: "\uC2A4\uD0C0\uBE0C\uB79C\uCE58"
+      english: Starbranch
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_43_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uB9C8\uB3C4\uC131"
+      english: "Western Ancient Forest \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_43_SPECIALTY
+      korean: "\uBCC4\uAC00\uC9C0 \uAD00\uCE21\uB300 \xB7 \uAE30\uC220 \uC0AC\uC5C5\uC5D0\uC11C
+        \uD76C\uADC0 \uC5F0\uAD6C \uB2E8\uC11C \uBC1C\uACAC \uAC00\uB2A5"
+      english: "\uBCC4\uAC00\uC9C0 \uAD00\uCE21\uB300 \xB7 \uAE30\uC220 \uC0AC\uC5C5\uC5D0\uC11C
+        \uD76C\uADC0 \uC5F0\uAD6C \uB2E8\uC11C \uBC1C\uACAC \uAC00\uB2A5"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.18, y: 0.69}
+    adjacentCastleIds:
+    - castle_42
+    - castle_44
+    - castle_45
+    - castle_48
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_44
+    displayName:
+      uid: CASTLE_44
+      korean: "\uB9AC\uBC84\uC708"
+      english: Riverwyn
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_44_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uB3C4\uC2DC"
+      english: "Western Ancient Forest \xB7 City"
+    specialty:
+      uid: CASTLE_44_SPECIALTY
+      korean: "\uC218\uC815 \uAC15\uB098\uB8E8 \xB7 \uC544\uAD70 \uC131 \uC0AC\uC774\uC758
+        \uC774\uB3D9 \uC9C0\uC6D0 \uC99D\uAC00"
+      english: "\uC218\uC815 \uAC15\uB098\uB8E8 \xB7 \uC544\uAD70 \uC131 \uC0AC\uC774\uC758
+        \uC774\uB3D9 \uC9C0\uC6D0 \uC99D\uAC00"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.11, y: 0.66}
+    adjacentCastleIds:
+    - castle_43
+    - castle_45
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_45
+    displayName:
+      uid: CASTLE_45
+      korean: "\uC3DC\uC6CC\uCE58"
+      english: Thornwatch
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_45_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uC694\uC0C8"
+      english: "Western Ancient Forest \xB7 Fortress"
+    specialty:
+      uid: CASTLE_45_SPECIALTY
+      korean: "\uAC00\uC2DC \uC7A5\uBCBD \xB7 \uC131\uC744 \uACF5\uACA9\uD558\uB294
+        \uC801 \uADFC\uC811 \uC778\uBB3C\uC5D0\uAC8C \uC9C0\uC18D \uD53C\uD574"
+      english: "\uAC00\uC2DC \uC7A5\uBCBD \xB7 \uC131\uC744 \uACF5\uACA9\uD558\uB294
+        \uC801 \uADFC\uC811 \uC778\uBB3C\uC5D0\uAC8C \uC9C0\uC18D \uD53C\uD574"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.13, y: 0.75}
+    adjacentCastleIds:
+    - castle_43
+    - castle_44
+    - castle_46
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_46
+    displayName:
+      uid: CASTLE_46
+      korean: "\uBBF8\uC2A4\uD2B8\uC6B0\uB4DC"
+      english: Mistwood
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_46_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uC694\uC0C8"
+      english: "Western Ancient Forest \xB7 Fortress"
+    specialty:
+      uid: CASTLE_46_SPECIALTY
+      korean: "\uC548\uAC1C \uC232\uAE38 \xB7 \uC801\uC758 \uC870\uC0AC\uC640 \uC6D0\uAC70\uB9AC
+        \uACF5\uACA9 \uD6A8\uC728 \uAC10\uC18C"
+      english: "\uC548\uAC1C \uC232\uAE38 \xB7 \uC801\uC758 \uC870\uC0AC\uC640 \uC6D0\uAC70\uB9AC
+        \uACF5\uACA9 \uD6A8\uC728 \uAC10\uC18C"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.21, y: 0.78}
+    adjacentCastleIds:
+    - castle_45
+    - castle_47
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_47
+    displayName:
+      uid: CASTLE_47
+      korean: "\uC5D8\uB354\uB8E8\uD2B8"
+      english: Elderroot
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_47_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uC131\uC5ED"
+      english: "Western Ancient Forest \xB7 Sanctuary"
+    specialty:
+      uid: CASTLE_47_SPECIALTY
+      korean: "\uD0DC\uACE0\uC758 \uBFCC\uB9AC \xB7 \uC601\uC6C5\uC758 \uD754\uC801
+        \uAD50\uCCB4 \uC2DC \uAE30\uC874 \uD6A8\uACFC \uC77C\uBD80 \uBCF4\uC874"
+      english: "\uD0DC\uACE0\uC758 \uBFCC\uB9AC \xB7 \uC601\uC6C5\uC758 \uD754\uC801
+        \uAD50\uCCB4 \uC2DC \uAE30\uC874 \uD6A8\uACFC \uC77C\uBD80 \uBCF4\uC874"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.29, y: 0.74}
+    adjacentCastleIds:
+    - castle_42
+    - castle_46
+    - castle_48
+    - castle_50
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_48
+    displayName:
+      uid: CASTLE_48
+      korean: "\uB358\uAE00\uB808\uC774\uB4DC"
+      english: Dawnglade
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_48_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uB3C4\uC2DC"
+      english: "Western Ancient Forest \xB7 City"
+    specialty:
+      uid: CASTLE_48_SPECIALTY
+      korean: "\uC0C8\uBCBD \uCD08\uC6D0 \xB7 \uCE58\uC548\uC774 \uB192\uC744 \uB54C
+        \uBC29\uBB38 \uC778\uC7AC \uC99D\uAC00"
+      english: "\uC0C8\uBCBD \uCD08\uC6D0 \xB7 \uCE58\uC548\uC774 \uB192\uC744 \uB54C
+        \uBC29\uBB38 \uC778\uC7AC \uC99D\uAC00"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.31, y: 0.66}
+    adjacentCastleIds:
+    - castle_42
+    - castle_43
+    - castle_47
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_49
+    displayName:
+      uid: CASTLE_49
+      korean: "\uB8E8\uB098\uB808\uC2A4"
+      english: Lunareth
+    castleSize: 0
+    factionId: sylvanroad
+    terrainTrait:
+      uid: CASTLE_49_TERRAIN
+      korean: "\uC11C\uBD80 \uACE0\uB300 \uC218\uB9BC \xB7 \uB9C8\uB3C4\uC131"
+      english: "Western Ancient Forest \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_49_SPECIALTY
+      korean: "\uC6D4\uAD11 \uB3C4\uC11C\uAD00 \xB7 \uB9C8\uB098 \uC18C\uBE44 \uC5C6\uC774
+        \uB0AE\uC740 \uB4F1\uAE09 \uC5F0\uAD6C \uD558\uB098 \uC9C4\uD589 \uAC00\uB2A5"
+      english: "\uC6D4\uAD11 \uB3C4\uC11C\uAD00 \xB7 \uB9C8\uB098 \uC18C\uBE44 \uC5C6\uC774
+        \uB0AE\uC740 \uB4F1\uAE09 \uC5F0\uAD6C \uD558\uB098 \uC9C4\uD589 \uAC00\uB2A5"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.27, y: 0.52}
+    adjacentCastleIds:
+    - castle_20
+    - castle_41
+    - castle_42
+    initialProsperity: 35
+    initialTechnology: 30
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 3259d5febeb3b13468795c4dd205b753, type: 3}
+  - id: castle_50
+    displayName:
+      uid: CASTLE_50
+      korean: "\uB124\uD06C\uB85C\uD3F4\uB9AC\uC2A4"
+      english: Necropolis
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_50_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uC218\uB3C4"
+      english: "Southern Volcanic Wasteland \xB7 Capital"
+    specialty:
+      uid: CASTLE_50_SPECIALTY
+      korean: "\uC601\uC6D0\uC758 \uBB18\uAD81 \xB7 \uC5B8\uB370\uB4DC \uC778\uC7AC\uAC00
+        \uD53C\uB85C\uB85C \uBC1B\uB294 \uBD88\uC774\uC775 \uBB34\uC2DC"
+      english: "\uC601\uC6D0\uC758 \uBB18\uAD81 \xB7 \uC5B8\uB370\uB4DC \uC778\uC7AC\uAC00
+        \uD53C\uB85C\uB85C \uBC1B\uB294 \uBD88\uC774\uC775 \uBB34\uC2DC"
+    specialtyEffectType: 3
+    specialtyProjectType: 0
+    specialtyEffectValue: 3
+    normalizedMapPosition: {x: 0.36, y: 0.75}
+    adjacentCastleIds:
+    - castle_47
+    - castle_51
+    - castle_52
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: 8499b7115546b6242a821e532ccc12d5, type: 3}
+  - id: castle_51
+    displayName:
+      uid: CASTLE_51
+      korean: "\uBAA8\uB974\uAC00\uB974"
+      english: Morgar
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_51_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uC694\uC0C8"
+      english: "Southern Volcanic Wasteland \xB7 Fortress"
+    specialty:
+      uid: CASTLE_51_SPECIALTY
+      korean: "\uAC80\uC740 \uBF08 \uC131\uBCBD \xB7 \uC131 \uBC29\uC5B4\uC804\uC5D0\uC11C
+        \uC804\uD22C \uBD88\uB2A5\uC790\uAC00 \uB9DD\uB839\uC73C\uB85C \uC77C\uC2DC
+        \uADC0\uD658"
+      english: "\uAC80\uC740 \uBF08 \uC131\uBCBD \xB7 \uC131 \uBC29\uC5B4\uC804\uC5D0\uC11C
+        \uC804\uD22C \uBD88\uB2A5\uC790\uAC00 \uB9DD\uB839\uC73C\uB85C \uC77C\uC2DC
+        \uADC0\uD658"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.43, y: 0.8}
+    adjacentCastleIds:
+    - castle_50
+    - castle_52
+    - castle_59
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: ecd8b8a7251a6ee45945180f8a76906a, type: 3}
+  - id: castle_52
+    displayName:
+      uid: CASTLE_52
+      korean: "\uB098\uC774\uD2B8\uBCA0\uC77C"
+      english: Nightveil
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_52_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uB3C4\uC2DC"
+      english: "Southern Volcanic Wasteland \xB7 City"
+    specialty:
+      uid: CASTLE_52_SPECIALTY
+      korean: "\uC601\uC6D0\uD55C \uC57C\uC2DC\uC7A5 \xB7 \uD76C\uADC0 \uBB3C\uD488
+        \uAC70\uB798\uC640 \uBE44\uBC00 \uC758\uB8B0\uC5D0 \uC720\uB9AC"
+      english: "\uC601\uC6D0\uD55C \uC57C\uC2DC\uC7A5 \xB7 \uD76C\uADC0 \uBB3C\uD488
+        \uAC70\uB798\uC640 \uBE44\uBC00 \uC758\uB8B0\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 1
+    specialtyProjectType: 0
+    specialtyEffectValue: 12
+    normalizedMapPosition: {x: 0.51, y: 0.84}
+    adjacentCastleIds:
+    - castle_50
+    - castle_51
+    - castle_53
+    - castle_59
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: ecd8b8a7251a6ee45945180f8a76906a, type: 3}
+  - id: castle_53
+    displayName:
+      uid: CASTLE_53
+      korean: "\uC560\uC26C\uD06C\uB77C\uC6B4"
+      english: Ashcrown
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_53_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uC694\uC0C8"
+      english: "Southern Volcanic Wasteland \xB7 Fortress"
+    specialty:
+      uid: CASTLE_53_SPECIALTY
+      korean: "\uC7AC\uC758 \uC655\uAD00 \xB7 \uC810\uB839\uACFC \uD30C\uAD34 \uD6C4
+        \uBC29\uC5B4 \uD68C\uBCF5\uC774 \uBE60\uB984"
+      english: "\uC7AC\uC758 \uC655\uAD00 \xB7 \uC810\uB839\uACFC \uD30C\uAD34 \uD6C4
+        \uBC29\uC5B4 \uD68C\uBCF5\uC774 \uBE60\uB984"
+    specialtyEffectType: 0
+    specialtyProjectType: 6
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.6, y: 0.87}
+    adjacentCastleIds:
+    - castle_52
+    - castle_54
+    - castle_59
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: ecd8b8a7251a6ee45945180f8a76906a, type: 3}
+  - id: castle_54
+    displayName:
+      uid: CASTLE_54
+      korean: "\uBCA8\uBAA8\uB77C"
+      english: Velmora
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_54_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uB9C8\uB3C4\uC131"
+      english: "Southern Volcanic Wasteland \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_54_SPECIALTY
+      korean: "\uD53C\uC758 \uC218\uC815\uD0D1 \xB7 \uCCB4\uB825\uC744 \uB300\uAC00\uB85C
+        \uB9C8\uB098 \uD06C\uB9AC\uC2A4\uD0C8 \uCD94\uAC00 \uC0DD\uC0B0 \uAC00\uB2A5"
+      english: "\uD53C\uC758 \uC218\uC815\uD0D1 \xB7 \uCCB4\uB825\uC744 \uB300\uAC00\uB85C
+        \uB9C8\uB098 \uD06C\uB9AC\uC2A4\uD0C8 \uCD94\uAC00 \uC0DD\uC0B0 \uAC00\uB2A5"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.7, y: 0.86}
+    adjacentCastleIds:
+    - castle_53
+    - castle_55
+    - castle_56
+    - castle_58
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: ecd8b8a7251a6ee45945180f8a76906a, type: 3}
+  - id: castle_55
+    displayName:
+      uid: CASTLE_55
+      korean: "\uADF8\uB9BC\uD560\uB85C\uC6B0"
+      english: Grimhollow
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_55_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uB3C4\uC2DC"
+      english: "Southern Volcanic Wasteland \xB7 City"
+    specialty:
+      uid: CASTLE_55_SPECIALTY
+      korean: "\uB9DD\uC790\uC758 \uC9C0\uD558\uB3C4\uC2DC \xB7 \uC778\uAD6C\uAC00
+        \uB0AE\uC544\uB3C4 \uAE08\uD654 \uC218\uC785 \uAC10\uC18C\uAC00 \uC801\uC74C"
+      english: "\uB9DD\uC790\uC758 \uC9C0\uD558\uB3C4\uC2DC \xB7 \uC778\uAD6C\uAC00
+        \uB0AE\uC544\uB3C4 \uAE08\uD654 \uC218\uC785 \uAC10\uC18C\uAC00 \uC801\uC74C"
+    specialtyEffectType: 1
+    specialtyProjectType: 0
+    specialtyEffectValue: 12
+    normalizedMapPosition: {x: 0.79, y: 0.82}
+    adjacentCastleIds:
+    - castle_54
+    - castle_56
+    - castle_57
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: ecd8b8a7251a6ee45945180f8a76906a, type: 3}
+  - id: castle_56
+    displayName:
+      uid: CASTLE_56
+      korean: "\uC624\uBE0C\uC2DC\uB514\uC544"
+      english: Obsidia
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_56_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uC694\uC0C8"
+      english: "Southern Volcanic Wasteland \xB7 Fortress"
+    specialty:
+      uid: CASTLE_56_SPECIALTY
+      korean: "\uD751\uC694\uC11D \uC808\uBCBD \xB7 \uD654\uC5FC \uBC0F \uB9C8\uBC95
+        \uD53C\uD574\uC5D0 \uAC15\uD55C \uC131\uBCBD"
+      english: "\uD751\uC694\uC11D \uC808\uBCBD \xB7 \uD654\uC5FC \uBC0F \uB9C8\uBC95
+        \uD53C\uD574\uC5D0 \uAC15\uD55C \uC131\uBCBD"
+    specialtyEffectType: 4
+    specialtyProjectType: 0
+    specialtyEffectValue: 20
+    normalizedMapPosition: {x: 0.84, y: 0.75}
+    adjacentCastleIds:
+    - castle_54
+    - castle_55
+    - castle_57
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: ecd8b8a7251a6ee45945180f8a76906a, type: 3}
+  - id: castle_57
+    displayName:
+      uid: CASTLE_57
+      korean: "\uB179\uC2A4\uBBF8\uB974"
+      english: Noxmere
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_57_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uC131\uC5ED"
+      english: "Southern Volcanic Wasteland \xB7 Sanctuary"
+    specialty:
+      uid: CASTLE_57_SPECIALTY
+      korean: "\uAC80\uC740 \uAC70\uC6B8 \uD638\uC218 \xB7 \uC801 \uACC4\uB7B5\uC744
+        \uBC18\uC0AC\uD558\uB294 \uD2B9\uBCC4 \uC0AC\uAC74 \uBC1C\uC0DD \uAC00\uB2A5"
+      english: "\uAC80\uC740 \uAC70\uC6B8 \uD638\uC218 \xB7 \uC801 \uACC4\uB7B5\uC744
+        \uBC18\uC0AC\uD558\uB294 \uD2B9\uBCC4 \uC0AC\uAC74 \uBC1C\uC0DD \uAC00\uB2A5"
+    specialtyEffectType: 0
+    specialtyProjectType: 0
+    specialtyEffectValue: 2
+    normalizedMapPosition: {x: 0.76, y: 0.71}
+    adjacentCastleIds:
+    - castle_19
+    - castle_55
+    - castle_56
+    - castle_58
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: ecd8b8a7251a6ee45945180f8a76906a, type: 3}
+  - id: castle_58
+    displayName:
+      uid: CASTLE_58
+      korean: "\uB4DC\uB808\uB4DC\uC2A4\uD30C\uC774\uC5B4"
+      english: Dreadspire
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_58_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uB9C8\uB3C4\uC131"
+      english: "Southern Volcanic Wasteland \xB7 Arcane City"
+    specialty:
+      uid: CASTLE_58_SPECIALTY
+      korean: "\uACF5\uD3EC\uC758 \uCCA8\uD0D1 \xB7 \uB514\uBC84\uD504\uC640 \uC18C\uD658
+        \uC2A4\uD0AC \uC5F0\uAD6C\uC5D0 \uC720\uB9AC"
+      english: "\uACF5\uD3EC\uC758 \uCCA8\uD0D1 \xB7 \uB514\uBC84\uD504\uC640 \uC18C\uD658
+        \uC2A4\uD0AC \uC5F0\uAD6C\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 2
+    specialtyProjectType: 0
+    specialtyEffectValue: 8
+    normalizedMapPosition: {x: 0.65, y: 0.73}
+    adjacentCastleIds:
+    - castle_54
+    - castle_57
+    - castle_59
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: ecd8b8a7251a6ee45945180f8a76906a, type: 3}
+  - id: castle_59
+    displayName:
+      uid: CASTLE_59
+      korean: "\uB77C\uC2A4\uD2B8\uB9AC\uC6C0"
+      english: Lastrium
+    castleSize: 0
+    factionId: necropolis
+    terrainTrait:
+      uid: CASTLE_59_TERRAIN
+      korean: "\uB0A8\uBD80 \uD654\uC0B0 \uD669\uBB34\uC9C0 \xB7 \uB3C4\uC2DC"
+      english: "Southern Volcanic Wasteland \xB7 City"
+    specialty:
+      uid: CASTLE_59_SPECIALTY
+      korean: "\uD669\uD63C\uC758 \uD56D\uAD6C \xB7 \uC911\uB9BD\xB7\uCD94\uBC29
+        \uC778\uC7AC\uC640 \uD3EC\uB85C \uAD50\uD658\uC5D0 \uC720\uB9AC"
+      english: "\uD669\uD63C\uC758 \uD56D\uAD6C \xB7 \uC911\uB9BD\xB7\uCD94\uBC29
+        \uC778\uC7AC\uC640 \uD3EC\uB85C \uAD50\uD658\uC5D0 \uC720\uB9AC"
+    specialtyEffectType: 1
+    specialtyProjectType: 0
+    specialtyEffectValue: 12
+    normalizedMapPosition: {x: 0.54, y: 0.76}
+    adjacentCastleIds:
+    - castle_51
+    - castle_52
+    - castle_53
+    - castle_58
+    initialProsperity: 35
+    initialTechnology: 55
+    initialStability: 40
+    initialDefense: 35
+    castleImage: {fileID: 21300000, guid: ecd8b8a7251a6ee45945180f8a76906a, type: 3}
+  heroes:
+  - id: ares
+    displayName:
+      uid: HERO_ARES
+      korean: "\uC544\uB808\uC2A4"
+      english: Ares
+    race: 0
+    heroClass: 0
+    grade: 0
+    traits: 0500000003000000
+    portrait: {fileID: 21300000, guid: 516b37312f8e9864386a01cae560d130, type: 3}
+    leadership: 55
+    might: 55
+    intelligence: 48
+    charisma: 50
+    politics: 42
+    loyaltyState: 0
+    requiredReputation: 0
+    recruitmentRequest:
+      uid: HERO_0_REQUEST
+      korean: "\uC544\uBC1C\uB860 \uC7AC\uAC74"
+      english: Rebuild Avalon
+    activeSkillAvailable: 1
+    recruitmentEventId: recruit_trust
+  - id: lyria
+    displayName:
+      uid: HERO_LYRIA
+      korean: "\uB9AC\uB9AC\uC544"
+      english: Lyria
+    race: 1
+    heroClass: 6
+    grade: 0
+    traits: 04000000
+    portrait: {fileID: 21300000, guid: b022ccf8ec4770a40bbf8857b9c28070, type: 3}
+    leadership: 58
+    might: 59
+    intelligence: 53
+    charisma: 53
+    politics: 46
+    loyaltyState: 0
+    requiredReputation: 0
+    recruitmentRequest:
+      uid: HERO_1_REQUEST
+      korean: "\uACE0\uB300 \uC720\uC801\uC758 \uB2E8\uC11C \uD655\uC778"
+      english: Investigate ancient ruins
+    activeSkillAvailable: 1
+    recruitmentEventId: recruit_trust
+  - id: brom
+    displayName:
+      uid: HERO_BROM
+      korean: "\uBE0C\uB86C"
+      english: Brom
+    race: 2
+    heroClass: 1
+    grade: 0
+    traits: 02000000
+    portrait: {fileID: 21300000, guid: 885c72d9d8b48c5428e53d195ae7edb2, type: 3}
+    leadership: 61
+    might: 63
+    intelligence: 58
+    charisma: 56
+    politics: 50
+    loyaltyState: 0
+    requiredReputation: 5
+    recruitmentRequest:
+      uid: HERO_2_REQUEST
+      korean: "\uC7A5\uC778\uC758 \uC791\uC5C5\uC7A5 \uC9C0\uC6D0"
+      english: Support an artisan workshop
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_service
+  - id: selene
+    displayName:
+      uid: HERO_SELENE
+      korean: "\uC140\uB808\uB124"
+      english: Selene
+    race: 0
+    heroClass: 7
+    grade: 0
+    traits: 06000000
+    portrait: {fileID: 21300000, guid: f98f64766ab92b04aa75a8ff5ceb73c9, type: 3}
+    leadership: 64
+    might: 67
+    intelligence: 63
+    charisma: 59
+    politics: 54
+    loyaltyState: 0
+    requiredReputation: 5
+    recruitmentRequest:
+      uid: HERO_3_REQUEST
+      korean: "\uBD80\uC0C1\uC790\uC640 \uC8FC\uBBFC \uAD6C\uD638"
+      english: Aid the wounded and residents
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_service
+  - id: kael
+    displayName:
+      uid: HERO_KAEL
+      korean: "\uCE74\uC5D8"
+      english: Kael
+    race: 3
+    heroClass: 5
+    grade: 0
+    traits: 03000000
+    portrait: {fileID: 21300000, guid: 0497da93ec170504eb45b697fd9c9805, type: 3}
+    leadership: 67
+    might: 71
+    intelligence: 68
+    charisma: 62
+    politics: 58
+    loyaltyState: 0
+    requiredReputation: 10
+    recruitmentRequest:
+      uid: HERO_4_REQUEST
+      korean: "\uB3C4\uC801 \uC6B0\uB450\uBA38\uB9AC \uCD94\uC801"
+      english: Track a bandit leader
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_service
+  - id: morrigan
+    displayName:
+      uid: HERO_MORRIGAN
+      korean: "\uBAA8\uB9AC\uAC74"
+      english: Morrigan
+    race: 6
+    heroClass: 6
+    grade: 0
+    traits: 0400000005000000
+    portrait: {fileID: 21300000, guid: e8a6045655ecafe4b833a743f62b86ed, type: 3}
+    leadership: 70
+    might: 75
+    intelligence: 73
+    charisma: 65
+    politics: 62
+    loyaltyState: 0
+    requiredReputation: 15
+    recruitmentRequest:
+      uid: HERO_5_REQUEST
+      korean: "\uB9C8\uB825 \uC9C0\uB300 \uC870\uC0AC"
+      english: Investigate a mana zone
+    activeSkillAvailable: 1
+    recruitmentEventId: recruit_faction
+  - id: theron
+    displayName:
+      uid: HERO_THERON
+      korean: "\uD14C\uB860"
+      english: Theron
+    race: 0
+    heroClass: 2
+    grade: 0
+    traits: 07000000
+    portrait: {fileID: 21300000, guid: 87c33ba3da4192349a49ffc468c440b4, type: 3}
+    leadership: 73
+    might: 79
+    intelligence: 78
+    charisma: 68
+    politics: 66
+    loyaltyState: 0
+    requiredReputation: 20
+    recruitmentRequest:
+      uid: HERO_6_REQUEST
+      korean: "\uC810\uB839\uC9C0 \uCE58\uC548 \uD68C\uBCF5"
+      english: Restore occupied-city stability
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_faction
+  - id: elwyn
+    displayName:
+      uid: HERO_ELWYN
+      korean: "\uC5D8\uC708"
+      english: Elwyn
+    race: 1
+    heroClass: 8
+    grade: 0
+    traits: 0000000006000000
+    portrait: {fileID: 21300000, guid: 1c6d8f245555daf458be4280333acfd1, type: 3}
+    leadership: 76
+    might: 83
+    intelligence: 83
+    charisma: 71
+    politics: 70
+    loyaltyState: 0
+    requiredReputation: 25
+    recruitmentRequest:
+      uid: HERO_7_REQUEST
+      korean: "\uB2E4\uC885\uC871 \uBD84\uC7C1 \uC911\uC7AC"
+      english: Mediate a racial dispute
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_faction
+  - id: common_gareth
+    displayName:
+      uid: CHARACTER_COMMON_GARETH
+      korean: "\uAC00\uB808\uC2A4"
+      english: Gareth
+    race: 0
+    heroClass: 1
+    grade: 1
+    traits: 
+    portrait: {fileID: 21300000, guid: 51d5dc92d9270c44c9fa2156929f0afd, type: 3}
+    leadership: 54
+    might: 62
+    intelligence: 28
+    charisma: 36
+    politics: 32
+    loyaltyState: 0
+    requiredReputation: 0
+    recruitmentRequest:
+      uid: CHARACTER_COMMON_GARETH_REQUEST
+      korean: "\uC138\uB825\uC758 \uC2E4\uB825\uC744 \uC99D\uBA85"
+      english: Prove the faction's strength
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_trust
+  - id: common_mira
+    displayName:
+      uid: CHARACTER_COMMON_MIRA
+      korean: "\uBBF8\uB77C"
+      english: Mira
+    race: 0
+    heroClass: 7
+    grade: 1
+    traits: 01000000
+    portrait: {fileID: 21300000, guid: 10d652a42d932c2409a09a4342c88f5d, type: 3}
+    leadership: 35
+    might: 28
+    intelligence: 58
+    charisma: 56
+    politics: 42
+    loyaltyState: 0
+    requiredReputation: 0
+    recruitmentRequest:
+      uid: CHARACTER_COMMON_MIRA_REQUEST
+      korean: "\uC138\uB825\uC758 \uC2E4\uB825\uC744 \uC99D\uBA85"
+      english: Prove the faction's strength
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_trust
+  - id: common_thane
+    displayName:
+      uid: CHARACTER_COMMON_THANE
+      korean: "\uD14C\uC778"
+      english: Thane
+    race: 2
+    heroClass: 1
+    grade: 1
+    traits: 
+    portrait: {fileID: 21300000, guid: f5469fc649a917048a0f8eff48c56b6e, type: 3}
+    leadership: 48
+    might: 65
+    intelligence: 30
+    charisma: 28
+    politics: 44
+    loyaltyState: 0
+    requiredReputation: 5
+    recruitmentRequest:
+      uid: CHARACTER_COMMON_THANE_REQUEST
+      korean: "\uC138\uB825\uC758 \uC2E4\uB825\uC744 \uC99D\uBA85"
+      english: Prove the faction's strength
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_service
+  - id: common_nym
+    displayName:
+      uid: CHARACTER_COMMON_NYM
+      korean: "\uB2D8"
+      english: Nym
+    race: 1
+    heroClass: 4
+    grade: 1
+    traits: 
+    portrait: {fileID: 21300000, guid: 1bc8d346e22972343861ca26361c5e60, type: 3}
+    leadership: 42
+    might: 55
+    intelligence: 47
+    charisma: 38
+    politics: 34
+    loyaltyState: 0
+    requiredReputation: 5
+    recruitmentRequest:
+      uid: CHARACTER_COMMON_NYM_REQUEST
+      korean: "\uC138\uB825\uC758 \uC2E4\uB825\uC744 \uC99D\uBA85"
+      english: Prove the faction's strength
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_service
+  - id: common_raska
+    displayName:
+      uid: CHARACTER_COMMON_RASKA
+      korean: "\uB77C\uC2A4\uCE74"
+      english: Raska
+    race: 4
+    heroClass: 3
+    grade: 1
+    traits: 
+    portrait: {fileID: 21300000, guid: e1feeca0debceb7409510d1cfd13f123, type: 3}
+    leadership: 45
+    might: 68
+    intelligence: 25
+    charisma: 34
+    politics: 26
+    loyaltyState: 0
+    requiredReputation: 10
+    recruitmentRequest:
+      uid: CHARACTER_COMMON_RASKA_REQUEST
+      korean: "\uC138\uB825\uC758 \uC2E4\uB825\uC744 \uC99D\uBA85"
+      english: Prove the faction's strength
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_service
+  - id: common_veil
+    displayName:
+      uid: CHARACTER_COMMON_VEIL
+      korean: "\uBCA0\uC77C"
+      english: Veil
+    race: 6
+    heroClass: 5
+    grade: 1
+    traits: 
+    portrait: {fileID: 21300000, guid: ef07c0d3dc8a0564187e9ccc38bb05e5, type: 3}
+    leadership: 40
+    might: 60
+    intelligence: 52
+    charisma: 32
+    politics: 30
+    loyaltyState: 0
+    requiredReputation: 10
+    recruitmentRequest:
+      uid: CHARACTER_COMMON_VEIL_REQUEST
+      korean: "\uC138\uB825\uC758 \uC2E4\uB825\uC744 \uC99D\uBA85"
+      english: Prove the faction's strength
+    activeSkillAvailable: 0
+    recruitmentEventId: recruit_service
+  specialFacilities:
+  - id: grand_forge
+    displayName:
+      uid: FACILITY_GRAND_FORGE
+      korean: "\uB300\uACF5\uBC29"
+      english: Grand Forge
+    description:
+      uid: FACILITY_GRAND_FORGE_DESC
+      korean: "\uACE0\uAE09 \uC7A5\uBE44 \uC81C\uC791\uACFC \uC218\uB9AC"
+      english: Advanced equipment crafting and repair
+    icon: {fileID: 21300000, guid: b9e382646ab865a4ca37e0dc658360b0, type: 3}
+  - id: mage_tower
+    displayName:
+      uid: FACILITY_MAGE_TOWER
+      korean: "\uB9C8\uBC95 \uD0D1"
+      english: Mage Tower
+    description:
+      uid: FACILITY_MAGE_TOWER_DESC
+      korean: "\uB9C8\uBC95 \uC5F0\uAD6C, \uACB0\uACC4\uC640 \uB9C8\uB098 \uC0DD\uC0B0"
+      english: Magic research, wards, and mana production
+    icon: {fileID: 21300000, guid: 7fabd48e94cdf404eb8579d1f3b4a0ca, type: 3}
+  - id: grand_market
+    displayName:
+      uid: FACILITY_GRAND_MARKET
+      korean: "\uB300\uC2DC\uC7A5"
+      english: Grand Market
+    description:
+      uid: FACILITY_GRAND_MARKET_DESC
+      korean: "\uAE08\uD654 \uC218\uC785, \uBB3C\uC790 \uBC0F \uC120\uBB3C \uAC70\uB798"
+      english: Gold income, supplies, and gift trading
+    icon: {fileID: 21300000, guid: d12d9ea4513724444829d6cbe19b58ae, type: 3}
+  - id: knightly_order
+    displayName:
+      uid: FACILITY_KNIGHTLY_ORDER
+      korean: "\uAE30\uC0AC\uB2E8"
+      english: Knightly Order
+    description:
+      uid: FACILITY_KNIGHTLY_ORDER_DESC
+      korean: "\uD569\uB3D9 \uD6C8\uB828, \uBC29\uC5B4\uC640 \uADFC\uC811 \uC778\uC7AC
+        \uBAA8\uC9D1"
+      english: Joint training, defense, and melee recruitment
+    icon: {fileID: 21300000, guid: 69b3a223122f83740831592f6a71d325, type: 3}
+  - id: adventurers_guild
+    displayName:
+      uid: FACILITY_ADVENTURERS_GUILD
+      korean: "\uBAA8\uD5D8\uAC00 \uAE38\uB4DC"
+      english: Adventurers Guild
+    description:
+      uid: FACILITY_ADVENTURERS_GUILD_DESC
+      korean: "\uC758\uB8B0, \uC778\uC7AC \uD0D0\uC0C9\uACFC \uC6D0\uAC70\uB9AC \uC778\uC7AC
+        \uBAA8\uC9D1"
+      english: Quests, talent search, and ranged recruitment
+    icon: {fileID: 21300000, guid: 675cc06a9352a5045b9358a707cbf85e, type: 3}
+  - id: sanctuary
+    displayName:
+      uid: FACILITY_SANCTUARY
+      korean: "\uC131\uC18C"
+      english: Sanctuary
+    description:
+      uid: FACILITY_SANCTUARY_DESC
+      korean: "\uBD80\uC0C1 \uD68C\uBCF5, \uCE58\uC548\uACFC \uC885\uC871 \uD654\uD569"
+      english: Injury recovery, stability, and racial harmony
+    icon: {fileID: 21300000, guid: 2b822e3889da50846bb3b8da0a8dc7f6, type: 3}
+  - id: spy_outpost
+    displayName:
+      uid: FACILITY_SPY_OUTPOST
+      korean: "\uCCA9\uBCF4\uC6D0 \uAC70\uC810"
+      english: Spy Outpost
+    description:
+      uid: FACILITY_SPY_OUTPOST_DESC
+      korean: "\uC801 \uC815\uBCF4, \uBC29\uCCA9\uACFC \uACC4\uB7B5"
+      english: Enemy intelligence, counterintelligence, and schemes
+    icon: {fileID: 21300000, guid: 2925c33f167169d4298c83c63b3d9948, type: 3}
+  - id: embassy
+    displayName:
+      uid: FACILITY_EMBASSY
+      korean: "\uC0AC\uC808\uAD00"
+      english: Embassy
+    description:
+      uid: FACILITY_EMBASSY_DESC
+      korean: "\uC678\uAD50, \uD3EC\uB85C \uAD50\uD658\uACFC \uD0C0 \uC885\uC871
+        \uB4F1\uC6A9"
+      english: Diplomacy, prisoner exchange, and cross-race recruitment
+    icon: {fileID: 21300000, guid: 9394bf6d5fcd7e04e9a43d9446f017c3, type: 3}
+  researchDefinitions:
+  - id: mana_circulation
+    displayName:
+      uid: RESEARCH_MANA_CIRCULATION
+      korean: "\uB9C8\uB098 \uC21C\uD658\uC220"
+      english: Mana Circulation
+    description:
+      uid: RESEARCH_MANA_CIRCULATION_DESC
+      korean: "\uAC01 \uC131\uC758 \uB9C8\uB098 \uC218\uC785\uC774 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      english: Increases mana income in every castle.
+    manaCost: 80
+    requiredTechnology: 30
+    durationMonths: 1
+    effectType: 1
+    effectValue: 2
+    prerequisiteResearchId: 
+  - id: royal_ledger
+    displayName:
+      uid: RESEARCH_ROYAL_LEDGER
+      korean: "\uC655\uC2E4 \uC7A5\uBD80 \uCCB4\uACC4"
+      english: Royal Ledger
+    description:
+      uid: RESEARCH_ROYAL_LEDGER_DESC
+      korean: "\uAE08\uD654 \uC218\uC785\uC774 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      english: Increases gold income.
+    manaCost: 100
+    requiredTechnology: 35
+    durationMonths: 2
+    effectType: 0
+    effectValue: 10
+    prerequisiteResearchId: 
+  - id: arcane_administration
+    displayName:
+      uid: RESEARCH_ARCANE_ADMIN
+      korean: "\uB9C8\uB3C4 \uD589\uC815\uD559"
+      english: Arcane Administration
+    description:
+      uid: RESEARCH_ARCANE_ADMIN_DESC
+      korean: "\uBAA8\uB4E0 \uC911\uC810 \uC0AC\uC5C5 \uC131\uACFC\uAC00 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      english: Improves all focus projects.
+    manaCost: 140
+    requiredTechnology: 45
+    durationMonths: 2
+    effectType: 3
+    effectValue: 2
+    prerequisiteResearchId: mana_circulation
+  - id: battle_enchantment
+    displayName:
+      uid: RESEARCH_BATTLE_ENCHANT
+      korean: "\uC804\uD22C \uB9C8\uBC95 \uBD80\uC5EC"
+      english: Battle Enchantment
+    description:
+      uid: RESEARCH_BATTLE_ENCHANT_DESC
+      korean: "\uBAA8\uB4E0 \uBD80\uB300\uC758 \uC804\uD22C\uB825\uC774 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      english: Increases battle power of every army.
+    manaCost: 180
+    requiredTechnology: 55
+    durationMonths: 3
+    effectType: 4
+    effectValue: 15
+    prerequisiteResearchId: arcane_administration
+  - id: diplomatic_seals
+    displayName:
+      uid: RESEARCH_DIPLOMATIC_SEALS
+      korean: "\uB9C8\uB3C4 \uC778\uC7A5 \uC678\uAD50"
+      english: Arcane Seals
+    description:
+      uid: RESEARCH_DIPLOMATIC_SEALS_DESC
+      korean: "\uAC01 \uC131\uC758 \uC601\uD5A5\uB825 \uC218\uC785\uC774 \uC99D\uAC00\uD569\uB2C8\uB2E4."
+      english: Increases influence income in every castle.
+    manaCost: 120
+    requiredTechnology: 40
+    durationMonths: 2
+    effectType: 2
+    effectValue: 1
+    prerequisiteResearchId: mana_circulation
+  titleDefinitions:
+  - id: retainer
+    displayName:
+      uid: TITLE_RETAINER
+      korean: "\uC655\uC2E4 \uC885\uC0AC"
+      english: Royal Retainer
+    requiredMerit: 10
+    influenceCost: 10
+    projectBonus: 1
+    battlePowerBonus: 0
+  - id: knight
+    displayName:
+      uid: TITLE_KNIGHT
+      korean: "\uAE30\uC0AC"
+      english: Knight
+    requiredMerit: 30
+    influenceCost: 20
+    projectBonus: 0
+    battlePowerBonus: 8
+  - id: baron
+    displayName:
+      uid: TITLE_BARON
+      korean: "\uB0A8\uC791"
+      english: Baron
+    requiredMerit: 60
+    influenceCost: 35
+    projectBonus: 2
+    battlePowerBonus: 5
+  - id: count
+    displayName:
+      uid: TITLE_COUNT
+      korean: "\uBC31\uC791"
+      english: Count
+    requiredMerit: 100
+    influenceCost: 60
+    projectBonus: 3
+    battlePowerBonus: 10
+  schemeDefinitions:
+  - id: scheme_investigation
+    displayName:
+      uid: SCHEME_INVESTIGATION
+      korean: "\uC870\uC0AC"
+      english: Investigation
+    description:
+      uid: SCHEME_INVESTIGATION_DESC
+      korean: "\uC801 \uC131\uC758 \uC218\uCE58\uC640 \uC8FC\uB454 \uC778\uBB3C\uC744
+        3\uAC1C\uC6D4\uAC04 \uD655\uC778\uD569\uB2C8\uB2E4."
+      english: "\uC801 \uC131\uC758 \uC218\uCE58\uC640 \uC8FC\uB454 \uC778\uBB3C\uC744
+        3\uAC1C\uC6D4\uAC04 \uD655\uC778\uD569\uB2C8\uB2E4."
+    schemeType: 0
+    influenceCost: 10
+    baseSuccessChance: 50
+    effectValue: 0
+    durationMonths: 3
+  - id: scheme_counterintelligence
+    displayName:
+      uid: SCHEME_COUNTERINTELLIGENCE
+      korean: "\uBC29\uCCA9"
+      english: Counterintelligence
+    description:
+      uid: SCHEME_COUNTERINTELLIGENCE_DESC
+      korean: "\uC544\uAD70 \uC131\uC744 3\uAC1C\uC6D4\uAC04 \uC801 \uC870\uC0AC\uC640
+        \uACC4\uB7B5\uC73C\uB85C\uBD80\uD130 \uBCF4\uD638\uD569\uB2C8\uB2E4."
+      english: "\uC544\uAD70 \uC131\uC744 3\uAC1C\uC6D4\uAC04 \uC801 \uC870\uC0AC\uC640
+        \uACC4\uB7B5\uC73C\uB85C\uBD80\uD130 \uBCF4\uD638\uD569\uB2C8\uB2E4."
+    schemeType: 1
+    influenceCost: 10
+    baseSuccessChance: 100
+    effectValue: 0
+    durationMonths: 3
+  - id: scheme_rumor
+    displayName:
+      uid: SCHEME_RUMOR
+      korean: "\uC720\uC5B8\uBE44\uC5B4"
+      english: Rumor
+    description:
+      uid: SCHEME_RUMOR_DESC
+      korean: "\uC801 \uC131\uC758 \uCE58\uC548\uC744 10 \uB0AE\uCDA5\uB2C8\uB2E4."
+      english: "\uC801 \uC131\uC758 \uCE58\uC548\uC744 10 \uB0AE\uCDA5\uB2C8\uB2E4."
+    schemeType: 2
+    influenceCost: 15
+    baseSuccessChance: 45
+    effectValue: 10
+    durationMonths: 0
+  - id: scheme_alienation
+    displayName:
+      uid: SCHEME_ALIENATION
+      korean: "\uC778\uC7AC \uC774\uAC04"
+      english: Alienation
+    description:
+      uid: SCHEME_ALIENATION_DESC
+      korean: "\uC801 \uC131 \uC778\uBB3C\uC758 \uCDA9\uC131 \uC0C1\uD0DC\uB97C \uD55C
+        \uB2E8\uACC4 \uD754\uB4ED\uB2C8\uB2E4."
+      english: "\uC801 \uC131 \uC778\uBB3C\uC758 \uCDA9\uC131 \uC0C1\uD0DC\uB97C
+        \uD55C \uB2E8\uACC4 \uD754\uB4ED\uB2C8\uB2E4."
+    schemeType: 3
+    influenceCost: 20
+    baseSuccessChance: 35
+    effectValue: 1
+    durationMonths: 0
+  difficultyDefinitions:
+  - difficulty: 0
+    displayName:
+      uid: DIFFICULTY_STANDARD
+      korean: "\uD45C\uC900"
+      english: Standard
+    description:
+      uid: DIFFICULTY_STANDARD_DESC
+      korean: "\uCD94\uCC9C \uB09C\uC774\uB3C4\uC785\uB2C8\uB2E4. AI\uAC00 \uC0C1\uC704
+        \uB450 \uD6C4\uBCF4 \uC548\uC5D0\uC11C \uC0C1\uD669\uC5D0 \uB9DE\uB294 \uACB0\uC815\uC744
+        \uB0B4\uB9BD\uB2C8\uB2E4."
+      english: "\uCD94\uCC9C \uB09C\uC774\uB3C4\uC785\uB2C8\uB2E4. AI\uAC00 \uC0C1\uC704
+        \uB450 \uD6C4\uBCF4 \uC548\uC5D0\uC11C \uC0C1\uD669\uC5D0 \uB9DE\uB294 \uACB0\uC815\uC744
+        \uB0B4\uB9BD\uB2C8\uB2E4."
+    aiCandidateWindow: 2
+  - difficulty: 1
+    displayName:
+      uid: DIFFICULTY_RELAXED
+      korean: "\uC5EC\uC720"
+      english: Relaxed
+    description:
+      uid: DIFFICULTY_RELAXED_DESC
+      korean: "\uC804\uB7B5 \uD559\uC2B5\uC5D0 \uC801\uD569\uD569\uB2C8\uB2E4. AI\uAC00
+        \uC0C1\uC704 \uC138 \uD6C4\uBCF4\uB97C \uD3ED\uB113\uAC8C \uAC80\uD1A0\uD574
+        \uCD5C\uC801 \uC120\uD0DD \uBE48\uB3C4\uAC00 \uB0AE\uC2B5\uB2C8\uB2E4."
+      english: "\uC804\uB7B5 \uD559\uC2B5\uC5D0 \uC801\uD569\uD569\uB2C8\uB2E4. AI\uAC00
+        \uC0C1\uC704 \uC138 \uD6C4\uBCF4\uB97C \uD3ED\uB113\uAC8C \uAC80\uD1A0\uD574
+        \uCD5C\uC801 \uC120\uD0DD \uBE48\uB3C4\uAC00 \uB0AE\uC2B5\uB2C8\uB2E4."
+    aiCandidateWindow: 3
+  - difficulty: 2
+    displayName:
+      uid: DIFFICULTY_HARD
+      korean: "\uB3C4\uC804"
+      english: Hard
+    description:
+      uid: DIFFICULTY_HARD_DESC
+      korean: "\uC219\uB828\uC790\uB97C \uC704\uD55C \uB09C\uC774\uB3C4\uC785\uB2C8\uB2E4.
+        AI\uAC00 \uC228\uC740 \uBCF4\uB108\uC2A4 \uC5C6\uC774 \uD56D\uC0C1 \uCD5C\uC0C1\uC704
+        \uD6C4\uBCF4\uB97C \uC120\uD0DD\uD569\uB2C8\uB2E4."
+      english: "\uC219\uB828\uC790\uB97C \uC704\uD55C \uB09C\uC774\uB3C4\uC785\uB2C8\uB2E4.
+        AI\uAC00 \uC228\uC740 \uBCF4\uB108\uC2A4 \uC5C6\uC774 \uD56D\uC0C1 \uCD5C\uC0C1\uC704
+        \uD6C4\uBCF4\uB97C \uC120\uD0DD\uD569\uB2C8\uB2E4."
+    aiCandidateWindow: 1
+  tutorialDefinitions:
+  - id: tutorial_global
+    month: 1
+    title:
+      uid: tutorial_global_title
+      korean: "\uB300\uB959\uACFC \uB2E4\uC74C \uD134"
+      english: Continent and Next Turn
+    description:
+      uid: tutorial_global_description
+      korean: "\uB300\uB959 \uC9C0\uB3C4\uC5D0\uC11C 60\uAC1C \uC131\uACFC \uC138\uB825
+        \uACBD\uACC4\uB97C \uC0B4\uD3B4\uBCF4\uC2ED\uC2DC\uC624. \uD558\uB2E8 \uC804\uC5ED
+        \uBA54\uB274\uB85C \uC138\uB825 \uBA85\uB839\uC744 \uC5F4\uACE0, \uC900\uBE44\uAC00
+        \uB05D\uB098\uBA74 \uC6B0\uCE21\uC758 \uB2E4\uC74C \uD134\uC73C\uB85C \uD55C
+        \uB2EC\uC744 \uC9C4\uD589\uD569\uB2C8\uB2E4."
+      english: Review the 60 castles and faction borders. Use the global menus for
+        faction commands, then advance one month with Next Turn.
+  - id: tutorial_castle
+    month: 2
+    title:
+      uid: tutorial_castle_title
+      korean: "\uC131 \uC911\uC2EC \uB0B4\uC815"
+      english: Castle Administration
+    description:
+      uid: tutorial_castle_description
+      korean: "\uC9C0\uB3C4\uC5D0\uC11C \uC544\uBC1C\uB860\uC758 \uC131\uC744 \uC120\uD0DD\uD558\uBA74
+        \uC131 \uD654\uBA74\uC73C\uB85C \uC804\uD658\uB429\uB2C8\uB2E4. \uC131 \uC218\uCE58,
+        \uD0DC\uC218\uC640 \uC8FC\uB454 \uC778\uBB3C\uC744 \uD655\uC778\uD55C \uB4A4
+        \uB300\uB959 \uC9C0\uB3C4\uB85C \uB3CC\uC544\uC62C \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+      english: Select an Avalon castle on the map to enter its administration view.
+        Review its values, governor and stationed characters, then return to the
+        continent.
+  - id: tutorial_project
+    month: 3
+    title:
+      uid: tutorial_project_title
+      korean: "\uC774\uBC88 \uB2EC \uC911\uC810 \uC0AC\uC5C5"
+      english: Monthly Focus Project
+    description:
+      uid: tutorial_project_description
+      korean: "\uC131 \uD654\uBA74\uC758 \uC911\uC810 \uC0AC\uC5C5\uC5D0\uC11C \uBC88\uC601\xB7\uAE30\uC220\xB7\uC548\uC815\xB7\uC694\uC0C8
+        \uB4F1 \uBAA9\uD45C\uC640 \uB2F4\uB2F9 \uC778\uBB3C\uC744 \uC120\uD0DD\uD569\uB2C8\uB2E4.
+        \uB2F4\uB2F9 \uC778\uBB3C\uC740 \uC644\uB8CC\uB420 \uB54C\uAE4C\uC9C0 \uB2E4\uB978
+        \uC784\uBB34\uB97C \uB9E1\uC744 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
+      english: Choose a focus and manager from the castle project menu. The manager
+        cannot take another duty until the project finishes.
+  - id: tutorial_research
+    month: 6
+    title:
+      uid: tutorial_research_title
+      korean: "\uC5F0\uAD6C\uC640 \uC778\uBB3C \uBC30\uC815"
+      english: Research and Assignment
+    description:
+      uid: tutorial_research_description
+      korean: "\uC804\uC5ED \uC5F0\uAD6C \uBA54\uB274\uC5D0\uC11C \uB9C8\uB098\uC640
+        \uAE30\uC220 \uC870\uAC74\uC744 \uD655\uC778\uD558\uC2ED\uC2DC\uC624. \uB300\uAE30
+        \uC778\uBB3C\uC744 \uC5F0\uAD6C \uB2F4\uB2F9\uC790\uB85C \uC9C0\uC815\uD558\uBA74
+        \uC644\uB8CC \uD6C4 \uC138\uB825 \uC804\uCCB4\uC5D0 \uD6A8\uACFC\uAC00 \uC801\uC6A9\uB429\uB2C8\uB2E4."
+      english: Check mana and technology requirements in the global research menu.
+        Assign an idle character to unlock a faction-wide effect.
+  - id: tutorial_military
+    month: 12
+    title:
+      uid: tutorial_military_title
+      korean: "\uAD70\uC0AC\uC640 \uCCAB\uD574 \uC810\uAC80"
+      english: Military and First-Year Review
+    description:
+      uid: tutorial_military_description
+      korean: "\uAD70\uC0AC \uBA54\uB274\uC5D0\uC11C \uBD80\uB300\uB97C \uD3B8\uC131\uD558\uACE0
+        \uC778\uC811 \uC131\uC73C\uB85C \uC774\uB3D9\uC2DC\uD0AC \uC218 \uC788\uC2B5\uB2C8\uB2E4.
+        \uCD9C\uC815 \uC804 \uC5ED\uD560\xB7\uBCF4\uAE09\xB7\uC219\uB828\uACFC \uC678\uAD50\uC758
+        \uC804\uC7C1 \uC0C1\uD0DC\uB97C \uD655\uC778\uD558\uC2ED\uC2DC\uC624."
+      english: Form armies and move them to adjacent castles. Before marching, review
+        roles, supply, proficiency and diplomatic war status.
+  campaignRules:
+    victoryRequiresAllCastles: 1
+    defeatWhenNoCastles: 1
+    victoryTitle:
+      uid: campaign_victory_title
+      korean: "\uB300\uB959 \uD1B5\uC77C"
+      english: Continental Unification
+    victoryDescription:
+      uid: campaign_victory_description
+      korean: "\uC544\uBC1C\uB860\uC774 \uB300\uB959\uC758 \uBAA8\uB4E0 \uC131\uC744
+        \uD1B5\uC77C\uD588\uC2B5\uB2C8\uB2E4. \uD669\uD63C\uC758 \uADC0\uD658 \uCEA0\uD398\uC778\uC758
+        \uCD5C\uC18C \uC2B9\uB9AC \uC870\uAC74\uC744 \uB2EC\uC131\uD588\uC2B5\uB2C8\uB2E4."
+      english: Avalon controls every castle on the continent and has achieved the
+        campaign's minimum victory condition.
+    defeatTitle:
+      uid: campaign_defeat_title
+      korean: "\uC544\uBC1C\uB860 \uBA78\uB9DD"
+      english: Fall of Avalon
+    defeatDescription:
+      uid: campaign_defeat_description
+      korean: "\uC544\uBC1C\uB860\uC774 \uC9C0\uBC30\uD558\uB294 \uC131\uC774 \uD558\uB098\uB3C4
+        \uB0A8\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4. \uC138\uB825\uC744 \uC7AC\uAC74\uD560
+        \uAE30\uBC18\uC744 \uC783\uC5C8\uC2B5\uB2C8\uB2E4."
+      english: Avalon controls no castles and has lost the foundation needed to rebuild
+        the faction.
+  projectBalance:
+    basicCost: 100
+    intensiveCost: 180
+    expansionBasicCost: 600
+    baseGain: 4
+    statDivisor: 20
+    intensiveGainBonus: 4
+    traitGainBonus: 2
+    policyGainBonus: 2
+    minimumGain: 4
+    maximumGain: 16
+    expansionDurationMonths: 3
+  traitDefinitions:
+  - traitType: 0
+    displayName:
+      uid: trait_0_name
+      korean: "\uB18D\uC815\uAC00"
+      english: Agronomist
+    description:
+      uid: trait_0_description
+      korean: "\uBC88\uC601 \uC0AC\uC5C5 \uC131\uACFC +2 \xB7 \uC8FC\uB454 \uBD80\uB300\uC758
+        \uBCF4\uAE09\uC744 \uCDA9\uBD84 \uC0C1\uD0DC\uB85C \uD68C\uBCF5"
+      english: "Prosperity +2 \xB7 restores stationed armies to sufficient supply"
+    projectTypes: 00000000
+    uniqueEffectValue: 1
+  - traitType: 1
+    displayName:
+      uid: trait_1_name
+      korean: "\uC0C1\uC778"
+      english: Merchant
+    description:
+      uid: trait_1_description
+      korean: "\uBC88\uC601 \uC0AC\uC5C5 \uC131\uACFC +2 \xB7 \uC0AC\uC5C5 \uC644\uB8CC
+        \uC2DC \uCD94\uAC00 \uAE08\uD654 50 \uD68D\uB4DD"
+      english: "Prosperity +2 \xB7 gains 50 additional gold on completion"
+    projectTypes: 00000000
+    uniqueEffectValue: 50
+  - traitType: 2
+    displayName:
+      uid: trait_2_name
+      korean: "\uAC74\uCD95\uAC00"
+      english: Architect
+    description:
+      uid: trait_2_description
+      korean: "\uC694\uC0C8\xB7\uD655\uC7A5 \uC0AC\uC5C5 \uC131\uACFC +2 \xB7 \uC0AC\uC5C5
+        \uC644\uB8CC \uC2DC \uACF5\uC0AC\uBE44 15% \uD658\uAE09"
+      english: "Fortification/expansion +2 \xB7 refunds 15% of project cost"
+    projectTypes: 0300000007000000
+    uniqueEffectValue: 15
+  - traitType: 3
+    displayName:
+      uid: trait_3_name
+      korean: "\uCE58\uC548\uAD00"
+      english: Constable
+    description:
+      uid: trait_3_description
+      korean: "\uC548\uC815 \uC0AC\uC5C5 \uC131\uACFC +2 \xB7 \uC0AC\uC5C5 \uC644\uB8CC
+        \uC2DC \uBC29\uCCA9\uC744 2\uAC1C\uC6D4 \uAC15\uD654"
+      english: "Stability +2 \xB7 strengthens counterintelligence for 2 months"
+    projectTypes: 02000000
+    uniqueEffectValue: 2
+  - traitType: 4
+    displayName:
+      uid: trait_4_name
+      korean: "\uD559\uC790"
+      english: Scholar
+    description:
+      uid: trait_4_description
+      korean: "\uAE30\uC220 \uC0AC\uC5C5 \uC131\uACFC +2 \xB7 \uC9C4\uD589 \uC911
+        \uC5F0\uAD6C\uB97C 1\uAC1C\uC6D4 \uB2E8\uCD95\uD558\uAC70\uB098 \uB9C8\uB098
+        1 \uD68D\uB4DD"
+      english: "Technology +2 \xB7 reduces active research by 1 month or gains 1
+        mana"
+    projectTypes: 01000000
+    uniqueEffectValue: 1
+  - traitType: 5
+    displayName:
+      uid: trait_5_name
+      korean: "\uAD50\uC12D\uAC00"
+      english: Negotiator
+    description:
+      uid: trait_5_description
+      korean: "\uC778\uC7AC \uC0AC\uC5C5 \uC131\uACFC +2 \xB7 \uAD00\uB828 \uC0AC\uAC74\uC758
+        \uC601\uC6C5 \uC120\uD0DD\uC9C0\uC640 \uC601\uD5A5\uB825 10 \uD68D\uB4DD"
+      english: "Recruitment +2 \xB7 unlocks hero event choice and gains 10 influence"
+    projectTypes: 04000000
+    uniqueEffectValue: 10
+  - traitType: 6
+    displayName:
+      uid: trait_6_name
+      korean: "\uC758\uC0AC"
+      english: Doctor
+    description:
+      uid: trait_6_description
+      korean: "\uD68C\uBCF5 \uC0AC\uC5C5 \uC131\uACFC +2 \xB7 \uC8FC\uB454 \uC778\uBB3C\uC758
+        \uBD80\uC0C1 1\uAC1C\uC6D4\uACFC \uD53C\uB85C 10 \uD68C\uBCF5"
+      english: "Recovery +2 \xB7 heals 1 injury month and 10 fatigue for stationed
+        characters"
+    projectTypes: 06000000
+    uniqueEffectValue: 1
+  - traitType: 7
+    displayName:
+      uid: trait_7_name
+      korean: "\uAD50\uAD00"
+      english: Instructor
+    description:
+      uid: trait_7_description
+      korean: "\uD6C8\uB828 \uC0AC\uC5C5 \uC131\uACFC +2 \xB7 \uC8FC\uB454 \uBD80\uB300\uC758
+        \uC219\uB828 \uACBD\uD5D8 15 \uD68D\uB4DD"
+      english: "Training +2 \xB7 grants 15 cohesion experience to stationed armies"
+    projectTypes: 05000000
+    uniqueEffectValue: 15
+  relationshipEventDefinitions:
+  - id: relationship_reconciliation
+    title:
+      uid: REL_RECON_TITLE
+      korean: "\uAE68\uC9C4 \uC2E0\uB8B0"
+      english: Broken Trust
+    description:
+      uid: REL_RECON_DESC
+      korean: "\uAC08\uB4F1\uD558\uB358 \uB450 \uC778\uBB3C\uC774 \uAC19\uC740 \uC131\uC5D0\uC11C
+        \uB2E4\uC2DC \uB9C8\uC8FC\uD588\uC2B5\uB2C8\uB2E4. \uAC70\uB9AC\uB97C \uB458\uC9C0
+        \uC18D\uB0B4\uB97C \uD138\uC5B4\uB193\uC744\uC9C0 \uACB0\uC815\uD569\uB2C8\uB2E4."
+      english: Two conflicted characters meet again in the same castle.
+    requiredLevel: 0
+    choices:
+    - label:
+        uid: REL_RECON_SAFE
+        korean: "\uB2F9\uBD84\uAC04 \uAC70\uB9AC\uB97C \uB454\uB2E4"
+        english: Keep some distance
+      resultDescription:
+        uid: REL_RECON_SAFE_RESULT
+        korean: "\uAD00\uACC4\uAC00 \uBCF4\uD1B5\uC73C\uB85C \uD68C\uBCF5\uB418\uACE0
+          \uACF5\uC801 +2"
+        english: Relationship becomes normal and merit +2
+      relationshipShift: 1
+      meritDelta: 2
+      fatigueDelta: 0
+    - label:
+        uid: REL_RECON_BOLD
+        korean: "\uC194\uC9C1\uD558\uAC8C \uB300\uD654\uD55C\uB2E4"
+        english: Speak honestly
+      resultDescription:
+        uid: REL_RECON_BOLD_RESULT
+        korean: "\uAD00\uACC4\uAC00 \uCE5C\uC560\uB85C \uD68C\uBCF5\uB418\uACE0 \uACF5\uC801
+          +5, \uD53C\uB85C +10"
+        english: Relationship becomes fondness, merit +5, fatigue +10
+      relationshipShift: 2
+      meritDelta: 5
+      fatigueDelta: 10
+  - id: relationship_shared_oath
+    title:
+      uid: REL_OATH_TITLE
+      korean: "\uD568\uAED8 \uC138\uC6B4 \uB9F9\uC138"
+      english: A Shared Oath
+    description:
+      uid: REL_OATH_DESC
+      korean: "\uC11C\uB85C\uB97C \uC2E0\uB8B0\uD558\uB294 \uB450 \uC778\uBB3C\uC774
+        \uC55E\uC73C\uB85C\uC758 \uD611\uB825 \uBC29\uC2DD\uC744 \uC815\uD558\uB824
+        \uD569\uB2C8\uB2E4."
+      english: Two trusted characters decide how they will cooperate.
+    requiredLevel: 2
+    choices:
+    - label:
+        uid: REL_OATH_SAFE
+        korean: "\uC11C\uB85C\uC758 \uC5ED\uD560\uC744 \uC874\uC911\uD55C\uB2E4"
+        english: Respect each role
+      resultDescription:
+        uid: REL_OATH_SAFE_RESULT
+        korean: "\uCE5C\uC560 \uC720\uC9C0, \uACF5\uC801 +3"
+        english: Maintain fondness and gain merit +3
+      relationshipShift: 0
+      meritDelta: 3
+      fatigueDelta: 0
+    - label:
+        uid: REL_OATH_BOLD
+        korean: "\uACF5\uB3D9\uC758 \uB9F9\uC138\uB97C \uC138\uC6B4\uB2E4"
+        english: Make a shared oath
+      resultDescription:
+        uid: REL_OATH_BOLD_RESULT
+        korean: "\uCE5C\uC560 \uC720\uC9C0, \uACF5\uC801 +8, \uD53C\uB85C +5"
+        english: Maintain fondness, merit +8, fatigue +5
+      relationshipShift: 0
+      meritDelta: 8
+      fatigueDelta: 5
+  heroLegacyDefinitions:
+  - id: legacy_prosperity
+    projectType: 0
+    displayName:
+      uid: legacy_prosperity_name
+      korean: "\uD48D\uC694\uC758 \uACE1\uCC3D"
+      english: Granary of Plenty
+    description:
+      uid: legacy_prosperity_description
+      korean: "\uBC88\uC601 \uC0AC\uC5C5 \uC131\uACFC\uB97C \uB192\uC774\uB294 \uC601\uC6C5\uC758
+        \uC6B4\uC601 \uC804\uD1B5\uC785\uB2C8\uB2E4."
+      english: A heroic tradition that improves prosperity projects.
+    projectGainBonus: 2
+  - id: legacy_technology
+    projectType: 1
+    displayName:
+      uid: legacy_technology_name
+      korean: "\uBCC4\uC758 \uAD00\uCE21\uC18C"
+      english: Stellar Observatory
+    description:
+      uid: legacy_technology_description
+      korean: "\uAE30\uC220 \uC0AC\uC5C5 \uC131\uACFC\uB97C \uB192\uC774\uB294 \uC5F0\uAD6C
+        \uC804\uD1B5\uC785\uB2C8\uB2E4."
+      english: A research tradition that improves technology projects.
+    projectGainBonus: 2
+  - id: legacy_stability
+    projectType: 2
+    displayName:
+      uid: legacy_stability_name
+      korean: "\uACF5\uC815\uD55C \uC7AC\uD310\uC815"
+      english: Hall of Fair Judgment
+    description:
+      uid: legacy_stability_description
+      korean: "\uC548\uC815 \uC0AC\uC5C5 \uC131\uACFC\uB97C \uB192\uC774\uB294 \uACF5\uC815\uD55C
+        \uD1B5\uCE58\uC758 \uD754\uC801\uC785\uB2C8\uB2E4."
+      english: A legacy of fair rule that improves stability projects.
+    projectGainBonus: 2
+  - id: legacy_fortification
+    projectType: 3
+    displayName:
+      uid: legacy_fortification_name
+      korean: "\uBD88\uAD74\uC758 \uB300\uACF5\uBC29"
+      english: Grand Workshop of Resolve
+    description:
+      uid: legacy_fortification_description
+      korean: "\uC694\uC0C8 \uC0AC\uC5C5 \uC131\uACFC\uB97C \uB192\uC774\uB294 \uC7A5\uC778\uC758
+        \uACF5\uBC95\uC785\uB2C8\uB2E4."
+      english: A masterwork tradition that improves fortification projects.
+    projectGainBonus: 2
+  - id: legacy_recruitment
+    projectType: 4
+    displayName:
+      uid: legacy_recruitment_name
+      korean: "\uB9F9\uC138\uC758 \uD68C\uB791"
+      english: Hall of Oaths
+    description:
+      uid: legacy_recruitment_description
+      korean: "\uC778\uC7AC \uC0AC\uC5C5 \uC131\uACFC\uB97C \uB192\uC774\uB294 \uC2E0\uB8B0\uC640
+        \uBA85\uC131\uC758 \uC7A5\uC18C\uC785\uB2C8\uB2E4."
+      english: A place of trust and renown that improves recruitment projects.
+    projectGainBonus: 2
+  - id: legacy_training
+    projectType: 5
+    displayName:
+      uid: legacy_training_name
+      korean: "\uBC31\uC804\uC758 \uC5F0\uBB34\uC7A5"
+      english: Veterans' Training Yard
+    description:
+      uid: legacy_training_description
+      korean: "\uD6C8\uB828 \uC0AC\uC5C5 \uC131\uACFC\uB97C \uB192\uC774\uB294 \uC2E4\uC804
+        \uAD50\uC721 \uC804\uD1B5\uC785\uB2C8\uB2E4."
+      english: A practical training tradition that improves training projects.
+    projectGainBonus: 2
+  - id: legacy_recovery
+    projectType: 6
+    displayName:
+      uid: legacy_recovery_name
+      korean: "\uCE58\uC720\uC758 \uC815\uC6D0"
+      english: Garden of Recovery
+    description:
+      uid: legacy_recovery_description
+      korean: "\uD68C\uBCF5 \uC0AC\uC5C5 \uC131\uACFC\uB97C \uB192\uC774\uB294 \uCE58\uB8CC\uC640
+        \uD734\uC2DD\uC758 \uC7A5\uC18C\uC785\uB2C8\uB2E4."
+      english: A sanctuary that improves recovery projects.
+    projectGainBonus: 2
+  - id: legacy_expansion
+    projectType: 7
+    displayName:
+      uid: legacy_expansion_name
+      korean: "\uAC1C\uCC99\uC790\uC758 \uAD11\uC7A5"
+      english: Founders' Plaza
+    description:
+      uid: legacy_expansion_description
+      korean: "\uD655\uC7A5 \uC0AC\uC5C5 \uC131\uACFC\uB97C \uB192\uC774\uB294 \uAC1C\uCC99
+        \uC815\uC2E0\uC758 \uC0C1\uC9D5\uC785\uB2C8\uB2E4."
+      english: A symbol of pioneering spirit that improves expansion projects.
+    projectGainBonus: 2
+  recruitmentEventDefinitions:
+  - id: recruit_trust
+    title:
+      uid: RECRUIT_TRUST_TITLE
+      korean: "\uC2E0\uB8B0\uC758 \uC99D\uBA85"
+      english: Proof of Trust
+    description:
+      uid: RECRUIT_TRUST_DESC
+      korean: "\uD6C4\uBCF4\uB294 \uB9D0\uBFD0\uC778 \uC57D\uC18D\uC774 \uC544\uB2C8\uB77C
+        \uBBFF\uC744 \uC218 \uC788\uB294 \uD0DC\uB3C4\uB97C \uC694\uAD6C\uD569\uB2C8\uB2E4."
+      english: The candidate asks for a trustworthy commitment.
+    choices:
+    - label:
+        uid: RECRUIT_TRUST_SAFE_label
+        korean: "\uC694\uAD6C\uB97C \uCC28\uBD84\uD788 \uBC1B\uC544\uB4E4\uC778\uB2E4"
+        english: "\uC694\uAD6C\uB97C \uCC28\uBD84\uD788 \uBC1B\uC544\uB4E4\uC778\uB2E4"
+      resultDescription:
+        uid: RECRUIT_TRUST_SAFE_result
+        korean: "\uB4F1\uC6A9, \uACF5\uC801 +5, \uD53C\uB85C +5"
+        english: "\uB4F1\uC6A9, \uACF5\uC801 +5, \uD53C\uB85C +5"
+      requiredReputation: 0
+      requiredMerit: 0
+      requiredFactionCastleCount: 0
+      requiresNegotiator: 0
+      recruiterMeritGain: 5
+      recruiterFatigueGain: 5
+    - label:
+        uid: RECRUIT_TRUST_BOLD_label
+        korean: "\uACF5\uAC1C\uC801\uC73C\uB85C \uBA85\uC608\uB97C \uAC74\uB2E4"
+        english: "\uACF5\uAC1C\uC801\uC73C\uB85C \uBA85\uC608\uB97C \uAC74\uB2E4"
+      resultDescription:
+        uid: RECRUIT_TRUST_BOLD_result
+        korean: "\uB4F1\uC6A9, \uACF5\uC801 +8, \uD53C\uB85C +10"
+        english: "\uB4F1\uC6A9, \uACF5\uC801 +8, \uD53C\uB85C +10"
+      requiredReputation: 10
+      requiredMerit: 0
+      requiredFactionCastleCount: 0
+      requiresNegotiator: 0
+      recruiterMeritGain: 8
+      recruiterFatigueGain: 10
+    - label:
+        uid: RECRUIT_TRUST_HERO_label
+        korean: "\uAD50\uC12D\uAC00\uC758 \uBCF4\uC99D\uC744 \uC81C\uC2DC\uD55C\uB2E4"
+        english: "\uAD50\uC12D\uAC00\uC758 \uBCF4\uC99D\uC744 \uC81C\uC2DC\uD55C\uB2E4"
+      resultDescription:
+        uid: RECRUIT_TRUST_HERO_result
+        korean: "\uB4F1\uC6A9, \uACF5\uC801 +12"
+        english: "\uB4F1\uC6A9, \uACF5\uC801 +12"
+      requiredReputation: 0
+      requiredMerit: 0
+      requiredFactionCastleCount: 0
+      requiresNegotiator: 1
+      recruiterMeritGain: 12
+      recruiterFatigueGain: 0
+  - id: recruit_service
+    title:
+      uid: RECRUIT_SERVICE_TITLE
+      korean: "\uACF5\uC801\uC758 \uBB34\uAC8C"
+      english: Weight of Service
+    description:
+      uid: RECRUIT_SERVICE_DESC
+      korean: "\uD6C4\uBCF4\uB294 \uC790\uC2E0\uC744 \uBD80\uB97C \uC790\uACA9\uC774
+        \uD589\uB3D9\uC73C\uB85C \uC99D\uBA85\uB410\uB294\uC9C0 \uBB3B\uC2B5\uB2C8\uB2E4."
+      english: The candidate asks whether the recruiter has proven their worth.
+    choices:
+    - label:
+        uid: RECRUIT_SERVICE_SAFE_label
+        korean: "\uD6C4\uBCF4\uC758 \uBD80\uD0C1\uC744 \uC9C1\uC811 \uB3D5\uB294\uB2E4"
+        english: "\uD6C4\uBCF4\uC758 \uBD80\uD0C1\uC744 \uC9C1\uC811 \uB3D5\uB294\uB2E4"
+      resultDescription:
+        uid: RECRUIT_SERVICE_SAFE_result
+        korean: "\uB4F1\uC6A9, \uACF5\uC801 +6, \uD53C\uB85C +10"
+        english: "\uB4F1\uC6A9, \uACF5\uC801 +6, \uD53C\uB85C +10"
+      requiredReputation: 0
+      requiredMerit: 0
+      requiredFactionCastleCount: 0
+      requiresNegotiator: 0
+      recruiterMeritGain: 6
+      recruiterFatigueGain: 10
+    - label:
+        uid: RECRUIT_SERVICE_BOLD_label
+        korean: "\uC313\uC544 \uC628 \uACF5\uC801\uC744 \uC99D\uBA85\uD55C\uB2E4"
+        english: "\uC313\uC544 \uC628 \uACF5\uC801\uC744 \uC99D\uBA85\uD55C\uB2E4"
+      resultDescription:
+        uid: RECRUIT_SERVICE_BOLD_result
+        korean: "\uB4F1\uC6A9, \uACF5\uC801 +10, \uD53C\uB85C +5"
+        english: "\uB4F1\uC6A9, \uACF5\uC801 +10, \uD53C\uB85C +5"
+      requiredReputation: 0
+      requiredMerit: 25
+      requiredFactionCastleCount: 0
+      requiresNegotiator: 0
+      recruiterMeritGain: 10
+      recruiterFatigueGain: 5
+    - label:
+        uid: RECRUIT_SERVICE_HERO_label
+        korean: "\uAD50\uC12D\uAC00\uAC00 \uC774\uD574\uAD00\uACC4\uB97C \uC870\uC728\uD55C\uB2E4"
+        english: "\uAD50\uC12D\uAC00\uAC00 \uC774\uD574\uAD00\uACC4\uB97C \uC870\uC728\uD55C\uB2E4"
+      resultDescription:
+        uid: RECRUIT_SERVICE_HERO_result
+        korean: "\uB4F1\uC6A9, \uACF5\uC801 +12"
+        english: "\uB4F1\uC6A9, \uACF5\uC801 +12"
+      requiredReputation: 0
+      requiredMerit: 0
+      requiredFactionCastleCount: 0
+      requiresNegotiator: 1
+      recruiterMeritGain: 12
+      recruiterFatigueGain: 0
+  - id: recruit_faction
+    title:
+      uid: RECRUIT_FACTION_TITLE
+      korean: "\uC138\uB825\uC758 \uBBF8\uB798"
+      english: Future of the Faction
+    description:
+      uid: RECRUIT_FACTION_DESC
+      korean: "\uD6C4\uBCF4\uB294 \uAC1C\uC778\uC758 \uB9D0\uBCF4\uB2E4 \uC138\uB825\uC774
+        \uC774\uB8EC \uAE30\uBC18\uACFC \uBBF8\uB798\uB97C \uD655\uC778\uD558\uB824
+        \uD569\uB2C8\uB2E4."
+      english: The candidate seeks proof of the faction's foundation and future.
+    choices:
+    - label:
+        uid: RECRUIT_FACTION_SAFE_label
+        korean: "\uD568\uAED8 \uBBF8\uB798\uB97C \uAC1C\uCC99\uD558\uC790\uACE0 \uC124\uB4DD\uD55C\uB2E4"
+        english: "\uD568\uAED8 \uBBF8\uB798\uB97C \uAC1C\uCC99\uD558\uC790\uACE0
+          \uC124\uB4DD\uD55C\uB2E4"
+      resultDescription:
+        uid: RECRUIT_FACTION_SAFE_result
+        korean: "\uB4F1\uC6A9, \uACF5\uC801 +5, \uD53C\uB85C +15"
+        english: "\uB4F1\uC6A9, \uACF5\uC801 +5, \uD53C\uB85C +15"
+      requiredReputation: 0
+      requiredMerit: 0
+      requiredFactionCastleCount: 0
+      requiresNegotiator: 0
+      recruiterMeritGain: 5
+      recruiterFatigueGain: 15
+    - label:
+        uid: RECRUIT_FACTION_BOLD_label
+        korean: "\uD655\uBCF4\uD55C \uC601\uD1A0\uC640 \uC131\uACFC\uB97C \uBCF4\uC5EC
+          \uC900\uB2E4"
+        english: "\uD655\uBCF4\uD55C \uC601\uD1A0\uC640 \uC131\uACFC\uB97C \uBCF4\uC5EC
+          \uC900\uB2E4"
+      resultDescription:
+        uid: RECRUIT_FACTION_BOLD_result
+        korean: "\uB4F1\uC6A9, \uACF5\uC801 +12, \uD53C\uB85C +5"
+        english: "\uB4F1\uC6A9, \uACF5\uC801 +12, \uD53C\uB85C +5"
+      requiredReputation: 0
+      requiredMerit: 0
+      requiredFactionCastleCount: 3
+      requiresNegotiator: 0
+      recruiterMeritGain: 12
+      recruiterFatigueGain: 5
+    - label:
+        uid: RECRUIT_FACTION_HERO_label
+        korean: "\uAD50\uC12D\uAC00\uAC00 \uAD8C\uD55C\uACFC \uCC45\uC784\uC744 \uBCF4\uC99D\uD55C\uB2E4"
+        english: "\uAD50\uC12D\uAC00\uAC00 \uAD8C\uD55C\uACFC \uCC45\uC784\uC744
+          \uBCF4\uC99D\uD55C\uB2E4"
+      resultDescription:
+        uid: RECRUIT_FACTION_HERO_result
+        korean: "\uB4F1\uC6A9, \uACF5\uC801 +15"
+        english: "\uB4F1\uC6A9, \uACF5\uC801 +15"
+      requiredReputation: 0
+      requiredMerit: 0
+      requiredFactionCastleCount: 0
+      requiresNegotiator: 1
+      recruiterMeritGain: 15
+      recruiterFatigueGain: 0
+  tavernQuestDefinitions:
+  - questType: 0
+    displayName:
+      uid: QUEST_0_NAME
+      korean: "\uD638\uC704\uC640 \uBB3C\uC790 \uC6B4\uC1A1"
+      english: Escort and Supply Run
+    description:
+      uid: QUEST_0_DESC
+      korean: "\uC0C1\uB2E8\uC744 \uD638\uC704\uD574 \uAD50\uC5ED\uB85C\uB97C \uC548\uC815\uC2DC\uD0A4\uACE0
+        \uC131\uC758 \uBC88\uC601\uC744 \uB192\uC785\uB2C8\uB2E4."
+      english: Escort merchants and improve prosperity.
+    durationMonths: 1
+    aptitude: 0
+    aptitudeThreshold: 55
+    goldReward: 60
+    meritReward: 4
+    reputationReward: 3
+    fatigueCost: 10
+    aptitudeBonusGold: 20
+    castleEffectValue: 2
+  - questType: 1
+    displayName:
+      uid: QUEST_1_NAME
+      korean: "\uAD34\uC218 \uB610\uB294 \uB3C4\uC801 \uD1A0\uBC8C"
+      english: Hunt Raiders
+    description:
+      uid: QUEST_1_DESC
+      korean: "\uC704\uD611\uC744 \uC9C1\uC811 \uD1A0\uBC8C\uD574 \uB192\uC740 \uAE08\uD654\uC640
+        \uACF5\uC801, \uCE58\uC548\uC744 \uC5BB\uC2B5\uB2C8\uB2E4."
+      english: Defeat threats for gold, merit, and stability.
+    durationMonths: 2
+    aptitude: 1
+    aptitudeThreshold: 60
+    goldReward: 90
+    meritReward: 8
+    reputationReward: 4
+    fatigueCost: 20
+    aptitudeBonusGold: 30
+    castleEffectValue: 3
+  - questType: 2
+    displayName:
+      uid: QUEST_2_NAME
+      korean: "\uC2E4\uC885\uC790\uC640 \uC720\uC801 \uD0D0\uC0C9"
+      english: Search the Ruins
+    description:
+      uid: QUEST_2_DESC
+      korean: "\uC2E4\uC885\uC790\uC640 \uC720\uC801\uC744 \uC870\uC0AC\uD574 \uBA85\uC131,
+        \uAE30\uC220\uACFC \uC778\uC7AC \uB2E8\uC11C\uB97C \uC5BB\uC2B5\uB2C8\uB2E4."
+      english: Search ruins for reputation, technology, and talent clues.
+    durationMonths: 2
+    aptitude: 2
+    aptitudeThreshold: 60
+    goldReward: 50
+    meritReward: 5
+    reputationReward: 8
+    fatigueCost: 15
+    aptitudeBonusGold: 25
+    castleEffectValue: 3
+  - questType: 3
+    displayName:
+      uid: QUEST_3_NAME
+      korean: "\uC8FC\uBBFC\xB7\uC885\uC871 \uAC08\uB4F1 \uC911\uC7AC"
+      english: Mediate the Dispute
+    description:
+      uid: QUEST_3_DESC
+      korean: "\uAC08\uB4F1\uC744 \uC911\uC7AC\uD574 \uB192\uC740 \uBA85\uC131\uACFC
+        \uC131\uC758 \uC548\uC815\uC744 \uC5BB\uC2B5\uB2C8\uB2E4."
+      english: Mediate conflict for reputation and stability.
+    durationMonths: 1
+    aptitude: 3
+    aptitudeThreshold: 55
+    goldReward: 40
+    meritReward: 4
+    reputationReward: 10
+    fatigueCost: 10
+    aptitudeBonusGold: 20
+    castleEffectValue: 4
+  - questType: 4
+    displayName:
+      uid: QUEST_4_NAME
+      korean: "\uCCA9\uC790 \uCD94\uC801"
+      english: Track the Spy
+    description:
+      uid: QUEST_4_DESC
+      korean: "\uCCA9\uC790\uB97C \uCD94\uC801\uD574 \uBC29\uCCA9 \uAE30\uAC04\uACFC
+        \uADE0\uD615 \uC7A1\uD78C \uBCF4\uC0C1\uC744 \uC5BB\uC2B5\uB2C8\uB2E4."
+      english: Track spies to strengthen counterintelligence.
+    durationMonths: 2
+    aptitude: 2
+    aptitudeThreshold: 65
+    goldReward: 70
+    meritReward: 7
+    reputationReward: 6
+    fatigueCost: 15
+    aptitudeBonusGold: 25
+    castleEffectValue: 3
+  startingYear: 1
+  startingMonth: 1
+  startingGold: 1200
+  startingManaCrystal: 300
+  startingInfluence: 100
+  startingHeroes:
+  - castleId: castle_00
+    heroId: ares
+    governor: 1
+  - castleId: castle_01
+    heroId: lyria
+    governor: 1
+  - castleId: castle_26
+    heroId: brom
+    governor: 1
+  - castleId: castle_38
+    heroId: morrigan
+    governor: 1
+  - castleId: castle_50
+    heroId: theron
+    governor: 1
+  - castleId: castle_01
+    heroId: common_gareth
+    governor: 0
+  - castleId: castle_26
+    heroId: common_thane
+    governor: 0
+  - castleId: castle_38
+    heroId: common_nym
+    governor: 0
+  - castleId: castle_50
+    heroId: common_veil
+    governor: 0
+  promotionRequiredMerit: 80
+  promotionRequiredReputation: 30
+  promotionInfluenceCost: 30

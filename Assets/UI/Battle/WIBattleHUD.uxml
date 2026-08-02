@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:Style src="project://database/Assets/UI/Battle/WIBattleHUD.uss" />
+    <ui:VisualElement name="battle-hud" class="battle-hud">
+        <ui:Label name="battle-status" text="전투 세션 대기 중" class="battle-status" />
+        <ui:VisualElement class="bottom-bar">
+            <ui:VisualElement class="command-group">
+                <ui:Button name="advance-command" text="전진" class="command-button" />
+                <ui:Button name="hold-command" text="위치 사수" class="command-button" />
+                <ui:Button name="focus-command" text="집중 공격" class="command-button" />
+                <ui:Button name="retreat-command" text="후퇴" class="command-button retreat" />
+            </ui:VisualElement>
+            <ui:VisualElement name="skill-buttons" class="skill-group" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

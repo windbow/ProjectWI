@@ -1,0 +1,46 @@
+.battle-hud {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding: 18px;
+}
+
+.battle-status {
+    align-self: center;
+    background-color: rgba(10, 14, 20, 0.88);
+    color: rgb(232, 213, 164);
+    border-width: 2px;
+    border-color: rgb(142, 105, 48);
+    padding: 10px 22px;
+    font-size: 20px;
+}
+
+.bottom-bar {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.command-group, .skill-group {
+    flex-direction: row;
+}
+
+.command-button, .skill-button {
+    min-width: 112px;
+    min-height: 58px;
+    margin-right: 8px;
+    background-color: rgb(36, 43, 55);
+    color: rgb(238, 224, 188);
+    border-width: 2px;
+    border-color: rgb(144, 107, 51);
+    font-size: 18px;
+}
+
+.retreat {
+    background-color: rgb(86, 28, 27);
+}

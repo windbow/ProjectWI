@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0008f2112f4ace3448c02fc7d9879bda, type: 3}
+  m_Name: WI_BattleConfig
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Battle.WIBattleConfigSO
+  arenaSize: {x: 18, y: 10}
+  formationColumnSpacing: 1.4
+  formationRowSpacing: 1.2
+  baseHealth: 100
+  healthPerMight: 3
+  baseMana: 30
+  manaPerIntelligence: 2
+  moveSpeed: 2.5
+  meleeRange: 1.2
+  rangedRange: 5
+  attackCooldown: 1
+  baseDamage: 8
+  advanceSpeedMultiplier: 1.25
+  holdDamageReduction: 0.25
+  focusDamageMultiplier: 1.2
+  minimumUnitSpacing: 0.75
+  collisionResolveStrength: 0.8
+  meleeKnockbackDistance: 0.35
+  holdKnockbackResistance: 0.7
+  formationReturnSpeed: 2.5
+  heroSkills:
+  - heroId: ares
+    displayName: "\uC655\uAC00\uC758 \uAC80\uC9C4"
+    skillType: 0
+    manaCost: 40
+    power: 45
+    range: 5
+    cooldown: 10
+  - heroId: lyria
+    displayName: "\uC804\uC7A5\uC758 \uACA9\uB824"
+    skillType: 1
+    manaCost: 35
+    power: 35
+    range: 6
+    cooldown: 12
+  - heroId: morrigan
+    displayName: "\uD669\uD63C \uD3ED\uBC1C"
+    skillType: 0
+    manaCost: 50
+    power: 55
+    range: 6
+    cooldown: 14
+  placeholderSprite: {fileID: 0}

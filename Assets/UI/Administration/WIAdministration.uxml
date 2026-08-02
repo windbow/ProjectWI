@@ -1,0 +1,112 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+  <ui:Style src="project://database/Assets/UI/Administration/WIAdministration.uss" />
+  <ui:VisualElement name="app" class="app">
+    <ui:VisualElement name="ornament-background" class="ornament-background" />
+    <ui:VisualElement name="compact-hud" class="compact-hud frame-gold">
+      <ui:Label name="date-label" text="190년 10월" class="date-label" />
+      <ui:VisualElement name="faction-emblem" class="faction-emblem image-placeholder" />
+      <ui:Label name="faction-label" text="아발론" class="faction-label" />
+      <ui:Label name="gold-label" text="금화 0" class="resource-chip gold" />
+      <ui:Label name="mana-label" text="마나 0" class="resource-chip mana" />
+      <ui:Label name="influence-label" text="영향력 0" class="resource-chip influence" />
+      <ui:VisualElement class="hud-spacer" />
+      <ui:Button name="information-button" text="정보" class="hud-icon-button" />
+      <ui:Button name="system-button" text="설정" class="hud-icon-button" />
+    </ui:VisualElement>
+
+    <ui:VisualElement name="global-view" class="screen-view global-view">
+      <ui:VisualElement name="map-frame" class="map-frame frame-gold">
+        <ui:VisualElement name="map-background-placeholder" class="image-placeholder map-background-placeholder">
+          <ui:Label text="대륙 지도 이미지 슬롯" class="placeholder-copy" />
+        </ui:VisualElement>
+        <ui:VisualElement class="map-heading">
+          <ui:Label text="천하 전략도" class="screen-title" />
+          <ui:Label name="turn-description" text="명령을 내릴 성을 선택하십시오." class="screen-subtitle" />
+        </ui:VisualElement>
+        <ui:VisualElement name="map" class="map" />
+        <ui:VisualElement class="faction-legend frame-dark">
+          <ui:Label text="세력 구도" class="legend-title" />
+          <ui:Label text="■ 아발론   ■ 발도르   ■ 네크로폴리스\n■ 아이언하트   ■ 실바니아\n━━ 이동 경로   ━━ 적대 전선\n━━ 선택 성 연결" class="legend-copy" />
+        </ui:VisualElement>
+        <ui:VisualElement class="map-tools">
+          <ui:Label text="배율 100%" class="zoom-label" />
+          <ui:Button text="−" class="map-tool-button" />
+          <ui:Button text="＋" class="map-tool-button" />
+          <ui:Button text="⌂" class="map-tool-button" />
+        </ui:VisualElement>
+      </ui:VisualElement>
+      <ui:VisualElement class="global-command-bar frame-gold">
+        <ui:Button name="military-button" text="군사" class="global-command" />
+        <ui:Button name="heroes-button" text="인사" class="global-command" />
+        <ui:Button name="diplomacy-button" text="외교" class="global-command" />
+        <ui:Button name="scheme-button" text="계략" class="global-command" />
+        <ui:Button name="research-button" text="연구" class="global-command" />
+        <ui:Button name="faction-button" text="통치" class="global-command" />
+        <ui:Button name="council-button" text="평정" class="global-command important" />
+        <ui:Button name="monthly-report-button" text="월보" class="global-command" />
+        <ui:VisualElement class="command-spacer" />
+        <ui:Button name="turn-button" text="다음 턴" class="turn-button" />
+      </ui:VisualElement>
+      <ui:VisualElement class="strategy-guide frame-dark">
+        <ui:VisualElement class="guide-portrait image-placeholder"><ui:Label text="안내 인물\n이미지 슬롯" /></ui:VisualElement>
+        <ui:VisualElement class="guide-copy">
+          <ui:Label text="대륙의 성을 선택하여 영지 화면으로 이동하십시오." class="guide-title" />
+          <ui:Label text="전역 명령은 하단 메뉴에서, 성의 내정과 인물 배치는 각 성 화면에서 처리합니다." class="guide-description" />
+        </ui:VisualElement>
+      </ui:VisualElement>
+    </ui:VisualElement>
+
+    <ui:VisualElement name="castle-view" class="screen-view castle-view">
+      <ui:VisualElement name="castle-background-placeholder" class="image-placeholder castle-background-placeholder">
+        <ui:Label text="선택한 성 전경 이미지 슬롯" class="placeholder-copy large" />
+      </ui:VisualElement>
+      <ui:VisualElement class="castle-top-strip frame-dark">
+        <ui:Button name="back-to-map-button" text="← 대륙 지도" class="back-button" />
+        <ui:VisualElement class="castle-heading-copy">
+          <ui:Label name="castle-title" text="성 이름" class="castle-title" />
+          <ui:Label name="castle-info" text="성 정보" class="castle-info" />
+        </ui:VisualElement>
+      </ui:VisualElement>
+      <ui:VisualElement name="governor-portrait-placeholder" class="image-placeholder governor-full"><ui:Label text="태수/인물\n이미지 슬롯" /></ui:VisualElement>
+      <ui:VisualElement class="castle-stat-panel frame-dark">
+        <ui:Label name="prosperity-label" text="번영 0" class="castle-stat" />
+        <ui:Label name="technology-label" text="기술 0" class="castle-stat" />
+        <ui:Label name="stability-label" text="치안 0" class="castle-stat" />
+        <ui:Label name="defense-label" text="방어 0" class="castle-stat" />
+      </ui:VisualElement>
+      <ui:VisualElement class="castle-command-menu frame-gold">
+        <ui:Label text="성 내정 명령" class="command-title" />
+        <ui:Button name="focus-project-button" text="중점 사업" class="castle-command" />
+        <ui:Button name="assign-button" text="인사 배치" class="castle-command" />
+        <ui:Button name="character-activity-button" text="인재 활동" class="castle-command" />
+        <ui:Button name="special-facility-button" text="특화 시설 선택" class="castle-command" />
+        <ui:Button name="basic-facility-button" text="기본 시설" class="castle-command" />
+        <ui:Button name="delegation-button" text="태수 위임" class="castle-command" />
+        <ui:Button name="march-button" text="진격 / 출정" class="castle-command danger" />
+        <ui:Button name="castle-record-button" text="성 상세" class="castle-command" />
+      </ui:VisualElement>
+      <ui:VisualElement class="castle-bottom-info frame-dark">
+        <ui:Label text="이번 달 중점" class="section-label" />
+        <ui:Label name="project-status-label" text="미지정" class="project-status" />
+        <ui:VisualElement class="slot-columns">
+          <ui:VisualElement class="slot-column"><ui:Label text="주둔 영웅" class="section-label" /><ui:VisualElement name="hero-slots" class="slot-grid" /></ui:VisualElement>
+          <ui:VisualElement class="slot-column"><ui:Label text="특화 시설" class="section-label" /><ui:VisualElement name="special-facility-slots" class="slot-grid" /></ui:VisualElement>
+        </ui:VisualElement>
+      </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="campaign-start-layer" class="campaign-start-layer">
+      <ui:VisualElement class="campaign-start-backdrop" />
+      <ui:VisualElement class="campaign-start-panel frame-gold">
+        <ui:Label text="PROJECT WI" class="campaign-kicker" />
+        <ui:Label text="아발론 재건 캠페인" class="campaign-title" />
+        <ui:Label text="마지막 성채에서 시작해 인재를 모으고 대륙의 세력 구도를 바꾸십시오." class="campaign-description" />
+        <ui:Label text="난이도 선택" class="difficulty-heading" />
+        <ui:VisualElement name="difficulty-options" class="difficulty-options" />
+        <ui:Button name="new-campaign-button" text="새 캠페인 시작" class="campaign-start-button" />
+        <ui:Button name="continue-campaign-button" text="자동 저장 이어하기" class="campaign-continue-button" />
+        <ui:Label text="난이도는 AI의 판단 정밀도만 변경하며 숨은 자원 보너스를 제공하지 않습니다." class="difficulty-note" />
+      </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="modal-layer" class="modal-layer" />
+  </ui:VisualElement>
+</ui:UXML>
