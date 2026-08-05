@@ -9,13 +9,14 @@ namespace ProjectWI.Administration
         public readonly struct Connection
         {
             // 지도 연결선의 양 끝점과 표시 스타일을 저장합니다.
-            public Connection(Vector2 start, Vector2 end, Color color, float width, bool frontline)
+            public Connection(Vector2 start, Vector2 end, Color color, float width, bool frontline, bool selected)
             {
                 Start = start;
                 End = end;
                 Color = color;
                 Width = width;
                 Frontline = frontline;
+                Selected = selected;
             }
 
             public Vector2 Start { get; }
@@ -23,9 +24,11 @@ namespace ProjectWI.Administration
             public Color Color { get; }
             public float Width { get; }
             public bool Frontline { get; }
+            public bool Selected { get; }
         }
 
         private readonly List<Connection> connections = new List<Connection>();
+        private bool colorVisionQaMode;
 
         // 연결선 레이어가 지도 입력을 가로채지 않도록 초기화합니다.
         public WIMapConnectionLayer()
@@ -44,6 +47,13 @@ namespace ProjectWI.Administration
         {
             connections.Clear();
             connections.AddRange(values);
+            MarkDirtyRepaint();
+        }
+
+        // 저채도 QA 모드에서 연결선 색을 회색으로 바꿔 기호만으로 구분 가능한지 확인합니다.
+        public void SetColorVisionQaMode(bool enabled)
+        {
+            colorVisionQaMode = enabled;
             MarkDirtyRepaint();
         }
 
@@ -66,7 +76,7 @@ namespace ProjectWI.Administration
                 painter.Stroke();
 
                 painter.BeginPath();
-                painter.strokeColor = connection.Color;
+                painter.strokeColor = colorVisionQaMode ? new Color(0.72f, 0.72f, 0.72f, 0.95f) : connection.Color;
                 painter.lineWidth = connection.Width;
                 painter.MoveTo(start);
                 painter.LineTo(end);
@@ -76,9 +86,23 @@ namespace ProjectWI.Administration
                 {
                     Vector2 midpoint = (start + end) * 0.5f;
                     painter.BeginPath();
-                    painter.fillColor = connection.Color;
-                    painter.Arc(midpoint, 4.5f, Angle.Degrees(0f), Angle.Degrees(360f));
-                    painter.Fill();
+                    painter.strokeColor = colorVisionQaMode ? Color.white : connection.Color;
+                    painter.lineWidth = 2.5f;
+                    painter.MoveTo(midpoint + new Vector2(-5f, -5f));
+                    painter.LineTo(midpoint + new Vector2(5f, 5f));
+                    painter.MoveTo(midpoint + new Vector2(-5f, 5f));
+                    painter.LineTo(midpoint + new Vector2(5f, -5f));
+                    painter.Stroke();
+                }
+
+                if (connection.Selected)
+                {
+                    Vector2 midpoint = (start + end) * 0.5f;
+                    painter.BeginPath();
+                    painter.strokeColor = Color.white;
+                    painter.lineWidth = 2f;
+                    painter.Arc(midpoint, 7f, Angle.Degrees(0f), Angle.Degrees(360f));
+                    painter.Stroke();
                 }
             }
         }

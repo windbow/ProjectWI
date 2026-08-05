@@ -37,7 +37,9 @@ namespace ProjectWI.Battle
         private void OnBattleFinished(WIBattleOutcome outcome)
         {
             battleController.BattleFinished -= OnBattleFinished;
-            WICampaignRuntimeService.Instance.CompleteBattle(outcome);
+            bool attackerRetreated = battleController.Runtime.AttackerCommand == WIBattleCommand.Retreat;
+            bool defenderRetreated = battleController.Runtime.DefenderCommand == WIBattleCommand.Retreat;
+            WICampaignRuntimeService.Instance.CompleteBattle(outcome, attackerRetreated, defenderRetreated);
         }
     }
 }

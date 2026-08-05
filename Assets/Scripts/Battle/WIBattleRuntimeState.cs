@@ -19,6 +19,42 @@ namespace ProjectWI.Battle
         Retreat
     }
 
+    public enum WIBattleVisualEffectType
+    {
+        MeleeHit,
+        Projectile,
+        SkillDamage,
+        SkillHeal,
+        SkillCommand
+    }
+
+    [Serializable]
+    public class WIBattleVisualEffectState
+    {
+        public int EffectId;
+        public WIBattleVisualEffectType EffectType;
+        public WIBattleSide Side;
+        public Vector2 StartPosition;
+        public Vector2 EndPosition;
+        public float StartedAt;
+        public float Duration;
+        public float Radius;
+    }
+
+    [Serializable]
+    public class WIBattleProjectileState
+    {
+        public int ProjectileId;
+        public string ShooterHeroId;
+        public string TargetHeroId;
+        public WIBattleSide Side;
+        public Vector2 Position;
+        public Vector2 TargetPosition;
+        public int Damage;
+        public float RemainingLifetime;
+        public float TravelledDistance;
+    }
+
     [Serializable]
     public class WIBattleCharacterState
     {
@@ -26,6 +62,9 @@ namespace ProjectWI.Battle
         public string ArmyId;
         public WIBattleSide Side;
         public WIUnitRole Role;
+        public WICharacterGrade Grade;
+        public WIHeroClass HeroClass;
+        public string DisplayName;
         public Vector2 Position;
         public Vector2 FormationPosition;
         public int MaxHealth;
@@ -53,5 +92,9 @@ namespace ProjectWI.Battle
         public string AttackerFocusHeroId;
         public string DefenderFocusHeroId;
         public List<WIBattleCharacterState> Characters = new List<WIBattleCharacterState>();
+        public List<WIBattleVisualEffectState> VisualEffects = new List<WIBattleVisualEffectState>();
+        public int NextVisualEffectId = 1;
+        public List<WIBattleProjectileState> Projectiles = new List<WIBattleProjectileState>();
+        public int NextProjectileId = 1;
     }
 }

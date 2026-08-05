@@ -85,7 +85,10 @@ namespace ProjectWI.Systems
         }
 
         // 전투 결과를 캠페인에 반영하고 전략 화면으로 비동기 복귀합니다.
-        public bool CompleteBattle(WIBattleOutcome attackerOutcome)
+        public bool CompleteBattle(
+            WIBattleOutcome attackerOutcome,
+            bool attackerRetreated = false,
+            bool defenderRetreated = false)
         {
             if (State == null || string.IsNullOrEmpty(PendingBattleSessionId))
             {
@@ -99,6 +102,12 @@ namespace ProjectWI.Systems
                 return true;
             }
             WITurnSummary summary = State.LastMonthlyReport ?? new WITurnSummary();
+            WIBattleSessionState session = State.BattleSessions.Find(item => item.SessionId == PendingBattleSessionId);
+            if (session != null)
+            {
+                session.AttackerRetreated = attackerRetreated;
+                session.DefenderRetreated = defenderRetreated;
+            }
             bool applied = WIAdministrationTurnSystem.SubmitBattleResult(
                 database, State, PendingBattleSessionId, attackerOutcome,
                 WIBattleResolutionSource.RealTimeBattle, summary);
@@ -123,9 +132,10 @@ namespace ProjectWI.Systems
         }
 
         // 선택한 난이도로 새 캠페인 상태를 만들고 진행 중 상태로 전환합니다.
-        public WIAdministrationState StartNewCampaign(WICampaignDifficulty difficulty)
+        public WIAdministrationState StartNewCampaign(WICampaignDifficulty difficulty,
+            WICampaignVariant variant = WICampaignVariant.Classic)
         {
-            State = database == null ? null : WIAdministrationState.Create(database, difficulty);
+            State = database == null ? null : WIAdministrationState.Create(database, difficulty, variant);
             PendingBattleSessionId = string.Empty;
             HasCampaignStarted = State != null;
             IsTestBattle = false;

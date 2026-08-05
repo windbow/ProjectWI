@@ -85,7 +85,10 @@ namespace ProjectWI.Administration
         Assassin,
         Archmage,
         Priest,
-        Druid
+        Druid,
+        Strategist,
+        Alchemist,
+        Warlock
     }
 
     public enum WILoyaltyState
@@ -160,6 +163,141 @@ namespace ProjectWI.Administration
         public WILocalizedString Description => description;
         public WIRelationshipLevel RequiredLevel => requiredLevel;
         public IReadOnlyList<WIRelationshipEventChoiceDefinition> Choices => choices;
+    }
+
+    [Serializable]
+    public class WIStartingRelationshipDefinition
+    {
+        [SerializeField] private string factionId;
+        [SerializeField] private string firstHeroId;
+        [SerializeField] private string secondHeroId;
+        [SerializeField] private WIRelationshipLevel level = WIRelationshipLevel.Normal;
+        [SerializeField] private WILocalizedString context;
+
+        public string FactionId => factionId;
+        public string FirstHeroId => firstHeroId;
+        public string SecondHeroId => secondHeroId;
+        public WIRelationshipLevel Level => level;
+        public WILocalizedString Context => context;
+    }
+
+    [Serializable]
+    public class WIRegionalEventChoiceDefinition
+    {
+        [SerializeField] private WILocalizedString label;
+        [SerializeField] private WILocalizedString resultDescription;
+        [SerializeField] private int goldDelta;
+        [SerializeField] private int manaDelta;
+        [SerializeField] private int influenceDelta;
+        [SerializeField] private int prosperityDelta;
+        [SerializeField] private int technologyDelta;
+        [SerializeField] private int stabilityDelta;
+        [SerializeField] private int defenseDelta;
+
+        public WILocalizedString Label => label;
+        public WILocalizedString ResultDescription => resultDescription;
+        public int GoldDelta => goldDelta;
+        public int ManaDelta => manaDelta;
+        public int InfluenceDelta => influenceDelta;
+        public int ProsperityDelta => prosperityDelta;
+        public int TechnologyDelta => technologyDelta;
+        public int StabilityDelta => stabilityDelta;
+        public int DefenseDelta => defenseDelta;
+    }
+
+    [Serializable]
+    public class WIRegionalEventDefinition
+    {
+        [SerializeField] private string id;
+        [SerializeField] private string originFactionId;
+        [SerializeField] private string targetCastleId;
+        [SerializeField] private int minimumTurn = 1;
+        [SerializeField] private WILocalizedString title;
+        [SerializeField] private WILocalizedString description;
+        [SerializeField] private List<WIRegionalEventChoiceDefinition> choices = new List<WIRegionalEventChoiceDefinition>();
+
+        public string Id => id;
+        public string OriginFactionId => originFactionId;
+        public string TargetCastleId => targetCastleId;
+        public int MinimumTurn => minimumTurn;
+        public WILocalizedString Title => title;
+        public WILocalizedString Description => description;
+        public IReadOnlyList<WIRegionalEventChoiceDefinition> Choices => choices;
+    }
+
+    [Serializable]
+    public class WIOccupationChoiceDefinition
+    {
+        [SerializeField] private string id;
+        [SerializeField] private WILocalizedString label;
+        [SerializeField] private WILocalizedString resultDescription;
+        [SerializeField] private int goldDelta;
+        [SerializeField] private int influenceDelta;
+        [SerializeField] private int stabilityDelta;
+        [SerializeField] private int defenseDelta;
+        [SerializeField] private int prosperityDelta;
+        [SerializeField] private int unrestMonths = 2;
+
+        public string Id => id;
+        public WILocalizedString Label => label;
+        public WILocalizedString ResultDescription => resultDescription;
+        public int GoldDelta => goldDelta;
+        public int InfluenceDelta => influenceDelta;
+        public int StabilityDelta => stabilityDelta;
+        public int DefenseDelta => defenseDelta;
+        public int ProsperityDelta => prosperityDelta;
+        public int UnrestMonths => unrestMonths;
+    }
+
+    [Serializable]
+    public class WIFactionEliminationNarrativeDefinition
+    {
+        [SerializeField] private string factionId;
+        [SerializeField] private WILocalizedString title;
+        [SerializeField] private WILocalizedString description;
+
+        public string FactionId => factionId;
+        public WILocalizedString Title => title;
+        public WILocalizedString Description => description;
+    }
+
+    [Serializable]
+    public class WICampaignEndingDefinition
+    {
+        [SerializeField] private WICampaignEndingType endingType;
+        [SerializeField] private WILocalizedString title;
+        [SerializeField] private WILocalizedString description;
+
+        public WICampaignEndingType EndingType => endingType;
+        public WILocalizedString Title => title;
+        public WILocalizedString Description => description;
+    }
+
+    public enum WICampaignVariant
+    {
+        Classic,
+        BorderGarrison,
+        DividedCourt
+    }
+
+    [Serializable]
+    public class WICampaignVariantDefinition
+    {
+        [SerializeField] private WICampaignVariant variant;
+        [SerializeField] private WILocalizedString displayName;
+        [SerializeField] private WILocalizedString description;
+        [SerializeField] private string additionalPlayerCastleId;
+        [SerializeField] private string relationshipFirstHeroId;
+        [SerializeField] private string relationshipSecondHeroId;
+        [SerializeField] private WIRelationshipLevel relationshipLevel = WIRelationshipLevel.Normal;
+
+        public WICampaignVariant Variant => variant;
+        public WILocalizedString DisplayName => displayName;
+        public WILocalizedString Description => description;
+        public string AdditionalPlayerCastleId => additionalPlayerCastleId;
+        public string RelationshipFirstHeroId => relationshipFirstHeroId;
+        public string RelationshipSecondHeroId => relationshipSecondHeroId;
+        public WIRelationshipLevel RelationshipLevel => relationshipLevel;
     }
 
     [Serializable]
@@ -350,6 +488,8 @@ namespace ProjectWI.Administration
         [SerializeField] private int baseSuccessChance = 40;
         [SerializeField] private int effectValue = 10;
         [SerializeField] private int durationMonths = 3;
+        [SerializeField] private int baseDetectionChance = 25;
+        [SerializeField] private int failureDetectionBonus = 20;
 
         public string Id => id;
         public WILocalizedString DisplayName => displayName;
@@ -359,6 +499,8 @@ namespace ProjectWI.Administration
         public int BaseSuccessChance => baseSuccessChance;
         public int EffectValue => effectValue;
         public int DurationMonths => durationMonths;
+        public int BaseDetectionChance => baseDetectionChance;
+        public int FailureDetectionBonus => failureDetectionBonus;
     }
 
     [Serializable]
@@ -549,6 +691,33 @@ namespace ProjectWI.Administration
         public bool Governor => governor;
     }
 
+    public enum WIHeroStatType
+    {
+        Leadership,
+        Might,
+        Intelligence,
+        Charisma,
+        Politics
+    }
+
+    [Serializable]
+    public class WIHeroClassDefinition
+    {
+        [SerializeField] private WIHeroClass heroClass;
+        [SerializeField] private WILocalizedString displayName;
+        [SerializeField] private WILocalizedString description;
+        [SerializeField] private WIHeroStatType primaryStat;
+        [SerializeField] private WIHeroStatType secondaryStat;
+        [SerializeField] private WIUnitRole recommendedRole = WIUnitRole.Melee;
+
+        public WIHeroClass HeroClass => heroClass;
+        public WILocalizedString DisplayName => displayName;
+        public WILocalizedString Description => description;
+        public WIHeroStatType PrimaryStat => primaryStat;
+        public WIHeroStatType SecondaryStat => secondaryStat;
+        public WIUnitRole RecommendedRole => recommendedRole;
+    }
+
     [Serializable]
     public class WITutorialDefinition
     {
@@ -579,6 +748,42 @@ namespace ProjectWI.Administration
         public WILocalizedString VictoryDescription => victoryDescription;
         public WILocalizedString DefeatTitle => defeatTitle;
         public WILocalizedString DefeatDescription => defeatDescription;
+    }
+
+    public enum WICampaignObjectiveType
+    {
+        CastleProsperity,
+        PlayerCastleCount,
+        FactionEliminated,
+        ContinentalUnification
+    }
+
+    [Serializable]
+    public class WICampaignObjectiveDefinition
+    {
+        [SerializeField] private string id;
+        [SerializeField] private WILocalizedString title;
+        [SerializeField] private WILocalizedString situation;
+        [SerializeField] private WILocalizedString description;
+        [SerializeField] private WICampaignObjectiveType objectiveType;
+        [SerializeField] private string targetCastleId;
+        [SerializeField] private string targetFactionId;
+        [SerializeField] private int targetValue;
+        [SerializeField] private int rewardGold;
+        [SerializeField] private int rewardMana;
+        [SerializeField] private int rewardInfluence;
+
+        public string Id => id;
+        public WILocalizedString Title => title;
+        public WILocalizedString Situation => situation;
+        public WILocalizedString Description => description;
+        public WICampaignObjectiveType ObjectiveType => objectiveType;
+        public string TargetCastleId => targetCastleId;
+        public string TargetFactionId => targetFactionId;
+        public int TargetValue => targetValue;
+        public int RewardGold => rewardGold;
+        public int RewardMana => rewardMana;
+        public int RewardInfluence => rewardInfluence;
     }
 
     [Serializable]
@@ -638,6 +843,7 @@ namespace ProjectWI.Administration
         [SerializeField] private List<WIFactionDefinition> factions = new List<WIFactionDefinition>();
         [SerializeField] private List<WICastleDefinition> castles = new List<WICastleDefinition>();
         [SerializeField] private List<WIHeroDefinition> heroes = new List<WIHeroDefinition>();
+        [SerializeField] private List<WIHeroClassDefinition> heroClassDefinitions = new List<WIHeroClassDefinition>();
         [SerializeField] private List<WISpecialFacilityDefinition> specialFacilities = new List<WISpecialFacilityDefinition>();
         [SerializeField] private List<WIResearchDefinition> researchDefinitions = new List<WIResearchDefinition>();
         [SerializeField] private List<WITitleDefinition> titleDefinitions = new List<WITitleDefinition>();
@@ -645,9 +851,16 @@ namespace ProjectWI.Administration
         [SerializeField] private List<WICampaignDifficultyDefinition> difficultyDefinitions = new List<WICampaignDifficultyDefinition>();
         [SerializeField] private List<WITutorialDefinition> tutorialDefinitions = new List<WITutorialDefinition>();
         [SerializeField] private WICampaignRuleDefinition campaignRules = new WICampaignRuleDefinition();
+        [SerializeField] private List<WICampaignObjectiveDefinition> campaignObjectives = new List<WICampaignObjectiveDefinition>();
         [SerializeField] private WIProjectBalanceDefinition projectBalance = new WIProjectBalanceDefinition();
         [SerializeField] private List<WITraitDefinition> traitDefinitions = new List<WITraitDefinition>();
         [SerializeField] private List<WIRelationshipEventDefinition> relationshipEventDefinitions = new List<WIRelationshipEventDefinition>();
+        [SerializeField] private List<WIStartingRelationshipDefinition> startingRelationships = new List<WIStartingRelationshipDefinition>();
+        [SerializeField] private List<WIRegionalEventDefinition> regionalEventDefinitions = new List<WIRegionalEventDefinition>();
+        [SerializeField] private List<WIOccupationChoiceDefinition> occupationChoices = new List<WIOccupationChoiceDefinition>();
+        [SerializeField] private List<WIFactionEliminationNarrativeDefinition> factionEliminationNarratives = new List<WIFactionEliminationNarrativeDefinition>();
+        [SerializeField] private List<WICampaignEndingDefinition> campaignEndings = new List<WICampaignEndingDefinition>();
+        [SerializeField] private List<WICampaignVariantDefinition> campaignVariants = new List<WICampaignVariantDefinition>();
         [SerializeField] private List<WIHeroLegacyDefinition> heroLegacyDefinitions = new List<WIHeroLegacyDefinition>();
         [SerializeField] private List<WIRecruitmentEventDefinition> recruitmentEventDefinitions = new List<WIRecruitmentEventDefinition>();
         [SerializeField] private List<WITavernQuestDefinition> tavernQuestDefinitions = new List<WITavernQuestDefinition>();
@@ -659,6 +872,21 @@ namespace ProjectWI.Administration
         [SerializeField] private int startingManaCrystal = 300;
         [SerializeField] private int startingInfluence = 100;
         [SerializeField] private List<WIStartingHeroPlacement> startingHeroes = new List<WIStartingHeroPlacement>();
+        [SerializeField] private int capturePowerMargin = 50;
+        [SerializeField] private int captureDurationMonths = 3;
+        [SerializeField] private int prisonerRansomGold = 150;
+        [SerializeField] private int jointAttackInfluenceCost = 20;
+        [SerializeField] private int jointAttackDurationMonths = 3;
+        [SerializeField] private bool permanentDeathEnabled;
+        [SerializeField] private int battleVictoryMerit = 10;
+        [SerializeField] private int battleVictoryExperience = 15;
+        [SerializeField] private int battleDefeatExperience = 8;
+        [SerializeField] private int battleVictoryFatigue = 15;
+        [SerializeField] private int battleDefeatFatigue = 25;
+        [SerializeField] private int orderlyRetreatFatigue = 12;
+        [SerializeField] private int battleInjuryPowerMargin = 30;
+        [SerializeField] private int battleInjuryMonths = 1;
+        [SerializeField] private int battleBondVictoryThreshold = 2;
         [SerializeField] private int promotionRequiredMerit = 80;
         [SerializeField] private int promotionRequiredReputation = 30;
         [SerializeField] private int promotionInfluenceCost = 30;
@@ -675,6 +903,7 @@ namespace ProjectWI.Administration
         public IReadOnlyList<WIFactionDefinition> Factions => factions;
         public IReadOnlyList<WICastleDefinition> Castles => castles;
         public IReadOnlyList<WIHeroDefinition> Heroes => heroes;
+        public IReadOnlyList<WIHeroClassDefinition> HeroClassDefinitions => heroClassDefinitions;
         public IReadOnlyList<WISpecialFacilityDefinition> SpecialFacilities => specialFacilities;
         public IReadOnlyList<WIResearchDefinition> ResearchDefinitions => researchDefinitions;
         public IReadOnlyList<WITitleDefinition> TitleDefinitions => titleDefinitions;
@@ -682,9 +911,46 @@ namespace ProjectWI.Administration
         public IReadOnlyList<WICampaignDifficultyDefinition> DifficultyDefinitions => difficultyDefinitions;
         public IReadOnlyList<WITutorialDefinition> TutorialDefinitions => tutorialDefinitions;
         public WICampaignRuleDefinition CampaignRules => campaignRules;
+        public IReadOnlyList<WICampaignObjectiveDefinition> CampaignObjectives => campaignObjectives;
+
+        // 식별자로 캠페인 목표 정의를 찾습니다.
+        public WICampaignObjectiveDefinition GetCampaignObjective(string id)
+        {
+            return campaignObjectives.Find(item => item.Id == id);
+        }
         public WIProjectBalanceDefinition ProjectBalance => projectBalance;
         public IReadOnlyList<WITraitDefinition> TraitDefinitions => traitDefinitions;
         public IReadOnlyList<WIRelationshipEventDefinition> RelationshipEventDefinitions => relationshipEventDefinitions;
+        public IReadOnlyList<WIStartingRelationshipDefinition> StartingRelationships => startingRelationships;
+        public IReadOnlyList<WIRegionalEventDefinition> RegionalEventDefinitions => regionalEventDefinitions;
+        public IReadOnlyList<WIOccupationChoiceDefinition> OccupationChoices => occupationChoices;
+        public IReadOnlyList<WIFactionEliminationNarrativeDefinition> FactionEliminationNarratives => factionEliminationNarratives;
+        public IReadOnlyList<WICampaignEndingDefinition> CampaignEndings => campaignEndings;
+        public IReadOnlyList<WICampaignVariantDefinition> CampaignVariants => campaignVariants;
+
+        // 시작 변형 유형에 대응하는 캠페인 설정을 찾습니다.
+        public WICampaignVariantDefinition GetCampaignVariant(WICampaignVariant variant)
+        {
+            return campaignVariants.Find(item => item.Variant == variant);
+        }
+
+        // 결말 유형에 대응하는 제목과 설명을 찾습니다.
+        public WICampaignEndingDefinition GetCampaignEnding(WICampaignEndingType endingType)
+        {
+            return campaignEndings.Find(item => item.EndingType == endingType);
+        }
+
+        // 세력 ID에 대응하는 멸망 사건 서사를 찾습니다.
+        public WIFactionEliminationNarrativeDefinition GetFactionEliminationNarrative(string factionId)
+        {
+            return factionEliminationNarratives.Find(item => item.FactionId == factionId);
+        }
+
+        // 식별자로 지역·세력 사건 정의를 찾습니다.
+        public WIRegionalEventDefinition GetRegionalEvent(string id)
+        {
+            return regionalEventDefinitions.Find(item => item.Id == id);
+        }
         public IReadOnlyList<WIHeroLegacyDefinition> HeroLegacyDefinitions => heroLegacyDefinitions;
         public IReadOnlyList<WIRecruitmentEventDefinition> RecruitmentEventDefinitions => recruitmentEventDefinitions;
         public IReadOnlyList<WITavernQuestDefinition> TavernQuestDefinitions => tavernQuestDefinitions;
@@ -694,6 +960,21 @@ namespace ProjectWI.Administration
         public int StartingManaCrystal => startingManaCrystal;
         public int StartingInfluence => startingInfluence;
         public IReadOnlyList<WIStartingHeroPlacement> StartingHeroes => startingHeroes;
+        public int CapturePowerMargin => capturePowerMargin;
+        public int CaptureDurationMonths => captureDurationMonths;
+        public int PrisonerRansomGold => prisonerRansomGold;
+        public int JointAttackInfluenceCost => jointAttackInfluenceCost;
+        public int JointAttackDurationMonths => jointAttackDurationMonths;
+        public bool PermanentDeathEnabled => permanentDeathEnabled;
+        public int BattleVictoryMerit => battleVictoryMerit;
+        public int BattleVictoryExperience => battleVictoryExperience;
+        public int BattleDefeatExperience => battleDefeatExperience;
+        public int BattleVictoryFatigue => battleVictoryFatigue;
+        public int BattleDefeatFatigue => battleDefeatFatigue;
+        public int OrderlyRetreatFatigue => orderlyRetreatFatigue;
+        public int BattleInjuryPowerMargin => battleInjuryPowerMargin;
+        public int BattleInjuryMonths => battleInjuryMonths;
+        public int BattleBondVictoryThreshold => battleBondVictoryThreshold;
         public int PromotionRequiredMerit => promotionRequiredMerit;
         public int PromotionRequiredReputation => promotionRequiredReputation;
         public int PromotionInfluenceCost => promotionInfluenceCost;
@@ -781,6 +1062,12 @@ namespace ProjectWI.Administration
         public WIHeroDefinition GetHero(string id)
         {
             return heroes.Find(item => item.Id == id);
+        }
+
+        // 직업 열거형에 대응하는 능력치 성향과 권장 역할을 찾습니다.
+        public WIHeroClassDefinition GetHeroClass(WIHeroClass heroClass)
+        {
+            return heroClassDefinitions.Find(item => item.HeroClass == heroClass);
         }
 
         // ID로 특화 시설 데이터를 찾습니다.

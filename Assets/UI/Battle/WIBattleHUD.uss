@@ -17,6 +17,26 @@
     font-size: 20px;
 }
 
+.command-feedback {
+    align-self: center;
+    margin-top: 8px;
+    background-color: rgba(10, 14, 20, 0.82);
+    color: rgb(218, 207, 177);
+    padding: 7px 16px;
+    font-size: 16px;
+}
+
+.selection-info {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    max-width: 360px;
+    background-color: rgba(10, 14, 20, 0.84);
+    color: rgb(210, 224, 226);
+    padding: 9px 13px;
+    font-size: 15px;
+}
+
 .bottom-bar {
     position: absolute;
     left: 18px;
@@ -43,4 +63,111 @@
 
 .retreat {
     background-color: rgb(86, 28, 27);
+}
+
+.active-command {
+    background-color: rgb(125, 88, 25);
+    border-color: rgb(244, 205, 95);
+    color: rgb(255, 245, 205);
+}
+
+.retreat-armed {
+    background-color: rgb(170, 42, 34);
+    border-color: rgb(255, 135, 105);
+}
+
+/* 전투 HUD도 행정 화면과 같은 흑백 정보 계층을 사용합니다. */
+.battle-status,.command-feedback,.selection-info {
+    background-color: rgba(4, 6, 8, 0.9);
+    color: rgb(240, 242, 244);
+    border-color: rgb(117, 124, 130);
+}
+
+.command-button,.skill-button {
+    background-color: rgb(27, 30, 33);
+    color: rgb(244, 245, 246);
+    border-color: rgb(112, 119, 125);
+}
+
+.active-command {
+    background-color: rgb(238, 240, 242);
+    color: rgb(15, 17, 19);
+    border-color: rgb(255, 255, 255);
+}
+
+.command-button:hover,.skill-button:hover {
+    background-color: rgb(241, 242, 243);
+    color: rgb(17, 19, 21);
+    border-color: rgb(255, 255, 255);
+}
+
+.command-button:active,.skill-button:active {
+    background-color: rgb(191, 196, 200);
+    color: rgb(8, 10, 12);
+}
+
+.command-button:disabled,.skill-button:disabled {
+    background-color: rgb(32, 35, 38);
+    color: rgb(119, 125, 130);
+    border-color: rgb(70, 76, 81);
+    opacity: 0.48;
+}
+
+.retreat:hover,.retreat-armed {
+    background-color: rgb(138, 48, 45);
+    color: rgb(255, 255, 255);
+    border-color: rgb(224, 154, 149);
+}
+
+/* 전략 화면 V2와 동일한 청회색 지휘 패널 스타일을 전투 HUD에도 적용합니다. */
+.battle-status {
+    min-width: 420px;
+    background-color: rgba(7, 13, 19, 0.94);
+    color: rgb(242, 246, 248);
+    border-width: 1px;
+    border-top-width: 2px;
+    border-color: rgb(85, 101, 113);
+}
+.command-feedback,.selection-info {
+    background-color: rgba(8, 15, 21, 0.92);
+    color: rgb(202, 212, 219);
+    border-width: 1px;
+    border-color: rgb(70, 85, 96);
+}
+.bottom-bar {
+    padding: 10px;
+    background-color: rgba(6, 11, 16, 0.92);
+    border-width: 1px;
+    border-color: rgb(76, 91, 102);
+}
+.command-button,.skill-button {
+    min-height: 62px;
+    background-color: rgb(17, 28, 37);
+    color: rgb(237, 243, 246);
+    border-width: 1px;
+    border-color: rgb(83, 100, 112);
+}
+.active-command {
+    background-color: rgb(34, 75, 109);
+    color: rgb(255, 255, 255);
+    border-width: 2px;
+    border-color: rgb(126, 159, 183);
+}
+.retreat { background-color: rgb(103, 40, 38); border-color: rgb(159, 80, 75); }
+.generated-texture-button { -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); }
+.generated-texture-button:hover { -unity-background-image-tint-color: rgb(217, 228, 236); }
+.generated-texture-button:active { -unity-background-image-tint-color: rgb(174, 187, 197); }
+.generated-texture-button:disabled { -unity-background-image-tint-color: rgb(102, 114, 123); }
+.generated-normal { background-image:url("project://database/Assets/Resources/UI/Generated/button_normal.png"); -unity-background-scale-mode:stretch-to-fill; }
+.generated-primary { background-image:url("project://database/Assets/Resources/UI/Generated/button_primary.png"); -unity-background-scale-mode:stretch-to-fill; }
+.generated-danger { background-image:url("project://database/Assets/Resources/UI/Generated/button_danger.png"); -unity-background-scale-mode:stretch-to-fill; }
+.skill-button { background-image:url("project://database/Assets/Resources/UI/Generated/button_primary.png"); -unity-background-scale-mode:stretch-to-fill; }
+
+/* 버튼의 양끝과 모서리는 고정하고 가운데 부분만 크기에 맞춰 확장합니다. */
+.generated-normal, .generated-primary, .generated-danger, .skill-button {
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:28;
+    -unity-slice-right:28;
+    -unity-slice-top:24;
+    -unity-slice-bottom:24;
 }

@@ -13,13 +13,27 @@ namespace ProjectWI.Administration
         public const int DeclareWarInfluenceCost = 10;
         public const int AllianceAidGold = 200;
 
+        // 지정한 성이 현재 플레이어가 직접 명령할 수 있는 소유 영지인지 확인합니다.
+        public static bool CanPlayerManageCastle(WIAdministrationState state, WICastleRuntimeState castle)
+        {
+            return state != null && castle != null && castle.FactionId == state.PlayerFactionId;
+        }
+
+        // 플레이어가 참가해야 하는 전투가 남아 있어 다음 턴을 진행할 수 없는지 확인합니다.
+        public static bool HasUnresolvedPlayerBattles(WIAdministrationState state)
+        {
+            return state?.BattleSessions != null && state.BattleSessions.Any(session =>
+                session.PlayerInvolved && session.Status != WIBattleSessionStatus.Resolved);
+        }
+
         // 모든 세력의 월간 수입과 중점 사업을 한 턴 단위로 계산합니다.
         public static WITurnSummary ExecuteTurn(WIAdministrationDatabaseSO database, WIAdministrationState state)
         {
             WITurnSummary summary = new WITurnSummary();
             summary.GoldSpent = state.PendingPlayerGoldSpent;
             state.PendingPlayerGoldSpent = 0;
-            PlanAIResearch(database, state);
+            ResolveFactionEliminations(database, state, summary);
+            PlanAIResearch(database, state, summary);
             int appliedPlayerGold = 0;
             int appliedPlayerMana = 0;
             int appliedPlayerInfluence = 0;
@@ -39,7 +53,7 @@ namespace ProjectWI.Administration
                 }
                 else
                 {
-                    AssignAIProject(database, state, castleState, faction, factionState);
+                    AssignAIProject(database, state, castleState, faction, factionState, summary);
                 }
 
                 WITurnSummary income = new WITurnSummary();
@@ -67,16 +81,21 @@ namespace ProjectWI.Administration
             ResolveTavernQuests(database, state, summary);
             ResolveCharacterTransfers(database, state, summary);
             ResolveArmyReorganization(database, state, summary);
+            ResolveCapturedCharacters(database, state, summary);
             ResolveArmyMovement(database, state, summary);
             ResolveStrategicBattles(database, state, summary);
+            ResolveFactionEliminations(database, state, summary);
             ResolveArmyTraining(database, state, summary);
             ResolveOccupationStability(database, state, summary);
             RefreshInvasionWarnings(database, state);
             PlanAIActions(database, state, summary);
             ResolvePromotionCandidates(database, state, summary);
             ResolveDiplomaticTurn(database, state, summary);
-            WISchemeSystem.ExecuteAISchemes(database, state, summary);
             WISchemeSystem.AdvanceMonth(state);
+            WISchemeSystem.ResolveScheduledMissions(database, state, summary);
+            WISchemeSystem.ScheduleAISchemes(database, state, summary);
+            WICampaignObjectiveSystem.Evaluate(database, state, summary);
+            WIRegionalEventSystem.CreateCandidate(database, state, summary);
 
             state.Gold += summary.GoldGained - appliedPlayerGold;
             state.ManaCrystal += summary.ManaGained - appliedPlayerMana;
@@ -301,11 +320,154 @@ namespace ProjectWI.Administration
             return true;
         }
 
+        // 원소속 세력이 몸값을 지불해 상대 세력이 억류한 포로 한 명을 즉시 귀환시킵니다.
+        public static bool RansomPrisoner(WIAdministrationDatabaseSO database, WIAdministrationState state,
+            string requesterFactionId, string prisonerHeroId)
+        {
+            WICharacterRuntimeState prisoner = state.GetCharacter(prisonerHeroId);
+            WIFactionRuntimeState requester = state.GetFactionState(requesterFactionId);
+            WIFactionRuntimeState captor = state.GetFactionState(prisoner?.CaptorFactionId);
+            if (prisoner == null || requester == null || captor == null || prisoner.Captured == false ||
+                prisoner.CapturedFromFactionId != requesterFactionId || requester.Gold < database.PrisonerRansomGold)
+            {
+                return false;
+            }
+
+            requester.Gold -= database.PrisonerRansomGold;
+            captor.Gold += database.PrisonerRansomGold;
+            return ReleaseCapturedCharacter(state, prisoner);
+        }
+
+        // 서로 상대 세력이 억류한 두 포로를 비용 없이 맞교환해 각 원소속 성으로 귀환시킵니다.
+        public static bool ExchangePrisoners(WIAdministrationState state, string firstFactionId, string secondFactionId,
+            string firstPrisonerHeroId, string secondPrisonerHeroId)
+        {
+            WICharacterRuntimeState first = state.GetCharacter(firstPrisonerHeroId);
+            WICharacterRuntimeState second = state.GetCharacter(secondPrisonerHeroId);
+            if (first == null || second == null || first.Captured == false || second.Captured == false ||
+                first.CapturedFromFactionId != firstFactionId || first.CaptorFactionId != secondFactionId ||
+                second.CapturedFromFactionId != secondFactionId || second.CaptorFactionId != firstFactionId)
+            {
+                return false;
+            }
+
+            return ReleaseCapturedCharacter(state, first) && ReleaseCapturedCharacter(state, second);
+        }
+
+        // 동맹 양측이 모두 교전 중인 제3세력의 성을 제한 기간 공동 공격 목표로 지정합니다.
+        public static bool ProposeJointAttack(WIAdministrationDatabaseSO database, WIAdministrationState state,
+            string proposerFactionId, string allyFactionId, string targetCastleId)
+        {
+            WIFactionRuntimeState proposer = state.GetFactionState(proposerFactionId);
+            WIDiplomaticRelationState alliance = state.GetOrCreateDiplomaticRelation(proposerFactionId, allyFactionId);
+            WICastleRuntimeState target = state.GetCastle(targetCastleId);
+            if (proposer == null || alliance == null || target == null || alliance.Status != WIDiplomaticStatus.Alliance ||
+                target.FactionId == proposerFactionId || target.FactionId == allyFactionId ||
+                AreFactionsAtWar(state, proposerFactionId, target.FactionId) == false ||
+                AreFactionsAtWar(state, allyFactionId, target.FactionId) == false ||
+                proposer.Influence < database.JointAttackInfluenceCost)
+            {
+                return false;
+            }
+
+            proposer.Influence -= database.JointAttackInfluenceCost;
+            alliance.JointAttackTargetCastleId = targetCastleId;
+            alliance.JointAttackMonthsRemaining = database.JointAttackDurationMonths;
+            return true;
+        }
+
         // 두 세력이 현재 전쟁 상태인지 확인합니다.
         public static bool AreFactionsAtWar(WIAdministrationState state, string firstFactionId, string secondFactionId)
         {
             WIDiplomaticRelationState relation = state.GetOrCreateDiplomaticRelation(firstFactionId, secondFactionId);
             return relation != null && relation.Status == WIDiplomaticStatus.War;
+        }
+
+        // 영토가 사라진 세력을 한 번만 멸망 처리하고 잔존 행동·부대·인물·외교 약속을 정리합니다.
+        public static void ResolveFactionEliminations(WIAdministrationDatabaseSO database, WIAdministrationState state,
+            WITurnSummary summary)
+        {
+            foreach (WIFactionRuntimeState faction in state.Factions.Where(item => item.Eliminated == false).ToList())
+            {
+                if (state.Castles.Any(castle => castle.FactionId == faction.FactionId)) continue;
+                faction.Eliminated = true;
+                faction.EliminatedTurn = state.Turn;
+                faction.ActiveResearchId = string.Empty;
+                faction.ResearcherHeroId = string.Empty;
+                faction.ResearchRemainingMonths = 0;
+
+                HashSet<string> removedCharacterIds = new HashSet<string>(state.Armies
+                    .Where(army => army.FactionId == faction.FactionId)
+                    .SelectMany(army => army.Members).Select(member => member.HeroId));
+                foreach (WICharacterRuntimeState prisoner in state.Characters.Where(character =>
+                             character.Captured && character.CapturedFromFactionId == faction.FactionId))
+                {
+                    removedCharacterIds.Add(prisoner.HeroId);
+                }
+                foreach (WICharacterRuntimeState releasedPrisoner in state.Characters.Where(character =>
+                             character.Captured && character.CaptorFactionId == faction.FactionId).ToList())
+                {
+                    ReleaseCapturedCharacter(state, releasedPrisoner);
+                }
+                state.Armies.RemoveAll(army => army.FactionId == faction.FactionId);
+                state.BattleSessions.RemoveAll(session => session.AttackerFactionId == faction.FactionId ||
+                                                         session.DefenderFactionId == faction.FactionId);
+                state.SchemeMissions.RemoveAll(mission => mission.InitiatorFactionId == faction.FactionId);
+                foreach (WIDiplomaticRelationState relation in state.DiplomaticRelations.Where(relation =>
+                             relation.FirstFactionId == faction.FactionId || relation.SecondFactionId == faction.FactionId))
+                {
+                    relation.JointAttackTargetCastleId = string.Empty;
+                    relation.JointAttackMonthsRemaining = 0;
+                    relation.AidCooldownMonths = 0;
+                }
+                foreach (string heroId in removedCharacterIds)
+                {
+                    foreach (WICastleRuntimeState castle in state.Castles) castle.HeroIds.Remove(heroId);
+                    WICharacterRuntimeState character = state.GetCharacter(heroId);
+                    if (character == null) continue;
+                    character.Recruited = false;
+                    character.Captured = false;
+                    character.CaptorFactionId = string.Empty;
+                    character.CapturedFromFactionId = string.Empty;
+                    character.CapturedMonthsRemaining = 0;
+                    character.Activity = WICharacterActivityType.None;
+                }
+
+                WIFactionDefinition definition = database.GetFaction(faction.FactionId);
+                WIFactionEliminationNarrativeDefinition narrative = database.GetFactionEliminationNarrative(faction.FactionId);
+                string title = narrative?.Title.Get(database.UseEnglish) ?? "세력 멸망";
+                string description = narrative?.Description.Get(database.UseEnglish) ?? "모든 영토를 상실했습니다.";
+                summary?.News.Add($"세력 멸망 · {definition?.DisplayName.Get(database.UseEnglish) ?? faction.FactionId} · " +
+                                  $"{title} · 제 {state.Turn}턴 · {description}");
+            }
+        }
+
+        // 한 턴의 AI 판단 근거를 세력·분야별 한 건으로 제한해 월보에 추가합니다.
+        public static void AddAIReasonReport(WITurnSummary summary, string factionId, string factionName,
+            string category, string reason)
+        {
+            if (summary == null) return;
+            summary.AIReasonReports = summary.AIReasonReports ?? new List<string>();
+            if (summary.AIReasonReports.Count >= 12) return;
+            string prefix = $"[AI 판단] {factionId} · {category} ·";
+            if (summary.AIReasonReports.Any(item => item.StartsWith(prefix))) return;
+            summary.AIReasonReports.Add($"{prefix} {factionName} · {reason}");
+        }
+
+        // 난이도의 AI 후보 범위 안에서 턴과 고정 소금값으로 재현 가능한 선택 순위를 반환합니다.
+        public static int GetAICandidateIndex(WIAdministrationDatabaseSO database, WIAdministrationState state,
+            int candidateCount, int salt)
+        {
+            if (candidateCount <= 1) return 0;
+            int window = Mathf.Clamp(database.GetDifficulty(state.Difficulty)?.AICandidateWindow ?? 2, 1, candidateCount);
+            return Mathf.Abs(state.Turn + salt) % window;
+        }
+
+        // 현재 난이도가 AI에게 허용하는 상위 후보 범위를 반환합니다.
+        public static int GetAICandidateWindow(WIAdministrationDatabaseSO database, WIAdministrationState state,
+            int candidateCount)
+        {
+            return Mathf.Clamp(database.GetDifficulty(state.Difficulty)?.AICandidateWindow ?? 2, 1, Mathf.Max(1, candidateCount));
         }
 
         // 외교 원조 대기 시간을 줄이고 AI 세력의 제한적인 관계 개선을 처리합니다.
@@ -314,6 +476,8 @@ namespace ProjectWI.Administration
             foreach (WIDiplomaticRelationState relation in state.DiplomaticRelations)
             {
                 relation.AidCooldownMonths = Mathf.Max(0, relation.AidCooldownMonths - 1);
+                relation.JointAttackMonthsRemaining = Mathf.Max(0, relation.JointAttackMonthsRemaining - 1);
+                if (relation.JointAttackMonthsRemaining == 0) relation.JointAttackTargetCastleId = string.Empty;
             }
 
             if (state.Turn % 4 != 0)
@@ -329,10 +493,11 @@ namespace ProjectWI.Administration
                 }
 
                 WIFactionRuntimeState factionState = state.GetFactionState(faction.Id);
+                if (factionState == null || factionState.Eliminated) continue;
                 WIDiplomaticRelationState relation = state.DiplomaticRelations.FirstOrDefault(item =>
                     (item.FirstFactionId == faction.Id || item.SecondFactionId == faction.Id) &&
                     item.Status == WIDiplomaticStatus.Neutral);
-                if (relation == null || factionState == null || factionState.Influence < 10)
+                if (relation == null || factionState.Influence < 10)
                 {
                     continue;
                 }
@@ -341,6 +506,8 @@ namespace ProjectWI.Administration
                 relation.Status = WIDiplomaticStatus.Friendly;
                 string counterpartId = relation.FirstFactionId == faction.Id ? relation.SecondFactionId : relation.FirstFactionId;
                 summary.News.Add($"대륙 정세 · {faction.DisplayName.Get(database.UseEnglish)}와 {database.GetFaction(counterpartId).DisplayName.Get(database.UseEnglish)}의 관계가 우호로 개선됨");
+                AddAIReasonReport(summary, faction.Id, faction.DisplayName.Get(database.UseEnglish), "외교",
+                    $"중립 관계를 개선해 고립을 완화 · 영향력 10 사용 · 대상 {database.GetFaction(counterpartId).DisplayName.Get(database.UseEnglish)}");
                 break;
             }
         }
@@ -871,6 +1038,12 @@ namespace ProjectWI.Administration
             List<WIArmyState> attackers = state.Armies.Where(army => army.AwaitingBattle).ToList();
             foreach (WIArmyState attacker in attackers)
             {
+                bool alreadyDefending = state.BattleSessions.Any(item =>
+                    item.Status != WIBattleSessionStatus.Resolved && item.DefenderArmyIds.Contains(attacker.ArmyId));
+                if (alreadyDefending)
+                {
+                    continue;
+                }
                 WICastleRuntimeState castle = state.GetCastle(attacker.CurrentCastleId);
                 if (castle == null || castle.FactionId == attacker.FactionId)
                 {
@@ -914,11 +1087,19 @@ namespace ProjectWI.Administration
             List<WIArmyState> defenders = state.Armies.Where(army =>
                 army != attacker && army.FactionId == castle.FactionId &&
                 army.CurrentCastleId == castle.CastleId && army.IsOperational).ToList();
+            WIArmyState counterAttacker = state.Armies.FirstOrDefault(army =>
+                army != attacker && army.AwaitingBattle && army.FactionId == castle.FactionId &&
+                army.CurrentCastleId == attacker.OriginCastleId && army.OriginCastleId == castle.CastleId);
+            if (counterAttacker != null && defenders.Contains(counterAttacker) == false)
+            {
+                defenders.Add(counterAttacker);
+            }
             WIBattleSessionState session = new WIBattleSessionState
             {
                 SessionId = $"battle_{state.NextBattleSessionNumber}",
                 CastleId = castle.CastleId,
                 AttackerArmyId = attacker.ArmyId,
+                CounterAttackerArmyId = counterAttacker?.ArmyId ?? string.Empty,
                 AttackerFactionId = attacker.FactionId,
                 DefenderFactionId = castle.FactionId,
                 AttackerPowerSnapshot = GetArmyBattlePower(database, state, attacker),
@@ -999,21 +1180,33 @@ namespace ProjectWI.Administration
                 {
                     defender.LastBattlePower = GetArmyBattlePower(database, state, defender);
                     defender.LastBattleOutcome = WIBattleOutcome.Defeat;
-                    RetreatAndReorganizeArmy(database, state, defender, castle.CastleId, margin);
+                    RetreatAndReorganizeArmy(database, state, defender, castle.CastleId, margin,
+                        session.DefenderRetreated, session.AttackerFactionId, summary);
                 }
                 attacker.LastBattleOutcome = WIBattleOutcome.Victory;
-                ApplyBattleConsequences(state, attacker, true, margin);
-                ResolveArmyVictoryAndOccupation(database, state, attacker);
+                ApplyBattleConsequences(database, state, attacker, true, margin, false, summary);
+                ApplyBattleRelationshipConsequences(database, state, attacker, summary);
+                ResolveArmyVictoryAndOccupation(database, state, attacker, summary);
                 summary?.News.Add($"전투 결과 · {database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish)} 점령 · {attacker.DisplayName} 승리 ({session.AttackerPowerSnapshot}:{session.DefenderPowerSnapshot})");
             }
             else
             {
                 attacker.LastBattleOutcome = WIBattleOutcome.Defeat;
-                RetreatAndReorganizeArmy(database, state, attacker, castle.CastleId, margin);
+                RetreatAndReorganizeArmy(database, state, attacker, castle.CastleId, margin,
+                    session.AttackerRetreated, session.DefenderFactionId, summary);
                 foreach (WIArmyState defender in defenders)
                 {
                     defender.LastBattleOutcome = WIBattleOutcome.Victory;
-                    ApplyBattleConsequences(state, defender, true, margin);
+                    if (defender.ArmyId == session.CounterAttackerArmyId)
+                    {
+                        defender.AwaitingBattle = false;
+                    }
+                    ApplyBattleConsequences(database, state, defender, true, margin, false, summary);
+                    ApplyBattleRelationshipConsequences(database, state, defender, summary);
+                    if (defender.ArmyId == session.CounterAttackerArmyId)
+                    {
+                        ResolveArmyVictoryAndOccupation(database, state, defender, summary);
+                    }
                 }
                 summary?.News.Add($"전투 결과 · {database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish)} 방어 성공 · {attacker.DisplayName} 후퇴 ({session.AttackerPowerSnapshot}:{session.DefenderPowerSnapshot})");
             }
@@ -1082,7 +1275,10 @@ namespace ProjectWI.Administration
             WIAdministrationState state,
             WIArmyState army,
             string battleCastleId,
-            int defeatMargin)
+            int defeatMargin,
+            bool orderlyRetreat,
+            string captorFactionId,
+            WITurnSummary summary)
         {
             string retreatId = string.Empty;
             if (string.IsNullOrEmpty(army.OriginCastleId) == false && state.GetCastle(army.OriginCastleId)?.FactionId == army.FactionId)
@@ -1113,28 +1309,151 @@ namespace ProjectWI.Administration
                 battleCastleState?.HeroIds.Remove(member.HeroId);
                 if (retreatCastle != null && retreatCastle.HeroIds.Contains(member.HeroId) == false) retreatCastle.HeroIds.Add(member.HeroId);
             }
-            ApplyBattleConsequences(state, army, false, defeatMargin);
+            ApplyBattleConsequences(database, state, army, false, defeatMargin, orderlyRetreat, summary);
+            TryCaptureDefeatedCharacter(database, state, army, defeatMargin, orderlyRetreat, captorFactionId, summary);
         }
 
         // 승패와 전력 차이에 따라 피로, 부상, 경험과 공적을 반영합니다.
-        private static void ApplyBattleConsequences(WIAdministrationState state, WIArmyState army, bool victory, int margin)
+        private static void ApplyBattleConsequences(
+            WIAdministrationDatabaseSO database,
+            WIAdministrationState state,
+            WIArmyState army,
+            bool victory,
+            int margin,
+            bool orderlyRetreat,
+            WITurnSummary summary)
         {
             foreach (WIArmyMemberState member in army.Members)
             {
                 WICharacterRuntimeState character = state.GetCharacter(member.HeroId);
                 if (character == null) continue;
-                character.Fatigue = Mathf.Clamp(character.Fatigue + (victory ? 15 : 25), 0, 100);
-                character.Experience += victory ? 15 : 8;
+                int fatigueGain = victory ? database.BattleVictoryFatigue
+                    : orderlyRetreat ? database.OrderlyRetreatFatigue : database.BattleDefeatFatigue;
+                int experienceGain = victory ? database.BattleVictoryExperience : database.BattleDefeatExperience;
+                character.Fatigue = Mathf.Clamp(character.Fatigue + fatigueGain, 0, 100);
+                character.Experience += experienceGain;
+                int meritGain = 0;
                 if (victory)
                 {
-                    character.Merit += 10;
+                    meritGain = database.BattleVictoryMerit;
+                    character.Merit += meritGain;
                     if (character.BaseGrade == WICharacterGrade.Common && character.PromotedToHero == false)
                     {
                         character.PromotionAchievement = true;
                     }
                 }
-                else if (margin >= 30) character.InjuryMonths = Mathf.Max(character.InjuryMonths, 1);
+                bool injured = victory == false && orderlyRetreat == false && margin >= database.BattleInjuryPowerMargin;
+                if (injured) character.InjuryMonths = Mathf.Max(character.InjuryMonths, database.BattleInjuryMonths);
+                WIHeroDefinition hero = database.GetHero(member.HeroId);
+                string result = victory ? "승리" : orderlyRetreat ? "질서 있는 후퇴" : "패배";
+                summary?.News.Add($"전투 인물 · {hero?.DisplayName.Get(database.UseEnglish) ?? member.HeroId} · {result} · " +
+                    $"공적 +{meritGain} · 경험 +{experienceGain} · 피로 +{fatigueGain}" +
+                    (injured ? $" · 부상 {database.BattleInjuryMonths}개월" : string.Empty));
             }
+        }
+
+        // 함께 승리한 부대원 쌍의 전우 승리를 누적하고 기준 도달 시 관계를 한 단계 개선합니다.
+        private static void ApplyBattleRelationshipConsequences(
+            WIAdministrationDatabaseSO database,
+            WIAdministrationState state,
+            WIArmyState army,
+            WITurnSummary summary)
+        {
+            List<string> memberIds = army.Members.Select(item => item.HeroId).Distinct().OrderBy(item => item).ToList();
+            for (int firstIndex = 0; firstIndex < memberIds.Count; firstIndex += 1)
+            {
+                for (int secondIndex = firstIndex + 1; secondIndex < memberIds.Count; secondIndex += 1)
+                {
+                    WIRelationshipState relationship = state.GetOrCreateRelationship(memberIds[firstIndex], memberIds[secondIndex]);
+                    relationship.SharedBattleVictories += 1;
+                    if (relationship.SharedBattleVictories < database.BattleBondVictoryThreshold ||
+                        relationship.Level == WIRelationshipLevel.Fondness)
+                    {
+                        continue;
+                    }
+                    relationship.SharedBattleVictories = 0;
+                    relationship.Level = (WIRelationshipLevel)Mathf.Min(
+                        (int)WIRelationshipLevel.Fondness,
+                        (int)relationship.Level + 1);
+                    WIHeroDefinition first = database.GetHero(memberIds[firstIndex]);
+                    WIHeroDefinition second = database.GetHero(memberIds[secondIndex]);
+                    summary?.News.Add($"전우 관계 발전 · {first?.DisplayName.Get(database.UseEnglish)} ↔ " +
+                        $"{second?.DisplayName.Get(database.UseEnglish)} · {relationship.Level}");
+                }
+            }
+        }
+
+        // 큰 전력 차이로 패배하고 질서 있게 후퇴하지 못했을 때 한 명을 결정적으로 포로 처리합니다.
+        private static void TryCaptureDefeatedCharacter(
+            WIAdministrationDatabaseSO database,
+            WIAdministrationState state,
+            WIArmyState army,
+            int defeatMargin,
+            bool orderlyRetreat,
+            string captorFactionId,
+            WITurnSummary summary)
+        {
+            if (orderlyRetreat || defeatMargin < database.CapturePowerMargin || army.Members.Count == 0)
+            {
+                return;
+            }
+            WIArmyMemberState capturedMember = army.Members
+                .OrderBy(member => database.GetHero(member.HeroId)?.Grade == WICharacterGrade.Common ? 0 : 1)
+                .ThenByDescending(member => state.GetCharacter(member.HeroId)?.Fatigue ?? 0)
+                .ThenBy(member => member.HeroId)
+                .First();
+            WICharacterRuntimeState character = state.GetCharacter(capturedMember.HeroId);
+            if (character == null) return;
+            character.Captured = true;
+            character.CaptorFactionId = captorFactionId;
+            character.CapturedFromFactionId = army.FactionId;
+            character.CapturedMonthsRemaining = database.CaptureDurationMonths;
+            character.Activity = WICharacterActivityType.None;
+            army.Members.Remove(capturedMember);
+            if (army.Members.Count == 0)
+            {
+                state.Armies.Remove(army);
+            }
+            else if (army.Members.Any(member => member.Role == WIUnitRole.Commander) == false)
+            {
+                WIArmyMemberState successor = army.Members.OrderByDescending(member =>
+                    database.GetHero(member.HeroId)?.Leadership ?? 0).First();
+                successor.Role = WIUnitRole.Commander;
+            }
+            foreach (WICastleRuntimeState castle in state.Castles) castle.HeroIds.Remove(capturedMember.HeroId);
+            WIHeroDefinition hero = database.GetHero(capturedMember.HeroId);
+            summary?.News.Add($"포로 발생 · {hero?.DisplayName.Get(database.UseEnglish) ?? capturedMember.HeroId} · " +
+                $"{database.GetFaction(captorFactionId)?.DisplayName.Get(database.UseEnglish) ?? captorFactionId} 억류 {database.CaptureDurationMonths}개월");
+        }
+
+        // 포로 억류 기간을 줄이고 만료된 인물을 원래 세력의 성으로 귀환시킵니다.
+        private static void ResolveCapturedCharacters(
+            WIAdministrationDatabaseSO database,
+            WIAdministrationState state,
+            WITurnSummary summary)
+        {
+            foreach (WICharacterRuntimeState character in state.Characters.Where(item => item.Captured).ToList())
+            {
+                character.CapturedMonthsRemaining = Mathf.Max(0, character.CapturedMonthsRemaining - 1);
+                if (character.CapturedMonthsRemaining > 0) continue;
+                if (ReleaseCapturedCharacter(state, character) == false) continue;
+                WICastleRuntimeState returnCastle = state.Castles.FirstOrDefault(item => item.HeroIds.Contains(character.HeroId));
+                WIHeroDefinition hero = database.GetHero(character.HeroId);
+                summary.News.Add($"포로 귀환 · {hero?.DisplayName.Get(database.UseEnglish) ?? character.HeroId} · " +
+                    $"{database.GetCastle(returnCastle.CastleId).DisplayName.Get(database.UseEnglish)} 도착");
+            }
+        }
+
+        // 포로 상태를 해제하고 원소속 세력이 보유한 첫 성으로 인물을 배치합니다.
+        private static bool ReleaseCapturedCharacter(WIAdministrationState state, WICharacterRuntimeState character)
+        {
+            WICastleRuntimeState returnCastle = state.Castles.FirstOrDefault(item => item.FactionId == character.CapturedFromFactionId);
+            if (returnCastle == null) return false;
+            character.Captured = false;
+            character.CaptorFactionId = string.Empty;
+            character.CapturedMonthsRemaining = 0;
+            if (returnCastle.HeroIds.Contains(character.HeroId) == false) returnCastle.HeroIds.Add(character.HeroId);
+            return true;
         }
 
         // 재편성 중인 부대의 남은 기간을 줄이고 완료 소식을 기록합니다.
@@ -1157,7 +1476,8 @@ namespace ProjectWI.Administration
         public static bool ResolveArmyVictoryAndOccupation(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
-            WIArmyState army)
+            WIArmyState army,
+            WITurnSummary summary = null)
         {
             if (army == null || army.AwaitingBattle == false)
             {
@@ -1170,6 +1490,7 @@ namespace ProjectWI.Administration
                 return false;
             }
 
+            string defeatedFactionId = castle.FactionId;
             castle.FactionId = army.FactionId;
             castle.Stability = Mathf.Min(castle.Stability, 20);
             castle.OccupationUnrestMonths = 3;
@@ -1182,6 +1503,11 @@ namespace ProjectWI.Administration
                 {
                     castle.HeroIds.Add(member.HeroId);
                 }
+            }
+
+            if (army.FactionId == state.PlayerFactionId)
+            {
+                WIOccupationEventSystem.CreatePending(state, castle.CastleId, defeatedFactionId, summary, database);
             }
 
             return true;
@@ -1697,12 +2023,12 @@ namespace ProjectWI.Administration
         }
 
         // AI가 성향, 선행 조건과 실제 마나 보유량에 맞춰 연구를 선택합니다.
-        private static void PlanAIResearch(WIAdministrationDatabaseSO database, WIAdministrationState state)
+        private static void PlanAIResearch(WIAdministrationDatabaseSO database, WIAdministrationState state, WITurnSummary summary)
         {
             foreach (WIFactionDefinition factionDefinition in database.Factions.Where(item => item.PlayerFaction == false))
             {
                 WIFactionRuntimeState faction = state.GetFactionState(factionDefinition.Id);
-                if (faction == null || string.IsNullOrEmpty(faction.ActiveResearchId) == false)
+                if (faction == null || faction.Eliminated || string.IsNullOrEmpty(faction.ActiveResearchId) == false)
                 {
                     continue;
                 }
@@ -1713,15 +2039,27 @@ namespace ProjectWI.Administration
                 {
                     continue;
                 }
-                IEnumerable<WIResearchDefinition> candidates = database.ResearchDefinitions
+                int maximumTechnology = state.Castles.Where(castle => castle.FactionId == faction.FactionId)
+                    .Select(castle => castle.Technology).DefaultIfEmpty(0).Max();
+                List<WIResearchDefinition> candidates = database.ResearchDefinitions
                     .Where(research => faction.CompletedResearchIds.Contains(research.Id) == false)
-                    .OrderByDescending(research => GetAIResearchPreference(factionDefinition.AIStrategy, research.EffectType));
-                foreach (WIResearchDefinition research in candidates)
+                    .Where(research => faction.ManaCrystal >= research.ManaCost && maximumTechnology >= research.RequiredTechnology)
+                    .Where(research => string.IsNullOrEmpty(research.PrerequisiteResearchId) ||
+                                       faction.CompletedResearchIds.Contains(research.PrerequisiteResearchId))
+                    .OrderByDescending(research => GetAIResearchPreference(factionDefinition.AIStrategy, research.EffectType)).ToList();
+                if (candidates.Count == 0) continue;
+                int factionSalt = database.Factions.ToList().FindIndex(item => item.Id == factionDefinition.Id);
+                int selectedIndex = GetAICandidateIndex(database, state, candidates.Count, factionSalt);
+                WIResearchDefinition research = candidates[selectedIndex];
+                if (BeginResearch(database, state, faction.FactionId, research.Id, researcher.HeroId))
                 {
-                    if (BeginResearch(database, state, faction.FactionId, research.Id, researcher.HeroId))
-                    {
-                        break;
-                    }
+                    WIResearchDefinition alternative = candidates.FirstOrDefault(item => item.Id != research.Id);
+                    int selectedScore = GetAIResearchPreference(factionDefinition.AIStrategy, research.EffectType);
+                    int alternativeScore = alternative == null ? 0 : GetAIResearchPreference(factionDefinition.AIStrategy, alternative.EffectType);
+                    AddAIReasonReport(summary, factionDefinition.Id, factionDefinition.DisplayName.Get(database.UseEnglish), "연구",
+                        $"상위 {GetAICandidateWindow(database, state, candidates.Count)}개 중 {selectedIndex + 1}순위 " +
+                        $"{research.DisplayName.Get(database.UseEnglish)} 선택 · 성향 적합 {selectedScore}점" +
+                        (alternative == null ? string.Empty : $" · 비교 {alternative.DisplayName.Get(database.UseEnglish)} {alternativeScore}점"));
                 }
             }
         }
@@ -1880,7 +2218,8 @@ namespace ProjectWI.Administration
             WIAdministrationState state,
             WICastleRuntimeState castleState,
             WIFactionDefinition faction,
-            WIFactionRuntimeState factionState)
+            WIFactionRuntimeState factionState,
+            WITurnSummary summary)
         {
             int projectCost = GetProjectCost(database, WICastleProjectType.Prosperity, WIProjectInvestment.Basic);
             if (castleState.ActiveProject != null || factionState.Gold < projectCost)
@@ -1903,6 +2242,23 @@ namespace ProjectWI.Administration
                 ManagerHeroId = manager.Id,
                 RemainingMonths = 1
             };
+            string reason = castleState.Stability < 35 ? $"치안 {castleState.Stability} 보완" :
+                castleState.Defense < 35 ? $"방어 {castleState.Defense} 보완" : $"{GetAIStrategyReason(faction.AIStrategy)} 성향 우선";
+            AddAIReasonReport(summary, faction.Id, faction.DisplayName.Get(database.UseEnglish), "사업",
+                $"{database.GetCastle(castleState.CastleId).DisplayName.Get(database.UseEnglish)}에서 {projectType} 선택 · {reason}");
+        }
+
+        // AI 성향을 사업과 군사 판단에 사용하는 짧은 한국어 근거로 변환합니다.
+        private static string GetAIStrategyReason(WIAIStrategy strategy)
+        {
+            switch (strategy)
+            {
+                case WIAIStrategy.Development: return "개발";
+                case WIAIStrategy.Defense: return "방어";
+                case WIAIStrategy.Aggressive: return "공세";
+                case WIAIStrategy.Scheme: return "모략";
+                default: return "번영";
+            }
         }
 
         // 현재 난이도의 후보 범위 안에서 AI 사업 담당 인물을 결정합니다.
@@ -1920,9 +2276,8 @@ namespace ProjectWI.Administration
                 return null;
             }
 
-            int candidateWindow = database.GetDifficulty(state.Difficulty)?.AICandidateWindow ?? 2;
             int castleNumber = int.Parse(castleState.CastleId.Substring(castleState.CastleId.Length - 2));
-            return candidates[(state.Turn + castleNumber) % Mathf.Min(candidateWindow, candidates.Count)];
+            return candidates[GetAICandidateIndex(database, state, candidates.Count, castleNumber)];
         }
 
         // AI 성향과 가장 취약한 성 수치를 조합해 사업 종류를 선택합니다.
@@ -1952,6 +2307,7 @@ namespace ProjectWI.Administration
                 {
                     continue;
                 }
+                if (state.GetFactionState(faction.Id)?.Eliminated == true) continue;
 
                 List<WICastleRuntimeState> factionCastles = state.Castles.FindAll(item => item.FactionId == faction.Id);
                 int armyLimit = Mathf.Max(1, factionCastles.Count / 8) + (faction.AIStrategy == WIAIStrategy.Aggressive ? 1 : 0);
@@ -1973,13 +2329,43 @@ namespace ProjectWI.Administration
                 List<WIArmyState> idleArmies = state.Armies
                     .Where(item => item.FactionId == faction.Id && item.IsOperational)
                     .ToList();
+                WIDiplomaticRelationState jointRelation = state.DiplomaticRelations.FirstOrDefault(item =>
+                    item.JointAttackMonthsRemaining > 0 &&
+                    (item.FirstFactionId == faction.Id || item.SecondFactionId == faction.Id));
+                WICastleRuntimeState jointTarget = state.GetCastle(jointRelation?.JointAttackTargetCastleId);
+                WICastleRuntimeState jointStagingCastle = jointTarget == null ? null : factionCastles.FirstOrDefault(item =>
+                    database.GetCastle(item.CastleId)?.AdjacentCastleIds.Contains(jointTarget.CastleId) == true);
                 WICastleRuntimeState threatenedCastle = factionCastles
                     .Where(item => GetCastleThreatScore(database, state, item, faction.Id) > 0)
                     .OrderByDescending(item => GetCastleThreatScore(database, state, item, faction.Id))
                     .FirstOrDefault();
                 bool shouldMarch = faction.AIStrategy == WIAIStrategy.Aggressive || state.Turn % 3 == 0;
+                string militaryReason = jointTarget != null ?
+                    $"동맹 공동 목표 {database.GetCastle(jointTarget.CastleId).DisplayName.Get(database.UseEnglish)} 우선" :
+                    threatenedCastle != null ?
+                        $"전선 위협 {GetCastleThreatScore(database, state, threatenedCastle, faction.Id)}점 · {database.GetCastle(threatenedCastle.CastleId).DisplayName.Get(database.UseEnglish)} 방어·증원" :
+                        shouldMarch ? $"{GetAIStrategyReason(faction.AIStrategy)} 성향에 따라 인접 적 공격 검토" : "전선 위협이 낮아 예비대 유지";
+                AddAIReasonReport(summary, faction.Id, faction.DisplayName.Get(database.UseEnglish), "군사", militaryReason);
                 foreach (WIArmyState army in idleArmies)
                 {
+                    if (jointTarget != null && jointStagingCastle != null &&
+                        AreFactionsAtWar(state, faction.Id, jointTarget.FactionId))
+                    {
+                        army.StrategicTargetCastleId = jointTarget.CastleId;
+                        if (army.CurrentCastleId == jointStagingCastle.CastleId)
+                        {
+                            if (BeginArmyMarch(database, state, army, jointTarget.CastleId)) army.Mission = WIArmyMission.Attack;
+                        }
+                        else
+                        {
+                            string jointStep = GetNextFriendlyStep(database, state, army.CurrentCastleId,
+                                jointStagingCastle.CastleId, faction.Id);
+                            if (string.IsNullOrEmpty(jointStep) == false && BeginArmyMarch(database, state, army, jointStep))
+                                army.Mission = WIArmyMission.Reinforce;
+                        }
+                        continue;
+                    }
+
                     if (threatenedCastle == null)
                     {
                         army.Mission = WIArmyMission.Reserve;
@@ -2005,11 +2391,15 @@ namespace ProjectWI.Administration
                     }
 
                     WICastleDefinition origin = database.GetCastle(army.CurrentCastleId);
-                    string targetId = origin?.AdjacentCastleIds
+                    List<string> targetCandidates = origin?.AdjacentCastleIds
                         .Where(id => state.GetCastle(id)?.FactionId != faction.Id &&
                                      AreFactionsAtWar(state, faction.Id, state.GetCastle(id)?.FactionId))
                         .OrderByDescending(id => GetAttackTargetScore(state, id))
-                        .FirstOrDefault();
+                        .ToList();
+                    int militarySalt = database.Factions.ToList().FindIndex(item => item.Id == faction.Id) + (army.ArmyId?.Length ?? 0);
+                    int targetIndex = targetCandidates == null || targetCandidates.Count == 0 ? -1 :
+                        GetAICandidateIndex(database, state, targetCandidates.Count, militarySalt);
+                    string targetId = targetIndex < 0 ? string.Empty : targetCandidates[targetIndex];
                     if (string.IsNullOrEmpty(targetId) || BeginArmyMarch(database, state, army, targetId) == false)
                     {
                         continue;
@@ -2282,7 +2672,7 @@ namespace ProjectWI.Administration
         }
 
         // 사업 종류에 알맞은 담당 인물 능력치를 반환합니다.
-        private static int GetProjectStat(WICastleProjectType projectType, WIHeroDefinition manager)
+        public static int GetProjectRelevantStat(WICastleProjectType projectType, WIHeroDefinition manager)
         {
             if (manager == null)
             {
@@ -2339,7 +2729,7 @@ namespace ProjectWI.Administration
             WIHeroDefinition manager,
             WIProjectInvestment investment)
         {
-            int relevantStat = GetProjectStat(projectType, manager);
+            int relevantStat = GetProjectRelevantStat(projectType, manager);
             WIProjectBalanceDefinition balance = database.ProjectBalance;
             int investmentBonus = investment == WIProjectInvestment.Intensive ? balance.IntensiveGainBonus : 0;
             int traitBonus = GetProjectTraitBonus(database, projectType, manager);

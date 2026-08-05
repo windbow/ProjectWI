@@ -11,6 +11,13 @@ namespace ProjectWI.Administration
         Defeat
     }
 
+    public enum WICampaignEndingType
+    {
+        None,
+        Concord,
+        Dominion
+    }
+
     [Serializable]
     public class WICastleProjectState
     {
@@ -74,6 +81,7 @@ namespace ProjectWI.Administration
         public List<string> AIProjectFactionIds = new List<string>();
         public List<string> News = new List<string>();
         public List<string> DelegationReports = new List<string>();
+        public List<string> AIReasonReports = new List<string>();
     }
 
     [Serializable]
@@ -82,6 +90,18 @@ namespace ProjectWI.Administration
         public string ObserverFactionId;
         public string TargetCastleId;
         public int RemainingMonths;
+    }
+
+    [Serializable]
+    public class WISchemeMissionState
+    {
+        public string SchemeId;
+        public string InitiatorFactionId;
+        public string AgentHeroId;
+        public string TargetCastleId;
+        public string TargetHeroId;
+        public int RemainingMonths = 1;
+        public int ResolutionRoll;
     }
 
     [Serializable]
@@ -196,6 +216,7 @@ namespace ProjectWI.Administration
         public string SessionId;
         public string CastleId;
         public string AttackerArmyId;
+        public string CounterAttackerArmyId;
         public List<string> DefenderArmyIds = new List<string>();
         public string AttackerFactionId;
         public string DefenderFactionId;
@@ -207,6 +228,8 @@ namespace ProjectWI.Administration
         public WIBattleSessionStatus Status;
         public WIBattleOutcome AttackerOutcome;
         public WIBattleResolutionSource ResolutionSource;
+        public bool AttackerRetreated;
+        public bool DefenderRetreated;
     }
 
     [Serializable]
@@ -247,6 +270,8 @@ namespace ProjectWI.Administration
         public string ActiveResearchId;
         public string ResearcherHeroId;
         public int ResearchRemainingMonths;
+        public bool Eliminated;
+        public int EliminatedTurn = -1;
     }
 
     public enum WIDiplomaticStatus
@@ -265,6 +290,8 @@ namespace ProjectWI.Administration
         public string SecondFactionId;
         public WIDiplomaticStatus Status = WIDiplomaticStatus.Neutral;
         public int AidCooldownMonths;
+        public string JointAttackTargetCastleId;
+        public int JointAttackMonthsRemaining;
     }
 
     [Serializable]
@@ -278,6 +305,11 @@ namespace ProjectWI.Administration
         public int Experience;
         public int Fatigue;
         public int InjuryMonths;
+        public bool Captured;
+        public string CaptorFactionId;
+        public string CapturedFromFactionId;
+        public int CapturedMonthsRemaining;
+        public bool IsDead;
         public int RecruitmentProgress;
         public WILoyaltyState LoyaltyState = WILoyaltyState.Stable;
         public string TitleId;
@@ -294,12 +326,27 @@ namespace ProjectWI.Administration
         public string FirstHeroId;
         public string SecondHeroId;
         public WIRelationshipLevel Level = WIRelationshipLevel.Normal;
+        public int SharedBattleVictories;
+    }
+
+    [Serializable]
+    public class WIPendingRegionalEvent
+    {
+        public string EventId;
+    }
+
+    [Serializable]
+    public class WIPendingOccupationEvent
+    {
+        public string CastleId;
+        public string DefeatedFactionId;
     }
 
     [Serializable]
     public class WIAdministrationState
     {
         public WICampaignDifficulty Difficulty = WICampaignDifficulty.Standard;
+        public WICampaignVariant CampaignVariant = WICampaignVariant.Classic;
         public int Year;
         public int Month;
         public int Turn;
@@ -314,6 +361,9 @@ namespace ProjectWI.Administration
         public List<WIPendingLegacyChoice> PendingLegacyChoices = new List<WIPendingLegacyChoice>();
         public List<WIPendingRelationshipEvent> PendingRelationshipEvents = new List<WIPendingRelationshipEvent>();
         public List<string> CompletedRelationshipEventKeys = new List<string>();
+        public List<WIPendingRegionalEvent> PendingRegionalEvents = new List<WIPendingRegionalEvent>();
+        public List<string> CompletedRegionalEventIds = new List<string>();
+        public List<WIPendingOccupationEvent> PendingOccupationEvents = new List<WIPendingOccupationEvent>();
         public List<WIPendingRecruitmentEvent> PendingRecruitmentEvents = new List<WIPendingRecruitmentEvent>();
         public List<WIArmyState> Armies = new List<WIArmyState>();
         public int NextArmyNumber = 1;
@@ -321,14 +371,18 @@ namespace ProjectWI.Administration
         public List<string> PendingHeroPromotionIds = new List<string>();
         public List<WICharacterTransferState> CharacterTransfers = new List<WICharacterTransferState>();
         public List<WISchemeIntelState> SchemeIntel = new List<WISchemeIntelState>();
+        public List<WISchemeMissionState> SchemeMissions = new List<WISchemeMissionState>();
         public int NextBattleSessionNumber = 1;
         public bool UseStrategicBattleFallback = true;
         public bool UsePlayerRealTimeBattles = true;
         public bool TutorialSkipped;
         public List<string> CompletedTutorialIds = new List<string>();
+        public List<string> CompletedCampaignObjectiveIds = new List<string>();
         public WICampaignResult CampaignResult;
         public int CampaignResultTurn;
         public bool CampaignResultAcknowledged;
+        public WICampaignEndingType CampaignEnding;
+        public List<string> OccupationPolicyHistory = new List<string>();
         public int PendingPlayerGoldSpent;
 
         public int Gold
@@ -356,14 +410,17 @@ namespace ProjectWI.Administration
         }
 
         // 마스터 데이터에서 새 캠페인의 런타임 상태를 생성합니다.
-        public static WIAdministrationState Create(WIAdministrationDatabaseSO database, WICampaignDifficulty difficulty = WICampaignDifficulty.Standard)
+        public static WIAdministrationState Create(WIAdministrationDatabaseSO database,
+            WICampaignDifficulty difficulty = WICampaignDifficulty.Standard,
+            WICampaignVariant variant = WICampaignVariant.Classic)
         {
             WIAdministrationState state = new WIAdministrationState
             {
                 Year = database.StartingYear,
                 Month = database.StartingMonth,
                 Turn = 1,
-                Difficulty = difficulty
+                Difficulty = difficulty,
+                CampaignVariant = variant
             };
 
             foreach (WIFactionDefinition faction in database.Factions)
@@ -416,13 +473,39 @@ namespace ProjectWI.Administration
                     continue;
                 }
 
-                castle.HeroIds.Add(placement.HeroId);
                 WICharacterRuntimeState character = state.GetCharacter(placement.HeroId);
+                if (character == null)
+                {
+                    continue;
+                }
+
+                castle.HeroIds.Add(placement.HeroId);
                 character.Discovered = true;
                 character.Recruited = true;
                 if (placement.Governor == true)
                 {
                     castle.GovernorHeroId = placement.HeroId;
+                }
+            }
+
+            foreach (WIStartingRelationshipDefinition definition in database.StartingRelationships)
+            {
+                WIHeroDefinition first = database.GetHero(definition.FirstHeroId);
+                WIHeroDefinition second = database.GetHero(definition.SecondHeroId);
+                if (first == null || second == null || first.Id == second.Id) continue;
+                state.GetOrCreateRelationship(first.Id, second.Id).Level = definition.Level;
+            }
+
+            WICampaignVariantDefinition variantDefinition = database.GetCampaignVariant(variant);
+            if (variantDefinition != null)
+            {
+                WICastleRuntimeState additionalCastle = state.GetCastle(variantDefinition.AdditionalPlayerCastleId);
+                if (additionalCastle != null) additionalCastle.FactionId = state.PlayerFactionId;
+                if (string.IsNullOrEmpty(variantDefinition.RelationshipFirstHeroId) == false &&
+                    string.IsNullOrEmpty(variantDefinition.RelationshipSecondHeroId) == false)
+                {
+                    state.GetOrCreateRelationship(variantDefinition.RelationshipFirstHeroId,
+                        variantDefinition.RelationshipSecondHeroId).Level = variantDefinition.RelationshipLevel;
                 }
             }
 
@@ -560,12 +643,15 @@ namespace ProjectWI.Administration
             bool assignedToArmy = Armies.Exists(army => army.Members.Exists(member => member.HeroId == heroId));
             bool assignedToResearch = Factions.Exists(faction => faction.ResearcherHeroId == heroId && string.IsNullOrEmpty(faction.ActiveResearchId) == false);
             bool transferring = CharacterTransfers.Exists(transfer => transfer.HeroId == heroId);
+            bool assignedToScheme = SchemeMissions != null && SchemeMissions.Exists(mission => mission.AgentHeroId == heroId);
             return IsHeroAssignedToProject(heroId) ||
+                   (character != null && (character.Captured || character.IsDead)) ||
                    (character != null && character.Activity != WICharacterActivityType.None) ||
                    assignedToQuest ||
                    assignedToArmy ||
                    assignedToResearch ||
-                   transferring;
+                   transferring ||
+                   assignedToScheme;
         }
     }
 }

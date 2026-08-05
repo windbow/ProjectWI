@@ -16,6 +16,7 @@ namespace ProjectWI.Administration
             WICampaignRuleDefinition rules = database.CampaignRules;
             if (rules.VictoryRequiresAllCastles && state.Castles.Count > 0 && playerCastles == state.Castles.Count)
             {
+                state.CampaignEnding = DetermineEnding(state);
                 SetResult(state, WICampaignResult.Victory);
                 return true;
             }
@@ -25,6 +26,15 @@ namespace ProjectWI.Administration
                 return true;
             }
             return false;
+        }
+
+        // 점령 통치 선택 누적에서 화합 통일 또는 군정 통일 결말을 판정합니다.
+        public static WICampaignEndingType DetermineEnding(WIAdministrationState state)
+        {
+            int martialLaw = state.OccupationPolicyHistory.Count(item => item == "martial_law");
+            int concord = state.OccupationPolicyHistory.Count(item =>
+                item == "conciliation" || item == "local_autonomy");
+            return martialLaw > concord ? WICampaignEndingType.Dominion : WICampaignEndingType.Concord;
         }
 
         // 캠페인 결과와 최초 판정 턴을 저장합니다.

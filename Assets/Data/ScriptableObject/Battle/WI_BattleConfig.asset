@@ -32,9 +32,27 @@ MonoBehaviour:
   meleeKnockbackDistance: 0.35
   holdKnockbackResistance: 0.7
   formationReturnSpeed: 2.5
+  placeholderCharacterSize: 0.65
+  placeholderProjectileSize: 0.18
+  placeholderAttackEffectDuration: 0.22
+  attackerPlaceholderColor: {r: 0.82, g: 0.2, b: 0.16, a: 1}
+  defenderPlaceholderColor: {r: 0.16, g: 0.42, b: 0.85, a: 1}
+  projectileSpeed: 8
+  projectileLifetime: 2.5
+  projectileCollisionRadius: 0.28
+  projectileFriendlyFireEnabled: 0
+  projectileFriendlyFireSafeDistance: 0.8
+  skillVisualDuration: 0.65
+  cameraPanSpeed: 7
+  cameraZoomSpeed: 0.65
+  cameraMinimumZoom: 3.5
+  cameraMaximumZoom: 6.2
+  characterSelectionRadius: 0.8
   heroSkills:
   - heroId: ares
     displayName: "\uC655\uAC00\uC758 \uAC80\uC9C4"
+    description: "\uC8FC\uBCC0 \uC801\uC5D0\uAC8C \uAC80\uAE30 \uD53C\uD574\uB97C
+      \uC90D\uB2C8\uB2E4."
     skillType: 0
     manaCost: 40
     power: 45
@@ -42,16 +60,89 @@ MonoBehaviour:
     cooldown: 10
   - heroId: lyria
     displayName: "\uC804\uC7A5\uC758 \uACA9\uB824"
-    skillType: 1
+    description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
+      \uC904\uC785\uB2C8\uB2E4."
+    skillType: 2
     manaCost: 35
-    power: 35
+    power: 45
     range: 6
     cooldown: 12
+  - heroId: brom
+    displayName: "\uBD88\uAD74\uC758 \uD568\uC131"
+    description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
+      \uD06C\uAC8C \uC904\uC785\uB2C8\uB2E4."
+    skillType: 2
+    manaCost: 30
+    power: 55
+    range: 4.5
+    cooldown: 13
+  - heroId: selene
+    displayName: "\uC740\uC6D4\uC758 \uCE58\uC720"
+    description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+    skillType: 1
+    manaCost: 40
+    power: 48
+    range: 5.5
+    cooldown: 12
+  - heroId: kael
+    displayName: "\uADF8\uB9BC\uC790 \uB09C\uBB34"
+    description: "\uC8FC\uBCC0 \uC801\uC5D0\uAC8C \uC5F0\uC18D \uCC38\uACA9 \uD53C\uD574\uB97C
+      \uC90D\uB2C8\uB2E4."
+    skillType: 0
+    manaCost: 45
+    power: 52
+    range: 3.8
+    cooldown: 11
   - heroId: morrigan
     displayName: "\uD669\uD63C \uD3ED\uBC1C"
+    description: "\uB113\uC740 \uBC94\uC704\uC758 \uC801\uC5D0\uAC8C \uB9C8\uB825
+      \uD53C\uD574\uB97C \uC90D\uB2C8\uB2E4."
     skillType: 0
     manaCost: 50
-    power: 55
+    power: 58
     range: 6
     cooldown: 14
+  - heroId: theron
+    displayName: "\uC131\uC804\uC758 \uB9F9\uC138"
+    description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
+      \uC904\uC785\uB2C8\uB2E4."
+    skillType: 2
+    manaCost: 42
+    power: 60
+    range: 5
+    cooldown: 14
+  - heroId: elwyn
+    displayName: "\uACE0\uB300 \uC232\uC758 \uC228\uACB0"
+    description: "\uB113\uC740 \uBC94\uC704\uC758 \uC544\uAD70 \uCCB4\uB825\uC744
+      \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+    skillType: 1
+    manaCost: 48
+    power: 55
+    range: 6.5
+    cooldown: 15
+  classSkills:
+  - heroClass: 0
+    skill: {heroId: class_magic_swordsman, displayName: 마력 참격, description: 주변 적에게 마력 피해를 줍니다., skillType: 0, manaCost: 32, power: 32, range: 3.5, cooldown: 11}
+  - heroClass: 1
+    skill: {heroId: class_guardian, displayName: 수호의 함성, description: 주변 아군의 공격 대기시간을 줄입니다., skillType: 2, manaCost: 25, power: 30, range: 4, cooldown: 13}
+  - heroClass: 2
+    skill: {heroId: class_crusader, displayName: 신성한 진군, description: 주변 아군의 공격 대기시간을 줄입니다., skillType: 2, manaCost: 30, power: 38, range: 5, cooldown: 13}
+  - heroClass: 3
+    skill: {heroId: class_sword_master, displayName: 일섬, description: 가까운 적에게 강한 피해를 줍니다., skillType: 0, manaCost: 30, power: 38, range: 2.8, cooldown: 10}
+  - heroClass: 4
+    skill: {heroId: class_archer, displayName: 화살비, description: 사거리 안의 적에게 피해를 줍니다., skillType: 0, manaCost: 32, power: 30, range: 5.5, cooldown: 11}
+  - heroClass: 5
+    skill: {heroId: class_assassin, displayName: 급소 습격, description: 가까운 적에게 기습 피해를 줍니다., skillType: 0, manaCost: 28, power: 42, range: 2.5, cooldown: 12}
+  - heroClass: 6
+    skill: {heroId: class_archmage, displayName: 마력 폭풍, description: 넓은 범위의 적에게 피해를 줍니다., skillType: 0, manaCost: 42, power: 40, range: 6, cooldown: 14}
+  - heroClass: 7
+    skill: {heroId: class_priest, displayName: 치유의 빛, description: 주변 아군의 체력을 회복합니다., skillType: 1, manaCost: 32, power: 36, range: 5, cooldown: 12}
+  - heroClass: 8
+    skill: {heroId: class_druid, displayName: 생명의 숨결, description: 주변 아군의 체력을 회복합니다., skillType: 1, manaCost: 34, power: 32, range: 5.5, cooldown: 12}
+  - heroClass: 9
+    skill: {heroId: class_strategist, displayName: 전술 지휘, description: 주변 아군의 공격 대기시간을 줄입니다., skillType: 2, manaCost: 28, power: 42, range: 6, cooldown: 13}
+  - heroClass: 10
+    skill: {heroId: class_alchemist, displayName: 회복 영약, description: 주변 아군의 체력을 회복합니다., skillType: 1, manaCost: 30, power: 34, range: 4.5, cooldown: 11}
+  - heroClass: 11
+    skill: {heroId: class_warlock, displayName: 암흑 파동, description: 주변 적에게 암흑 피해를 줍니다., skillType: 0, manaCost: 38, power: 43, range: 5, cooldown: 13}
   placeholderSprite: {fileID: 0}

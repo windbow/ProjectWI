@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,12 @@ using ProjectWI.Systems;
 
 namespace ProjectWI.Administration
 {
+    public enum WIAdministrationShortcutAction
+    {
+        None, CloseModal, ReturnToGlobal, Military, Heroes, Diplomacy, Scheme, Research,
+        Faction, Council, MonthlyReport, EndTurn
+    }
+
     [RequireComponent(typeof(UIDocument))]
     public class WIAdministrationUIController : MonoBehaviour
     {
@@ -26,12 +33,14 @@ namespace ProjectWI.Administration
         private VisualElement modalLayer;
         private VisualElement campaignStartLayer;
         private VisualElement difficultyOptions;
+        private VisualElement variantOptions;
         private Label factionLabel;
         private Label dateLabel;
         private Label turnDescription;
         private Label goldLabel;
         private Label manaLabel;
         private Label influenceLabel;
+        private Label factionLegendLabel;
         private Label castleTitle;
         private Label castleInfo;
         private Label prosperityLabel;
@@ -39,13 +48,24 @@ namespace ProjectWI.Administration
         private Label stabilityLabel;
         private Label defenseLabel;
         private Label projectStatusLabel;
+        private Label globalCastleName;
+        private Label globalCastleOwner;
+        private Label globalCastleStats;
+        private Label globalCastleHeroes;
+        private VisualElement globalCastleImage;
+        private Label rightObjectiveProgress;
+        private Label rightMonthlyNews;
+        private Button battleAlertButton;
         private VisualElement heroSlots;
         private VisualElement specialFacilitySlots;
         private Button specialFacilityButton;
+        private Button objectiveButton;
         private WICastleRuntimeState selectedCastle;
         private readonly Dictionary<string, Button> castleButtons = new Dictionary<string, Button>();
         private readonly Dictionary<WICampaignDifficulty, Button> difficultyButtons = new Dictionary<WICampaignDifficulty, Button>();
+        private readonly Dictionary<WICampaignVariant, Button> variantButtons = new Dictionary<WICampaignVariant, Button>();
         private WICampaignDifficulty selectedDifficulty = WICampaignDifficulty.Standard;
+        private WICampaignVariant selectedVariant = WICampaignVariant.Classic;
 
         // UI 문서와 버튼 이벤트를 초기화합니다.
         private void Awake()
@@ -65,6 +85,7 @@ namespace ProjectWI.Administration
                 : campaignService.GetOrCreateState(database);
             CacheElements();
             BindGlobalButtons();
+            BindKeyboardShortcuts();
             BuildMap();
             RefreshAll();
             SelectInitialCastle();
@@ -72,6 +93,11 @@ namespace ProjectWI.Administration
             campaignStartLayer.style.display = campaignService == null || campaignService.HasCampaignStarted == false
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
+            if (campaignService != null && campaignService.HasCampaignStarted &&
+                WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state))
+            {
+                OpenMonthlyReportModal();
+            }
         }
 
         // 자주 사용하는 UI 요소를 이름으로 캐시합니다.
@@ -87,12 +113,14 @@ namespace ProjectWI.Administration
             modalLayer = root.Q<VisualElement>("modal-layer");
             campaignStartLayer = root.Q<VisualElement>("campaign-start-layer");
             difficultyOptions = root.Q<VisualElement>("difficulty-options");
+            variantOptions = root.Q<VisualElement>("variant-options");
             factionLabel = root.Q<Label>("faction-label");
             dateLabel = root.Q<Label>("date-label");
             turnDescription = root.Q<Label>("turn-description");
             goldLabel = root.Q<Label>("gold-label");
             manaLabel = root.Q<Label>("mana-label");
             influenceLabel = root.Q<Label>("influence-label");
+            factionLegendLabel = root.Q<Label>("faction-legend-copy");
             castleTitle = root.Q<Label>("castle-title");
             castleInfo = root.Q<Label>("castle-info");
             prosperityLabel = root.Q<Label>("prosperity-label");
@@ -100,9 +128,18 @@ namespace ProjectWI.Administration
             stabilityLabel = root.Q<Label>("stability-label");
             defenseLabel = root.Q<Label>("defense-label");
             projectStatusLabel = root.Q<Label>("project-status-label");
+            globalCastleName = root.Q<Label>("global-castle-name");
+            globalCastleOwner = root.Q<Label>("global-castle-owner");
+            globalCastleStats = root.Q<Label>("global-castle-stats");
+            globalCastleHeroes = root.Q<Label>("global-castle-heroes");
+            globalCastleImage = root.Q<VisualElement>("global-castle-image");
+            rightObjectiveProgress = root.Q<Label>("right-objective-progress");
+            rightMonthlyNews = root.Q<Label>("right-monthly-news");
+            battleAlertButton = root.Q<Button>("battle-alert-button");
             heroSlots = root.Q<VisualElement>("hero-slots");
             specialFacilitySlots = root.Q<VisualElement>("special-facility-slots");
             specialFacilityButton = root.Q<Button>("special-facility-button");
+            objectiveButton = root.Q<Button>("objective-button");
             ApplyVisualAssets();
         }
 
@@ -147,6 +184,100 @@ namespace ProjectWI.Administration
             root.Q<Button>("system-button").clicked += OpenSystemModal;
             root.Q<Button>("new-campaign-button").clicked += StartNewCampaign;
             root.Q<Button>("continue-campaign-button").clicked += ContinueAutoSave;
+            root.Q<Button>("capital-manage-button").clicked += OpenGlobalSummaryCastle;
+            battleAlertButton.clicked += OpenMonthlyReportModal;
+            objectiveButton.clicked += () => ShowCurrentObjective(false);
+        }
+
+        // 좌측 전역 요약 패널이 가리키는 플레이어 성을 내정 화면으로 엽니다.
+        private void OpenGlobalSummaryCastle()
+        {
+            WICastleRuntimeState castle = GetGlobalSummaryCastle();
+            if (castle != null) SelectCastle(castle.CastleId);
+        }
+
+        // 현재 선택 성 또는 플레이어의 첫 소유 성을 전역 요약 대상으로 반환합니다.
+        private WICastleRuntimeState GetGlobalSummaryCastle()
+        {
+            if (selectedCastle != null && selectedCastle.FactionId == state.PlayerFactionId) return selectedCastle;
+            return state.Castles.FirstOrDefault(castle => castle.FactionId == state.PlayerFactionId);
+        }
+
+        // 전략 화면에 PC 단축키를 연결하고 버튼에 키 안내를 표시합니다.
+        private void BindKeyboardShortcuts()
+        {
+            root.focusable = true;
+            root.RegisterCallback<KeyDownEvent>(HandleKeyboardShortcut, TrickleDown.TrickleDown);
+            SetShortcutHint("military-button", "군사  M", "M · 군사 화면");
+            SetShortcutHint("heroes-button", "인사  H", "H · 전체 인물 목록");
+            SetShortcutHint("diplomacy-button", "외교  D", "D · 외교 화면");
+            SetShortcutHint("scheme-button", "계략  S", "S · 계략 화면");
+            SetShortcutHint("research-button", "연구  R", "R · 연구 화면");
+            SetShortcutHint("faction-button", "통치  G", "G · 세력 통치 화면");
+            SetShortcutHint("council-button", "평정  C", "C · 세력 방침 화면");
+            SetShortcutHint("monthly-report-button", "월보  L", "L · 월간 보고서");
+            SetShortcutHint("turn-button", "다음 턴  T", "T · 다음 턴 진행");
+            root.Focus();
+        }
+
+        // 버튼 문구와 툴팁에 단축키를 함께 기록합니다.
+        private void SetShortcutHint(string elementName, string text, string tooltip)
+        {
+            Button button = root.Q<Button>(elementName);
+            if (button == null) return;
+            button.text = text;
+            button.tooltip = tooltip;
+        }
+
+        // 현재 UI 계층의 우선순위에 맞춰 키 입력을 모달·화면·전역 명령으로 전달합니다.
+        private void HandleKeyboardShortcut(KeyDownEvent keyboardEvent)
+        {
+            bool modalOpen = modalLayer.resolvedStyle.display != DisplayStyle.None;
+            bool castleOpen = castleView.resolvedStyle.display != DisplayStyle.None;
+            bool campaignStartOpen = campaignStartLayer.resolvedStyle.display != DisplayStyle.None;
+            bool textInputFocused = root.focusController?.focusedElement is TextField;
+            WIAdministrationShortcutAction action = ResolveShortcutAction(keyboardEvent.keyCode, modalOpen,
+                castleOpen, campaignStartOpen, textInputFocused);
+            if (action == WIAdministrationShortcutAction.None) return;
+
+            switch (action)
+            {
+                case WIAdministrationShortcutAction.CloseModal: CloseModal(); break;
+                case WIAdministrationShortcutAction.ReturnToGlobal: ShowGlobalView(); break;
+                case WIAdministrationShortcutAction.Military: OpenMilitaryModal(); break;
+                case WIAdministrationShortcutAction.Heroes: OpenHeroListModal(); break;
+                case WIAdministrationShortcutAction.Diplomacy: OpenDiplomacyModal(); break;
+                case WIAdministrationShortcutAction.Scheme: OpenSchemeModal(); break;
+                case WIAdministrationShortcutAction.Research: OpenResearchModal(); break;
+                case WIAdministrationShortcutAction.Faction: OpenFactionOverviewModal(); break;
+                case WIAdministrationShortcutAction.Council: OpenFactionPolicyModal(); break;
+                case WIAdministrationShortcutAction.MonthlyReport: OpenMonthlyReportModal(); break;
+                case WIAdministrationShortcutAction.EndTurn: BeginTurn(); break;
+            }
+            keyboardEvent.StopImmediatePropagation();
+        }
+
+        // 키와 화면 상태만으로 실행할 전략 명령을 결정해 입력 우선순위를 일관되게 유지합니다.
+        public static WIAdministrationShortcutAction ResolveShortcutAction(KeyCode keyCode, bool modalOpen,
+            bool castleOpen, bool campaignStartOpen, bool textInputFocused)
+        {
+            if (keyCode == KeyCode.Escape)
+            {
+                if (modalOpen) return WIAdministrationShortcutAction.CloseModal;
+                if (castleOpen) return WIAdministrationShortcutAction.ReturnToGlobal;
+                return WIAdministrationShortcutAction.None;
+            }
+            if (campaignStartOpen || modalOpen || castleOpen || textInputFocused) return WIAdministrationShortcutAction.None;
+            if (keyCode == KeyCode.M) return WIAdministrationShortcutAction.Military;
+            if (keyCode == KeyCode.H) return WIAdministrationShortcutAction.Heroes;
+            if (keyCode == KeyCode.D) return WIAdministrationShortcutAction.Diplomacy;
+            if (keyCode == KeyCode.S) return WIAdministrationShortcutAction.Scheme;
+            if (keyCode == KeyCode.R) return WIAdministrationShortcutAction.Research;
+            if (keyCode == KeyCode.G) return WIAdministrationShortcutAction.Faction;
+            if (keyCode == KeyCode.C) return WIAdministrationShortcutAction.Council;
+            if (keyCode == KeyCode.L) return WIAdministrationShortcutAction.MonthlyReport;
+            if (keyCode == KeyCode.T) return WIAdministrationShortcutAction.EndTurn;
+            return WIAdministrationShortcutAction.None;
         }
 
         // ScriptableObject 난이도 정의를 PC용 선택 카드로 구성합니다.
@@ -163,10 +294,35 @@ namespace ProjectWI.Administration
                 difficultyButtons[definition.Difficulty] = button;
             }
             SelectDifficulty(WICampaignDifficulty.Standard);
+            BuildCampaignVariantOptions();
 
             WICampaignRuntimeService service = WICampaignRuntimeService.Instance;
             Button continueButton = root.Q<Button>("continue-campaign-button");
             continueButton.SetEnabled(service != null && service.HasSave(0));
+        }
+
+        // ScriptableObject의 반복 플레이 시작 조건을 선택 카드로 구성합니다.
+        private void BuildCampaignVariantOptions()
+        {
+            variantOptions.Clear();
+            variantButtons.Clear();
+            foreach (WICampaignVariantDefinition definition in database.CampaignVariants)
+            {
+                Button button = new Button(() => SelectCampaignVariant(definition.Variant));
+                button.text = $"{definition.DisplayName.Get(database.UseEnglish)}\n{definition.Description.Get(database.UseEnglish)}";
+                button.AddToClassList("variant-card");
+                variantOptions.Add(button);
+                variantButtons[definition.Variant] = button;
+            }
+            SelectCampaignVariant(WICampaignVariant.Classic);
+        }
+
+        // 선택한 시작 변형 카드의 강조 상태를 갱신합니다.
+        private void SelectCampaignVariant(WICampaignVariant variant)
+        {
+            selectedVariant = variant;
+            foreach (KeyValuePair<WICampaignVariant, Button> pair in variantButtons)
+                pair.Value.EnableInClassList("selected", pair.Key == variant);
         }
 
         // 선택한 난이도 카드의 강조 상태를 갱신합니다.
@@ -182,22 +338,53 @@ namespace ProjectWI.Administration
         // 선택 난이도로 런타임 상태를 교체하고 새 캠페인을 시작합니다.
         private void StartNewCampaign()
         {
-            BeginCampaign(selectedDifficulty);
+            BeginCampaign(selectedDifficulty, selectedVariant);
         }
 
         // 지정 난이도로 새 캠페인을 시작해 시작 화면을 닫습니다.
-        public void BeginCampaign(WICampaignDifficulty difficulty)
+        public void BeginCampaign(WICampaignDifficulty difficulty,
+            WICampaignVariant variant = WICampaignVariant.Classic)
         {
             WICampaignRuntimeService service = WICampaignRuntimeService.Instance;
             state = service == null
-                ? WIAdministrationState.Create(database, difficulty)
-                : service.StartNewCampaign(difficulty);
+                ? WIAdministrationState.Create(database, difficulty, variant)
+                : service.StartNewCampaign(difficulty, variant);
             RebuildCampaignView();
             campaignStartLayer.style.display = DisplayStyle.None;
             if (ShowCampaignResult() == false)
             {
-                ShowCurrentTutorial();
+                ShowCurrentObjective(true);
             }
+        }
+
+        // 현재 캠페인 목표의 시작 정세, 조건, 진행도와 보상을 표시합니다.
+        private void ShowCurrentObjective(bool showTutorialAfterClose)
+        {
+            WICampaignObjectiveDefinition objective = WICampaignObjectiveSystem.GetCurrent(database, state);
+            if (objective == null)
+            {
+                ShowMessage("현재 등록된 다음 캠페인 목표가 없습니다.");
+                return;
+            }
+
+            VisualElement panel = CreateModal(objective.Title.Get(database.UseEnglish));
+            Label situation = new Label(objective.Situation.Get(database.UseEnglish));
+            situation.AddToClassList("objective-modal-copy");
+            panel.Add(situation);
+            Label description = new Label(objective.Description.Get(database.UseEnglish));
+            description.AddToClassList("objective-modal-copy");
+            panel.Add(description);
+            int progress = WICampaignObjectiveSystem.GetProgress(state, objective);
+            Label progressLabel = new Label($"진행 {progress}/{objective.TargetValue} · 보상 G {objective.RewardGold} / M {objective.RewardMana} / I {objective.RewardInfluence}");
+            progressLabel.AddToClassList("objective-modal-progress");
+            panel.Add(progressLabel);
+            Button confirm = new Button(() =>
+            {
+                CloseModal();
+                if (showTutorialAfterClose) ShowCurrentTutorial();
+            });
+            confirm.text = "목표 확인";
+            panel.Add(confirm);
         }
 
         // 자동 저장 슬롯을 불러와 캠페인 화면으로 진입합니다.
@@ -213,6 +400,11 @@ namespace ProjectWI.Administration
             state = service.State;
             RebuildCampaignView();
             campaignStartLayer.style.display = DisplayStyle.None;
+            if (string.IsNullOrEmpty(error) == false)
+            {
+                ShowMessage(error);
+                return;
+            }
             if (ShowCampaignResult() == false)
             {
                 ShowCurrentTutorial();
@@ -243,7 +435,10 @@ namespace ProjectWI.Administration
                 Button node = new Button(() => SelectCastle(castle.Id));
                 node.name = $"castle-{castle.Id}";
                 node.AddToClassList("castle-node");
-                node.text = castle.DisplayName.Get(database.UseEnglish);
+                string castleName = castle.DisplayName.Get(database.UseEnglish);
+                string factionCode = GetFactionAccessibilityCode(castleState.FactionId);
+                node.text = $"{factionCode}·{TruncateLabel(castleName, 9)}";
+                node.tooltip = $"[{factionCode}] {faction?.DisplayName.Get(database.UseEnglish) ?? castleState.FactionId}\n{castleName}";
                 node.style.left = Length.Percent(castle.NormalizedMapPosition.x * 100f);
                 node.style.top = Length.Percent(castle.NormalizedMapPosition.y * 100f);
                 if (faction != null)
@@ -305,7 +500,8 @@ namespace ProjectWI.Administration
                         adjacent.NormalizedMapPosition,
                         routeColor,
                         selectedRoute ? 4f : (frontline ? 3f : 1.5f),
-                        frontline));
+                        frontline,
+                        selectedRoute));
                 }
             }
             mapConnectionLayer.SetConnections(connections);
@@ -331,22 +527,56 @@ namespace ProjectWI.Administration
         {
             selectedCastle = state.GetCastle(castleId);
             WICastleDefinition castle = database.GetCastle(castleId);
+            bool ownCastle = WIAdministrationTurnSystem.CanPlayerManageCastle(state, selectedCastle);
+            bool detailed = WIInformationVisibility.CanViewCastleDetails(state, state.PlayerFactionId, selectedCastle);
+            WIFactionDefinition owner = database.GetFaction(selectedCastle.FactionId);
+            string ownerName = owner == null ? selectedCastle.FactionId : owner.DisplayName.Get(database.UseEnglish);
+            string accessText = ownCastle ? "직접 관리 영지" : $"관찰 전용 · {ownerName} 소유";
             ApplyBackgroundSprite(castleBackground, castle.CastleImage);
-            WIHeroDefinition governor = database.GetHero(selectedCastle.GovernorHeroId);
+            WIHeroDefinition governor = detailed ? database.GetHero(selectedCastle.GovernorHeroId) : null;
+            if (detailed == false)
+            {
+                governorPortrait.style.backgroundImage = StyleKeyword.None;
+                Label governorPlaceholder = governorPortrait.Q<Label>();
+                if (governorPlaceholder != null) governorPlaceholder.style.display = DisplayStyle.Flex;
+            }
             ApplyBackgroundSprite(governorPortrait, governor == null ? null : governor.Portrait);
             castleTitle.text = castle.DisplayName.Get(database.UseEnglish);
             string terrainName = castle.TerrainTrait == null ? string.Empty : castle.TerrainTrait.Get(database.UseEnglish);
-            castleInfo.text = $"{selectedCastle.CastleSize} · {terrainName} · 인물 {selectedCastle.HeroIds.Count}/{selectedCastle.GetHeroSlotCount()}";
-            prosperityLabel.text = $"번영 {selectedCastle.Prosperity} · {GetCastleStatusName(selectedCastle.Prosperity)}";
-            technologyLabel.text = $"기술 {selectedCastle.Technology} · {GetCastleStatusName(selectedCastle.Technology)}";
-            stabilityLabel.text = $"치안 {selectedCastle.Stability} · {GetCastleStatusName(selectedCastle.Stability)}";
-            defenseLabel.text = $"방어 {selectedCastle.Defense} · {GetCastleStatusName(selectedCastle.Defense)}";
-            projectStatusLabel.text = selectedCastle.DelegatedToGovernor && selectedCastle.ActiveProject == null
-                ? $"태수 위임 · {GetGovernorPolicyDisplayName(selectedCastle.GovernorPolicy)} · 월 {selectedCastle.GovernorMonthlyBudget}G"
-                : GetProjectStatusText(selectedCastle.ActiveProject);
-            RefreshCastleSlots(castle, selectedCastle);
-            specialFacilityButton.SetEnabled(selectedCastle.PendingSpecialFacilityChoice);
+            string ownerCode = GetFactionAccessibilityCode(selectedCastle.FactionId);
+            castleInfo.text = detailed
+                ? $"[{ownerCode}] {accessText} · {selectedCastle.CastleSize} · {terrainName} · 인물 {selectedCastle.HeroIds.Count}/{selectedCastle.GetHeroSlotCount()}"
+                : $"[{ownerCode}] {accessText} · {terrainName} · 상세 정보 미확보";
+            prosperityLabel.text = detailed ? $"번영 {selectedCastle.Prosperity} · {GetCastleStatusName(selectedCastle.Prosperity)}" : "번영 ??";
+            technologyLabel.text = detailed ? $"기술 {selectedCastle.Technology} · {GetCastleStatusName(selectedCastle.Technology)}" : "기술 ??";
+            stabilityLabel.text = detailed ? $"치안 {selectedCastle.Stability} · {GetCastleStatusName(selectedCastle.Stability)}" : "치안 ??";
+            defenseLabel.text = detailed ? $"방어 {selectedCastle.Defense} · {GetCastleStatusName(selectedCastle.Defense)}" : "방어 ??";
+            prosperityLabel.tooltip = detailed ? "번영 · 금화 수입의 기본값입니다. 성 규모와 치안 효율을 곱해 계산합니다." : "정보 미확보 · 조사 또는 동맹 정보가 필요합니다.";
+            technologyLabel.tooltip = detailed ? "기술 · 마나 수입과 연구 조건에 사용합니다. 성 규모가 높을수록 월간 마나가 증가합니다." : "정보 미확보 · 조사 또는 동맹 정보가 필요합니다.";
+            stabilityLabel.tooltip = detailed ? "치안 · 금화 수입 효율과 영향력 수입을 높이고 적 계략 성공률을 낮춥니다." : "정보 미확보 · 조사 또는 동맹 정보가 필요합니다.";
+            defenseLabel.tooltip = detailed ? "방어 · 공성전 자동 판정과 수비 전력에 반영됩니다." : "정보 미확보 · 조사 또는 동맹 정보가 필요합니다.";
+            projectStatusLabel.text = detailed
+                ? selectedCastle.DelegatedToGovernor && selectedCastle.ActiveProject == null
+                    ? $"태수 위임 · {GetGovernorPolicyDisplayName(selectedCastle.GovernorPolicy)} · 월 {selectedCastle.GovernorMonthlyBudget}G"
+                    : GetProjectStatusText(selectedCastle.ActiveProject)
+                : "계략의 조사를 성공하면 일정 기간 상세 정보가 공개됩니다.";
+            if (detailed) RefreshCastleSlots(castle, selectedCastle);
+            else RefreshHiddenCastleSlots();
+            foreach (Button command in root.Query<Button>(className: "castle-command").ToList())
+            {
+                command.SetEnabled(ownCastle || command.name == "castle-record-button");
+            }
+            specialFacilityButton.SetEnabled(ownCastle && selectedCastle.PendingSpecialFacilityChoice);
             ShowCastleView();
+        }
+
+        // 미조사 적 성의 주둔 인물과 특화 시설 슬롯을 비공개 안내로 대체합니다.
+        private void RefreshHiddenCastleSlots()
+        {
+            heroSlots.Clear();
+            heroSlots.Add(new Label("주둔 인물 정보 미확보"));
+            specialFacilitySlots.Clear();
+            specialFacilitySlots.Add(new Label("시설 정보 미확보"));
         }
 
         // 대륙 전략 화면을 표시하고 성 내정 화면을 숨깁니다.
@@ -374,6 +604,213 @@ namespace ProjectWI.Administration
 
             SelectCastle(castleId);
             Debug.Log($"성 화면 전환: {castleId} · 전역 {globalView.style.display.value} · 성 {castleView.style.display.value}");
+        }
+
+        // 해상도 QA에서 모달 없이 전역 지도 화면을 즉시 표시합니다.
+        public void OpenGlobalPreviewForQA()
+        {
+            BeginCampaign(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
+            CloseModal();
+            ShowGlobalView();
+            RefreshAll();
+        }
+
+        // 해상도 QA에서 아발론 소유 성 화면을 모달 없이 즉시 표시합니다.
+        public void OpenCastlePreviewForQA()
+        {
+            BeginCampaign(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
+            CloseModal();
+            SelectCastle("castle_00");
+            RefreshAll();
+        }
+
+        // 긴 이름과 큰 숫자를 실제 저장 데이터 변경 없이 전역 화면에 주입해 레이아웃을 검증합니다.
+        public void OpenLongContentGlobalPreviewForQA()
+        {
+            OpenGlobalPreviewForQA();
+            ApplyLongContentStressLabels(false);
+        }
+
+        // 긴 이름과 큰 숫자를 실제 저장 데이터 변경 없이 성 화면에 주입해 레이아웃을 검증합니다.
+        public void OpenLongContentCastlePreviewForQA()
+        {
+            OpenCastlePreviewForQA();
+            ApplyLongContentStressLabels(true);
+        }
+
+        // 공통 버튼의 기본·호버·선택·비활성·위험 상태를 한 화면에서 비교합니다.
+        public void OpenInteractionStatePreviewForQA()
+        {
+            OpenGlobalPreviewForQA();
+            VisualElement panel = CreateModal("마우스 상호작용 상태 QA");
+            AddInteractionStateSample(panel, "기본", "기본 명령", string.Empty, true);
+            AddInteractionStateSample(panel, "호버", "마우스 호버", "qa-hover-state", true);
+            AddInteractionStateSample(panel, "선택", "현재 선택됨", "qa-selected-state", true);
+            AddInteractionStateSample(panel, "비활성", "조건 미충족", "qa-disabled-state", false);
+            AddInteractionStateSample(panel, "위험", "진격 / 후퇴", "qa-danger-state", true);
+            Label note = new Label("백색 반전은 탐색·선택, 낮은 회색은 사용 불가, 적갈색은 결과가 위험한 명령에만 사용합니다.");
+            note.AddToClassList("qa-state-note");
+            panel.Add(note);
+        }
+
+        // 대표 자원·성 수치·사업·계략의 툴팁 문장을 한 화면에서 비교합니다.
+        public void OpenCalculationTooltipPreviewForQA()
+        {
+            OpenCastlePreviewForQA();
+            VisualElement panel = CreateModal("계산 근거 툴팁 QA");
+            panel.Add(CreateCalculationSample("금화 수입", BuildResourceCalculationTooltip("금화", 1200, 67, 3,
+                "성별 번영 × 성 규모 × 치안 효율 + 전문 분야·시설·연구")));
+            panel.Add(CreateCalculationSample("성 수치", "치안 50 · 금화 효율 75% · 영향력과 계략 방어에 반영"));
+            panel.Add(CreateCalculationSample("사업 성과", "예상 8 = 기본 3 + 담당 적성 50/20 + 집중 투자 2 + 특기 1 + 전문 분야 0 + 방침 0"));
+            panel.Add(CreateCalculationSample("계략 확률", "성공 55% = 기본 60 + 지력/2 - 치안/2 - 방첩 20\n미조사 대상은 정확한 치안과 최종 확률을 공개하지 않습니다."));
+            panel.Add(CreateCalculationSample("외교 명령", "확정 명령 · 비용을 충족하면 무작위 판정 없이 관계가 한 단계 변합니다."));
+        }
+
+        // 모든 세력색과 경로색을 회색으로 낮춰 코드·기호만으로 지도를 읽을 수 있는지 검증합니다.
+        public void OpenColorVisionPreviewForQA()
+        {
+            OpenGlobalPreviewForQA();
+            foreach (KeyValuePair<string, Button> pair in castleButtons)
+            {
+                string factionId = state.GetCastle(pair.Key)?.FactionId;
+                float shade = GetFactionAccessibilityCode(factionId) == "AV" ? 0.72f :
+                              GetFactionAccessibilityCode(factionId) == "VD" ? 0.32f :
+                              GetFactionAccessibilityCode(factionId) == "IH" ? 0.46f :
+                              GetFactionAccessibilityCode(factionId) == "SY" ? 0.58f : 0.22f;
+                pair.Value.style.backgroundColor = new Color(shade, shade, shade, 1f);
+            }
+            mapConnectionLayer?.SetColorVisionQaMode(true);
+            turnDescription.text = "저채도 QA · 세력 코드, 전선 ×, 선택 연결 ◎로 판독하십시오.";
+        }
+
+        // 툴팁 QA용 제목과 계산 문장을 흑백 정보 카드로 구성합니다.
+        private static VisualElement CreateCalculationSample(string title, string calculation)
+        {
+            VisualElement row = new VisualElement();
+            row.AddToClassList("calculation-sample");
+            Label titleLabel = new Label(title);
+            titleLabel.AddToClassList("calculation-title");
+            Label detailLabel = new Label(calculation);
+            detailLabel.AddToClassList("calculation-detail");
+            row.Add(titleLabel);
+            row.Add(detailLabel);
+            return row;
+        }
+
+        // 상태 견본 한 행을 생성해 동일한 크기와 텍스트 조건에서 색상 차이를 비교합니다.
+        private static void AddInteractionStateSample(VisualElement panel, string labelText, string buttonText,
+            string stateClass, bool enabledState)
+        {
+            VisualElement row = new VisualElement();
+            row.AddToClassList("qa-state-row");
+            Label label = new Label(labelText);
+            label.AddToClassList("qa-state-label");
+            Button button = new Button { text = buttonText };
+            button.AddToClassList("qa-state-button");
+            if (string.IsNullOrEmpty(stateClass) == false) button.AddToClassList(stateClass);
+            button.SetEnabled(enabledState);
+            row.Add(label);
+            row.Add(button);
+            panel.Add(row);
+        }
+
+        // QA 화면에 최악 조건의 한글·영문 문구와 7자리 자원 값을 표시합니다.
+        private void ApplyLongContentStressLabels(bool castleScreen)
+        {
+            factionLabel.text = "아발론 북부 변경 재건 연합왕국";
+            factionLabel.tooltip = "Kingdom of the United Northern Avalon Reconstruction Frontier";
+            goldLabel.text = $"금화\n{FormatHudNumber(9876543, database.UseEnglish)} (+{FormatHudNumber(654321, database.UseEnglish)})";
+            manaLabel.text = $"마나\n{FormatHudNumber(7654321, database.UseEnglish)} (+{FormatHudNumber(543210, database.UseEnglish)})";
+            influenceLabel.text = $"영향력\n{FormatHudNumber(5432109, database.UseEnglish)} (+{FormatHudNumber(321098, database.UseEnglish)})";
+            goldLabel.tooltip = "금화 9,876,543 · 다음 턴 +654,321";
+            manaLabel.tooltip = "마나 7,654,321 · 다음 턴 +543,210";
+            influenceLabel.tooltip = "영향력 5,432,109 · 다음 턴 +321,098";
+
+            int index = 0;
+            foreach (Button node in castleButtons.Values)
+            {
+                string stressName = index++ % 2 == 0
+                    ? "북부 변경의 영원한 별빛 수호 대성채"
+                    : "Citadel of the Everlasting Northern Starlight Frontier";
+                node.text = $"{TruncateLabel(stressName, 12)}\n99H · 99부대";
+                node.tooltip = stressName;
+                if (index >= 4) break;
+            }
+
+            if (castleScreen)
+            {
+                const string longCastleName = "북부 변경의 영원한 별빛을 수호하는 아발론 왕립 대성채";
+                castleTitle.text = TruncateLabel(longCastleName, 26);
+                castleTitle.tooltip = longCastleName;
+                castleInfo.text = "직접 관리 영지 · Metropolitan Stronghold · 서부 빛바랜 호반 변경지대 · 인물 99/99";
+                castleInfo.tooltip = castleInfo.text;
+                foreach (Label caption in root.Query<Label>(className: "slot-caption").ToList())
+                {
+                    caption.text = "알렉산드리아 폰 에버라이트 변경백\n장기 원정 임무 준비 중";
+                    caption.tooltip = caption.text;
+                }
+            }
+        }
+
+        // 제한 폭 UI에서 원문을 툴팁으로 보존하면서 표시 문자열을 안전하게 축약합니다.
+        public static string TruncateLabel(string value, int maxCharacters)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length <= maxCharacters) return value ?? string.Empty;
+            return value.Substring(0, Mathf.Max(1, maxCharacters - 1)) + "…";
+        }
+
+        // 큰 HUD 숫자를 언어별 짧은 단위로 바꿔 자원 칩의 폭을 안정적으로 유지합니다.
+        public static string FormatHudNumber(int value, bool useEnglish)
+        {
+            long absolute = Math.Abs((long)value);
+            string sign = value < 0 ? "-" : string.Empty;
+            if (useEnglish)
+            {
+                if (absolute >= 1000000) return $"{sign}{absolute / 1000000d:0.#}M";
+                if (absolute >= 1000) return $"{sign}{absolute / 1000d:0.#}K";
+            }
+            else
+            {
+                if (absolute >= 100000000) return $"{sign}{absolute / 100000000d:0.#}억";
+                if (absolute >= 10000) return $"{sign}{absolute / 10000d:0.#}만";
+            }
+            return value.ToString("N0");
+        }
+
+        // HUD 자원의 현재값·예상 증가량·소유 성 수와 계산식을 일관된 툴팁 문장으로 만듭니다.
+        public static string BuildResourceCalculationTooltip(string resourceName, int current, int monthlyGain,
+            int castleCount, string basis)
+        {
+            return $"{resourceName} {current:N0}\n다음 턴 예상 +{monthlyGain:N0} · 소유 성 {castleCount}개\n근거: {basis}";
+        }
+
+        // 세력색을 볼 수 없는 상황에서도 사용할 고유 영문 코드를 반환합니다.
+        public static string GetFactionAccessibilityCode(string factionId)
+        {
+            switch (factionId)
+            {
+                case "avalon": return "AV";
+                case "valdor": return "VD";
+                case "ironheart": return "IH";
+                case "sylvanroad": return "SY";
+                case "necropolis": return "NC";
+                default: return "??";
+            }
+        }
+
+        // 현재 세력 목록과 경로 기호를 색상 없이 읽을 수 있는 범례 문장으로 갱신합니다.
+        private void RefreshFactionLegend()
+        {
+            if (factionLegendLabel == null) return;
+            List<string> entries = new List<string>();
+            foreach (WIFactionDefinition faction in database.Factions)
+            {
+                entries.Add($"[{GetFactionAccessibilityCode(faction.Id)}] {faction.DisplayName.Get(database.UseEnglish)}");
+            }
+            factionLegendLabel.text = string.Join("   ", entries.Take(2)) + "\n" +
+                                      string.Join("   ", entries.Skip(2).Take(2)) + "\n" +
+                                      string.Join(string.Empty, entries.Skip(4)) +
+                                      "\n— 이동   × 전선   ◎ 선택 연결";
         }
 
         // 성 수치에 대응하는 간결한 상태명을 반환합니다.
@@ -418,7 +855,7 @@ namespace ProjectWI.Administration
         // 중점 사업과 투자 단계를 선택하는 모달을 엽니다.
         private void OpenFocusProjectModal()
         {
-            if (selectedCastle == null)
+            if (EnsureSelectedCastleManageable() == false)
             {
                 return;
             }
@@ -484,6 +921,13 @@ namespace ProjectWI.Administration
                 int traitBonus = WIAdministrationTurnSystem.GetProjectTraitBonus(database, projectType, hero);
                 string traitText = traitBonus > 0 ? $" · 특기 적용 +{traitBonus}" : " · 특기 미적용";
                 button.text = $"{hero.DisplayName.Get(database.UseEnglish)} · 예상 성과 +{expectedGain}{traitText}";
+                int relevantStat = WIAdministrationTurnSystem.GetProjectRelevantStat(projectType, hero);
+                int investmentBonus = investment == WIProjectInvestment.Intensive
+                    ? database.ProjectBalance.IntensiveGainBonus : 0;
+                int specialtyBonus = WIAdministrationTurnSystem.GetCastleSpecialtyProjectBonus(
+                    database.GetCastle(selectedCastle.CastleId), projectType);
+                int policyBonus = WIAdministrationTurnSystem.GetFactionPolicyBonus(database, state.FactionPolicy, projectType);
+                button.tooltip = $"예상 성과 {expectedGain} = 기본 {database.ProjectBalance.BaseGain} + 담당 적성 {relevantStat}/{database.ProjectBalance.StatDivisor} + 투자 {investmentBonus} + 특기 {traitBonus} + 전문 분야 {specialtyBonus} + 세력 방침 {policyBonus}\n기본·적성·투자·특기 합계는 {database.ProjectBalance.MinimumGain}~{database.ProjectBalance.MaximumGain} 범위로 제한된 뒤 전문 분야와 방침을 더합니다.";
                 panel.Add(button);
             }
         }
@@ -568,6 +1012,18 @@ namespace ProjectWI.Administration
             return investment == WIProjectInvestment.Intensive ? "집중 투자" : "기본 투자";
         }
 
+        // 현재 선택한 성의 플레이어 소유권을 확인하고 잘못된 명령 진입을 차단합니다.
+        private bool EnsureSelectedCastleManageable()
+        {
+            if (WIAdministrationTurnSystem.CanPlayerManageCastle(state, selectedCastle))
+            {
+                return true;
+            }
+
+            ShowMessage("다른 세력의 성은 정보를 열람할 수 있지만 내정 명령은 내릴 수 없습니다.");
+            return false;
+        }
+
         // 이번 달 세력 전체 방침을 선택하는 평정 모달을 엽니다.
         private void OpenFactionPolicyModal()
         {
@@ -604,6 +1060,7 @@ namespace ProjectWI.Administration
                 }
                 Button button = new Button(() => OpenResearcherModal(research));
                 button.text = $"{research.DisplayName.Get(database.UseEnglish)} · 마나 {research.ManaCost} · 기술 {research.RequiredTechnology} · {research.DurationMonths}개월";
+                button.tooltip = $"비용: 마나 {research.ManaCost}\n조건: 보유 성 최고 기술 {research.RequiredTechnology} 이상, 진행 중 연구 없음\n기간: 기본 {research.DurationMonths}개월 · 담당 인물 지력에 따라 단축 가능\n효과: {research.Description.Get(database.UseEnglish)}";
                 button.SetEnabled(string.IsNullOrEmpty(faction.ActiveResearchId));
                 panel.Add(button);
             }
@@ -762,7 +1219,8 @@ namespace ProjectWI.Administration
             SelectInitialCastle();
             CloseModal();
             RefreshAll();
-            ShowMessage(slot == 0 ? "자동 저장을 불러왔습니다." : $"슬롯 {slot}을 불러왔습니다.");
+            string loadedMessage = slot == 0 ? "자동 저장을 불러왔습니다." : $"슬롯 {slot}을 불러왔습니다.";
+            ShowMessage(string.IsNullOrEmpty(error) ? loadedMessage : $"{loadedMessage}\n{error}");
         }
 
         // 각 세력의 공개 정보와 AI 운영 성향을 정세 창에 표시합니다.
@@ -776,7 +1234,17 @@ namespace ProjectWI.Administration
                 string economy = faction.PlayerFaction && factionState != null
                     ? $" · 금화 {factionState.Gold:N0} · 마나 {factionState.ManaCrystal:N0} · 영향력 {factionState.Influence:N0}"
                     : string.Empty;
-                panel.Add(new Label($"{faction.DisplayName.Get(database.UseEnglish)} · 영토 {castleCount}성 · 성향 {GetAIStrategyDisplayName(faction.AIStrategy)}{economy}"));
+                string status = factionState?.Eliminated == true ? $" · 멸망(제 {factionState.EliminatedTurn}턴)" : string.Empty;
+                panel.Add(new Label($"{faction.DisplayName.Get(database.UseEnglish)} · 영토 {castleCount}성 · 성향 {GetAIStrategyDisplayName(faction.AIStrategy)}{status}{economy}"));
+                foreach (WIStartingRelationshipDefinition relationship in database.StartingRelationships)
+                {
+                    if (relationship.FactionId != faction.Id) continue;
+                    WIHeroDefinition first = database.GetHero(relationship.FirstHeroId);
+                    WIHeroDefinition second = database.GetHero(relationship.SecondHeroId);
+                    if (first == null || second == null) continue;
+                    string level = relationship.Level == WIRelationshipLevel.Conflict ? "갈등" : "친애";
+                    panel.Add(new Label($"  └ 주요 관계 · {first.DisplayName.Get(database.UseEnglish)} ↔ {second.DisplayName.Get(database.UseEnglish)} · {level}\n     {relationship.Context.Get(database.UseEnglish)}"));
+                }
             }
         }
 
@@ -791,6 +1259,7 @@ namespace ProjectWI.Administration
                 {
                     continue;
                 }
+                if (state.GetFactionState(faction.Id)?.Eliminated == true) continue;
 
                 WIDiplomaticRelationState relation = state.GetOrCreateDiplomaticRelation(state.PlayerFactionId, faction.Id);
                 Button factionButton = new Button(() => OpenDiplomacyTargetModal(faction));
@@ -806,10 +1275,20 @@ namespace ProjectWI.Administration
             panel.Add(new Label("지력이 높은 인물을 보내십시오. 적 성의 치안과 방첩이 성공률을 낮춥니다."));
             WIFactionRuntimeState faction = state.GetFactionState(state.PlayerFactionId);
             panel.Add(new Label($"보유 영향력 {faction.Influence:N0}"));
+            foreach (WISchemeMissionState mission in state.SchemeMissions.Where(item => item.InitiatorFactionId == state.PlayerFactionId))
+            {
+                WISchemeDefinition activeScheme = database.GetScheme(mission.SchemeId);
+                WIHeroDefinition activeAgent = database.GetHero(mission.AgentHeroId);
+                WICastleDefinition activeTarget = database.GetCastle(mission.TargetCastleId);
+                panel.Add(new Label($"진행 중 · {activeScheme?.DisplayName.Get(database.UseEnglish)} · " +
+                    $"{activeAgent?.DisplayName.Get(database.UseEnglish)} → {activeTarget?.DisplayName.Get(database.UseEnglish)} · {mission.RemainingMonths}개월"));
+            }
             foreach (WISchemeDefinition scheme in database.SchemeDefinitions)
             {
                 Button button = new Button(() => OpenSchemeAgentModal(scheme));
-                button.text = $"{scheme.DisplayName.Get(database.UseEnglish)} · 영향력 {scheme.InfluenceCost}\n{scheme.Description.Get(database.UseEnglish)}";
+                button.text = $"{scheme.DisplayName.Get(database.UseEnglish)} · 영향력 {scheme.InfluenceCost} · " +
+                              $"기본 성공 {scheme.BaseSuccessChance}% · 기본 발각 {scheme.BaseDetectionChance}%\n" +
+                              scheme.Description.Get(database.UseEnglish);
                 button.SetEnabled(faction.Influence >= scheme.InfluenceCost);
                 panel.Add(button);
             }
@@ -863,8 +1342,22 @@ namespace ProjectWI.Administration
                         ExecuteScheme(scheme, agent, castleState, null);
                     }
                 });
-                string defense = ownTarget ? $"방첩 {castleState.CounterintelligenceMonths}개월" : $"공개 치안 {castleState.Stability}";
+                WISchemeIntelState intel = state.SchemeIntel.Find(item =>
+                    item.ObserverFactionId == state.PlayerFactionId && item.TargetCastleId == castleState.CastleId);
+                string defense = ownTarget ? $"방첩 {castleState.CounterintelligenceMonths}개월"
+                    : intel == null ? "정보 미확보" : $"조사 정보 {intel.RemainingMonths}개월";
                 button.text = $"{castle.DisplayName.Get(database.UseEnglish)} · {defense}";
+                bool canRevealCalculation = ownTarget || intel != null;
+                if (canRevealCalculation)
+                {
+                    int successChance = WISchemeSystem.CalculateSuccessChance(scheme, agent, castleState);
+                    int counterPenalty = castleState.CounterintelligenceMonths > 0 ? 20 : 0;
+                    button.tooltip = $"성공 {successChance}% = 기본 {scheme.BaseSuccessChance}% + 담당 지력 {agent.Intelligence}/2 - 치안 {castleState.Stability}/2 - 방첩 {counterPenalty}%\n발각은 기본 확률 + 치안/4 + 방첩 - 담당 지력/3으로 별도 판정합니다.";
+                }
+                else
+                {
+                    button.tooltip = $"정보 미확보 · 기본 성공 {scheme.BaseSuccessChance}%만 확인할 수 있습니다. 조사 성공 후 치안·방첩을 포함한 최종 확률이 공개됩니다.";
+                }
                 panel.Add(button);
             }
         }
@@ -873,6 +1366,11 @@ namespace ProjectWI.Administration
         private void OpenSchemeTargetHeroModal(WISchemeDefinition scheme, WIHeroDefinition agent, WICastleRuntimeState castle)
         {
             VisualElement panel = CreateModal("인재 이간 · 대상 인물");
+            if (WIInformationVisibility.CanViewCastleDetails(state, state.PlayerFactionId, castle) == false)
+            {
+                panel.Add(new Label("주둔 인물 정보가 없습니다. 먼저 해당 성의 조사를 성공시키십시오."));
+                return;
+            }
             foreach (string heroId in castle.HeroIds)
             {
                 WIHeroDefinition hero = database.GetHero(heroId);
@@ -888,23 +1386,13 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 계략 성공 판정을 실행하고 조사 성공 시 확보한 성 정보를 결과에 포함합니다.
+        // 계략 담당 인물을 한 달 임무에 배정하고 다음 턴 판정을 예약합니다.
         private void ExecuteScheme(WISchemeDefinition scheme, WIHeroDefinition agent, WICastleRuntimeState targetCastle, WIHeroDefinition targetHero)
         {
-            WISchemeResult result = WISchemeSystem.Execute(database, state, scheme.Id, state.PlayerFactionId,
-                agent.Id, targetCastle.CastleId, targetHero?.Id, UnityEngine.Random.Range(0, 100));
+            bool scheduled = WISchemeSystem.TrySchedule(database, state, scheme.Id, state.PlayerFactionId,
+                agent.Id, targetCastle.CastleId, targetHero?.Id, UnityEngine.Random.Range(0, 100), out string message);
             RefreshAll();
-            string detail = result.Message;
-            if (result.Executed)
-            {
-                detail += $"\n성공 확률 {result.SuccessChance}%";
-            }
-            if (result.Succeeded && scheme.SchemeType == WISchemeType.Investigation)
-            {
-                detail += $"\n번영 {targetCastle.Prosperity} · 기술 {targetCastle.Technology} · 치안 {targetCastle.Stability} · 방어 {targetCastle.Defense}";
-                detail += $"\n주둔 인물 {targetCastle.HeroIds.Count}명 · 방첩 {targetCastle.CounterintelligenceMonths}개월";
-            }
-            ShowMessage(detail);
+            ShowMessage(scheduled ? message + "\n담당 인물은 결과가 나올 때까지 다른 임무에 배정할 수 없습니다." : message);
         }
 
         // 충성 상태를 계략 UI용 한국어로 변환합니다.
@@ -925,6 +1413,33 @@ namespace ProjectWI.Administration
             VisualElement panel = CreateModal($"외교 · {targetFaction.DisplayName.Get(database.UseEnglish)}");
             panel.Add(new Label(GetDiplomaticDescription(relation)));
 
+            List<WICharacterRuntimeState> ourPrisoners = state.Characters.Where(item => item.Captured &&
+                item.CapturedFromFactionId == state.PlayerFactionId && item.CaptorFactionId == targetFaction.Id).ToList();
+            List<WICharacterRuntimeState> theirPrisoners = state.Characters.Where(item => item.Captured &&
+                item.CapturedFromFactionId == targetFaction.Id && item.CaptorFactionId == state.PlayerFactionId).ToList();
+            foreach (WICharacterRuntimeState prisoner in ourPrisoners)
+            {
+                WIHeroDefinition hero = database.GetHero(prisoner.HeroId);
+                Button ransom = new Button(() => ExecuteDiplomaticCommand(
+                    WIAdministrationTurnSystem.RansomPrisoner(database, state, state.PlayerFactionId, prisoner.HeroId),
+                    targetFaction));
+                ransom.text = $"포로 몸값 · {hero?.DisplayName.Get(database.UseEnglish) ?? prisoner.HeroId} · " +
+                              $"금화 {database.PrisonerRansomGold}";
+                ransom.SetEnabled(state.GetPlayerFactionState().Gold >= database.PrisonerRansomGold);
+                panel.Add(ransom);
+            }
+            if (ourPrisoners.Count > 0 && theirPrisoners.Count > 0)
+            {
+                WICharacterRuntimeState ourPrisoner = ourPrisoners[0];
+                WICharacterRuntimeState theirPrisoner = theirPrisoners[0];
+                Button exchange = new Button(() => ExecuteDiplomaticCommand(
+                    WIAdministrationTurnSystem.ExchangePrisoners(state, state.PlayerFactionId, targetFaction.Id,
+                        ourPrisoner.HeroId, theirPrisoner.HeroId), targetFaction));
+                exchange.text = $"포로 맞교환 · {database.GetHero(ourPrisoner.HeroId)?.DisplayName.Get(database.UseEnglish)} ↔ " +
+                                database.GetHero(theirPrisoner.HeroId)?.DisplayName.Get(database.UseEnglish);
+                panel.Add(exchange);
+            }
+
             if (relation.Status == WIDiplomaticStatus.War || relation.Status == WIDiplomaticStatus.Neutral)
             {
                 Button improve = new Button(() => ExecuteDiplomaticCommand(
@@ -933,6 +1448,7 @@ namespace ProjectWI.Administration
                 improve.text = relation.Status == WIDiplomaticStatus.War
                     ? $"휴전 교섭 · 금화 {WIAdministrationTurnSystem.ImproveRelationsGoldCost} · 영향력 {WIAdministrationTurnSystem.ImproveRelationsInfluenceCost}"
                     : $"친선 사절 · 금화 {WIAdministrationTurnSystem.ImproveRelationsGoldCost} · 영향력 {WIAdministrationTurnSystem.ImproveRelationsInfluenceCost}";
+                improve.tooltip = $"확정 명령 · 금화 {WIAdministrationTurnSystem.ImproveRelationsGoldCost} + 영향력 {WIAdministrationTurnSystem.ImproveRelationsInfluenceCost}를 소비해 관계를 한 단계 개선합니다.";
                 panel.Add(improve);
             }
             else if (relation.Status == WIDiplomaticStatus.Friendly)
@@ -941,6 +1457,7 @@ namespace ProjectWI.Administration
                     WIAdministrationTurnSystem.SignNonAggression(state, state.PlayerFactionId, targetFaction.Id),
                     targetFaction));
                 pact.text = $"불가침 협정 · 영향력 {WIAdministrationTurnSystem.NonAggressionInfluenceCost}";
+                pact.tooltip = $"확정 명령 · 우호 관계에서 영향력 {WIAdministrationTurnSystem.NonAggressionInfluenceCost}를 소비합니다.";
                 panel.Add(pact);
             }
             else if (relation.Status == WIDiplomaticStatus.NonAggression)
@@ -949,6 +1466,7 @@ namespace ProjectWI.Administration
                     WIAdministrationTurnSystem.FormAlliance(state, state.PlayerFactionId, targetFaction.Id),
                     targetFaction));
                 alliance.text = $"동맹 체결 · 영향력 {WIAdministrationTurnSystem.AllianceInfluenceCost}";
+                alliance.tooltip = $"확정 명령 · 불가침 관계에서 영향력 {WIAdministrationTurnSystem.AllianceInfluenceCost}를 소비합니다.";
                 panel.Add(alliance);
             }
             else if (relation.Status == WIDiplomaticStatus.Alliance)
@@ -960,7 +1478,29 @@ namespace ProjectWI.Administration
                     ? $"금화 원조 · {relation.AidCooldownMonths}개월 후 재요청"
                     : $"금화 원조 요청 · +{WIAdministrationTurnSystem.AllianceAidGold}";
                 aid.SetEnabled(relation.AidCooldownMonths <= 0);
+                aid.tooltip = relation.AidCooldownMonths > 0
+                    ? $"사용 불가 · 재요청 대기 {relation.AidCooldownMonths}개월"
+                    : $"확정 명령 · 동맹으로부터 금화 {WIAdministrationTurnSystem.AllianceAidGold}를 받고 재사용 대기시간이 적용됩니다.";
                 panel.Add(aid);
+
+                if (relation.JointAttackMonthsRemaining > 0)
+                {
+                    panel.Add(new Label($"공동 공격 진행 · {database.GetCastle(relation.JointAttackTargetCastleId)?.DisplayName.Get(database.UseEnglish)} · " +
+                                        $"{relation.JointAttackMonthsRemaining}개월 남음"));
+                }
+                foreach (WICastleRuntimeState target in state.Castles.Where(item =>
+                             item.FactionId != state.PlayerFactionId && item.FactionId != targetFaction.Id &&
+                             WIAdministrationTurnSystem.AreFactionsAtWar(state, state.PlayerFactionId, item.FactionId) &&
+                             WIAdministrationTurnSystem.AreFactionsAtWar(state, targetFaction.Id, item.FactionId))
+                         .GroupBy(item => item.FactionId).Select(group => group.First()))
+                {
+                    Button jointAttack = new Button(() => ExecuteDiplomaticCommand(
+                        WIAdministrationTurnSystem.ProposeJointAttack(database, state, state.PlayerFactionId,
+                            targetFaction.Id, target.CastleId), targetFaction));
+                    jointAttack.text = $"공동 공격 제안 · {database.GetCastle(target.CastleId).DisplayName.Get(database.UseEnglish)} · " +
+                                       $"영향력 {database.JointAttackInfluenceCost} · {database.JointAttackDurationMonths}개월";
+                    panel.Add(jointAttack);
+                }
             }
 
             if (relation.Status != WIDiplomaticStatus.War)
@@ -969,6 +1509,7 @@ namespace ProjectWI.Administration
                     WIAdministrationTurnSystem.DeclareWar(state, state.PlayerFactionId, targetFaction.Id),
                     targetFaction));
                 war.text = $"선전포고 · 영향력 {WIAdministrationTurnSystem.DeclareWarInfluenceCost}";
+                war.tooltip = $"위험한 확정 명령 · 영향력 {WIAdministrationTurnSystem.DeclareWarInfluenceCost}를 소비하고 즉시 전쟁 상태가 됩니다.";
                 panel.Add(war);
             }
         }
@@ -1028,7 +1569,7 @@ namespace ProjectWI.Administration
         // 선택한 성의 태수, 운영 방침과 월간 예산을 설정합니다.
         private void OpenDelegationModal()
         {
-            if (selectedCastle == null)
+            if (EnsureSelectedCastleManageable() == false)
             {
                 return;
             }
@@ -1121,12 +1662,18 @@ namespace ProjectWI.Administration
             }
 
             WITurnSummary report = state.LastMonthlyReport;
-            VisualElement panel = CreateModal("지난달 월보");
+            VisualElement panel = CreateModalWithFooter("지난달 월보", out VisualElement battleFooter);
             panel.Add(new Label($"금화 +{report.GoldGained} / 지출 -{report.GoldSpent}"));
             panel.Add(new Label($"마나 +{report.ManaGained} / 영향력 +{report.InfluenceGained}"));
             foreach (string delegationReport in report.DelegationReports)
             {
                 panel.Add(new Label(delegationReport));
+            }
+
+            if (report.AIReasonReports != null && report.AIReasonReports.Count > 0) panel.Add(new Label("AI 세력 판단 근거"));
+            foreach (string aiReport in report.AIReasonReports ?? new List<string>())
+            {
+                panel.Add(new Label(aiReport));
             }
 
             foreach (string news in report.News)
@@ -1150,6 +1697,23 @@ namespace ProjectWI.Administration
                 panel.Add(eventButton);
             }
 
+            foreach (WIPendingRegionalEvent pendingEvent in new List<WIPendingRegionalEvent>(state.PendingRegionalEvents))
+            {
+                WIRegionalEventDefinition definition = database.GetRegionalEvent(pendingEvent.EventId);
+                if (definition == null) continue;
+                Button eventButton = new Button(() => OpenRegionalEventModal(pendingEvent));
+                eventButton.text = $"지역 사건 · {definition.Title.Get(database.UseEnglish)}";
+                panel.Add(eventButton);
+            }
+
+            foreach (WIPendingOccupationEvent pendingEvent in new List<WIPendingOccupationEvent>(state.PendingOccupationEvents))
+            {
+                WICastleDefinition castle = database.GetCastle(pendingEvent.CastleId);
+                Button eventButton = new Button(() => OpenOccupationEventModal(pendingEvent));
+                eventButton.text = $"점령 통치 · {castle?.DisplayName.Get(database.UseEnglish) ?? pendingEvent.CastleId}";
+                panel.Add(eventButton);
+            }
+
             foreach (WIPendingRecruitmentEvent pendingEvent in new List<WIPendingRecruitmentEvent>(state.PendingRecruitmentEvents))
             {
                 WIRecruitmentEventDefinition definition = database.GetRecruitmentEvent(pendingEvent.EventId);
@@ -1164,6 +1728,57 @@ namespace ProjectWI.Administration
                 Button legacyButton = new Button(() => ConfirmLegacyChoice(legacyChoice));
                 legacyButton.text = $"영웅의 흔적 · {legacyChoice.Legacy.DisplayName}";
                 panel.Add(legacyButton);
+            }
+            AddPendingBattleActions(battleFooter);
+        }
+
+        // 지역 사건의 배경과 ScriptableObject 선택 결과를 표시합니다.
+        private void OpenRegionalEventModal(WIPendingRegionalEvent pendingEvent)
+        {
+            WIRegionalEventDefinition definition = database.GetRegionalEvent(pendingEvent.EventId);
+            if (definition == null) return;
+            VisualElement panel = CreateModal(definition.Title.Get(database.UseEnglish));
+            panel.Add(new Label(definition.Description.Get(database.UseEnglish)));
+            for (int index = 0; index < definition.Choices.Count; index += 1)
+            {
+                int selectedIndex = index;
+                WIRegionalEventChoiceDefinition choice = definition.Choices[index];
+                Button button = new Button(() =>
+                {
+                    if (WIRegionalEventSystem.Resolve(database, state, pendingEvent, selectedIndex, state.LastMonthlyReport))
+                    {
+                        CloseModal();
+                        RefreshAll();
+                    }
+                });
+                button.text = $"{choice.Label.Get(database.UseEnglish)} · {choice.ResultDescription.Get(database.UseEnglish)}";
+                button.SetEnabled(WIRegionalEventSystem.CanChoose(state, choice));
+                panel.Add(button);
+            }
+        }
+
+        // 새 점령지의 통치 방침과 예상 자원·불안 결과를 표시합니다.
+        private void OpenOccupationEventModal(WIPendingOccupationEvent pendingEvent)
+        {
+            WICastleDefinition castle = database.GetCastle(pendingEvent.CastleId);
+            WIFactionDefinition defeatedFaction = database.GetFaction(pendingEvent.DefeatedFactionId);
+            VisualElement panel = CreateModal($"점령 통치 · {castle?.DisplayName.Get(database.UseEnglish) ?? pendingEvent.CastleId}");
+            panel.Add(new Label($"구 소유 세력 · {defeatedFaction?.DisplayName.Get(database.UseEnglish) ?? pendingEvent.DefeatedFactionId}\n점령 불안을 줄일 통치 방침을 선택하십시오."));
+            for (int index = 0; index < database.OccupationChoices.Count; index += 1)
+            {
+                int selectedIndex = index;
+                WIOccupationChoiceDefinition choice = database.OccupationChoices[index];
+                Button button = new Button(() =>
+                {
+                    if (WIOccupationEventSystem.Resolve(database, state, pendingEvent, selectedIndex, state.LastMonthlyReport))
+                    {
+                        CloseModal();
+                        RefreshAll();
+                    }
+                });
+                button.text = $"{choice.Label.Get(database.UseEnglish)} · {choice.ResultDescription.Get(database.UseEnglish)} · 불안 {choice.UnrestMonths}개월";
+                button.SetEnabled(WIOccupationEventSystem.CanChoose(state, choice));
+                panel.Add(button);
             }
         }
 
@@ -1428,6 +2043,17 @@ namespace ProjectWI.Administration
 
             WICastleDefinition castle = database.GetCastle(selectedCastle.CastleId);
             VisualElement panel = CreateModal($"{castle.DisplayName.Get(database.UseEnglish)} 상세");
+            bool detailed = WIInformationVisibility.CanViewCastleDetails(state, state.PlayerFactionId, selectedCastle);
+            if (detailed == false)
+            {
+                panel.Add(new Label("소유 세력과 지형 외 상세 정보가 확인되지 않았습니다."));
+                panel.Add(new Label("계략 메뉴에서 조사를 성공시키면 일정 기간 성 수치·주둔·시설 정보를 볼 수 있습니다."));
+                if (WIInformationVisibility.CanViewMilitaryDetails(state, state.PlayerFactionId, selectedCastle))
+                {
+                    panel.Add(new Label("현재 전투 접촉으로 전투 세션의 양측 전력만 확인할 수 있습니다."));
+                }
+                return;
+            }
             panel.Add(new Label($"규모: {selectedCastle.CastleSize} / 지형: {castle.TerrainTrait.Get(database.UseEnglish)} / 특산: {castle.Specialty.Get(database.UseEnglish)}"));
             panel.Add(new Label($"전문 분야 효과 · {GetSpecialtyEffectDescription(castle)}"));
             panel.Add(new Label($"번영 {selectedCastle.Prosperity} · 기술 {selectedCastle.Technology} · 치안 {selectedCastle.Stability} · 방어 {selectedCastle.Defense}"));
@@ -1477,7 +2103,7 @@ namespace ProjectWI.Administration
         // 성 확장으로 획득한 슬롯에 배치할 특화 시설을 선택합니다.
         private void OpenSpecialFacilityModal()
         {
-            if (selectedCastle == null)
+            if (EnsureSelectedCastleManageable() == false)
             {
                 return;
             }
@@ -1511,7 +2137,8 @@ namespace ProjectWI.Administration
         {
             WITutorialSystem.Complete(state, "tutorial_military");
             VisualElement panel = CreateModal("군사 · 부대 목록");
-            foreach (WIBattleSessionState session in state.BattleSessions.FindAll(item => item.Status != WIBattleSessionStatus.Resolved))
+            foreach (WIBattleSessionState session in state.BattleSessions.FindAll(item =>
+                         item.Status != WIBattleSessionStatus.Resolved && item.PlayerInvolved))
             {
                 Button battleButton = new Button(() => OpenBattleSessionModal(session));
                 battleButton.text = $"전투 세션 · {database.GetCastle(session.CastleId).DisplayName.Get(database.UseEnglish)} · {session.Status}";
@@ -1519,6 +2146,7 @@ namespace ProjectWI.Administration
             }
             foreach (WIArmyState army in state.Armies)
             {
+                if (army.FactionId != state.PlayerFactionId) continue;
                 Button armyButton = new Button(() => OpenArmyDetailModal(army));
                 string status = army.AwaitingBattle ? "전투 대기" : (army.IsMoving ? $"이동 {army.RemainingTravelMonths}개월" : "주둔");
                 armyButton.text = $"{army.DisplayName} · {army.Members.Count}/{WIAdministrationTurnSystem.GetRecommendedArmySize(database, army)} · {army.Proficiency} · 보급 {army.Supply} · {status}";
@@ -1729,19 +2357,42 @@ namespace ProjectWI.Administration
                 string action = target.FactionId == army.FactionId ? "이동" : "출정";
                 Button button = new Button(() =>
                 {
-                    WIAdministrationTurnSystem.BeginArmyMarch(database, state, army, targetId);
+                    if (WIAdministrationTurnSystem.BeginArmyMarch(database, state, army, targetId) == false)
+                    {
+                        ShowMessage(GetArmyMarchFailureMessage(army, target));
+                        return;
+                    }
                     CloseModal();
                     RefreshAll();
                 });
-                button.text = $"{action} · {database.GetCastle(targetId).DisplayName.Get(database.UseEnglish)}";
+                string cost = target.FactionId == army.FactionId ? string.Empty : " · 영향력 20";
+                button.text = $"{action} · {database.GetCastle(targetId).DisplayName.Get(database.UseEnglish)}{cost}";
                 panel.Add(button);
             }
+        }
+
+        // 출정 시작이 거부된 경우 현재 상태에서 가장 직접적인 해결 방법을 안내합니다.
+        private string GetArmyMarchFailureMessage(WIArmyState army, WICastleRuntimeState target)
+        {
+            if (army == null || target == null) return "출정 정보를 확인할 수 없습니다.";
+            if (army.IsMoving) return "이미 이동 중인 부대입니다.";
+            if (army.AwaitingBattle) return "현재 전투 결과를 기다리는 부대입니다.";
+            if (army.ReorganizationMonths > 0) return $"재편성 완료까지 {army.ReorganizationMonths}개월 남았습니다.";
+            if (target.FactionId != army.FactionId)
+            {
+                if (WIAdministrationTurnSystem.AreFactionsAtWar(state, army.FactionId, target.FactionId) == false)
+                    return "교전 중인 세력의 성에만 출정할 수 있습니다. 먼저 외교 관계를 확인하십시오.";
+                WIFactionRuntimeState faction = state.GetFactionState(army.FactionId);
+                if (faction == null || faction.Influence < 20)
+                    return "출정에 필요한 영향력 20이 부족합니다.";
+            }
+            return "현재 경로로 출정할 수 없습니다. 인접 성과 부대 상태를 확인하십시오.";
         }
 
         // 선택한 성에 주둔한 부대 중 출정할 부대를 선택합니다.
         private void OpenCastleMarchModal()
         {
-            if (selectedCastle == null)
+            if (EnsureSelectedCastleManageable() == false)
             {
                 return;
             }
@@ -1763,7 +2414,11 @@ namespace ProjectWI.Administration
 
             if (found == false)
             {
-                panel.Add(new Label("이 성에서 출정할 수 있는 부대가 없습니다."));
+                panel.Add(new Label("주둔 영웅은 먼저 부대로 편성해야 출정할 수 있습니다."));
+                Button createArmy = new Button(() => OpenArmyCommanderModal(selectedCastle));
+                createArmy.text = "이 성의 영웅으로 새 부대 편성";
+                createArmy.tooltip = "대장을 선택한 뒤 부대원을 추가하고 이동 / 출정을 선택합니다.";
+                panel.Add(createArmy);
             }
         }
 
@@ -1777,6 +2432,11 @@ namespace ProjectWI.Administration
         // 모든 성이 기본으로 보유한 시설과 역할을 안내합니다.
         private void OpenBasicFacilityModal()
         {
+            if (EnsureSelectedCastleManageable() == false)
+            {
+                return;
+            }
+
             VisualElement panel = CreateModal("기본 시설");
             panel.Add(new Label("성관 · 태수 임명과 성 운영"));
             panel.Add(new Label("시장 · 기본 거래와 영지 수입"));
@@ -1851,7 +2511,7 @@ namespace ProjectWI.Administration
         // 현재 성에서 이번 달 개인 활동을 수행할 인물을 선택합니다.
         private void OpenCharacterActivityModal()
         {
-            if (selectedCastle == null)
+            if (EnsureSelectedCastleManageable() == false)
             {
                 return;
             }
@@ -2014,10 +2674,30 @@ namespace ProjectWI.Administration
             return grade == WICharacterGrade.Hero ? "영웅" : "일반";
         }
 
+        // 인물과 연결된 주요 시작 관계를 상대 이름과 단계 문구로 요약합니다.
+        private string GetRelationshipSummary(string heroId)
+        {
+            List<string> entries = new List<string>();
+            foreach (WIRelationshipState relationship in state.Relationships)
+            {
+                string counterpartId = relationship.FirstHeroId == heroId
+                    ? relationship.SecondHeroId
+                    : relationship.SecondHeroId == heroId ? relationship.FirstHeroId : string.Empty;
+                if (string.IsNullOrEmpty(counterpartId)) continue;
+                WIHeroDefinition counterpart = database.GetHero(counterpartId);
+                if (counterpart == null) continue;
+                string level = relationship.Level == WIRelationshipLevel.Conflict ? "갈등"
+                    : relationship.Level == WIRelationshipLevel.Fondness ? "친애" : "보통";
+                entries.Add($"{counterpart.DisplayName.Get(database.UseEnglish)}({level})");
+            }
+
+            return entries.Count == 0 ? string.Empty : $" · 관계 {string.Join(", ", entries)}";
+        }
+
         // 미배치 영웅을 현재 성에 배치하는 모달을 엽니다.
         private void OpenHeroAssignmentModal()
         {
-            if (selectedCastle == null)
+            if (EnsureSelectedCastleManageable() == false)
             {
                 return;
             }
@@ -2071,13 +2751,20 @@ namespace ProjectWI.Administration
 
                 WIHeroDefinition hero = database.GetHero(character.HeroId);
                 string activity = character.Activity == WICharacterActivityType.None ? "대기" : character.Activity.ToString();
+                if (character.IsDead) activity = "사망";
+                else if (character.Captured) activity = $"포로 · {database.GetFaction(character.CaptorFactionId)?.DisplayName.Get(database.UseEnglish)} · {character.CapturedMonthsRemaining}개월";
                 WICharacterTransferState transfer = state.CharacterTransfers.Find(item => item.HeroId == character.HeroId);
                 if (transfer != null)
                 {
                     activity = $"이동 중 · {database.GetCastle(transfer.TargetCastleId).DisplayName.Get(database.UseEnglish)} · {transfer.RemainingMonths}개월";
                 }
                 WICharacterGrade effectiveGrade = character.PromotedToHero ? WICharacterGrade.Hero : character.BaseGrade;
-                panel.Add(new Label($"[{GetGradeDisplayName(effectiveGrade)}] {hero.DisplayName.Get(database.UseEnglish)} · {hero.HeroClass} · 공적 {character.Merit} · 명성 {character.Reputation} · {character.LoyaltyState} · {activity}"));
+                WIHeroClassDefinition classDefinition = database.GetHeroClass(hero.HeroClass);
+                string classTendency = classDefinition == null
+                    ? hero.HeroClass.ToString()
+                    : $"{classDefinition.DisplayName.Get(database.UseEnglish)} · 주 {classDefinition.PrimaryStat} / 보조 {classDefinition.SecondaryStat} · 권장 {GetUnitRoleDisplayName(classDefinition.RecommendedRole)}";
+                string relationships = GetRelationshipSummary(hero.Id);
+                panel.Add(new Label($"[{GetGradeDisplayName(effectiveGrade)}] {hero.DisplayName.Get(database.UseEnglish)} · {classTendency} · 공적 {character.Merit} · 명성 {character.Reputation} · {character.LoyaltyState} · {activity}{relationships}"));
                 panel.Add(new Label($"특기: {GetTraitDisplayText(hero)} · 피로 {character.Fatigue} · 부상 {character.InjuryMonths}개월"));
                 if (state.PendingHeroPromotionIds.Contains(character.HeroId))
                 {
@@ -2148,6 +2835,11 @@ namespace ProjectWI.Administration
         // 턴 연산 오버레이를 표시한 뒤 결과 요약을 엽니다.
         private void BeginTurn()
         {
+            if (WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state))
+            {
+                OpenMonthlyReportModal();
+                return;
+            }
             StartCoroutine(ExecuteTurnRoutine());
         }
 
@@ -2167,7 +2859,7 @@ namespace ProjectWI.Administration
         // 턴 결과의 자원과 소식을 요약 모달로 표시합니다.
         private void ShowTurnSummary(WITurnSummary summary)
         {
-            VisualElement panel = CreateModal(database.GetText("UI_TURN_SUMMARY"));
+            VisualElement panel = CreateModalWithFooter(database.GetText("UI_TURN_SUMMARY"), out VisualElement battleFooter);
             panel.Add(new Label($"Gold +{summary.GoldGained}"));
             panel.Add(new Label($"Gold Spent -{summary.GoldSpent}"));
             panel.Add(new Label($"Mana +{summary.ManaGained}"));
@@ -2176,10 +2868,16 @@ namespace ProjectWI.Administration
             {
                 panel.Add(new Label(report));
             }
+            if (summary.AIReasonReports != null && summary.AIReasonReports.Count > 0) panel.Add(new Label("AI 세력 판단 근거"));
+            foreach (string aiReport in summary.AIReasonReports ?? new List<string>())
+            {
+                panel.Add(new Label(aiReport));
+            }
             foreach (string news in summary.News)
             {
                 panel.Add(new Label(news));
             }
+            AddPendingBattleActions(battleFooter);
             if (state.CampaignResult != WICampaignResult.Ongoing && state.CampaignResultAcknowledged == false)
             {
                 AddCampaignResultContent(panel);
@@ -2187,6 +2885,36 @@ namespace ProjectWI.Administration
             else
             {
                 AddPendingTutorial(panel);
+            }
+        }
+
+        // 턴 결과에서 플레이어가 참가할 대기 전투를 놓치지 않도록 즉시 진입 버튼을 표시합니다.
+        private void AddPendingBattleActions(VisualElement panel)
+        {
+            List<WIBattleSessionState> pendingBattles = state.BattleSessions.FindAll(item =>
+                item.PlayerInvolved && item.Status == WIBattleSessionStatus.Pending);
+            panel.style.display = pendingBattles.Count == 0 ? DisplayStyle.None : DisplayStyle.Flex;
+            if (pendingBattles.Count == 0) return;
+
+            Label heading = new Label($"전투 발생 · {pendingBattles.Count}건");
+            heading.AddToClassList("modal-section-heading");
+            panel.Add(heading);
+            foreach (WIBattleSessionState session in pendingBattles)
+            {
+                WICastleDefinition castle = database.GetCastle(session.CastleId);
+                Button battleButton = new Button(() =>
+                {
+                    WICampaignRuntimeService service = WICampaignRuntimeService.Instance;
+                    if (service == null || service.StartBattle(session.SessionId) == false)
+                    {
+                        ShowMessage("전투를 시작할 수 없습니다. 군사 화면에서 전투 세션 상태를 확인하십시오.");
+                    }
+                });
+                battleButton.text = $"전투 시작 · {castle?.DisplayName.Get(database.UseEnglish) ?? session.CastleId} · " +
+                                    $"아군 {session.AttackerPowerSnapshot} / 적군 {session.DefenderPowerSnapshot}";
+                battleButton.AddToClassList("danger");
+                battleButton.tooltip = "실시간 전투 화면으로 이동합니다.";
+                panel.Add(battleButton);
             }
         }
 
@@ -2198,9 +2926,13 @@ namespace ProjectWI.Administration
                 return false;
             }
             WICampaignRuleDefinition rules = database.CampaignRules;
-            string title = state.CampaignResult == WICampaignResult.Victory
-                ? rules.VictoryTitle.Get(database.UseEnglish)
-                : rules.DefeatTitle.Get(database.UseEnglish);
+            WICampaignEndingDefinition ending = state.CampaignResult == WICampaignResult.Victory
+                ? database.GetCampaignEnding(state.CampaignEnding) : null;
+            string title = ending != null
+                ? ending.Title.Get(database.UseEnglish)
+                : state.CampaignResult == WICampaignResult.Victory
+                    ? rules.VictoryTitle.Get(database.UseEnglish)
+                    : rules.DefeatTitle.Get(database.UseEnglish);
             VisualElement panel = CreateModal(title);
             AddCampaignResultContent(panel);
             return true;
@@ -2210,12 +2942,18 @@ namespace ProjectWI.Administration
         private void AddCampaignResultContent(VisualElement panel)
         {
             WICampaignRuleDefinition rules = database.CampaignRules;
-            string title = state.CampaignResult == WICampaignResult.Victory
-                ? rules.VictoryTitle.Get(database.UseEnglish)
-                : rules.DefeatTitle.Get(database.UseEnglish);
-            string description = state.CampaignResult == WICampaignResult.Victory
-                ? rules.VictoryDescription.Get(database.UseEnglish)
-                : rules.DefeatDescription.Get(database.UseEnglish);
+            WICampaignEndingDefinition ending = state.CampaignResult == WICampaignResult.Victory
+                ? database.GetCampaignEnding(state.CampaignEnding) : null;
+            string title = ending != null
+                ? ending.Title.Get(database.UseEnglish)
+                : state.CampaignResult == WICampaignResult.Victory
+                    ? rules.VictoryTitle.Get(database.UseEnglish)
+                    : rules.DefeatTitle.Get(database.UseEnglish);
+            string description = ending != null
+                ? ending.Description.Get(database.UseEnglish)
+                : state.CampaignResult == WICampaignResult.Victory
+                    ? rules.VictoryDescription.Get(database.UseEnglish)
+                    : rules.DefeatDescription.Get(database.UseEnglish);
             panel.Add(new Label($"{title} · 판정 턴 {state.CampaignResultTurn}"));
             panel.Add(new Label(description));
             Button continueButton = new Button(() =>
@@ -2298,9 +3036,11 @@ namespace ProjectWI.Administration
                 }
             }
 
-            factionLabel.text = playerFaction == null
+            string factionName = playerFaction == null
                 ? database.GetText("UI_GAME_TITLE")
                 : playerFaction.DisplayName.Get(database.UseEnglish);
+            factionLabel.text = TruncateLabel(factionName, 18);
+            factionLabel.tooltip = factionName;
             ApplyBackgroundSprite(factionEmblem, playerFaction == null ? null : playerFaction.Emblem);
             dateLabel.text = $"{state.Year}년 {state.Month:00}월 · 제 {state.Turn}턴";
             WITurnSummary forecast = WIAdministrationTurnSystem.GetFactionMonthlyIncome(database, state, state.PlayerFactionId);
@@ -2308,9 +3048,39 @@ namespace ProjectWI.Administration
             turnDescription.text = depleted
                 ? $"자원 고갈 · 다음 턴 기본 수입 G+{forecast.GoldGained} / M+{forecast.ManaGained} / I+{forecast.InfluenceGained}로 회복할 수 있습니다."
                 : $"세력 방침: {GetFactionPolicyDisplayName(state.FactionPolicy)} · {state.Month:00}월 명령을 검토하십시오.";
-            goldLabel.text = $"금화\n{state.Gold:N0} (+{forecast.GoldGained})";
-            manaLabel.text = $"마나\n{state.ManaCrystal:N0} (+{forecast.ManaGained})";
-            influenceLabel.text = $"영향력\n{state.Influence:N0} (+{forecast.InfluenceGained})";
+            goldLabel.text = $"금화\n{FormatHudNumber(state.Gold, database.UseEnglish)} (+{FormatHudNumber(forecast.GoldGained, database.UseEnglish)})";
+            manaLabel.text = $"마나\n{FormatHudNumber(state.ManaCrystal, database.UseEnglish)} (+{FormatHudNumber(forecast.ManaGained, database.UseEnglish)})";
+            influenceLabel.text = $"영향력\n{FormatHudNumber(state.Influence, database.UseEnglish)} (+{FormatHudNumber(forecast.InfluenceGained, database.UseEnglish)})";
+            int ownedCastleCount = state.Castles.Count(castle => castle.FactionId == state.PlayerFactionId);
+            goldLabel.tooltip = BuildResourceCalculationTooltip("금화", state.Gold, forecast.GoldGained, ownedCastleCount,
+                "성별 번영 × 성 규모 × 치안 효율 + 전문 분야·시설·연구");
+            manaLabel.tooltip = BuildResourceCalculationTooltip("마나", state.ManaCrystal, forecast.ManaGained, ownedCastleCount,
+                "성별 기술 × 성 규모 + 전문 분야·마법 시설·연구");
+            influenceLabel.tooltip = BuildResourceCalculationTooltip("영향력", state.Influence, forecast.InfluenceGained, ownedCastleCount,
+                "성별 치안 × 성 규모 + 전문 분야·연구");
+            Button turnButton = root.Q<Button>("turn-button");
+            int unresolvedBattleCount = state.BattleSessions.Count(session =>
+                session.PlayerInvolved && session.Status != WIBattleSessionStatus.Resolved);
+            turnButton.SetEnabled(unresolvedBattleCount == 0);
+            turnButton.text = unresolvedBattleCount == 0 ? "다음 턴  T" : $"전투 해결 필요 · {unresolvedBattleCount}건";
+            turnButton.tooltip = unresolvedBattleCount == 0
+                ? "T · 다음 턴 진행"
+                : "플레이어가 참가하는 모든 전투를 끝내야 다음 턴으로 진행할 수 있습니다.";
+            WICampaignObjectiveDefinition objective = WICampaignObjectiveSystem.GetCurrent(database, state);
+            if (objective == null)
+            {
+                objectiveButton.text = state.CampaignResult == WICampaignResult.Victory
+                    ? "캠페인 목표 완료 · 대륙 통일"
+                    : "모든 등록 목표 완료";
+                objectiveButton.SetEnabled(false);
+            }
+            else
+            {
+                int progress = WICampaignObjectiveSystem.GetProgress(state, objective);
+                objectiveButton.text = $"목표 · {objective.Title.Get(database.UseEnglish)}   {progress}/{objective.TargetValue}";
+                objectiveButton.SetEnabled(true);
+            }
+            RefreshGlobalSidePanels(objective, unresolvedBattleCount);
             foreach (KeyValuePair<string, Button> pair in castleButtons)
             {
                 WICastleRuntimeState castle = state.GetCastle(pair.Key);
@@ -2320,12 +3090,19 @@ namespace ProjectWI.Administration
                 {
                     pair.Value.style.backgroundColor = owner.Color;
                 }
-                string eventBadge = castle.InvasionWarning ? " !" : string.Empty;
-                string occupationBadge = castle.OccupationUnrestMonths > 0 ? " ⚑" : string.Empty;
+                bool detailed = WIInformationVisibility.CanViewCastleDetails(state, state.PlayerFactionId, castle);
+                bool military = WIInformationVisibility.CanViewMilitaryDetails(state, state.PlayerFactionId, castle);
+                string eventBadge = detailed && castle.InvasionWarning ? " !" : string.Empty;
+                string occupationBadge = detailed && castle.OccupationUnrestMonths > 0 ? " ⚑" : string.Empty;
                 int armyCount = state.Armies.FindAll(army => army.CurrentCastleId == pair.Key).Count;
-                string battleBadge = state.Armies.Exists(army => army.CurrentCastleId == pair.Key && army.AwaitingBattle) ? " ⚔" : string.Empty;
-                pair.Value.text = $"{definition.DisplayName.Get(database.UseEnglish)}\n{castle.HeroIds.Count}H · {armyCount}부대{eventBadge}{battleBadge}{occupationBadge}";
+                string battleBadge = military && state.Armies.Exists(army => army.CurrentCastleId == pair.Key && army.AwaitingBattle) ? " ⚔" : string.Empty;
+                string detailText = detailed ? $"{castle.HeroIds.Count}H · {armyCount}부대" : military ? "전투 접촉 · 전력 확인 가능" : "정보 미확보";
+                string castleName = definition.DisplayName.Get(database.UseEnglish);
+                string factionCode = GetFactionAccessibilityCode(castle.FactionId);
+                pair.Value.text = $"{factionCode}·{TruncateLabel(castleName, 9)}\n{detailText}{eventBadge}{battleBadge}{occupationBadge}";
+                pair.Value.tooltip = $"[{factionCode}] {owner?.DisplayName.Get(database.UseEnglish) ?? castle.FactionId}\n{castleName}\n{detailText}";
             }
+            RefreshFactionLegend();
             RefreshMapConnections();
 
             if (selectedCastle != null && castleView.resolvedStyle.display == DisplayStyle.Flex)
@@ -2333,6 +3110,45 @@ namespace ProjectWI.Administration
                 string selectedCastleId = selectedCastle.CastleId;
                 SelectCastle(selectedCastleId);
             }
+        }
+
+        // 시안형 전역 화면의 좌측 성 현황과 우측 목표·전투 알림을 현재 상태로 갱신합니다.
+        private void RefreshGlobalSidePanels(WICampaignObjectiveDefinition objective, int unresolvedBattleCount)
+        {
+            WICastleRuntimeState castle = GetGlobalSummaryCastle();
+            if (castle != null)
+            {
+                WICastleDefinition definition = database.GetCastle(castle.CastleId);
+                WIFactionDefinition owner = database.GetFaction(castle.FactionId);
+                globalCastleName.text = definition?.DisplayName.Get(database.UseEnglish) ?? castle.CastleId;
+                globalCastleOwner.text = $"{castle.CastleSize} · {owner?.DisplayName.Get(database.UseEnglish) ?? castle.FactionId}";
+                globalCastleStats.text = $"번영 {castle.Prosperity}  ·  기술 {castle.Technology}\n치안 {castle.Stability}  ·  방어 {castle.Defense}";
+                int armyCount = state.Armies.Count(army => army.CurrentCastleId == castle.CastleId);
+                globalCastleHeroes.text = $"주둔 영웅 {castle.HeroIds.Count}명  ·  주둔 부대 {armyCount}개";
+                ApplyBackgroundSprite(globalCastleImage, definition?.CastleImage);
+            }
+
+            if (objective == null)
+            {
+                rightObjectiveProgress.text = state.CampaignResult == WICampaignResult.Victory
+                    ? "대륙 통일 목표를 달성했습니다."
+                    : "현재 진행 중인 목표가 없습니다.";
+            }
+            else
+            {
+                int progress = WICampaignObjectiveSystem.GetProgress(state, objective);
+                rightObjectiveProgress.text = $"진행 {progress}/{objective.TargetValue}\n{objective.Description.Get(database.UseEnglish)}";
+            }
+
+            battleAlertButton.text = unresolvedBattleCount > 0
+                ? $"전투 발생 {unresolvedBattleCount}건 · 확인"
+                : "현재 전투 없음";
+            battleAlertButton.SetEnabled(unresolvedBattleCount > 0 || state.LastMonthlyReport != null);
+            battleAlertButton.EnableInClassList("danger", unresolvedBattleCount > 0);
+            string latestNews = state.LastMonthlyReport?.News?.LastOrDefault();
+            rightMonthlyNews.text = string.IsNullOrEmpty(latestNews)
+                ? "새로운 월보가 없습니다."
+                : $"최근 소식\n{latestNews}";
         }
 
         // UID에 해당하는 단순 안내 모달을 표시합니다.
@@ -2382,19 +3198,48 @@ namespace ProjectWI.Administration
         // 공통 모달 배경과 패널을 생성합니다.
         private VisualElement CreateModal(string title)
         {
+            return CreateModalLayout(title, false, out _);
+        }
+
+        // 월보처럼 스크롤 본문 아래에 고정 행동 영역이 필요한 모달을 생성합니다.
+        private VisualElement CreateModalWithFooter(string title, out VisualElement footer)
+        {
+            return CreateModalLayout(title, true, out footer);
+        }
+
+        // 공통 모달의 고정 헤더, 스크롤 본문과 선택적 하단 행동 영역을 구성합니다.
+        private VisualElement CreateModalLayout(string title, bool includeFooter, out VisualElement footer)
+        {
             CloseModal();
             modalLayer.style.display = DisplayStyle.Flex;
             VisualElement panel = new VisualElement();
             panel.AddToClassList("modal-panel");
+            panel.AddToClassList("generated-panel-background");
+            VisualElement header = new VisualElement();
+            header.AddToClassList("modal-header");
             Label titleLabel = new Label(title);
             titleLabel.AddToClassList("modal-title");
-            panel.Add(titleLabel);
+            header.Add(titleLabel);
             Button close = new Button(CloseModal);
             close.text = database.GetText("UI_CLOSE");
             close.AddToClassList("modal-close");
-            panel.Add(close);
+            header.Add(close);
+            panel.Add(header);
+            ScrollView scrollView = new ScrollView(ScrollViewMode.Vertical);
+            scrollView.name = "modal-scroll-view";
+            scrollView.AddToClassList("modal-scroll-view");
+            scrollView.contentContainer.AddToClassList("modal-scroll-content");
+            panel.Add(scrollView);
+            ScrollView footerScrollView = new ScrollView(ScrollViewMode.Vertical);
+            footer = footerScrollView.contentContainer;
+            if (includeFooter)
+            {
+                footerScrollView.AddToClassList("modal-fixed-footer");
+                footer.AddToClassList("modal-fixed-footer-content");
+                panel.Add(footerScrollView);
+            }
             modalLayer.Add(panel);
-            return panel;
+            return scrollView.contentContainer;
         }
 
         // 현재 열린 모달을 닫습니다.

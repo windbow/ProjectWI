@@ -134,12 +134,10 @@ namespace ProjectWI.Editor
         }
 
         // 인물 클래스에 어울리는 기본 전투 역할로 선택 진영에 추가합니다.
-        private static void AddMember(List<TestMember> members, WIHeroDefinition hero)
+        private void AddMember(List<TestMember> members, WIHeroDefinition hero)
         {
-            WIUnitRole role = hero.HeroClass == WIHeroClass.Archer ? WIUnitRole.Ranged
-                : hero.HeroClass == WIHeroClass.Archmage ? WIUnitRole.Magic
-                : hero.HeroClass == WIHeroClass.Priest || hero.HeroClass == WIHeroClass.Druid ? WIUnitRole.Support
-                : members.Count == 0 ? WIUnitRole.Commander : WIUnitRole.Melee;
+            WIHeroClassDefinition classDefinition = database.GetHeroClass(hero.HeroClass);
+            WIUnitRole role = classDefinition == null ? WIUnitRole.Melee : classDefinition.RecommendedRole;
             members.Add(new TestMember { heroId = hero.Id, role = role });
         }
 
@@ -204,12 +202,23 @@ namespace ProjectWI.Editor
         static WIBattleTestLabLauncher()
         {
             EditorApplication.playModeStateChanged += OnPlayModeChanged;
+            if (EditorApplication.isPlaying)
+            {
+                BeginLaunchWait();
+            }
         }
 
         // 플레이 모드 진입 후 MainScene 서비스가 생성될 시간을 두고 실행 대기를 시작합니다.
         private static void OnPlayModeChanged(PlayModeStateChange state)
         {
             if (state != PlayModeStateChange.EnteredPlayMode) return;
+            BeginLaunchWait();
+        }
+
+        // 도메인 재로딩 시점과 관계없이 최대 120 프레임 동안 임시 전투 실행을 재시도합니다.
+        private static void BeginLaunchWait()
+        {
+            EditorApplication.update -= TryLaunch;
             remainingFrames = 120;
             EditorApplication.update += TryLaunch;
         }
