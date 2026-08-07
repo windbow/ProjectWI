@@ -23,6 +23,13 @@ namespace ProjectWI.Battle
                 return runtime.AttackerOutcome;
             }
             runtime.ElapsedSeconds += deltaTime;
+            WIBattleOutcome objectiveOutcome = EvaluateObjective(runtime, deltaTime);
+            if (objectiveOutcome != WIBattleOutcome.None)
+            {
+                runtime.Finished = true;
+                runtime.AttackerOutcome = objectiveOutcome;
+                return objectiveOutcome;
+            }
             runtime.VisualEffects.RemoveAll(item => runtime.ElapsedSeconds - item.StartedAt >= item.Duration);
             AdvanceProjectiles(config, runtime, deltaTime);
             List<WIBattleCharacterState> activeActors = new List<WIBattleCharacterState>(runtime.Characters.Count);
@@ -96,6 +103,45 @@ namespace ProjectWI.Battle
             runtime.Finished = true;
             runtime.AttackerOutcome = attackersAlive ? WIBattleOutcome.Victory : WIBattleOutcome.Defeat;
             return runtime.AttackerOutcome;
+        }
+
+        // 제한 방어 시간과 중앙 거점 점유 시간을 계산해 목표 달성 승패를 반환합니다.
+        private static WIBattleOutcome EvaluateObjective(WIBattleRuntimeState runtime, float deltaTime)
+        {
+            if (runtime.ObjectiveType == WIBattleObjectiveType.TimedDefense &&
+                runtime.ElapsedSeconds >= runtime.ObjectiveDurationSeconds)
+            {
+                return WIBattleOutcome.Defeat;
+            }
+
+            if (runtime.ObjectiveType != WIBattleObjectiveType.ControlPoint)
+            {
+                return WIBattleOutcome.None;
+            }
+
+            float radiusSquared = runtime.ControlRadius * runtime.ControlRadius;
+            bool attackerPresent = runtime.Characters.Any(character => character.IsAlive &&
+                character.Side == WIBattleSide.Attacker && character.Position.sqrMagnitude <= radiusSquared);
+            bool defenderPresent = runtime.Characters.Any(character => character.IsAlive &&
+                character.Side == WIBattleSide.Defender && character.Position.sqrMagnitude <= radiusSquared);
+            if (attackerPresent && defenderPresent == false)
+            {
+                runtime.AttackerControlSeconds += deltaTime;
+            }
+            else if (defenderPresent && attackerPresent == false)
+            {
+                runtime.DefenderControlSeconds += deltaTime;
+            }
+
+            if (runtime.AttackerControlSeconds >= runtime.ControlDurationSeconds)
+            {
+                return WIBattleOutcome.Victory;
+            }
+            if (runtime.DefenderControlSeconds >= runtime.ControlDurationSeconds)
+            {
+                return WIBattleOutcome.Defeat;
+            }
+            return WIBattleOutcome.None;
         }
 
         // 현재 역할이 실제 이동 발사체를 사용하는 원거리 계열인지 반환합니다.

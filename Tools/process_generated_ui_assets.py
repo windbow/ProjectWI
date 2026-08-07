@@ -13,6 +13,12 @@ ICON_CLEAN = SOURCE_CACHE / "icon_atlas_clean.png"
 BUTTON_CLEAN = SOURCE_CACHE / "button_atlas_clean.png"
 CASTLE_STAT_CLEAN = SOURCE_CACHE / "castle_stat_atlas_clean.png"
 CASTLE_SLOT_CLEAN = SOURCE_CACHE / "castle_slot_atlas_clean.png"
+MAP_MARKER_CLEAN = SOURCE_CACHE / "map_castle_marker_atlas_clean.png"
+FLAT_ICON_CLEAN = SOURCE_CACHE / "command_icons_flat_atlas_clean.png"
+FLAT_BUTTON_CLEAN = SOURCE_CACHE / "button_flat_atlas_clean.png"
+FLAT_FACTION_ICON_CLEAN = SOURCE_CACHE / "icon_faction_flat_clean.png"
+FLAT_HUD_ICON_CLEAN = SOURCE_CACHE / "hud_icons_flat_atlas_clean.png"
+RIGHT_PANEL_COMPONENT_CLEAN = SOURCE_CACHE / "right_panel_component_atlas_clean.png"
 
 
 def remove_magenta(image: Image.Image) -> Image.Image:
@@ -114,6 +120,88 @@ def extract_castle_slots() -> None:
         source.crop(bounds).resize((640, 180), Image.Resampling.LANCZOS).save(OUTPUT / f"{name}.png")
 
 
+def extract_map_castle_markers() -> None:
+    """5개 세력의 성채·깃발 마커를 투명한 독립 PNG로 분리합니다."""
+    source = Image.open(MAP_MARKER_CLEAN).convert("RGBA")
+    names = ["avalon", "valdor", "ironheart", "sylvanroad", "necropolis"]
+    cell_width = source.width // 5
+    for index, name in enumerate(names):
+        left = index * cell_width
+        right = source.width if index == len(names) - 1 else (index + 1) * cell_width
+        cell = source.crop((left, 120, right, 860))
+        bbox = cell.getchannel("A").getbbox()
+        if bbox is None:
+            continue
+        cropped = cell.crop(bbox)
+        canvas = Image.new("RGBA", (256, 320))
+        cropped.thumbnail((244, 308), Image.Resampling.LANCZOS)
+        canvas.alpha_composite(cropped, ((canvas.width - cropped.width) // 2, canvas.height - cropped.height - 6))
+        canvas.save(OUTPUT / f"map_castle_{name}.png")
+
+
+def extract_flat_command_icons() -> None:
+    """시안형 4×2 명령 아이콘 시트를 독립적인 단색 아이콘으로 분리합니다."""
+    source = Image.open(FLAT_ICON_CLEAN).convert("RGBA")
+    names = ["military", "heroes", "diplomacy", "scheme", "research", "council", "report", "turn"]
+    cell_width = source.width // 4
+    cell_height = source.height // 2
+    for index, name in enumerate(names):
+        column = index % 4
+        row = index // 4
+        cell = source.crop((column * cell_width, row * cell_height,
+                            (column + 1) * cell_width, (row + 1) * cell_height))
+        trim_and_square(cell, 128).save(OUTPUT / f"icon_flat_{name}.png")
+
+
+def extract_flat_buttons() -> None:
+    """시안형 일반·선택·위험 버튼을 9슬라이스용 동일 크기로 분리합니다."""
+    source = Image.open(FLAT_BUTTON_CLEAN).convert("RGBA")
+    names = ["button_flat_normal", "button_flat_primary", "button_flat_danger"]
+    row_height = source.height // 3
+    for row, name in enumerate(names):
+        cell = source.crop((0, row * row_height, source.width, (row + 1) * row_height))
+        bbox = cell.getchannel("A").getbbox()
+        if bbox is None:
+            continue
+        cropped = cell.crop(bbox)
+        cropped.resize((768, 128), Image.Resampling.LANCZOS).save(OUTPUT / f"{name}.png")
+
+
+def extract_flat_faction_icon() -> None:
+    """통치 메뉴의 왕관·깃발 아이콘을 다른 명령 아이콘과 같은 크기로 정리합니다."""
+    source = Image.open(FLAT_FACTION_ICON_CLEAN).convert("RGBA")
+    trim_and_square(source, 128).save(OUTPUT / "icon_flat_faction.png")
+
+
+def extract_flat_hud_icons() -> None:
+    """상단 HUD의 날짜·금화·마나·영향력 아이콘을 각각 분리합니다."""
+    source = Image.open(FLAT_HUD_ICON_CLEAN).convert("RGBA")
+    names = ["date", "gold", "mana", "influence"]
+    cell_width = source.width // 4
+    for index, name in enumerate(names):
+        cell = source.crop((index * cell_width, 0, (index + 1) * cell_width, source.height))
+        trim_and_square(cell, 96).save(OUTPUT / f"hud_flat_{name}.png")
+
+
+def extract_right_panel_components() -> None:
+    """우측 목표·알림 및 성 명령 패널에 사용할 공통 프레임을 분리합니다."""
+    source = Image.open(RIGHT_PANEL_COMPONENT_CLEAN).convert("RGBA")
+    components = {
+        "right_panel_header": ((35, 135, 625, 238), (768, 128)),
+        "right_panel_frame": ((680, 75, 1195, 758), (512, 768)),
+        "right_objective_card": ((40, 398, 615, 723), (640, 320)),
+        "right_notice_row": ((38, 822, 615, 985), (640, 160)),
+        "right_danger_row": ((658, 822, 1207, 985), (640, 160)),
+        "right_action_button": ((710, 1058, 1138, 1182), (384, 112)),
+    }
+    for name, (bounds, size) in components.items():
+        cell = source.crop(bounds)
+        bbox = cell.getchannel("A").getbbox()
+        if bbox is None:
+            continue
+        cell.crop(bbox).resize(size, Image.Resampling.LANCZOS).save(OUTPUT / f"{name}.png")
+
+
 def main() -> None:
     """생성 원본을 Unity Resources 폴더의 최종 UI 에셋으로 변환합니다."""
     OUTPUT.mkdir(parents=True, exist_ok=True)
@@ -123,6 +211,12 @@ def main() -> None:
     prepare_header()
     extract_castle_stats()
     extract_castle_slots()
+    extract_map_castle_markers()
+    extract_flat_command_icons()
+    extract_flat_buttons()
+    extract_flat_faction_icon()
+    extract_flat_hud_icons()
+    extract_right_panel_components()
 
 
 if __name__ == "__main__":

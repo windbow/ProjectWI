@@ -1,13 +1,21 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:wi="ProjectWI.Administration" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Administration/WIAdministration.uss?fileID=7433441132597879392&amp;guid=e3cd209d510bab248a4d831f90c7ab91&amp;type=3#WIAdministration"/>
     <ui:VisualElement name="app" class="app">
         <ui:VisualElement name="ornament-background" class="ornament-background"/>
         <ui:VisualElement name="compact-hud" class="compact-hud frame-gold">
-            <ui:Label name="date-label" text="190년 10월" class="date-label"/>
             <ui:VisualElement name="faction-emblem" class="faction-emblem image-placeholder"/>
             <ui:Label name="faction-label" text="아발론" class="faction-label"/>
+            <ui:VisualElement class="hud-separator"/>
+            <ui:VisualElement class="hud-resource-icon hud-date-icon"/>
+            <ui:Label name="date-label" text="190년 10월" class="date-label"/>
+            <ui:VisualElement class="hud-separator"/>
+            <ui:VisualElement class="hud-resource-icon hud-gold-icon"/>
             <ui:Label name="gold-label" text="금화 0" class="resource-chip gold"/>
+            <ui:VisualElement class="hud-separator"/>
+            <ui:VisualElement class="hud-resource-icon hud-mana-icon"/>
             <ui:Label name="mana-label" text="마나 0" class="resource-chip mana"/>
+            <ui:VisualElement class="hud-separator"/>
+            <ui:VisualElement class="hud-resource-icon hud-influence-icon"/>
             <ui:Label name="influence-label" text="영향력 0" class="resource-chip influence"/>
             <ui:VisualElement class="hud-spacer"/>
             <ui:Button name="information-button" text="정보" class="hud-icon-button"/>
@@ -22,22 +30,91 @@
                     <ui:Label text="천하 전략도" class="screen-title"/>
                     <ui:Label name="turn-description" text="명령을 내릴 성을 선택하십시오." class="screen-subtitle"/>
                 </ui:VisualElement>
-                <ui:VisualElement class="map-side-panel castle-summary-panel generated-panel-background">
+                <ui:VisualElement class="map-side-panel castle-summary-panel concept-side-panel">
                     <ui:Label text="아발론 영지" class="side-panel-kicker"/>
                     <ui:Label name="global-castle-name" text="별빛 수도" class="side-panel-title"/>
                     <ui:VisualElement name="global-castle-image" class="global-castle-image image-placeholder"/>
                     <ui:Label name="global-castle-owner" text="수도 · 아발론 왕국" class="side-panel-subtitle"/>
                     <ui:Label name="global-castle-stats" text="번영 45  ·  기술 40\n치안 55  ·  방어 60" class="side-panel-stats"/>
                     <ui:Label name="global-castle-heroes" text="주둔 영웅 4명  ·  주둔 부대 1개" class="side-panel-copy"/>
+                    <ui:VisualElement name="global-castle-hero-cards" class="global-castle-hero-cards">
+                        <ui:VisualElement name="global-hero-card-0" class="global-hero-card"><ui:VisualElement name="global-hero-portrait-0" class="global-hero-portrait image-placeholder"/><ui:Label name="global-hero-name-0" text="빈 슬롯" class="global-hero-name"/></ui:VisualElement>
+                        <ui:VisualElement name="global-hero-card-1" class="global-hero-card"><ui:VisualElement name="global-hero-portrait-1" class="global-hero-portrait image-placeholder"/><ui:Label name="global-hero-name-1" text="빈 슬롯" class="global-hero-name"/></ui:VisualElement>
+                        <ui:VisualElement name="global-hero-card-2" class="global-hero-card"><ui:VisualElement name="global-hero-portrait-2" class="global-hero-portrait image-placeholder"/><ui:Label name="global-hero-name-2" text="빈 슬롯" class="global-hero-name"/></ui:VisualElement>
+                        <ui:VisualElement name="global-hero-card-3" class="global-hero-card"><ui:VisualElement name="global-hero-portrait-3" class="global-hero-portrait image-placeholder"/><ui:Label name="global-hero-name-3" text="빈 슬롯" class="global-hero-name"/></ui:VisualElement>
+                    </ui:VisualElement>
                     <ui:Button name="capital-manage-button" text="수도 관리" class="side-action generated-primary"/>
                 </ui:VisualElement>
-                <ui:VisualElement name="map" class="map"/>
-                <ui:VisualElement class="map-side-panel campaign-summary-panel generated-panel-background">
-                    <ui:Label text="이번 달" class="side-panel-kicker"/>
-                    <ui:Label text="주요 목표" class="side-panel-section"/>
+                <ui:VisualElement name="map" class="map">
+                    <wi:WIMapConnectionLayer name="map-connection-layer"/>
+                    <ui:Button name="castle-castle_00" class="castle-node" style="left:18%; top:48%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_00" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_01" class="castle-node" style="left:27%; top:43%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_01" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_02" class="castle-node" style="left:36%; top:38%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_02" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_03" class="castle-node" style="left:46%; top:34%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_03" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_04" class="castle-node" style="left:57%; top:32%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_04" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_05" class="castle-node" style="left:68%; top:31%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_05" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_06" class="castle-node" style="left:78%; top:33%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_06" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_07" class="castle-node" style="left:86%; top:38%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_07" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_08" class="castle-node" style="left:89%; top:46%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_08" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_09" class="castle-node" style="left:86%; top:54%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_09" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_10" class="castle-node" style="left:25%; top:52%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_10" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_11" class="castle-node" style="left:34%; top:48%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_11" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_12" class="castle-node" style="left:44%; top:44%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_12" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_13" class="castle-node" style="left:54%; top:42%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_13" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_14" class="castle-node" style="left:64%; top:41%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_14" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_15" class="castle-node" style="left:74%; top:43%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_15" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_16" class="castle-node" style="left:81%; top:48%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_16" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_17" class="castle-node" style="left:80%; top:57%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_17" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_18" class="castle-node" style="left:72%; top:61%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_18" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_19" class="castle-node" style="left:62%; top:61%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_19" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_20" class="castle-node" style="left:28%; top:60%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_20" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_21" class="castle-node" style="left:38%; top:57%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_21" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_22" class="castle-node" style="left:48%; top:54%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_22" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_23" class="castle-node" style="left:57%; top:51%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_23" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_24" class="castle-node" style="left:66%; top:50%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_24" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_25" class="castle-node" style="left:70%; top:56%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_25" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_26" class="castle-node" style="left:72%; top:23%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_26" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_27" class="castle-node" style="left:63%; top:20%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_27" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_28" class="castle-node" style="left:54%; top:18%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_28" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_29" class="castle-node" style="left:45%; top:19%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_29" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_30" class="castle-node" style="left:25%; top:29%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_30" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_31" class="castle-node" style="left:32%; top:23%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_31" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_32" class="castle-node" style="left:40%; top:16%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_32" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_33" class="castle-node" style="left:49%; top:12%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_33" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_34" class="castle-node" style="left:59%; top:13%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_34" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_35" class="castle-node" style="left:68%; top:16%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_35" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_36" class="castle-node" style="left:77%; top:20%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_36" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_37" class="castle-node" style="left:83%; top:26%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_37" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_38" class="castle-node" style="left:16%; top:39%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_38" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_39" class="castle-node" style="left:11%; top:46%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_39" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_40" class="castle-node" style="left:12%; top:55%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_40" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_41" class="castle-node" style="left:18%; top:58%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_41" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_42" class="castle-node" style="left:23%; top:64%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_42" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_43" class="castle-node" style="left:18%; top:69%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_43" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_44" class="castle-node" style="left:11%; top:66%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_44" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_45" class="castle-node" style="left:13%; top:75%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_45" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_46" class="castle-node" style="left:21%; top:78%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_46" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_47" class="castle-node" style="left:29%; top:74%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_47" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_48" class="castle-node" style="left:31%; top:66%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_48" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_49" class="castle-node" style="left:27%; top:52%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_49" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_50" class="castle-node" style="left:36%; top:75%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_50" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_51" class="castle-node" style="left:43%; top:80%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_51" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_52" class="castle-node" style="left:51%; top:84%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_52" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_53" class="castle-node" style="left:60%; top:87%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_53" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_54" class="castle-node" style="left:70%; top:86%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_54" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_55" class="castle-node" style="left:79%; top:82%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_55" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_56" class="castle-node" style="left:84%; top:75%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_56" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_57" class="castle-node" style="left:76%; top:71%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_57" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_58" class="castle-node" style="left:65%; top:73%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_58" class="castle-node-name"/></ui:Button>
+                    <ui:Button name="castle-castle_59" class="castle-node" style="left:54%; top:76%;"><ui:VisualElement class="castle-node-marker"/><ui:Label text="castle_59" class="castle-node-name"/></ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement class="map-side-panel campaign-summary-panel concept-side-panel">
+                    <ui:Label text="이번 달" class="side-panel-kicker right-panel-heading"/>
+                    <ui:Label text="주요 목표" class="side-panel-section right-panel-section-heading"/>
                     <ui:Button name="objective-button" text="첫 목표" class="objective-strip generated-normal"/>
                     <ui:Label name="right-objective-progress" text="진행 상황을 확인하십시오." class="side-panel-copy"/>
-                    <ui:Label text="알림" class="side-panel-section alert-heading"/>
+                    <ui:VisualElement class="objective-progress-track"><ui:VisualElement name="objective-progress-fill" class="objective-progress-fill"/></ui:VisualElement>
+                    <ui:Label text="알림" class="side-panel-section alert-heading right-panel-section-heading"/>
                     <ui:Button name="battle-alert-button" text="현재 전투 없음" class="battle-alert-button generated-danger"/>
                     <ui:Label name="right-monthly-news" text="새로운 월보가 없습니다." class="side-panel-news"/>
                 </ui:VisualElement>
@@ -58,7 +135,7 @@
                 <ui:Button name="diplomacy-button" text="외교" class="global-command generated-normal"><ui:VisualElement class="generated-command-icon icon-diplomacy"/></ui:Button>
                 <ui:Button name="scheme-button" text="계략" class="global-command generated-normal"><ui:VisualElement class="generated-command-icon icon-scheme"/></ui:Button>
                 <ui:Button name="research-button" text="연구" class="global-command generated-normal"><ui:VisualElement class="generated-command-icon icon-research"/></ui:Button>
-                <ui:Button name="faction-button" text="통치" class="global-command generated-normal"/>
+                <ui:Button name="faction-button" text="통치" class="global-command generated-normal"><ui:VisualElement class="generated-command-icon icon-faction"/></ui:Button>
                 <ui:Button name="council-button" text="평정" class="global-command important generated-normal"><ui:VisualElement class="generated-command-icon icon-council"/></ui:Button>
                 <ui:Button name="monthly-report-button" text="월보" class="global-command generated-normal"><ui:VisualElement class="generated-command-icon icon-report"/></ui:Button>
                 <ui:VisualElement class="command-spacer"/>
@@ -85,17 +162,20 @@
                     <ui:Label name="castle-info" text="성 정보" class="castle-info"/>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement name="governor-portrait-placeholder" class="image-placeholder governor-full">
-                <ui:Label text="태수/인물\n이미지 슬롯"/>
-            </ui:VisualElement>
-            <ui:VisualElement class="castle-stat-panel frame-dark">
-                <ui:Label name="prosperity-label" text="번영 0" class="castle-stat castle-stat-prosperity"/>
-                <ui:Label name="technology-label" text="기술 0" class="castle-stat castle-stat-technology"/>
-                <ui:Label name="stability-label" text="치안 0" class="castle-stat castle-stat-stability"/>
-                <ui:Label name="defense-label" text="방어 0" class="castle-stat castle-stat-defense"/>
+            <ui:VisualElement class="castle-overview-panel frame-dark concept-side-panel">
+                <ui:Label text="성 현황" class="castle-panel-heading"/>
+                <ui:VisualElement name="governor-portrait-placeholder" class="image-placeholder governor-full">
+                    <ui:Label text="태수/인물\n이미지 슬롯"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="castle-stat-panel">
+                    <ui:Label name="prosperity-label" text="번영 0" class="castle-stat castle-stat-prosperity"/>
+                    <ui:Label name="technology-label" text="기술 0" class="castle-stat castle-stat-technology"/>
+                    <ui:Label name="stability-label" text="치안 0" class="castle-stat castle-stat-stability"/>
+                    <ui:Label name="defense-label" text="방어 0" class="castle-stat castle-stat-defense"/>
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="castle-command-menu frame-gold">
-                <ui:Label text="성 내정 명령" class="command-title"/>
+                <ui:Label text="성 내정 명령" class="command-title right-panel-heading"/>
                 <ui:Button name="focus-project-button" text="중점 사업" class="castle-command generated-normal"/>
                 <ui:Button name="assign-button" text="인사 배치" class="castle-command generated-normal"/>
                 <ui:Button name="character-activity-button" text="인재 활동" class="castle-command generated-normal"/>
@@ -109,13 +189,29 @@
                 <ui:Label text="이번 달 중점" class="section-label"/>
                 <ui:Label name="project-status-label" text="미지정" class="project-status"/>
                 <ui:VisualElement class="slot-columns">
-                    <ui:VisualElement class="slot-column">
-                        <ui:Label text="주둔 영웅" class="section-label"/>
-                        <ui:VisualElement name="hero-slots" class="slot-grid"/>
+                    <ui:VisualElement class="slot-column castle-slot-section hero-slot-section">
+                        <ui:Label text="주둔 영웅" class="section-label slot-section-title"/>
+                        <ui:ScrollView mode="Vertical" class="slot-scroll hero-slot-scroll">
+                            <ui:VisualElement name="hero-slots" class="slot-grid hero-slot-grid">
+                                <ui:VisualElement name="hero-slot-0" class="slot hero-slot"><ui:VisualElement name="hero-slot-image-0" class="slot-image hero-slot-image"/><ui:Label name="hero-slot-caption-0" text="빈 영웅 슬롯" class="slot-caption"/></ui:VisualElement>
+                                <ui:VisualElement name="hero-slot-1" class="slot hero-slot"><ui:VisualElement name="hero-slot-image-1" class="slot-image hero-slot-image"/><ui:Label name="hero-slot-caption-1" text="빈 영웅 슬롯" class="slot-caption"/></ui:VisualElement>
+                                <ui:VisualElement name="hero-slot-2" class="slot hero-slot"><ui:VisualElement name="hero-slot-image-2" class="slot-image hero-slot-image"/><ui:Label name="hero-slot-caption-2" text="빈 영웅 슬롯" class="slot-caption"/></ui:VisualElement>
+                                <ui:VisualElement name="hero-slot-3" class="slot hero-slot"><ui:VisualElement name="hero-slot-image-3" class="slot-image hero-slot-image"/><ui:Label name="hero-slot-caption-3" text="빈 영웅 슬롯" class="slot-caption"/></ui:VisualElement>
+                                <ui:VisualElement name="hero-slot-4" class="slot hero-slot"><ui:VisualElement name="hero-slot-image-4" class="slot-image hero-slot-image"/><ui:Label name="hero-slot-caption-4" text="빈 영웅 슬롯" class="slot-caption"/></ui:VisualElement>
+                                <ui:VisualElement name="hero-slot-5" class="slot hero-slot"><ui:VisualElement name="hero-slot-image-5" class="slot-image hero-slot-image"/><ui:Label name="hero-slot-caption-5" text="빈 영웅 슬롯" class="slot-caption"/></ui:VisualElement>
+                                <ui:VisualElement name="hero-slot-6" class="slot hero-slot"><ui:VisualElement name="hero-slot-image-6" class="slot-image hero-slot-image"/><ui:Label name="hero-slot-caption-6" text="빈 영웅 슬롯" class="slot-caption"/></ui:VisualElement>
+                                <ui:VisualElement name="hero-slot-7" class="slot hero-slot"><ui:VisualElement name="hero-slot-image-7" class="slot-image hero-slot-image"/><ui:Label name="hero-slot-caption-7" text="빈 영웅 슬롯" class="slot-caption"/></ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:ScrollView>
                     </ui:VisualElement>
-                    <ui:VisualElement class="slot-column">
-                        <ui:Label text="특화 시설" class="section-label"/>
-                        <ui:VisualElement name="special-facility-slots" class="slot-grid"/>
+                    <ui:VisualElement class="slot-column castle-slot-section facility-slot-section">
+                        <ui:Label text="특화 시설" class="section-label slot-section-title"/>
+                        <ui:ScrollView mode="Vertical" class="slot-scroll facility-slot-scroll">
+                            <ui:VisualElement name="special-facility-slots" class="slot-grid facility-slot-grid">
+                                <ui:VisualElement name="facility-slot-0" class="slot facility-slot"><ui:VisualElement name="facility-slot-image-0" class="slot-image facility-slot-image"/><ui:Label name="facility-slot-caption-0" text="확장 완료 시 선택" class="slot-caption"/></ui:VisualElement>
+                                <ui:VisualElement name="facility-slot-1" class="slot facility-slot"><ui:VisualElement name="facility-slot-image-1" class="slot-image facility-slot-image"/><ui:Label name="facility-slot-caption-1" text="확장 완료 시 선택" class="slot-caption"/></ui:VisualElement>
+                            </ui:VisualElement>
+                        </ui:ScrollView>
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>

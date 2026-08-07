@@ -171,3 +171,46 @@
     -unity-slice-top:24;
     -unity-slice-bottom:24;
 }
+
+/* 전투 이미지 버튼도 단색 배경 반전 대신 텍스처 틴트로 조작 상태를 표시합니다. */
+.generated-normal, .generated-primary, .generated-danger, .skill-button {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:rgb(237,243,246);
+    -unity-background-image-tint-color:rgb(255,255,255);
+    -unity-text-outline-width:1px;
+    -unity-text-outline-color:rgba(3,8,12,.9);
+}
+.generated-normal:hover, .generated-primary:hover, .skill-button:hover {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:rgb(255,255,255);
+    -unity-background-image-tint-color:rgb(217,234,255);
+}
+.generated-danger:hover {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:rgb(255,255,255);
+    -unity-background-image-tint-color:rgb(255,209,209);
+}
+.generated-normal:active, .generated-primary:active, .generated-danger:active, .skill-button:active {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:rgb(255,255,255);
+    -unity-background-image-tint-color:rgb(145,167,184);
+}
+.generated-normal:disabled, .generated-primary:disabled, .generated-danger:disabled, .skill-button:disabled {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:rgb(154,163,170);
+    opacity:.62;
+    -unity-background-image-tint-color:rgb(89,101,110);
+}
+
+/* 전투 명령 버튼도 작은 한글이 뭉개지지 않도록 고딕체와 무외곽선을 사용합니다. */
+.command-button, .generated-normal, .generated-primary, .generated-danger, .skill-button, .retreat {
+    -unity-font-definition:url("project://database/Assets/Fonts/NotoSansKR-VariableFont_wght.ttf");
+    -unity-font-style:normal;
+    -unity-text-outline-width:0;
+    -unity-text-outline-color:rgba(0,0,0,0);
+}

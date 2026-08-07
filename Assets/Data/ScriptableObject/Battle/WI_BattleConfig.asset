@@ -122,27 +122,174 @@ MonoBehaviour:
     cooldown: 15
   classSkills:
   - heroClass: 0
-    skill: {heroId: class_magic_swordsman, displayName: 마력 참격, description: 주변 적에게 마력 피해를 줍니다., skillType: 0, manaCost: 32, power: 32, range: 3.5, cooldown: 11}
+    skill:
+      heroId: class_magic_swordsman
+      displayName: "\uB9C8\uB825 \uCC38\uACA9"
+      description: "\uC8FC\uBCC0 \uC801\uC5D0\uAC8C \uB9C8\uB825 \uD53C\uD574\uB97C
+        \uC90D\uB2C8\uB2E4."
+      skillType: 0
+      manaCost: 32
+      power: 32
+      range: 3.5
+      cooldown: 11
   - heroClass: 1
-    skill: {heroId: class_guardian, displayName: 수호의 함성, description: 주변 아군의 공격 대기시간을 줄입니다., skillType: 2, manaCost: 25, power: 30, range: 4, cooldown: 13}
+    skill:
+      heroId: class_guardian
+      displayName: "\uC218\uD638\uC758 \uD568\uC131"
+      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
+        \uC904\uC785\uB2C8\uB2E4."
+      skillType: 2
+      manaCost: 25
+      power: 30
+      range: 4
+      cooldown: 13
   - heroClass: 2
-    skill: {heroId: class_crusader, displayName: 신성한 진군, description: 주변 아군의 공격 대기시간을 줄입니다., skillType: 2, manaCost: 30, power: 38, range: 5, cooldown: 13}
+    skill:
+      heroId: class_crusader
+      displayName: "\uC2E0\uC131\uD55C \uC9C4\uAD70"
+      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
+        \uC904\uC785\uB2C8\uB2E4."
+      skillType: 2
+      manaCost: 30
+      power: 38
+      range: 5
+      cooldown: 13
   - heroClass: 3
-    skill: {heroId: class_sword_master, displayName: 일섬, description: 가까운 적에게 강한 피해를 줍니다., skillType: 0, manaCost: 30, power: 38, range: 2.8, cooldown: 10}
+    skill:
+      heroId: class_sword_master
+      displayName: "\uC77C\uC12C"
+      description: "\uAC00\uAE4C\uC6B4 \uC801\uC5D0\uAC8C \uAC15\uD55C \uD53C\uD574\uB97C
+        \uC90D\uB2C8\uB2E4."
+      skillType: 0
+      manaCost: 30
+      power: 38
+      range: 2.8
+      cooldown: 10
   - heroClass: 4
-    skill: {heroId: class_archer, displayName: 화살비, description: 사거리 안의 적에게 피해를 줍니다., skillType: 0, manaCost: 32, power: 30, range: 5.5, cooldown: 11}
+    skill:
+      heroId: class_archer
+      displayName: "\uD654\uC0B4\uBE44"
+      description: "\uC0AC\uAC70\uB9AC \uC548\uC758 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C
+        \uC90D\uB2C8\uB2E4."
+      skillType: 0
+      manaCost: 32
+      power: 30
+      range: 5.5
+      cooldown: 11
   - heroClass: 5
-    skill: {heroId: class_assassin, displayName: 급소 습격, description: 가까운 적에게 기습 피해를 줍니다., skillType: 0, manaCost: 28, power: 42, range: 2.5, cooldown: 12}
+    skill:
+      heroId: class_assassin
+      displayName: "\uAE09\uC18C \uC2B5\uACA9"
+      description: "\uAC00\uAE4C\uC6B4 \uC801\uC5D0\uAC8C \uAE30\uC2B5 \uD53C\uD574\uB97C
+        \uC90D\uB2C8\uB2E4."
+      skillType: 0
+      manaCost: 28
+      power: 42
+      range: 2.5
+      cooldown: 12
   - heroClass: 6
-    skill: {heroId: class_archmage, displayName: 마력 폭풍, description: 넓은 범위의 적에게 피해를 줍니다., skillType: 0, manaCost: 42, power: 40, range: 6, cooldown: 14}
+    skill:
+      heroId: class_archmage
+      displayName: "\uB9C8\uB825 \uD3ED\uD48D"
+      description: "\uB113\uC740 \uBC94\uC704\uC758 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C
+        \uC90D\uB2C8\uB2E4."
+      skillType: 0
+      manaCost: 42
+      power: 40
+      range: 6
+      cooldown: 14
   - heroClass: 7
-    skill: {heroId: class_priest, displayName: 치유의 빛, description: 주변 아군의 체력을 회복합니다., skillType: 1, manaCost: 32, power: 36, range: 5, cooldown: 12}
+    skill:
+      heroId: class_priest
+      displayName: "\uCE58\uC720\uC758 \uBE5B"
+      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+      skillType: 1
+      manaCost: 32
+      power: 36
+      range: 5
+      cooldown: 12
   - heroClass: 8
-    skill: {heroId: class_druid, displayName: 생명의 숨결, description: 주변 아군의 체력을 회복합니다., skillType: 1, manaCost: 34, power: 32, range: 5.5, cooldown: 12}
+    skill:
+      heroId: class_druid
+      displayName: "\uC0DD\uBA85\uC758 \uC228\uACB0"
+      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+      skillType: 1
+      manaCost: 34
+      power: 32
+      range: 5.5
+      cooldown: 12
   - heroClass: 9
-    skill: {heroId: class_strategist, displayName: 전술 지휘, description: 주변 아군의 공격 대기시간을 줄입니다., skillType: 2, manaCost: 28, power: 42, range: 6, cooldown: 13}
+    skill:
+      heroId: class_strategist
+      displayName: "\uC804\uC220 \uC9C0\uD718"
+      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
+        \uC904\uC785\uB2C8\uB2E4."
+      skillType: 2
+      manaCost: 28
+      power: 42
+      range: 6
+      cooldown: 13
   - heroClass: 10
-    skill: {heroId: class_alchemist, displayName: 회복 영약, description: 주변 아군의 체력을 회복합니다., skillType: 1, manaCost: 30, power: 34, range: 4.5, cooldown: 11}
+    skill:
+      heroId: class_alchemist
+      displayName: "\uD68C\uBCF5 \uC601\uC57D"
+      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+      skillType: 1
+      manaCost: 30
+      power: 34
+      range: 4.5
+      cooldown: 11
   - heroClass: 11
-    skill: {heroId: class_warlock, displayName: 암흑 파동, description: 주변 적에게 암흑 피해를 줍니다., skillType: 0, manaCost: 38, power: 43, range: 5, cooldown: 13}
+    skill:
+      heroId: class_warlock
+      displayName: "\uC554\uD751 \uD30C\uB3D9"
+      description: "\uC8FC\uBCC0 \uC801\uC5D0\uAC8C \uC554\uD751 \uD53C\uD574\uB97C
+        \uC90D\uB2C8\uB2E4."
+      skillType: 0
+      manaCost: 38
+      power: 43
+      range: 5
+      cooldown: 13
+  battleObjectives:
+  - id: objective_elimination
+    displayName:
+      uid: BATTLE_OBJECTIVE_0_NAME
+      korean: "\uC12C\uBA78"
+      english: Elimination
+    description:
+      uid: BATTLE_OBJECTIVE_0_DESC
+      korean: "\uC801 \uC804\uD22C \uC778\uBB3C\uC744 \uBAA8\uB450 \uC4F0\uB7EC\uB728\uB9AC\uC2ED\uC2DC\uC624."
+      english: Defeat every opposing combatant.
+    objectiveType: 0
+    durationSeconds: 120
+    controlDurationSeconds: 20
+    controlRadius: 2
+  - id: objective_timed_defense
+    displayName:
+      uid: BATTLE_OBJECTIVE_1_NAME
+      korean: "\uC81C\uD55C \uC2DC\uAC04 \uBC29\uC5B4"
+      english: Timed Defense
+    description:
+      uid: BATTLE_OBJECTIVE_1_DESC
+      korean: "\uC81C\uD55C \uC2DC\uAC04\uC774 \uB05D\uB0A0 \uB54C\uAE4C\uC9C0 \uC218\uBE44
+        \uC9C4\uC601\uC744 \uC720\uC9C0\uD558\uC2ED\uC2DC\uC624."
+      english: Hold the defensive line until time expires.
+    objectiveType: 1
+    durationSeconds: 90
+    controlDurationSeconds: 20
+    controlRadius: 2
+  - id: objective_control_point
+    displayName:
+      uid: BATTLE_OBJECTIVE_2_NAME
+      korean: "\uC911\uC559 \uAC70\uC810 \uC810\uB839"
+      english: Control Point
+    description:
+      uid: BATTLE_OBJECTIVE_2_DESC
+      korean: "\uC911\uC559 \uAC70\uC810\uC744 \uB2E8\uB3C5 \uC810\uC720\uD574 \uBAA9\uD45C
+        \uC2DC\uAC04\uC744 \uCC44\uC6B0\uC2ED\uC2DC\uC624."
+      english: Hold the central point uncontested for the required time.
+    objectiveType: 2
+    durationSeconds: 120
+    controlDurationSeconds: 18
+    controlRadius: 2
   placeholderSprite: {fileID: 0}

@@ -53,17 +53,29 @@ namespace ProjectWI.Administration
         private Label globalCastleStats;
         private Label globalCastleHeroes;
         private VisualElement globalCastleImage;
+        private VisualElement globalCastleHeroCards;
+        private readonly List<VisualElement> globalHeroCards = new List<VisualElement>();
+        private readonly List<VisualElement> globalHeroPortraits = new List<VisualElement>();
+        private readonly List<Label> globalHeroNames = new List<Label>();
+        private VisualElement objectiveProgressFill;
         private Label rightObjectiveProgress;
         private Label rightMonthlyNews;
         private Button battleAlertButton;
         private VisualElement heroSlots;
         private VisualElement specialFacilitySlots;
+        private readonly List<VisualElement> castleHeroSlotElements = new List<VisualElement>();
+        private readonly List<VisualElement> castleHeroSlotImages = new List<VisualElement>();
+        private readonly List<Label> castleHeroSlotCaptions = new List<Label>();
+        private readonly List<VisualElement> castleFacilitySlotElements = new List<VisualElement>();
+        private readonly List<VisualElement> castleFacilitySlotImages = new List<VisualElement>();
+        private readonly List<Label> castleFacilitySlotCaptions = new List<Label>();
         private Button specialFacilityButton;
         private Button objectiveButton;
         private WICastleRuntimeState selectedCastle;
         private readonly Dictionary<string, Button> castleButtons = new Dictionary<string, Button>();
         private readonly Dictionary<WICampaignDifficulty, Button> difficultyButtons = new Dictionary<WICampaignDifficulty, Button>();
         private readonly Dictionary<WICampaignVariant, Button> variantButtons = new Dictionary<WICampaignVariant, Button>();
+        private bool mapNodesBound;
         private WICampaignDifficulty selectedDifficulty = WICampaignDifficulty.Standard;
         private WICampaignVariant selectedVariant = WICampaignVariant.Classic;
 
@@ -133,14 +145,42 @@ namespace ProjectWI.Administration
             globalCastleStats = root.Q<Label>("global-castle-stats");
             globalCastleHeroes = root.Q<Label>("global-castle-heroes");
             globalCastleImage = root.Q<VisualElement>("global-castle-image");
+            globalCastleHeroCards = root.Q<VisualElement>("global-castle-hero-cards");
+            objectiveProgressFill = root.Q<VisualElement>("objective-progress-fill");
             rightObjectiveProgress = root.Q<Label>("right-objective-progress");
             rightMonthlyNews = root.Q<Label>("right-monthly-news");
             battleAlertButton = root.Q<Button>("battle-alert-button");
             heroSlots = root.Q<VisualElement>("hero-slots");
             specialFacilitySlots = root.Q<VisualElement>("special-facility-slots");
+            CacheFixedSlotElements();
             specialFacilityButton = root.Q<Button>("special-facility-button");
             objectiveButton = root.Q<Button>("objective-button");
             ApplyVisualAssets();
+        }
+
+        // UXML에 미리 배치된 영웅 카드와 성 슬롯을 목록으로 캐시합니다.
+        private void CacheFixedSlotElements()
+        {
+            for (int index = 0; index < 4; index += 1)
+            {
+                globalHeroCards.Add(root.Q<VisualElement>($"global-hero-card-{index}"));
+                globalHeroPortraits.Add(root.Q<VisualElement>($"global-hero-portrait-{index}"));
+                globalHeroNames.Add(root.Q<Label>($"global-hero-name-{index}"));
+            }
+
+            for (int index = 0; index < 8; index += 1)
+            {
+                castleHeroSlotElements.Add(root.Q<VisualElement>($"hero-slot-{index}"));
+                castleHeroSlotImages.Add(root.Q<VisualElement>($"hero-slot-image-{index}"));
+                castleHeroSlotCaptions.Add(root.Q<Label>($"hero-slot-caption-{index}"));
+            }
+
+            for (int index = 0; index < 2; index += 1)
+            {
+                castleFacilitySlotElements.Add(root.Q<VisualElement>($"facility-slot-{index}"));
+                castleFacilitySlotImages.Add(root.Q<VisualElement>($"facility-slot-image-{index}"));
+                castleFacilitySlotCaptions.Add(root.Q<Label>($"facility-slot-caption-{index}"));
+            }
         }
 
         // ScriptableObject에 지정된 실제 지도 이미지를 전역 지도 배경에 적용합니다.
@@ -420,36 +460,52 @@ namespace ProjectWI.Administration
             SelectInitialCastle();
         }
 
-        // 데이터에 정의된 모든 성을 지도 노드로 생성합니다.
+        // UXML에 미리 배치된 성 노드에 데이터와 선택 이벤트를 연결합니다.
         private void BuildMap()
         {
-            map.Clear();
             castleButtons.Clear();
-            mapConnectionLayer = new WIMapConnectionLayer();
-            mapConnectionLayer.name = "map-connection-layer";
-            map.Add(mapConnectionLayer);
+            mapConnectionLayer = map.Q<WIMapConnectionLayer>("map-connection-layer");
             foreach (WICastleDefinition castle in database.Castles)
             {
                 WICastleRuntimeState castleState = state.GetCastle(castle.Id);
                 WIFactionDefinition faction = database.GetFaction(castleState.FactionId);
-                Button node = new Button(() => SelectCastle(castle.Id));
-                node.name = $"castle-{castle.Id}";
-                node.AddToClassList("castle-node");
+                Button node = map.Q<Button>($"castle-{castle.Id}");
+                if (node == null)
+                {
+                    Debug.LogError($"UXML 지도 노드를 찾을 수 없습니다: {castle.Id}");
+                    continue;
+                }
+
+                if (mapNodesBound == false)
+                {
+                    string castleId = castle.Id;
+                    node.clicked += () => SelectCastle(castleId);
+                }
+
+                ApplyMapNodeFactionClass(node, castleState.FactionId);
                 string castleName = castle.DisplayName.Get(database.UseEnglish);
                 string factionCode = GetFactionAccessibilityCode(castleState.FactionId);
-                node.text = $"{factionCode}·{TruncateLabel(castleName, 9)}";
+                Label nameplate = node.Q<Label>(className: "castle-node-name");
+                if (nameplate != null)
+                {
+                    nameplate.text = TruncateLabel(castleName, 9);
+                }
                 node.tooltip = $"[{factionCode}] {faction?.DisplayName.Get(database.UseEnglish) ?? castleState.FactionId}\n{castleName}";
                 node.style.left = Length.Percent(castle.NormalizedMapPosition.x * 100f);
                 node.style.top = Length.Percent(castle.NormalizedMapPosition.y * 100f);
-                if (faction != null)
-                {
-                    node.style.backgroundColor = faction.Color;
-                }
-
-                map.Add(node);
                 castleButtons.Add(castle.Id, node);
             }
+            mapNodesBound = true;
             RefreshMapConnections();
+        }
+
+        // 성 소유 세력에 맞는 성채·깃발 이미지 클래스를 지도 노드에 적용합니다.
+        private static void ApplyMapNodeFactionClass(VisualElement node, string factionId)
+        {
+            string[] factionIds = { "avalon", "valdor", "ironheart", "sylvanroad", "necropolis" };
+            foreach (string id in factionIds) node.RemoveFromClassList($"castle-node-{id}");
+            string resolved = factionIds.Contains(factionId) ? factionId : "ironheart";
+            node.AddToClassList($"castle-node-{resolved}");
         }
 
         // 인접 성 관계를 중복 없이 경로로 만들고 세력 경계를 전선 색상으로 표시합니다.
@@ -573,10 +629,25 @@ namespace ProjectWI.Administration
         // 미조사 적 성의 주둔 인물과 특화 시설 슬롯을 비공개 안내로 대체합니다.
         private void RefreshHiddenCastleSlots()
         {
-            heroSlots.Clear();
-            heroSlots.Add(new Label("주둔 인물 정보 미확보"));
-            specialFacilitySlots.Clear();
-            specialFacilitySlots.Add(new Label("시설 정보 미확보"));
+            for (int index = 0; index < castleHeroSlotElements.Count; index += 1)
+            {
+                bool first = index == 0;
+                castleHeroSlotElements[index].style.display = first ? DisplayStyle.Flex : DisplayStyle.None;
+                castleHeroSlotElements[index].EnableInClassList("empty-slot", true);
+                ClearBackgroundSprite(castleHeroSlotImages[index]);
+                castleHeroSlotImages[index].style.display = DisplayStyle.None;
+                castleHeroSlotCaptions[index].text = "주둔 인물 정보 미확보";
+            }
+
+            for (int index = 0; index < castleFacilitySlotElements.Count; index += 1)
+            {
+                bool first = index == 0;
+                castleFacilitySlotElements[index].style.display = first ? DisplayStyle.Flex : DisplayStyle.None;
+                castleFacilitySlotElements[index].EnableInClassList("empty-slot", true);
+                ClearBackgroundSprite(castleFacilitySlotImages[index]);
+                castleFacilitySlotImages[index].style.display = DisplayStyle.None;
+                castleFacilitySlotCaptions[index].text = "시설 정보 미확보";
+            }
         }
 
         // 대륙 전략 화면을 표시하고 성 내정 화면을 숨깁니다.
@@ -1877,29 +1948,12 @@ namespace ProjectWI.Administration
         // 사건 선택 결과를 성 수치에 적용하고 대기 목록에서 제거합니다.
         private void ResolveProjectEvent(WIPendingProjectEvent pendingEvent, int gain, bool boldRisk)
         {
-            WICastleRuntimeState castle = state.GetCastle(pendingEvent.CastleId);
-            ApplyEventStat(castle, pendingEvent.ProjectType, gain);
-            if (pendingEvent.ProjectType == WICastleProjectType.Recruitment)
+            if (WIAdministrationTurnSystem.ResolveProjectEvent(
+                    state, pendingEvent, gain, boldRisk, state.LastMonthlyReport))
             {
-                state.GetCharacter(pendingEvent.HeroId).Reputation += gain;
+                CloseModal();
+                RefreshAll();
             }
-            if (boldRisk)
-            {
-                castle.Stability = Mathf.Clamp(castle.Stability - 2, 0, 100);
-            }
-
-            state.PendingProjectEvents.Remove(pendingEvent);
-            CloseModal();
-            RefreshAll();
-        }
-
-        // 사건의 사업 종류에 맞는 성 수치를 증가시킵니다.
-        private void ApplyEventStat(WICastleRuntimeState castle, WICastleProjectType projectType, int gain)
-        {
-            if (projectType == WICastleProjectType.Prosperity) castle.Prosperity = Mathf.Clamp(castle.Prosperity + gain, 0, 100);
-            else if (projectType == WICastleProjectType.Technology) castle.Technology = Mathf.Clamp(castle.Technology + gain, 0, 100);
-            else if (projectType == WICastleProjectType.Stability) castle.Stability = Mathf.Clamp(castle.Stability + gain, 0, 100);
-            else if (projectType == WICastleProjectType.Fortification) castle.Defense = Mathf.Clamp(castle.Defense + gain, 0, 100);
         }
 
         // 대성공으로 생성된 영웅의 흔적을 성에 기록하거나 교체 대상을 선택합니다.
@@ -1958,70 +2012,87 @@ namespace ProjectWI.Administration
         // 주둔 인물 및 특화 시설 슬롯을 현재 성 상태에 맞게 갱신합니다.
         private void RefreshCastleSlots(WICastleDefinition castle, WICastleRuntimeState castleState)
         {
-            heroSlots.Clear();
-            for (int index = 0; index < castleState.GetHeroSlotCount(); index += 1)
+            int heroSlotCount = Mathf.Min(castleState.GetHeroSlotCount(), castleHeroSlotElements.Count);
+            for (int index = 0; index < castleHeroSlotElements.Count; index += 1)
             {
-                VisualElement slot = new VisualElement();
-                slot.AddToClassList("slot");
-                slot.AddToClassList("hero-slot");
-                Label caption = new Label();
-                caption.AddToClassList("slot-caption");
+                VisualElement slot = castleHeroSlotElements[index];
+                VisualElement portrait = castleHeroSlotImages[index];
+                Label caption = castleHeroSlotCaptions[index];
+                bool available = index < heroSlotCount;
+                slot.style.display = available ? DisplayStyle.Flex : DisplayStyle.None;
+                if (available == false)
+                {
+                    continue;
+                }
+
                 if (index < castleState.HeroIds.Count)
                 {
                     string heroId = castleState.HeroIds[index];
                     WICharacterRuntimeState character = state.GetCharacter(heroId);
                     WIHeroDefinition hero = database.GetHero(heroId);
-                    string activity = character.Activity == WICharacterActivityType.None ? "대기" : character.Activity.ToString();
-                    VisualElement portrait = new VisualElement();
-                    portrait.AddToClassList("slot-image");
-                    portrait.AddToClassList("hero-slot-image");
-                    ApplyBackgroundSprite(portrait, hero.Portrait);
-                    slot.Add(portrait);
-                    caption.text = $"{hero.DisplayName.Get(database.UseEnglish)}\n{activity}";
+                    string activity = character == null || character.Activity == WICharacterActivityType.None
+                        ? "대기"
+                        : character.Activity.ToString();
+                    slot.EnableInClassList("empty-slot", false);
+                    portrait.style.display = DisplayStyle.Flex;
+                    ApplyBackgroundSprite(portrait, hero == null ? null : hero.Portrait);
+                    caption.text = hero == null
+                        ? heroId
+                        : $"{hero.DisplayName.Get(database.UseEnglish)}\n{activity}";
                 }
                 else
                 {
-                    slot.AddToClassList("empty-slot");
+                    slot.EnableInClassList("empty-slot", true);
+                    ClearBackgroundSprite(portrait);
+                    portrait.style.display = DisplayStyle.None;
                     caption.text = database.GetText("UI_EMPTY_HERO");
                 }
-                slot.Add(caption);
-                heroSlots.Add(slot);
             }
 
-            specialFacilitySlots.Clear();
-            int facilitySlotCount = castleState.GetSpecialFacilitySlotCount();
-            for (int index = 0; index < facilitySlotCount; index += 1)
+            int facilitySlotCount = Mathf.Min(castleState.GetSpecialFacilitySlotCount(), castleFacilitySlotElements.Count);
+            for (int index = 0; index < castleFacilitySlotElements.Count; index += 1)
             {
-                VisualElement slot = new VisualElement();
-                slot.AddToClassList("slot");
-                slot.AddToClassList("facility-slot");
-                Label caption = new Label();
-                caption.AddToClassList("slot-caption");
+                VisualElement slot = castleFacilitySlotElements[index];
+                VisualElement icon = castleFacilitySlotImages[index];
+                Label caption = castleFacilitySlotCaptions[index];
+                bool available = index < facilitySlotCount;
+                slot.style.display = available ? DisplayStyle.Flex : DisplayStyle.None;
+                if (available == false)
+                {
+                    continue;
+                }
+
                 if (index < castleState.SpecialFacilityIds.Count)
                 {
                     WISpecialFacilityDefinition facility = database.GetSpecialFacility(castleState.SpecialFacilityIds[index]);
-                    VisualElement icon = new VisualElement();
-                    icon.AddToClassList("slot-image");
-                    icon.AddToClassList("facility-slot-image");
-                    ApplyBackgroundSprite(icon, facility.Icon);
-                    slot.Add(icon);
-                    caption.text = facility.DisplayName.Get(database.UseEnglish);
+                    slot.EnableInClassList("empty-slot", false);
+                    icon.style.display = DisplayStyle.Flex;
+                    ApplyBackgroundSprite(icon, facility == null ? null : facility.Icon);
+                    caption.text = facility == null
+                        ? castleState.SpecialFacilityIds[index]
+                        : facility.DisplayName.Get(database.UseEnglish);
                 }
                 else
                 {
-                    slot.AddToClassList("empty-slot");
+                    slot.EnableInClassList("empty-slot", true);
+                    ClearBackgroundSprite(icon);
+                    icon.style.display = DisplayStyle.None;
                     caption.text = "확장 완료 시 선택";
                 }
-                slot.Add(caption);
-                specialFacilitySlots.Add(slot);
             }
         }
 
         // Sprite가 있으면 UI 요소의 배경에 적용하고 없으면 빈 슬롯 상태를 유지합니다.
         private void ApplyBackgroundSprite(VisualElement element, Sprite sprite)
         {
-            if (element == null || sprite == null)
+            if (element == null)
             {
+                return;
+            }
+
+            if (sprite == null)
+            {
+                ClearBackgroundSprite(element);
                 return;
             }
 
@@ -2030,6 +2101,15 @@ namespace ProjectWI.Administration
             if (placeholder != null)
             {
                 placeholder.style.display = DisplayStyle.None;
+            }
+        }
+
+        // 재사용 슬롯에 이전 데이터의 이미지가 남지 않도록 배경 이미지를 제거합니다.
+        private static void ClearBackgroundSprite(VisualElement element)
+        {
+            if (element != null)
+            {
+                element.style.backgroundImage = StyleKeyword.None;
             }
         }
 
@@ -3086,10 +3166,7 @@ namespace ProjectWI.Administration
                 WICastleRuntimeState castle = state.GetCastle(pair.Key);
                 WICastleDefinition definition = database.GetCastle(pair.Key);
                 WIFactionDefinition owner = database.GetFaction(castle.FactionId);
-                if (owner != null)
-                {
-                    pair.Value.style.backgroundColor = owner.Color;
-                }
+                ApplyMapNodeFactionClass(pair.Value, castle.FactionId);
                 bool detailed = WIInformationVisibility.CanViewCastleDetails(state, state.PlayerFactionId, castle);
                 bool military = WIInformationVisibility.CanViewMilitaryDetails(state, state.PlayerFactionId, castle);
                 string eventBadge = detailed && castle.InvasionWarning ? " !" : string.Empty;
@@ -3099,7 +3176,11 @@ namespace ProjectWI.Administration
                 string detailText = detailed ? $"{castle.HeroIds.Count}H · {armyCount}부대" : military ? "전투 접촉 · 전력 확인 가능" : "정보 미확보";
                 string castleName = definition.DisplayName.Get(database.UseEnglish);
                 string factionCode = GetFactionAccessibilityCode(castle.FactionId);
-                pair.Value.text = $"{factionCode}·{TruncateLabel(castleName, 9)}\n{detailText}{eventBadge}{battleBadge}{occupationBadge}";
+                Label nameplate = pair.Value.Q<Label>(className: "castle-node-name");
+                if (nameplate != null)
+                {
+                    nameplate.text = $"{TruncateLabel(castleName, 9)}{eventBadge}{battleBadge}{occupationBadge}";
+                }
                 pair.Value.tooltip = $"[{factionCode}] {owner?.DisplayName.Get(database.UseEnglish) ?? castle.FactionId}\n{castleName}\n{detailText}";
             }
             RefreshFactionLegend();
@@ -3126,6 +3207,7 @@ namespace ProjectWI.Administration
                 int armyCount = state.Armies.Count(army => army.CurrentCastleId == castle.CastleId);
                 globalCastleHeroes.text = $"주둔 영웅 {castle.HeroIds.Count}명  ·  주둔 부대 {armyCount}개";
                 ApplyBackgroundSprite(globalCastleImage, definition?.CastleImage);
+                RefreshGlobalHeroCards(castle);
             }
 
             if (objective == null)
@@ -3139,6 +3221,10 @@ namespace ProjectWI.Administration
                 int progress = WICampaignObjectiveSystem.GetProgress(state, objective);
                 rightObjectiveProgress.text = $"진행 {progress}/{objective.TargetValue}\n{objective.Description.Get(database.UseEnglish)}";
             }
+            int objectiveProgress = objective == null || objective.TargetValue <= 0
+                ? state.CampaignResult == WICampaignResult.Victory ? 100 : 0
+                : Mathf.Clamp(Mathf.RoundToInt(WICampaignObjectiveSystem.GetProgress(state, objective) * 100f / objective.TargetValue), 0, 100);
+            if (objectiveProgressFill != null) objectiveProgressFill.style.width = Length.Percent(objectiveProgress);
 
             battleAlertButton.text = unresolvedBattleCount > 0
                 ? $"전투 발생 {unresolvedBattleCount}건 · 확인"
@@ -3149,6 +3235,28 @@ namespace ProjectWI.Administration
             rightMonthlyNews.text = string.IsNullOrEmpty(latestNews)
                 ? "새로운 월보가 없습니다."
                 : $"최근 소식\n{latestNews}";
+        }
+
+        // 좌측 성 요약 패널에 최대 네 명의 주둔 영웅 초상 카드와 이름을 표시합니다.
+        private void RefreshGlobalHeroCards(WICastleRuntimeState castle)
+        {
+            for (int index = 0; index < globalHeroCards.Count; index += 1)
+            {
+                bool occupied = index < castle.HeroIds.Count;
+                globalHeroCards[index].style.display = occupied ? DisplayStyle.Flex : DisplayStyle.None;
+                if (occupied == false)
+                {
+                    ClearBackgroundSprite(globalHeroPortraits[index]);
+                    globalHeroNames[index].text = string.Empty;
+                    continue;
+                }
+
+                WIHeroDefinition hero = database.GetHero(castle.HeroIds[index]);
+                ApplyBackgroundSprite(globalHeroPortraits[index], hero == null ? null : hero.Portrait);
+                globalHeroNames[index].text = hero == null
+                    ? castle.HeroIds[index]
+                    : TruncateLabel(hero.DisplayName.Get(database.UseEnglish), 6);
+            }
         }
 
         // UID에 해당하는 단순 안내 모달을 표시합니다.

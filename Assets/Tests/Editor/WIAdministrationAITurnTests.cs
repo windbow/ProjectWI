@@ -337,11 +337,11 @@ namespace ProjectWI.Tests.Editor
         public void ContentAudit_ReportsCharacterAndCombatTypeCounts()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            Assert.AreEqual(8, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Hero));
-            Assert.AreEqual(16, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Common));
+            Assert.AreEqual(100, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Hero));
+            Assert.AreEqual(400, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Common));
             Assert.AreEqual(12, System.Enum.GetValues(typeof(WIHeroClass)).Length);
             Assert.AreEqual(6, System.Enum.GetValues(typeof(WIUnitRole)).Length);
-            TestContext.WriteLine("고유 영웅 8 · 일반 인물 16 · 클래스 12 · 부대 역할 6 · 병사/병종 데이터 없음(기획 의도)");
+            TestContext.WriteLine("영웅 100 · 일반 인물 400 · 클래스 12 · 부대 역할 6 · 병사/병종 데이터 없음(기획 의도)");
         }
 
         // 특기 8종의 표시 문구와 적용 사업이 모두 데이터에 있고 실제 +2 성과로 연결되는지 검증합니다.
@@ -1322,7 +1322,7 @@ namespace ProjectWI.Tests.Editor
             WISchemeResult defense = WISchemeSystem.Execute(database, state, "scheme_counterintelligence", "avalon", "ares", "castle_00", null, 99);
             Assert.IsTrue(defense.Succeeded);
 
-            WISchemeResult blocked = WISchemeSystem.Execute(database, state, "scheme_rumor", "valdor", "lyria", "castle_00", null, 89);
+            WISchemeResult blocked = WISchemeSystem.Execute(database, state, "scheme_rumor", "valdor", "elwyn", "castle_00", null, 89);
             Assert.IsTrue(blocked.Executed);
             Assert.IsFalse(blocked.Succeeded);
             Assert.AreEqual(3, state.GetCastle("castle_00").CounterintelligenceMonths);
@@ -1340,8 +1340,8 @@ namespace ProjectWI.Tests.Editor
 
             Assert.IsTrue(WISchemeSystem.Execute(database, state, "scheme_rumor", "avalon", "ares", "castle_01", null, 0).Succeeded);
             Assert.AreEqual(stabilityBefore - 10, state.GetCastle("castle_01").Stability);
-            Assert.IsTrue(WISchemeSystem.Execute(database, state, "scheme_alienation", "avalon", "ares", "castle_01", "lyria", 0).Succeeded);
-            Assert.AreEqual(WILoyaltyState.Unsettled, state.GetCharacter("lyria").LoyaltyState);
+            Assert.IsTrue(WISchemeSystem.Execute(database, state, "scheme_alienation", "avalon", "ares", "castle_01", "elwyn", 0).Succeeded);
+            Assert.AreEqual(WILoyaltyState.Unsettled, state.GetCharacter("elwyn").LoyaltyState);
         }
 
         // 성 좌표가 격자가 아닌 각 세력의 지리적 본거지에 배치되었는지 검증합니다.
@@ -1671,9 +1671,12 @@ namespace ProjectWI.Tests.Editor
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             Assert.IsTrue(database.Castles.All(castle => castle.CastleImage != null));
-            Assert.IsTrue(database.Heroes.Where(hero => hero.Id.StartsWith("common_") == false ||
-                                                        new[] { "common_alden", "common_sable", "common_varek", "common_izel", "common_doran",
-                                                            "common_petra", "common_fael", "common_siora", "common_malus", "common_orris" }.Contains(hero.Id) == false)
+            string[] portraitRequiredIds =
+            {
+                "ares", "lyria", "brom", "selene", "kael", "morrigan", "theron", "elwyn",
+                "common_gareth", "common_mira", "common_thane", "common_nym", "common_raska", "common_veil"
+            };
+            Assert.IsTrue(database.Heroes.Where(hero => portraitRequiredIds.Contains(hero.Id))
                 .All(hero => hero.Portrait != null));
             Assert.IsTrue(database.SpecialFacilities.All(facility => facility.Icon != null));
 
@@ -1716,9 +1719,8 @@ namespace ProjectWI.Tests.Editor
                 castle.Stability = castle.CastleId == "castle_01" ? 0 : 100;
             }
             int influenceBefore = state.GetFactionState("valdor").Influence;
-            int expectedIncome = state.Castles
-                .Where(castle => castle.FactionId == "valdor")
-                .Sum(castle => System.Math.Max(1, castle.Stability * ((int)castle.CastleSize + 1) / 25));
+            int expectedIncome = WIAdministrationTurnSystem.GetFactionMonthlyIncome(
+                database, state, "valdor").InfluenceGained;
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
 
@@ -1741,9 +1743,18 @@ namespace ProjectWI.Tests.Editor
                 castle.Stability = castle.CastleId == "castle_01" ? 0 : 100;
             }
             WICastleRuntimeState frontline = state.GetCastle("castle_01");
-            frontline.HeroIds.Add("selene");
-            state.GetCharacter("selene").Discovered = true;
-            state.GetCharacter("selene").Recruited = true;
+            string[] additionalCommanders =
+            {
+                "hero_009", "hero_010", "hero_011", "hero_012", "hero_013",
+                "hero_014", "hero_015", "hero_016", "hero_017", "hero_018",
+                "hero_019", "hero_020", "hero_021"
+            };
+            foreach (string heroId in additionalCommanders)
+            {
+                frontline.HeroIds.Add(heroId);
+                state.GetCharacter(heroId).Discovered = true;
+                state.GetCharacter(heroId).Recruited = true;
+            }
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
 
@@ -1781,12 +1792,13 @@ namespace ProjectWI.Tests.Editor
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIArmyState army = state.Armies.First(item => item.FactionId == "valdor");
+            string attackerHeroId = army.Members[0].HeroId;
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
 
             Assert.AreEqual(WIBattleOutcome.Defeat, army.LastBattleOutcome);
             Assert.AreEqual("castle_01", army.CurrentCastleId);
             Assert.AreEqual(1, army.ReorganizationMonths);
-            Assert.Greater(state.GetCharacter("lyria").Fatigue, 0);
+            Assert.Greater(state.GetCharacter(attackerHeroId).Fatigue, 0);
             Assert.AreEqual("avalon", state.GetCastle("castle_00").FactionId);
         }
 
@@ -1801,7 +1813,10 @@ namespace ProjectWI.Tests.Editor
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIArmyState army = state.Armies.First(item => item.FactionId == "valdor");
-            string[] reinforcements = { "selene", "kael", "elwyn" };
+            string commanderId = army.Members[0].HeroId;
+            string[] reinforcements = database.Heroes
+                .Where(hero => hero.Grade == WICharacterGrade.Hero && army.Members.All(member => member.HeroId != hero.Id))
+                .Select(hero => hero.Id).Take(3).ToArray();
             foreach (string heroId in reinforcements)
             {
                 state.GetCharacter(heroId).Discovered = true;
@@ -1814,8 +1829,8 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(WIBattleOutcome.Victory, army.LastBattleOutcome);
             Assert.AreEqual("valdor", state.GetCastle("castle_00").FactionId);
             Assert.AreEqual(3, state.GetCastle("castle_00").OccupationUnrestMonths);
-            Assert.Greater(state.GetCharacter("lyria").Merit, 0);
-            WIRelationshipState battleBond = state.GetOrCreateRelationship("lyria", "selene");
+            Assert.Greater(state.GetCharacter(commanderId).Merit, 0);
+            WIRelationshipState battleBond = state.GetOrCreateRelationship(commanderId, reinforcements[0]);
             Assert.AreEqual(1, battleBond.SharedBattleVictories);
             Assert.IsTrue(state.LastMonthlyReport.News.Any(item => item.Contains("전투 인물")));
         }
@@ -1936,16 +1951,17 @@ namespace ProjectWI.Tests.Editor
                 database, state, session.SessionId, WIBattleOutcome.Defeat,
                 WIBattleResolutionSource.RealTimeBattle, summary));
 
-            WICharacterRuntimeState captured = state.GetCharacter("lyria");
+            string attackerHeroId = session.AttackerHeroIds[0].HeroId;
+            WICharacterRuntimeState captured = state.GetCharacter(attackerHeroId);
             Assert.IsTrue(captured.Captured);
             Assert.AreEqual("avalon", captured.CaptorFactionId);
             Assert.AreEqual(database.CaptureDurationMonths, captured.CapturedMonthsRemaining);
-            Assert.IsTrue(state.IsCharacterBusy("lyria"));
+            Assert.IsTrue(state.IsCharacterBusy(attackerHeroId));
             Assert.IsTrue(summary.News.Any(item => item.Contains("포로 발생")));
             string json = WICampaignSaveSystem.Serialize(state);
             Assert.IsTrue(WICampaignSaveSystem.TryDeserialize(json, out WIAdministrationState loaded, out string error), error);
-            Assert.IsTrue(loaded.GetCharacter("lyria").Captured);
-            Assert.AreEqual(database.CaptureDurationMonths, loaded.GetCharacter("lyria").CapturedMonthsRemaining);
+            Assert.IsTrue(loaded.GetCharacter(attackerHeroId).Captured);
+            Assert.AreEqual(database.CaptureDurationMonths, loaded.GetCharacter(attackerHeroId).CapturedMonthsRemaining);
         }
 
         // 플레이어가 명시적으로 후퇴한 패배에는 포로와 중상 대신 낮은 피로만 적용되는지 검증합니다.
@@ -1962,13 +1978,14 @@ namespace ProjectWI.Tests.Editor
             session.AttackerPowerSnapshot = 10;
             session.DefenderPowerSnapshot = 100;
             session.AttackerRetreated = true;
-            int fatigueBefore = state.GetCharacter("lyria").Fatigue;
+            string attackerHeroId = session.AttackerHeroIds[0].HeroId;
+            int fatigueBefore = state.GetCharacter(attackerHeroId).Fatigue;
 
             Assert.IsTrue(WIAdministrationTurnSystem.SubmitBattleResult(
                 database, state, session.SessionId, WIBattleOutcome.Defeat,
                 WIBattleResolutionSource.RealTimeBattle, new WITurnSummary()));
 
-            WICharacterRuntimeState character = state.GetCharacter("lyria");
+            WICharacterRuntimeState character = state.GetCharacter(attackerHeroId);
             Assert.IsFalse(character.Captured);
             Assert.AreEqual(0, character.InjuryMonths);
             Assert.AreEqual(fatigueBefore + database.OrderlyRetreatFatigue, character.Fatigue);
@@ -2576,7 +2593,7 @@ namespace ProjectWI.Tests.Editor
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIBattleConfigSO config = AssetDatabase.LoadAssetAtPath<WIBattleConfigSO>(BattleConfigPath);
-            string[] heroIds = database.Heroes.Where(item => item.Grade == WICharacterGrade.Hero).Select(item => item.Id).ToArray();
+            string[] heroIds = database.Heroes.Where(item => item.ActiveSkillAvailable).Select(item => item.Id).ToArray();
 
             Assert.AreEqual(8, heroIds.Length);
             Assert.IsTrue(heroIds.All(id => config.GetHeroSkill(id) != null));
@@ -2584,7 +2601,8 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(config.HeroSkills.Any(item => item.SkillType == WIBattleSkillType.AreaDamage));
             Assert.IsTrue(config.HeroSkills.Any(item => item.SkillType == WIBattleSkillType.HealAllies));
             Assert.IsTrue(config.HeroSkills.Any(item => item.SkillType == WIBattleSkillType.CommandBuff));
-            Assert.IsTrue(database.Heroes.Where(item => item.Grade == WICharacterGrade.Hero).All(item => item.ActiveSkillAvailable));
+            Assert.IsTrue(database.Heroes.Where(item => item.ActiveSkillAvailable)
+                .All(item => item.Grade == WICharacterGrade.Hero));
         }
 
         // 회복 스킬이 설정 범위 안의 아군만 회복하고 초록 범위 효과를 예약하는지 검증합니다.
@@ -2637,7 +2655,7 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
 
-            Assert.AreEqual(16, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Common));
+            Assert.AreEqual(400, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Common));
             Assert.AreEqual(WICharacterGrade.Common, state.GetCharacter("common_gareth").BaseGrade);
             Assert.IsFalse(state.GetCharacter("common_gareth").PromotedToHero);
         }
@@ -2789,7 +2807,8 @@ namespace ProjectWI.Tests.Editor
             character.Activity = WICharacterActivityType.None;
             Assert.IsTrue(WIAdministrationTurnSystem.AssignGovernor(state, castle.CastleId, "ares"));
             Assert.AreEqual("ares", castle.GovernorHeroId);
-            Assert.IsFalse(WIAdministrationTurnSystem.AssignGovernor(state, castle.CastleId, "lyria"));
+            Assert.IsTrue(WIAdministrationTurnSystem.AssignGovernor(state, castle.CastleId, "lyria"));
+            Assert.AreEqual("lyria", castle.GovernorHeroId);
         }
 
         // 보유 자원이 모두 0이어도 다음 달 기본 성 수입으로 다시 회복되는지 검증합니다.

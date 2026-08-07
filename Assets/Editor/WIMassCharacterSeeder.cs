@@ -82,8 +82,21 @@ namespace ProjectWI.Editor
             new string[] { "Nightblade", "Voidstalker", "Shadowweaver", "Furystrike", "Darkstar", "Bloodmoon", "Crimsonshade", "Silentstab", "Venomweb", "Darksword", "Crimsonmoon" }
         };
 
+        private struct StartingPlacementSeed
+        {
+            public string CastleId;
+            public string HeroId;
+            public bool Governor;
+
+            public StartingPlacementSeed(string castleId, string heroId, bool governor)
+            {
+                CastleId = castleId;
+                HeroId = heroId;
+                Governor = governor;
+            }
+        }
+
         [MenuItem("ProjectWI/Data/Seed Mass Character Roster (100 Heroes, 400 Commons)")]
-        // Hero 100종, Common 400종 (Human 60%, 기타 6종 각 6.67%) 무작위 원본 인물 로스터를 생성하고 내정 데이터베이스를 갱신합니다.
         public static void SeedMassRoster()
         {
             UnityEngine.Object databaseAsset = AssetDatabase.LoadMainAssetAtPath(DatabasePath);
@@ -95,8 +108,6 @@ namespace ProjectWI.Editor
 
             SerializedObject serializedDatabase = new SerializedObject(databaseAsset);
             SerializedProperty heroes = serializedDatabase.FindProperty("heroes");
-
-            // 고유 8영웅 및 6일반 캐릭터 원본 보존을 위한 맵핑
             heroes.ClearArray();
 
             System.Random rand = new System.Random(20260806); // 결정론적 시드 생성
@@ -104,7 +115,6 @@ namespace ProjectWI.Editor
             int totalHeroesTarget = 100;
             int totalCommonsTarget = 400;
 
-            // 종족 비율 계산: Human 60%, 나머지 6종족 각 6.67%
             int[] heroRaceCounts = CalculateRaceDistribution(totalHeroesTarget);
             int[] commonRaceCounts = CalculateRaceDistribution(totalCommonsTarget);
 
@@ -136,14 +146,15 @@ namespace ProjectWI.Editor
 
                     int heroClass = (heroIdIndex - 1) % 12;
                     AddCharacter(heroes, id, true, raceIdx, heroClass, rand, heroIdIndex, overrideKR, overrideEN);
+                    ApplyCoreCharacterOverrides(heroes.GetArrayElementAtIndex(heroes.arraySize - 1), id);
                     heroIdIndex++;
                 }
             }
 
             // 2. Common 400명 생성 (시작 일반 인물 ID 보존)
-            string[] startingCommonIds = { "common_alden", "common_sable", "common_gareth", "common_varek", "common_mira", "common_thane", "common_nym", "common_raska" };
-            string[] startingCommonNamesKR = { "알덴", "세이블", "가레스", "바렉", "미라", "테인", "님", "라스카" };
-            string[] startingCommonNamesEN = { "Alden", "Sable", "Gareth", "Varek", "Mira", "Thane", "Nym", "Raska" };
+            string[] startingCommonIds = { "common_alden", "common_sable", "common_gareth", "common_varek", "common_mira", "common_thane", "common_nym", "common_raska", "common_veil" };
+            string[] startingCommonNamesKR = { "알덴", "세이블", "가레스", "바렉", "미라", "테인", "님", "라스카", "베일" };
+            string[] startingCommonNamesEN = { "Alden", "Sable", "Gareth", "Varek", "Mira", "Thane", "Nym", "Raska", "Veil" };
 
             int commonIdIndex = 1;
             for (int raceIdx = 0; raceIdx < 7; raceIdx++)
@@ -168,15 +179,79 @@ namespace ProjectWI.Editor
 
                     int heroClass = (commonIdIndex - 1) % 12;
                     AddCharacter(heroes, id, false, raceIdx, heroClass, rand, commonIdIndex, overrideKR, overrideEN);
+                    ApplyCoreCharacterOverrides(heroes.GetArrayElementAtIndex(heroes.arraySize - 1), id);
                     commonIdIndex++;
                 }
             }
+
+            // 3. 핵심 인물만 시작 성에 배치하고 나머지는 탐색·등용 후보로 유지합니다.
+            SeedStartingHeroPlacements(serializedDatabase);
+            SynchronizeStartingRelationships(serializedDatabase);
 
             serializedDatabase.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(databaseAsset);
             AssetDatabase.SaveAssets();
 
-            Debug.Log($"ProjectWI 대규모 인물 로스터 생성 완료! 총 {heroes.arraySize}명 (영웅 100명, 일반 400명 | Human 60%)");
+            Debug.Log("ProjectWI 대규모 인물 로스터 및 시작 성 배치 완료! 총 500명(영웅 100명, 일반 400명) 중 핵심 인물 19명이 시작 성에 배치되었습니다.");
+        }
+
+        // 세력별 핵심 관계와 초기 편성에 필요한 최소 인물만 시작 성에 배치합니다.
+        private static void SeedStartingHeroPlacements(SerializedObject serializedDatabase)
+        {
+            SerializedProperty startingHeroesProp = serializedDatabase.FindProperty("startingHeroes");
+            startingHeroesProp.ClearArray();
+            List<StartingPlacementSeed> placements = new List<StartingPlacementSeed>
+            {
+                new StartingPlacementSeed("castle_00", "ares", true),
+                new StartingPlacementSeed("castle_00", "lyria", false),
+                new StartingPlacementSeed("castle_00", "common_alden", false),
+                new StartingPlacementSeed("castle_00", "common_sable", false),
+                new StartingPlacementSeed("castle_01", "elwyn", true),
+                new StartingPlacementSeed("castle_01", "selene", false),
+                new StartingPlacementSeed("castle_01", "common_gareth", false),
+                new StartingPlacementSeed("castle_01", "common_varek", false),
+                new StartingPlacementSeed("castle_26", "brom", true),
+                new StartingPlacementSeed("castle_26", "common_thane", false),
+                new StartingPlacementSeed("castle_26", "common_010", false),
+                new StartingPlacementSeed("castle_38", "morrigan", true),
+                new StartingPlacementSeed("castle_38", "common_nym", false),
+                new StartingPlacementSeed("castle_38", "common_011", false),
+                new StartingPlacementSeed("castle_50", "theron", true),
+                new StartingPlacementSeed("castle_50", "kael", false),
+                new StartingPlacementSeed("castle_50", "common_raska", false),
+                new StartingPlacementSeed("castle_50", "common_mira", false),
+                new StartingPlacementSeed("castle_50", "common_veil", false)
+            };
+
+            // SerializedProperty에 저장
+            foreach (StartingPlacementSeed seed in placements)
+            {
+                startingHeroesProp.arraySize++;
+                SerializedProperty elem = startingHeroesProp.GetArrayElementAtIndex(startingHeroesProp.arraySize - 1);
+                elem.FindPropertyRelative("castleId").stringValue = seed.CastleId;
+                elem.FindPropertyRelative("heroId").stringValue = seed.HeroId;
+                elem.FindPropertyRelative("governor").boolValue = seed.Governor;
+            }
+        }
+
+        // 시작 배치가 바뀌어도 세력별 핵심 관계 인물과 설명이 같은 성을 가리키도록 동기화합니다.
+        private static void SynchronizeStartingRelationships(SerializedObject serializedDatabase)
+        {
+            SerializedProperty relationships = serializedDatabase.FindProperty("startingRelationships");
+            for (int index = 0; index < relationships.arraySize; index++)
+            {
+                SerializedProperty relationship = relationships.GetArrayElementAtIndex(index);
+                if (relationship.FindPropertyRelative("factionId").stringValue != "valdor")
+                {
+                    continue;
+                }
+
+                relationship.FindPropertyRelative("firstHeroId").stringValue = "elwyn";
+                relationship.FindPropertyRelative("secondHeroId").stringValue = "common_gareth";
+                SerializedProperty context = relationship.FindPropertyRelative("context");
+                context.FindPropertyRelative("korean").stringValue = "엘윈과 가레스는 아발론 전선의 공세 속도를 두고 대립합니다.";
+                context.FindPropertyRelative("english").stringValue = "Elwyn and Gareth clash over the pace of the Avalon offensive.";
+            }
         }
 
         // 종족별 수량 계산 (Human 60%, 나머지 6개 종족 동등 분배)
@@ -224,11 +299,13 @@ namespace ProjectWI.Editor
                 string[] surnameKR = RaceSurnamesKR[raceIndex];
                 string[] surnameEN = RaceSurnamesEN[raceIndex];
 
-                int fIdx = rand.Next(firstKR.Length);
-                int sIdx = rand.Next(surnameKR.Length);
+                int fIdxKR = rand.Next(firstKR.Length);
+                int fIdxEN = rand.Next(firstEN.Length);
+                int sIdxKR = rand.Next(surnameKR.Length);
+                int sIdxEN = rand.Next(surnameEN.Length);
 
-                krName = $"{firstKR[fIdx]} {surnameKR[sIdx]}";
-                enName = $"{firstEN[fIdx]} {surnameEN[sIdx]}";
+                krName = $"{firstKR[fIdxKR]} {surnameKR[sIdxKR]}";
+                enName = $"{firstEN[fIdxEN]} {surnameEN[sIdxEN]}";
             }
 
             SerializedProperty nameProp = charProp.FindPropertyRelative("displayName");
@@ -267,18 +344,76 @@ namespace ProjectWI.Editor
             requestProp.FindPropertyRelative("english").stringValue = "Prove the faction's reputation and strength";
 
             // 스킬 사용 가능 여부
-            charProp.FindPropertyRelative("activeSkillAvailable").boolValue = isHero;
+            charProp.FindPropertyRelative("activeSkillAvailable").boolValue = false;
 
             // 특기 및 초상화 초기화
             charProp.FindPropertyRelative("traits").arraySize = 0;
             charProp.FindPropertyRelative("portrait").objectReferenceValue = null;
         }
 
+        // 기존 핵심 인물의 특기·초상화·능력치와 전용 스킬 자격을 보존합니다.
+        private static void ApplyCoreCharacterOverrides(SerializedProperty character, string id)
+        {
+            switch (id)
+            {
+                case "ares": WriteCoreCharacter(character, 0, 0, 55, 55, 48, 50, 42, 0, "recruit_trust", true, "Portrait_ares_V1.png", 5, 3); break;
+                case "lyria": WriteCoreCharacter(character, 1, 6, 58, 59, 53, 53, 46, 0, "recruit_trust", true, "Portrait_lyria_V1.png", 4); break;
+                case "brom": WriteCoreCharacter(character, 2, 1, 61, 63, 58, 56, 50, 5, "recruit_service", true, "Portrait_brom_V1.png", 2); break;
+                case "selene": WriteCoreCharacter(character, 0, 7, 64, 67, 63, 59, 54, 5, "recruit_service", true, "Portrait_selene_V1.png", 6); break;
+                case "kael": WriteCoreCharacter(character, 3, 5, 67, 71, 68, 62, 58, 10, "recruit_service", true, "Portrait_kael_V1.png", 3); break;
+                case "morrigan": WriteCoreCharacter(character, 6, 6, 70, 75, 73, 65, 62, 15, "recruit_faction", true, "Portrait_morrigan_V1.png", 4, 5); break;
+                case "theron": WriteCoreCharacter(character, 0, 2, 73, 79, 78, 68, 66, 20, "recruit_faction", true, "Portrait_theron_V1.png", 7); break;
+                case "elwyn": WriteCoreCharacter(character, 1, 8, 76, 83, 83, 71, 70, 25, "recruit_faction", true, "Portrait_elwyn_V1.png", 0, 6); break;
+                case "common_gareth": WriteCoreCharacter(character, 0, 1, 54, 62, 28, 36, 32, 0, "recruit_trust", false, "Portrait_common_gareth_V1.png"); break;
+                case "common_mira": WriteCoreCharacter(character, 0, 7, 35, 28, 58, 56, 42, 0, "recruit_trust", false, "Portrait_common_mira_V1.png", 1); break;
+                case "common_thane": WriteCoreCharacter(character, 2, 1, 48, 65, 30, 28, 44, 5, "recruit_service", false, "Portrait_common_thane_V1.png"); break;
+                case "common_nym": WriteCoreCharacter(character, 1, 4, 42, 55, 47, 38, 34, 5, "recruit_service", false, "Portrait_common_nym_V1.png"); break;
+                case "common_raska": WriteCoreCharacter(character, 4, 3, 45, 68, 25, 34, 26, 10, "recruit_service", false, "Portrait_common_raska_V1.png"); break;
+                case "common_veil": WriteCoreCharacter(character, 6, 5, 40, 60, 52, 32, 30, 10, "recruit_service", false, "Portrait_common_veil_V1.png"); break;
+            }
+        }
+
+        // 핵심 인물 한 명의 원본 전투·내정 데이터와 Sprite 참조를 기록합니다.
+        private static void WriteCoreCharacter(
+            SerializedProperty character,
+            int race,
+            int heroClass,
+            int leadership,
+            int might,
+            int intelligence,
+            int charisma,
+            int politics,
+            int reputation,
+            string recruitmentEventId,
+            bool activeSkillAvailable,
+            string portraitFile,
+            params int[] traits)
+        {
+            character.FindPropertyRelative("race").enumValueIndex = race;
+            character.FindPropertyRelative("heroClass").enumValueIndex = heroClass;
+            character.FindPropertyRelative("leadership").intValue = leadership;
+            character.FindPropertyRelative("might").intValue = might;
+            character.FindPropertyRelative("intelligence").intValue = intelligence;
+            character.FindPropertyRelative("charisma").intValue = charisma;
+            character.FindPropertyRelative("politics").intValue = politics;
+            character.FindPropertyRelative("requiredReputation").intValue = reputation;
+            character.FindPropertyRelative("recruitmentEventId").stringValue = recruitmentEventId;
+            character.FindPropertyRelative("activeSkillAvailable").boolValue = activeSkillAvailable;
+            character.FindPropertyRelative("portrait").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(
+                $"Assets/Art/Characters/{portraitFile}");
+
+            SerializedProperty traitProperty = character.FindPropertyRelative("traits");
+            traitProperty.arraySize = traits.Length;
+            for (int index = 0; index < traits.Length; index++)
+            {
+                traitProperty.GetArrayElementAtIndex(index).enumValueIndex = traits[index];
+            }
+        }
+
         // 클래스 직업 특성에 맞는 적절한 5대 능력치 밸런스 분배
         private static void GenerateBalancedStats(bool isHero, int heroClass, System.Random rand,
             out int leadership, out int might, out int intelligence, out int politics, out int charisma)
         {
-            // 기본 베이스 (Hero: 총합 320~400 / Common: 총합 200~300)
             int baseMin = isHero ? 55 : 30;
             int baseMax = isHero ? 75 : 50;
 
@@ -288,63 +423,61 @@ namespace ProjectWI.Editor
             politics = rand.Next(baseMin, baseMax);
             charisma = rand.Next(baseMin, baseMax);
 
-            // 클래스 주/보조 능력치 보너스 (+15 ~ +25)
             int mainBonus = isHero ? rand.Next(18, 26) : rand.Next(12, 18);
             int subBonus = isHero ? rand.Next(10, 18) : rand.Next(8, 14);
 
             switch (heroClass)
             {
-                case 0: // MagicSwordsman (Might + Intelligence)
+                case 0:
                     might += mainBonus;
                     intelligence += subBonus;
                     break;
-                case 1: // Guardian (Leadership + Might)
+                case 1:
                     leadership += mainBonus;
                     might += subBonus;
                     break;
-                case 2: // Crusader (Leadership + Politics)
+                case 2:
                     leadership += mainBonus;
                     politics += subBonus;
                     break;
-                case 3: // SwordMaster (Might + Leadership)
+                case 3:
                     might += mainBonus;
                     leadership += subBonus;
                     break;
-                case 4: // Archer (Might + Intelligence)
+                case 4:
                     might += mainBonus;
                     intelligence += subBonus;
                     break;
-                case 5: // Assassin (Might + Charisma)
+                case 5:
                     might += mainBonus;
                     charisma += subBonus;
                     break;
-                case 6: // Archmage (Intelligence + Charisma)
+                case 6:
                     intelligence += mainBonus;
                     charisma += subBonus;
                     break;
-                case 7: // Priest (Intelligence + Politics)
+                case 7:
                     intelligence += mainBonus;
                     politics += subBonus;
                     break;
-                case 8: // Druid (Intelligence + Leadership)
+                case 8:
                     intelligence += mainBonus;
                     leadership += subBonus;
                     break;
-                case 9: // Strategist (Intelligence + Politics)
+                case 9:
                     intelligence += mainBonus;
                     politics += subBonus;
                     break;
-                case 10: // Alchemist (Intelligence + Politics)
+                case 10:
                     intelligence += mainBonus;
                     politics += subBonus;
                     break;
-                case 11: // Warlock (Intelligence + Might)
+                case 11:
                     intelligence += mainBonus;
                     might += subBonus;
                     break;
             }
 
-            // 0~99 상한 제한
             leadership = Mathf.Clamp(leadership, 1, 99);
             might = Mathf.Clamp(might, 1, 99);
             intelligence = Mathf.Clamp(intelligence, 1, 99);

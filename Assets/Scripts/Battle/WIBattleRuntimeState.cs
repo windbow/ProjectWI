@@ -87,6 +87,14 @@ namespace ProjectWI.Battle
         public float ElapsedSeconds;
         public bool Finished;
         public WIBattleOutcome AttackerOutcome;
+        public string ObjectiveId;
+        public string ObjectiveName;
+        public WIBattleObjectiveType ObjectiveType;
+        public float ObjectiveDurationSeconds;
+        public float ControlDurationSeconds;
+        public float ControlRadius;
+        public float AttackerControlSeconds;
+        public float DefenderControlSeconds;
         public WIBattleCommand AttackerCommand = WIBattleCommand.Advance;
         public WIBattleCommand DefenderCommand = WIBattleCommand.Hold;
         public string AttackerFocusHeroId;

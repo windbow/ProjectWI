@@ -190,6 +190,20 @@
 .facility-slot { background-image:url("project://database/Assets/Resources/UI/Generated/facility_slot_card.png"); }
 .hero-slot .slot-caption, .facility-slot .slot-caption { color:#111820; -unity-text-outline-width:0; }
 .hero-slot.empty-slot, .facility-slot.empty-slot { opacity:.82; }
+
+/* 영웅과 특화 시설을 독립 패널로 분리하고 각 목록의 넘침을 내부 스크롤로 처리합니다. */
+.slot-columns { flex-grow:1; min-height:0; overflow:hidden; justify-content:space-between; }
+.castle-slot-section { width:49%; height:100%; min-height:0; padding:8px 9px; background-color:rgba(3,8,12,.78); border-width:1px; border-color:#53636f; }
+.hero-slot-section { margin-right:1%; }
+.facility-slot-section { margin-left:1%; padding-right:9px; }
+.slot-section-title { flex-shrink:0; padding-bottom:5px; margin-bottom:6px; border-bottom-width:1px; border-bottom-color:#667681; }
+.slot-scroll { flex-grow:1; min-height:0; overflow:hidden; }
+.slot-scroll .unity-scroll-view__content-container { flex-direction:row; flex-wrap:wrap; align-content:flex-start; padding-right:5px; }
+.slot-scroll .unity-scroll-view__vertical-scroller { width:10px; margin-left:3px; }
+.slot-scroll .unity-scroller__slider { background-color:#263746; }
+.slot-scroll .unity-base-slider__dragger { background-color:#9ba8b1; }
+.hero-slot-grid, .facility-slot-grid { width:100%; flex-direction:row; flex-wrap:wrap; align-content:flex-start; }
+.facility-slot-grid .slot { width:100%; margin-right:0; }
 .modal-layer { background-color:rgba(1,4,7,.82); }
 .modal-panel { width:620px; max-height:90%; padding:0; background-color:#0c141b; color:#edf2f4; border-width:1px; border-color:#71808b; }
 .modal-header { min-height:64px; padding:14px 16px; align-items:center; background-color:#e9edf0; border-bottom-width:2px; border-bottom-color:#566672; }
@@ -241,6 +255,7 @@
 
 /* 시안 레이아웃: 좌측 성 현황, 중앙 전략 지도, 우측 목표·전투 알림을 한 화면에 배치합니다. */
 .map-side-panel { position:absolute; top:16px; bottom:18px; width:248px; padding:22px 18px 18px; color:#e9eef1; overflow:hidden; }
+.concept-side-panel { background-color:rgba(6,11,16,.95); border-width:1px; border-top-width:2px; border-color:#566672; border-top-color:#9aa8b3; }
 .castle-summary-panel { left:16px; }
 .campaign-summary-panel { right:16px; width:268px; }
 .map-heading { left:280px; right:300px; width:auto; }
@@ -299,6 +314,93 @@
     margin-top:10px;
 }
 
+/* 이미지 버튼은 기존 단색 반전을 사용하지 않고 원화를 유지한 채 틴트와 글자 대비로 상태를 표현합니다. */
+.generated-normal, .generated-primary, .generated-danger, .modal-panel Button {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:#edf3f7;
+    -unity-background-image-tint-color:#ffffff;
+    -unity-text-outline-width:1px;
+    -unity-text-outline-color:rgba(3,8,12,.9);
+}
+.generated-normal:hover, .generated-primary:hover, .modal-panel Button:hover {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:#ffffff;
+    -unity-background-image-tint-color:#d9eaff;
+}
+.generated-danger:hover, .modal-panel Button.danger:hover, .modal-panel Button.retreat:hover {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:#ffffff;
+    -unity-background-image-tint-color:#ffd1d1;
+}
+.generated-normal:active, .generated-primary:active, .generated-danger:active, .modal-panel Button:active {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:#ffffff;
+    -unity-background-image-tint-color:#91a7b8;
+}
+.generated-normal:disabled, .generated-primary:disabled, .generated-danger:disabled, .modal-panel Button:disabled {
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:#9aa3aa;
+    opacity:.62;
+    -unity-background-image-tint-color:#59656e;
+}
+.generated-normal:hover .generated-command-icon, .generated-primary:hover .generated-command-icon, .generated-danger:hover .generated-command-icon {
+    -unity-background-image-tint-color:#ffffff;
+}
+.generated-normal:disabled .generated-command-icon, .generated-primary:disabled .generated-command-icon, .generated-danger:disabled .generated-command-icon {
+    -unity-background-image-tint-color:#727d85;
+}
+
+/* 전략 지도 성은 색상 사각형 대신 세력별 성채·깃발 마커와 고정 명패를 사용합니다. */
+.castle-node { width:68px; height:82px; min-height:0; margin-left:-34px; margin-top:-58px; padding:0; background-color:rgba(0,0,0,0); border-width:0; overflow:visible; }
+.castle-node:hover { background-color:rgba(0,0,0,0); }
+.castle-node-marker { position:absolute; left:13px; top:0; width:42px; height:58px; -unity-background-scale-mode:scale-to-fit; }
+.castle-node-name { position:absolute; left:0; right:0; bottom:1px; height:22px; padding:3px 4px; background-color:rgba(5,9,13,.94); color:#f2f4f5; border-width:1px; border-color:#7f8b94; font-size:9px; -unity-font-style:bold; -unity-text-align:middle-center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.castle-node:hover .castle-node-marker { -unity-background-image-tint-color:#d9eaff; }
+.castle-node:hover .castle-node-name { background-color:#dce5eb; color:#10161b; border-color:#ffffff; }
+.castle-node-avalon .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_avalon.png"); }
+.castle-node-valdor .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_valdor.png"); }
+.castle-node-ironheart .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_ironheart.png"); }
+.castle-node-sylvanroad .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_sylvanroad.png"); }
+.castle-node-necropolis .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_necropolis.png"); }
+
+/* 전역 좌측 패널은 성 이미지·수치·영웅 카드를 상업 전략 게임 수준의 정보 계층으로 묶습니다. */
+.global-castle-hero-cards { height:80px; margin-top:9px; flex-direction:row; justify-content:space-between; }
+.global-hero-card { width:24%; height:78px; background-color:#0b1218; border-width:1px; border-color:#5d6b75; }
+.global-hero-portrait { height:56px; background-color:#111b23; -unity-background-scale-mode:scale-and-crop; }
+.global-hero-name { height:20px; padding:2px; background-color:rgba(4,8,12,.95); color:#edf2f5; font-size:9px; -unity-text-align:middle-center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.objective-progress-track { height:7px; margin-top:8px; background-color:#18242d; border-width:1px; border-color:#53636f; }
+.objective-progress-fill { height:100%; width:0; background-color:#6e99b8; }
+
+/* 성 내정 화면 시안: 좌측 현황, 중앙 성 전경, 우측 명령, 하단 영웅·시설·중점의 네 구역입니다. */
+.castle-overview-panel { position:absolute; left:18px; top:112px; bottom:18px; width:304px; padding:18px 16px; overflow:hidden; }
+.castle-panel-heading { height:34px; color:#ffffff; font-size:19px; -unity-font-style:bold; border-bottom-width:1px; border-bottom-color:#667681; }
+.castle-overview-panel .governor-full { position:relative; left:auto; bottom:auto; width:100%; height:225px; margin-top:12px; background-color:#101923; border-width:1px; border-color:#71808b; }
+.castle-overview-panel .castle-stat-panel { position:relative; left:auto; top:auto; width:100%; margin-top:12px; padding:0; flex-direction:column; flex-wrap:nowrap; }
+.castle-overview-panel .castle-stat { width:100%; height:48px; margin:0 0 6px 0; padding-left:72px; -unity-text-align:middle-left; font-size:12px; }
+.castle-top-strip { left:340px; right:258px; height:76px; background-color:rgba(6,11,16,.93); }
+.castle-command-menu { right:18px; top:112px; bottom:18px; width:222px; padding:17px 13px; background-color:rgba(6,11,16,.96); }
+.castle-command { flex-grow:1; min-height:42px; max-height:52px; margin-bottom:7px; }
+.castle-bottom-info { left:340px; right:258px; bottom:18px; height:252px; padding:16px 18px; background-color:rgba(6,11,16,.94); }
+.castle-bottom-info .project-status { min-height:46px; padding:12px 14px; }
+.castle-bottom-info .slot-columns { margin-top:12px; }
+
+@media (max-width:1365px) {
+    .castle-node { width:58px; height:70px; margin-left:-29px; margin-top:-50px; }
+    .castle-node-marker { left:11px; width:36px; height:49px; }
+    .castle-node-name { height:19px; font-size:8px; }
+    .castle-overview-panel { width:252px; padding-left:12px; padding-right:12px; }
+    .castle-overview-panel .governor-full { height:180px; }
+    .castle-overview-panel .castle-stat { height:42px; padding-left:60px; }
+    .castle-top-strip { left:284px; right:220px; }
+    .castle-command-menu { width:202px; }
+    .castle-bottom-info { left:284px; right:220px; height:224px; }
+}
+
 @media (max-width:1365px) {
     .map-side-panel { width:218px; padding-left:14px; padding-right:14px; }
     .campaign-summary-panel { width:232px; }
@@ -311,4 +413,260 @@
     .global-command .generated-command-icon { left:5px; top:13px; width:24px; height:24px; }
     .turn-button { padding-left:39px; padding-right:7px; font-size:15px; }
     .turn-button .generated-command-icon { left:7px; top:13px; width:30px; height:30px; }
+}
+
+/* 시안형 서체 체계: 화면 전체를 명조로 통일하고 숫자 중심의 작은 정보만 고딕을 사용합니다. */
+.app {
+    -unity-font-definition:url("project://database/Assets/Fonts/NotoSerifKR-VariableFont_wght.ttf");
+}
+.app Label, .app Button, .app TextField, .app Toggle {
+    -unity-font-definition:url("project://database/Assets/Fonts/NotoSerifKR-VariableFont_wght.ttf");
+}
+.resource-chip, .side-panel-stats, .castle-stat, .global-hero-name,
+.castle-node-name, .zoom-label, .slot-caption {
+    -unity-font-definition:url("project://database/Assets/Fonts/NotoSansKR-VariableFont_wght.ttf");
+}
+
+/* 시안형 상단 HUD는 큰 문장과 독립 자원 아이콘을 한 줄에 정렬합니다. */
+.compact-hud {
+    height:74px;
+    padding:8px 24px;
+    background-color:rgba(5,11,17,.99);
+    border-bottom-width:1px;
+    border-bottom-color:#52606a;
+}
+.faction-emblem { width:48px; height:56px; margin-right:12px; }
+.faction-label {
+    min-width:190px;
+    padding-left:0;
+    border-left-width:0;
+    color:#f1eee7;
+    font-size:25px;
+}
+.hud-separator { width:1px; height:38px; margin:0 14px; background-color:#26333d; }
+.hud-resource-icon { width:30px; height:30px; flex-shrink:0; margin-right:8px; -unity-background-scale-mode:scale-to-fit; }
+.hud-date-icon { background-image:url("project://database/Assets/Resources/UI/Generated/hud_flat_date.png"); }
+.hud-gold-icon { background-image:url("project://database/Assets/Resources/UI/Generated/hud_flat_gold.png"); }
+.hud-mana-icon { background-image:url("project://database/Assets/Resources/UI/Generated/hud_flat_mana.png"); }
+.hud-influence-icon { background-image:url("project://database/Assets/Resources/UI/Generated/hud_flat_influence.png"); }
+.date-label {
+    min-width:120px;
+    color:#ece9e3;
+    font-size:19px;
+    -unity-font-style:normal;
+}
+.resource-chip {
+    min-width:126px;
+    height:42px;
+    margin-left:0;
+    padding:8px 4px;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    color:#ece9e3;
+    font-size:16px;
+    -unity-text-align:middle-left;
+}
+
+/* 장식형 액자를 절제된 흑청색 9-Slice 버튼으로 교체합니다. */
+.generated-normal { background-image:url("project://database/Assets/Resources/UI/Generated/button_flat_normal.png"); }
+.generated-primary { background-image:url("project://database/Assets/Resources/UI/Generated/button_flat_primary.png"); }
+.generated-danger { background-image:url("project://database/Assets/Resources/UI/Generated/button_flat_danger.png"); }
+.generated-ornate-action {
+    background-image:url("project://database/Assets/Resources/UI/Generated/button_type_h.png");
+    -unity-slice-left:112;
+    -unity-slice-right:32;
+    -unity-slice-top:32;
+    -unity-slice-bottom:32;
+}
+.modal-panel Button, .modal-close { background-image:url("project://database/Assets/Resources/UI/Generated/button_flat_normal.png"); }
+.modal-panel Button.danger, .modal-panel Button.retreat { background-image:url("project://database/Assets/Resources/UI/Generated/button_flat_danger.png"); }
+.generated-normal, .generated-primary, .generated-danger, .modal-panel Button, .modal-close {
+    -unity-slice-left:18;
+    -unity-slice-right:18;
+    -unity-slice-top:16;
+    -unity-slice-bottom:16;
+}
+
+/* 시안형 하단 명령 바와 신규 단색 명령 아이콘입니다. */
+.global-command-bar {
+    height:78px;
+    padding:9px 12px;
+    background-color:#070d13;
+    border-width:1px;
+    border-color:#4b5964;
+}
+.global-command {
+    width:112px;
+    height:58px;
+    margin-right:2px;
+    padding-left:44px;
+    padding-right:10px;
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_action_button.png");
+    -unity-slice-left:28;
+    -unity-slice-right:28;
+    -unity-slice-top:20;
+    -unity-slice-bottom:20;
+    color:#e8e3d9;
+    font-size:17px;
+    -unity-text-align:middle-center;
+    -unity-text-outline-width:0;
+}
+.global-command .generated-command-icon {
+    left:10px;
+    top:13px;
+    width:32px;
+    height:32px;
+}
+.turn-button {
+    height:60px;
+    padding-left:55px;
+    color:#f1eee8;
+    font-size:21px;
+    -unity-text-outline-width:0;
+}
+.turn-button .generated-command-icon { left:14px; top:11px; width:38px; height:38px; }
+.icon-military { background-image:url("project://database/Assets/Resources/UI/Generated/icon_flat_military.png"); }
+.icon-heroes { background-image:url("project://database/Assets/Resources/UI/Generated/icon_flat_heroes.png"); }
+.icon-diplomacy { background-image:url("project://database/Assets/Resources/UI/Generated/icon_flat_diplomacy.png"); }
+.icon-scheme { background-image:url("project://database/Assets/Resources/UI/Generated/icon_flat_scheme.png"); }
+.icon-research { background-image:url("project://database/Assets/Resources/UI/Generated/icon_flat_research.png"); }
+.icon-faction { background-image:url("project://database/Assets/Resources/UI/Generated/icon_flat_faction.png"); }
+.icon-council { background-image:url("project://database/Assets/Resources/UI/Generated/icon_flat_council.png"); }
+.icon-report { background-image:url("project://database/Assets/Resources/UI/Generated/icon_flat_report.png"); }
+.icon-turn { background-image:url("project://database/Assets/Resources/UI/Generated/icon_flat_turn.png"); }
+
+@media (max-width:1365px) {
+    .compact-hud { height:62px; padding-left:10px; padding-right:10px; }
+    .faction-emblem { width:38px; height:46px; margin-right:7px; }
+    .faction-label { min-width:128px; font-size:19px; }
+    .hud-separator { margin-left:6px; margin-right:6px; height:30px; }
+    .hud-resource-icon { width:23px; height:23px; margin-right:3px; }
+    .date-label { min-width:92px; font-size:15px; }
+    .resource-chip { min-width:90px; font-size:12px; }
+    .global-command { width:86px; height:54px; padding-left:33px; padding-right:4px; font-size:13px; }
+    .global-command .generated-command-icon { left:6px; top:14px; width:26px; height:26px; }
+    .turn-button { width:158px; padding-left:42px; font-size:17px; }
+    .turn-button .generated-command-icon { left:8px; top:14px; width:30px; height:30px; }
+}
+
+/* 작은 버튼 문자는 획이 뭉개지지 않도록 고딕체와 무외곽선으로 통일합니다. */
+.app Button, .generated-normal, .generated-primary, .generated-danger,
+.modal-panel Button, .modal-close, .castle-command, .objective-strip,
+.battle-alert-button, .campaign-start-button, .campaign-continue-button,
+.difficulty-card, .variant-card {
+    -unity-font-definition:url("project://database/Assets/Fonts/NotoSansKR-VariableFont_wght.ttf");
+    -unity-font-style:normal;
+    -unity-text-outline-width:0;
+    -unity-text-outline-color:rgba(0,0,0,0);
+}
+
+/* 전략 지도와 성 화면 우측 패널은 동일한 흑청색·은색 시각 체계를 사용합니다. */
+.campaign-summary-panel, .castle-command-menu {
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_panel_frame.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:22;
+    -unity-slice-right:22;
+    -unity-slice-top:22;
+    -unity-slice-bottom:22;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+}
+.right-panel-heading {
+    height:48px;
+    min-height:48px;
+    margin:0 0 8px 0;
+    padding:8px 38px;
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_panel_header.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:38;
+    -unity-slice-right:38;
+    -unity-slice-top:20;
+    -unity-slice-bottom:20;
+    color:#f2f0eb;
+    font-size:18px;
+    -unity-font-style:normal;
+    -unity-text-align:middle-center;
+    border-width:0;
+}
+.right-panel-section-heading {
+    height:36px;
+    margin:8px 0 2px 0;
+    padding:4px 24px;
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_panel_header.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:38;
+    -unity-slice-right:38;
+    -unity-slice-top:20;
+    -unity-slice-bottom:20;
+    color:#dedbd4;
+    font-size:14px;
+    -unity-font-style:normal;
+    -unity-text-align:middle-center;
+    border-width:0;
+}
+.campaign-summary-panel .objective-strip {
+    min-height:88px;
+    padding:14px 16px;
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_objective_card.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:22;
+    -unity-slice-right:22;
+    -unity-slice-top:22;
+    -unity-slice-bottom:22;
+    color:#f0eee8;
+    border-width:0;
+}
+.campaign-summary-panel .side-panel-news {
+    min-height:68px;
+    padding:12px 16px;
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_notice_row.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:22;
+    -unity-slice-right:22;
+    -unity-slice-top:22;
+    -unity-slice-bottom:22;
+    color:#d8dde0;
+    border-width:0;
+}
+.campaign-summary-panel .battle-alert-button {
+    min-height:68px;
+    padding:12px 16px;
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_danger_row.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:22;
+    -unity-slice-right:22;
+    -unity-slice-top:22;
+    -unity-slice-bottom:22;
+    color:#ffbbb5;
+    border-width:0;
+}
+.castle-command-menu { padding:14px 13px; }
+.castle-command-menu .command-title { margin-bottom:9px; padding-bottom:8px; }
+.castle-command-menu .castle-command {
+    min-height:46px;
+    max-height:54px;
+    margin-bottom:5px;
+    padding:8px 14px;
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_notice_row.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:22;
+    -unity-slice-right:22;
+    -unity-slice-top:22;
+    -unity-slice-bottom:22;
+    color:#e7e5df;
+    border-width:0;
+    font-size:14px;
+    -unity-text-align:middle-left;
+}
+.castle-command-menu .castle-command.danger {
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_danger_row.png");
+    color:#ffbbb5;
+}
+#castle-record-button {
+    background-image:url("project://database/Assets/Resources/UI/Generated/right_action_button.png");
+    -unity-slice-left:28;
+    -unity-slice-right:28;
+    -unity-slice-top:20;
+    -unity-slice-bottom:20;
+    -unity-text-align:middle-center;
 }

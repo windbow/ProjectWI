@@ -12,6 +12,33 @@ namespace ProjectWI.Battle
         CommandBuff
     }
 
+    public enum WIBattleObjectiveType
+    {
+        Elimination,
+        TimedDefense,
+        ControlPoint
+    }
+
+    [Serializable]
+    public class WIBattleObjectiveDefinition
+    {
+        [SerializeField] private string id;
+        [SerializeField] private WILocalizedString displayName;
+        [SerializeField] private WILocalizedString description;
+        [SerializeField] private WIBattleObjectiveType objectiveType;
+        [SerializeField, Min(1f)] private float durationSeconds = 90f;
+        [SerializeField, Min(1f)] private float controlDurationSeconds = 20f;
+        [SerializeField, Min(0.5f)] private float controlRadius = 2f;
+
+        public string Id => id;
+        public WILocalizedString DisplayName => displayName;
+        public WILocalizedString Description => description;
+        public WIBattleObjectiveType ObjectiveType => objectiveType;
+        public float DurationSeconds => Mathf.Max(1f, durationSeconds);
+        public float ControlDurationSeconds => Mathf.Max(1f, controlDurationSeconds);
+        public float ControlRadius => Mathf.Max(0.5f, controlRadius);
+    }
+
     [Serializable]
     public class WIBattleSkillDefinition
     {
@@ -85,6 +112,7 @@ namespace ProjectWI.Battle
         [SerializeField] private float characterSelectionRadius = 0.8f;
         [SerializeField] private List<WIBattleSkillDefinition> heroSkills = new List<WIBattleSkillDefinition>();
         [SerializeField] private List<WIBattleClassSkillDefinition> classSkills = new List<WIBattleClassSkillDefinition>();
+        [SerializeField] private List<WIBattleObjectiveDefinition> battleObjectives = new List<WIBattleObjectiveDefinition>();
         [SerializeField] private Sprite placeholderSprite;
 
         public Vector2 ArenaSize => arenaSize;
@@ -125,6 +153,7 @@ namespace ProjectWI.Battle
         public float CharacterSelectionRadius => characterSelectionRadius;
         public IReadOnlyList<WIBattleSkillDefinition> HeroSkills => heroSkills;
         public IReadOnlyList<WIBattleClassSkillDefinition> ClassSkills => classSkills;
+        public IReadOnlyList<WIBattleObjectiveDefinition> BattleObjectives => battleObjectives;
         public Sprite PlaceholderSprite => placeholderSprite;
 
         // 영웅 ID에 대응하는 액티브 스킬 설정을 반환합니다.
@@ -143,6 +172,29 @@ namespace ProjectWI.Battle
         public WIBattleSkillDefinition GetCharacterSkill(string heroId, WIHeroClass heroClass)
         {
             return GetHeroSkill(heroId) ?? GetClassSkill(heroClass);
+        }
+
+        // 식별자에 대응하는 전투 목표를 반환합니다.
+        public WIBattleObjectiveDefinition GetBattleObjective(string id)
+        {
+            return battleObjectives.Find(item => item.Id == id);
+        }
+
+        // 실제 캠페인 전투 번호를 기준으로 전투 목표를 순환 선택합니다.
+        public WIBattleObjectiveDefinition SelectBattleObjective(string sessionId)
+        {
+            if (battleObjectives.Count == 0)
+            {
+                return null;
+            }
+
+            int separator = sessionId == null ? -1 : sessionId.LastIndexOf('_');
+            if (separator < 0 || int.TryParse(sessionId.Substring(separator + 1), out int number) == false)
+            {
+                return battleObjectives.Find(item => item.ObjectiveType == WIBattleObjectiveType.Elimination) ?? battleObjectives[0];
+            }
+
+            return battleObjectives[Mathf.Abs(number - 1) % battleObjectives.Count];
         }
     }
 }

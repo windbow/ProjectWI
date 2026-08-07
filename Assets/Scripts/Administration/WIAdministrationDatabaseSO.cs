@@ -891,8 +891,22 @@ namespace ProjectWI.Administration
         [SerializeField] private int promotionRequiredReputation = 30;
         [SerializeField] private int promotionInfluenceCost = 30;
 
+        [Header("AI 전선 활성화")]
+        [SerializeField, Min(1)] private int aiWarPressureIntervalMonths = 12;
+        [SerializeField, Min(1)] private int aiMinimumActiveWarFronts = 2;
+
+        [Header("전략 전투 전력 균형")]
+        [SerializeField, Min(0)] private int castleDefensePowerPercent = 300;
+        [SerializeField, Min(0)] private int castleStabilityPowerPercent = 50;
+        [SerializeField, Range(0, 100)] private int garrisonHeroPowerPercent = 50;
+
         public bool UseEnglish => useEnglish;
         public Sprite GlobalMapImage => globalMapImage;
+        public int AIWarPressureIntervalMonths => Mathf.Max(1, aiWarPressureIntervalMonths);
+        public int AIMinimumActiveWarFronts => Mathf.Max(1, aiMinimumActiveWarFronts);
+        public int CastleDefensePowerPercent => Mathf.Max(0, castleDefensePowerPercent);
+        public int CastleStabilityPowerPercent => Mathf.Max(0, castleStabilityPowerPercent);
+        public int GarrisonHeroPowerPercent => Mathf.Clamp(garrisonHeroPowerPercent, 0, 100);
 
         // 시스템 언어 설정에 따라 런타임 표시 언어를 변경합니다.
         public void SetUseEnglish(bool value)

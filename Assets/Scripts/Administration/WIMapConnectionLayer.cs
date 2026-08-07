@@ -4,7 +4,8 @@ using UnityEngine.UIElements;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIMapConnectionLayer : VisualElement
+    [UxmlElement]
+    public sealed partial class WIMapConnectionLayer : VisualElement
     {
         public readonly struct Connection
         {

@@ -57,7 +57,7 @@ namespace ProjectWI.Battle
             }
             int attackers = runtime.Characters.Count(item => item.Side == WIBattleSide.Attacker && item.IsAlive);
             int defenders = runtime.Characters.Count(item => item.Side == WIBattleSide.Defender && item.IsAlive);
-            statusLabel.text = $"{runtime.ElapsedSeconds:0.0}초 · 공격 {attackers} / 수비 {defenders}";
+            statusLabel.text = $"{runtime.ObjectiveName} · {runtime.ElapsedSeconds:0.0}초 · 공격 {attackers} / 수비 {defenders}";
             BuildSkillButtons(runtime);
             RefreshSkillButtons(runtime);
             RefreshCommandFeedback(runtime);

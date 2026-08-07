@@ -97,7 +97,9 @@ namespace ProjectWI.Tests.Editor
                 "icon_research.png", "icon_council.png", "icon_report.png", "icon_turn.png",
                 "castle_stat_prosperity.png", "castle_stat_technology.png",
                 "castle_stat_stability.png", "castle_stat_defense.png",
-                "hero_slot_card.png", "facility_slot_card.png"
+                "hero_slot_card.png", "facility_slot_card.png",
+                "map_castle_avalon.png", "map_castle_valdor.png", "map_castle_ironheart.png",
+                "map_castle_sylvanroad.png", "map_castle_necropolis.png"
             };
             foreach (string assetName in assetNames)
             {
@@ -144,6 +146,122 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains(".campaign-start-button, .campaign-continue-button", administration);
             StringAssert.Contains("height:50px", administration);
             StringAssert.Contains("-unity-slice-left:28", battle);
+        }
+
+        // 성 내정의 영웅과 특화 시설 목록이 분리된 스크롤 영역을 사용하는지 검증합니다.
+        [Test]
+        public void CastleSlots_UseSeparatedScrollableSections()
+        {
+            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
+
+            StringAssert.Contains("slot-scroll hero-slot-scroll", layout);
+            StringAssert.Contains("slot-scroll facility-slot-scroll", layout);
+            StringAssert.Contains("name=\"hero-slots\"", layout);
+            StringAssert.Contains("name=\"special-facility-slots\"", layout);
+            StringAssert.Contains(".castle-slot-section", stylesheet);
+            StringAssert.Contains(".slot-scroll { flex-grow:1; min-height:0; overflow:hidden; }", stylesheet);
+            StringAssert.Contains(".facility-slot-grid .slot { width:100%", stylesheet);
+        }
+
+        // 이미지 버튼의 호버·클릭·비활성 상태가 단색 반전 대신 텍스처 틴트를 사용하는지 검증합니다.
+        [Test]
+        public void GeneratedButtons_UseImageAwareInteractionStates()
+        {
+            string administration = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
+            string battle = File.ReadAllText("Assets/UI/Battle/WIBattleHUD.uss");
+
+            StringAssert.Contains(".generated-normal:hover, .generated-primary:hover, .modal-panel Button:hover", administration);
+            StringAssert.Contains("-unity-background-image-tint-color:#d9eaff", administration);
+            StringAssert.Contains(".generated-danger:hover", administration);
+            StringAssert.Contains("-unity-background-image-tint-color:#ffd1d1", administration);
+            StringAssert.Contains(".generated-normal:disabled", administration);
+            StringAssert.Contains(".generated-normal:hover, .generated-primary:hover, .skill-button:hover", battle);
+            StringAssert.Contains("-unity-background-image-tint-color:rgb(217,234,255)", battle);
+        }
+
+        // 전략 지도와 성 내정 화면이 시안형 성채 마커·좌우 패널·하단 관리 구조를 유지하는지 검증합니다.
+        [Test]
+        public void StrategyAndCastleViews_UseConceptLayoutAndCastleMarkers()
+        {
+            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
+            string controller = File.ReadAllText("Assets/Scripts/Administration/WIAdministrationUIController.cs");
+
+            StringAssert.Contains("global-castle-hero-cards", layout);
+            StringAssert.Contains("objective-progress-fill", layout);
+            StringAssert.Contains("castle-overview-panel", layout);
+            StringAssert.Contains(".castle-node-avalon .castle-node-marker", stylesheet);
+            StringAssert.Contains("UI/Generated/map_castle_necropolis.png", stylesheet);
+            StringAssert.Contains(".castle-overview-panel .governor-full", stylesheet);
+            StringAssert.Contains("ApplyMapNodeFactionClass(node, castleState.FactionId)", controller);
+            StringAssert.Contains("RefreshGlobalHeroCards(castle)", controller);
+        }
+
+        // 시안형 명조·고딕 폰트와 평면 버튼·명령 아이콘이 UXML/USS에 직접 연결되는지 검증합니다.
+        [Test]
+        public void StrategyTheme_UsesProjectFontsAndFlatCommandAssets()
+        {
+            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
+
+            Assert.IsTrue(File.Exists("Assets/Fonts/NotoSerifKR-VariableFont_wght.ttf"));
+            Assert.IsTrue(File.Exists("Assets/Fonts/NotoSansKR-VariableFont_wght.ttf"));
+            StringAssert.Contains("NotoSansKR-VariableFont_wght.ttf", stylesheet);
+            StringAssert.Contains("NotoSerifKR-VariableFont_wght.ttf", stylesheet);
+            StringAssert.Contains(".app Label, .app Button, .app TextField, .app Toggle", stylesheet);
+            StringAssert.Contains(".resource-chip, .side-panel-stats, .castle-stat", stylesheet);
+            StringAssert.Contains("button_flat_normal.png", stylesheet);
+            StringAssert.Contains("button_flat_primary.png", stylesheet);
+            StringAssert.Contains("button_flat_danger.png", stylesheet);
+            StringAssert.Contains("icon_flat_military.png", stylesheet);
+            StringAssert.Contains("icon_flat_faction.png", stylesheet);
+            StringAssert.Contains("hud_flat_gold.png", stylesheet);
+            StringAssert.Contains("hud-resource-icon hud-date-icon", layout);
+            StringAssert.Contains("generated-command-icon icon-faction", layout);
+        }
+
+        // 하단 전역 명령 8개는 D Type을 사용하고 다음 턴 버튼은 기존 B Type을 유지하는지 검증합니다.
+        [Test]
+        public void GlobalCommands_UseDTypeWhileTurnButtonKeepsBType()
+        {
+            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
+
+            Assert.AreEqual(8, layout.Split(new[] { "class=\"global-command " }, System.StringSplitOptions.None).Length - 1);
+            StringAssert.Contains("class=\"turn-button generated-primary\"", layout);
+            StringAssert.Contains("background-image:url(\"project://database/Assets/Resources/UI/Generated/right_action_button.png\");", stylesheet);
+            StringAssert.Contains("-unity-slice-left:28;", stylesheet);
+            StringAssert.Contains("-unity-slice-right:28;", stylesheet);
+            StringAssert.Contains("-unity-slice-top:20;", stylesheet);
+            StringAssert.Contains("-unity-slice-bottom:20;", stylesheet);
+        }
+
+        // 우측 목표·알림 및 성 명령 패널이 생성 에셋과 읽기 쉬운 버튼 서체를 사용하는지 검증합니다.
+        [Test]
+        public void RightPanels_UseGeneratedFramesAndSansButtonFont()
+        {
+            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
+            string battleStylesheet = File.ReadAllText("Assets/UI/Battle/WIBattleHUD.uss");
+
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/right_panel_header.png"));
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/right_panel_frame.png"));
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/right_objective_card.png"));
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/right_notice_row.png"));
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/right_danger_row.png"));
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/right_action_button.png"));
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/button_type_h.png"));
+            StringAssert.Contains("side-panel-kicker right-panel-heading", layout);
+            StringAssert.Contains("command-title right-panel-heading", layout);
+            StringAssert.Contains("right_panel_frame.png", stylesheet);
+            StringAssert.Contains("right_objective_card.png", stylesheet);
+            StringAssert.Contains("right_danger_row.png", stylesheet);
+            StringAssert.Contains(".generated-ornate-action", stylesheet);
+            StringAssert.Contains("UI/Generated/button_type_h.png", stylesheet);
+            StringAssert.Contains(".app Button, .generated-normal", stylesheet);
+            StringAssert.Contains("-unity-text-outline-width:0", stylesheet);
+            StringAssert.Contains("NotoSansKR-VariableFont_wght.ttf", battleStylesheet);
         }
 
         // 긴 이름은 지정 폭에 맞춰 생략 기호를 포함한 길이로 축약되는지 검증합니다.

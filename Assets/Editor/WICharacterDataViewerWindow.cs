@@ -383,7 +383,10 @@ namespace ProjectWI.Editor
             // 가시 뷰포트 영역 내부의 행만 IMGUI 컨트롤 그리기
             for (int row = firstRowOnPage; row < lastRowOnPage; row++)
             {
+                if (startIndex + row >= filteredCache.Count) break;
                 CharacterCache cacheItem = filteredCache[startIndex + row];
+                if (cacheItem.OriginalIndex >= heroesProperty.arraySize) continue;
+
                 SerializedProperty heroProp = heroesProperty.GetArrayElementAtIndex(cacheItem.OriginalIndex);
                 DrawTableRow(cacheItem.OriginalIndex, heroProp, row % 2 == 0);
             }

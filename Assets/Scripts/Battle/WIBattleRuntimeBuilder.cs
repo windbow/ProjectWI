@@ -14,9 +14,29 @@ namespace ProjectWI.Battle
             WIBattleSessionState session)
         {
             WIBattleRuntimeState runtime = new WIBattleRuntimeState { SessionId = session.SessionId };
+            ApplyObjective(config, runtime, session.SessionId);
             AddSide(runtime, config, database, session.AttackerHeroIds, WIBattleSide.Attacker);
             AddSide(runtime, config, database, session.DefenderHeroIds, WIBattleSide.Defender);
             return runtime;
+        }
+
+        // 전투 설정의 순환 규칙에 따라 이번 세션의 목표와 제한값을 런타임에 복사합니다.
+        private static void ApplyObjective(WIBattleConfigSO config, WIBattleRuntimeState runtime, string sessionId)
+        {
+            WIBattleObjectiveDefinition objective = config.SelectBattleObjective(sessionId);
+            if (objective == null)
+            {
+                runtime.ObjectiveType = WIBattleObjectiveType.Elimination;
+                runtime.ObjectiveName = "섬멸";
+                return;
+            }
+
+            runtime.ObjectiveId = objective.Id;
+            runtime.ObjectiveName = objective.DisplayName.Korean;
+            runtime.ObjectiveType = objective.ObjectiveType;
+            runtime.ObjectiveDurationSeconds = objective.DurationSeconds;
+            runtime.ControlDurationSeconds = objective.ControlDurationSeconds;
+            runtime.ControlRadius = objective.ControlRadius;
         }
 
         // 한 진영의 인물을 역할 순서에 맞춰 전열, 중앙과 후열에 배치합니다.

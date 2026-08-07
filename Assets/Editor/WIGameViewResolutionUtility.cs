@@ -38,6 +38,19 @@ namespace ProjectWI.Editor
         [MenuItem("WI/QA/Preview/Color Vision")]
         private static void OpenColorVisionPreview() => FindController()?.OpenColorVisionPreviewForQA();
 
+        [MenuItem("WI/QA/Capture/Current Game View")]
+        private static void CaptureCurrentGameView()
+        {
+            if (Application.isPlaying == false)
+            {
+                Debug.LogWarning("Game View 캡처는 플레이 모드에서 실행해야 합니다.");
+                return;
+            }
+            const string path = "Assets/Screenshots/UI_Current_Preview.png";
+            ScreenCapture.CaptureScreenshot(path, 1);
+            Debug.Log($"Game View 캡처 요청 · {path}");
+        }
+
         // 플레이 모드에서 내정 UI 컨트롤러를 찾아 QA 화면 전환에 사용합니다.
         private static WIAdministrationUIController FindController()
         {
