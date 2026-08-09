@@ -42,6 +42,13 @@
 
 ## 4. 데이터 에셋
 
+- `Assets/Resources/UI/Generated/bg_type_a.png`
+  - `Panel_BackGround.png`의 바깥 체크무늬 영역을 제거하고 모서리를 투명 처리한 1587×508 RGBA 배경 Sprite
+  - Background A Type으로 분류하며 좌·우·상·하 3px 9-Slice 사용
+  - 모서리 사선 깊이 2px, 단일 2px 금속 외곽선 사용
+  - 알파 투명도 사용, 밉맵 비활성, Clamp, 무압축 임포트 설정
+  - 행정 화면의 HUD·지도 보조 패널·명령 바·성 정보 패널·공통 모달과 전투 HUD 정보 패널의 공통 배경이며 캠페인 첫 화면은 기존 `popup_panel.png` 유지
+
 - `Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset`
   - 전역 지도, 진영 문장, 인물 초상화, 성 전경과 시설 아이콘 Sprite 참조
   - 진영 5개
@@ -88,10 +95,13 @@
 - `WIMapConnectionLayer.cs`: 인접 성 경로, 접경 전선과 선택 경로의 UI Toolkit 벡터 렌더링
 - `Assets/Resources/UI/Generated/map_castle_*.png`: 5대 진영의 성채·깃발 지도 마커
 - `Assets/Art/Characters/Battle_MedievalSwordsman_Test_V2.png`: 약 4.5~5등신 양손 검 전투 준비 자세의 투명 배경 단일 프레임 테스트 스프라이트(전투 데이터 미연결)
+- `Assets/generated/sprites/medieval-swordsman-idle/sprite-sheet-alpha.png`: 중세 검사 4프레임 공격 애니메이션 투명 아틀라스. 프레임 좌표와 8 FPS 비반복 재생 정보는 같은 폴더의 `manifest.json`이 소유하며 현재 전투 데이터에는 연결하지 않음
+- `Assets/generated/sprites/medieval-swordsman-attack-v2/sprite-sheet-alpha.png`: 관절 포즈 가이드로 높은 당김·앞발 내딛기·대각선 타격·낮은 후속 자세를 고정한 개선 공격 아틀라스. 4프레임 좌표와 8 FPS 비반복 정보는 같은 폴더의 `manifest.json`이 소유하며 현재 권장 검토 후보이나 전투 데이터에는 연결하지 않음
 - `Assets/Art/Characters/Character_MedievalSwordsman_Test_V1.png`: 일러스트 방향 비교를 위해 보존한 미사용 초기 테스트 이미지
 - `Assets/Resources/UI/Generated/icon_flat_*.png`: 군사·영웅·외교·첩보·연구·통치·의회·월간 보고·다음 턴 명령 아이콘
 - `Assets/Resources/UI/Generated/hud_flat_*.png`: 날짜·금화·마나·영향력 HUD 아이콘
-- `Assets/Resources/UI/Generated/button_flat_*.png`: 일반·선택·위험 9-Slice 버튼 배경
+- `Assets/Resources/UI/Generated/button_flat_*.png`: 일반·선택·위험 9-Slice 버튼 배경. A(`normal`)와 B(`primary`)는 2px 투명 모서리와 단일 2px 테두리의 동일 형상이며 B만 푸른 색조를 사용함
+- `Assets/Resources/UI/Generated/popup_header.png`: 공통 모달 제목 영역의 9-Slice 배경. 좌우의 남색 홈을 제거하고 양피지 면이 외곽 금속 프레임까지 이어지는 1024×160 헤더
 - `GameDocuments/ButtonTypeGuide.md`: 현행 버튼 이미지의 A~H Type 공식 별칭, 사용처와 업무 지시 기준
 - `GameDocuments/FantasyTerminologyGuide.md`: 삼국지식 이전 표현과 판타지 공식 표시 용어의 대응표, 성·영지 구분 및 내부 식별자 유지 기준
 - `GameDocuments/UIReferences/ProjectWI_ButtonTypeCatalog.png`: 기존 A~G 버튼 에셋 7종을 모은 시각 카탈로그

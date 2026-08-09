@@ -214,3 +214,18 @@
     -unity-text-outline-width:0;
     -unity-text-outline-color:rgba(0,0,0,0);
 }
+
+/* 단색으로 채우던 전투 HUD 패널을 Background A Type 9-Slice 이미지로 통일합니다. */
+.battle-status,
+.command-feedback,
+.selection-info,
+.bottom-bar {
+    background-image:url("project://database/Assets/Resources/UI/Generated/bg_type_a.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:3;
+    -unity-slice-right:3;
+    -unity-slice-top:3;
+    -unity-slice-bottom:3;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+}

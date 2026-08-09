@@ -137,7 +137,7 @@ namespace ProjectWI.Tests.Editor
         {
             string[] assetNames =
             {
-                "button_normal.png", "button_primary.png", "button_danger.png", "popup_panel.png",
+                "button_normal.png", "button_primary.png", "button_danger.png", "popup_panel.png", "bg_type_a.png",
                 "popup_header.png",
                 "icon_military.png", "icon_heroes.png", "icon_diplomacy.png", "icon_scheme.png",
                 "icon_research.png", "icon_council.png", "icon_report.png", "icon_turn.png",
@@ -165,6 +165,25 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("UI/Generated/castle_stat_prosperity.png", administrationUss);
             StringAssert.Contains("UI/Generated/hero_slot_card.png", administrationUss);
             StringAssert.Contains("UI/Generated/facility_slot_card.png", administrationUss);
+        }
+
+        // 행정과 전투의 단색 패널 컨테이너가 Background A Type 9-Slice 에셋을 사용하는지 검증합니다.
+        [Test]
+        public void PlainPanelContainers_UseBackgroundTypeA()
+        {
+            string administration = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
+            string battle = File.ReadAllText("Assets/UI/Battle/WIBattleHUD.uss");
+
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/bg_type_a.png"));
+            StringAssert.Contains(".compact-hud,", administration);
+            StringAssert.Contains(".castle-overview-panel,", administration);
+            StringAssert.Contains("UI/Generated/bg_type_a.png", administration);
+            StringAssert.Contains(".battle-status,", battle);
+            StringAssert.Contains(".bottom-bar {", battle);
+            StringAssert.Contains("UI/Generated/bg_type_a.png", battle);
+            StringAssert.Contains("-unity-slice-left:3", administration);
+            StringAssert.Contains("-unity-slice-left:3", battle);
+            StringAssert.Contains("UI/Generated/popup_panel.png", administration);
         }
 
         // 밝은 팝업 헤더의 제목 대비와 축소 해상도 메뉴 아이콘의 절대 배치 규칙을 검증합니다.
@@ -260,6 +279,10 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("button_flat_normal.png", stylesheet);
             StringAssert.Contains("button_flat_primary.png", stylesheet);
             StringAssert.Contains("button_flat_danger.png", stylesheet);
+            StringAssert.Contains("-unity-slice-left:3;", stylesheet);
+            StringAssert.Contains("-unity-slice-right:3;", stylesheet);
+            StringAssert.Contains("-unity-slice-top:3;", stylesheet);
+            StringAssert.Contains("-unity-slice-bottom:3;", stylesheet);
             StringAssert.Contains("icon_flat_military.png", stylesheet);
             StringAssert.Contains("icon_flat_faction.png", stylesheet);
             StringAssert.Contains("hud_flat_gold.png", stylesheet);

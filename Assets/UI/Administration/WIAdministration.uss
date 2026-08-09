@@ -485,10 +485,10 @@
 .modal-panel Button, .modal-close { background-image:url("project://database/Assets/Resources/UI/Generated/button_flat_normal.png"); }
 .modal-panel Button.danger, .modal-panel Button.retreat { background-image:url("project://database/Assets/Resources/UI/Generated/button_flat_danger.png"); }
 .generated-normal, .generated-primary, .generated-danger, .modal-panel Button, .modal-close {
-    -unity-slice-left:18;
-    -unity-slice-right:18;
-    -unity-slice-top:16;
-    -unity-slice-bottom:16;
+    -unity-slice-left:3;
+    -unity-slice-right:3;
+    -unity-slice-top:3;
+    -unity-slice-bottom:3;
 }
 
 /* 시안형 하단 명령 바와 신규 단색 명령 아이콘입니다. */
@@ -673,4 +673,28 @@
     -unity-slice-top:20;
     -unity-slice-bottom:20;
     -unity-text-align:middle-center;
+}
+
+/* 단색으로 채우던 주요 패널 컨테이너를 Background A Type 9-Slice 이미지로 통일합니다. */
+.compact-hud,
+.map-heading,
+.faction-legend,
+.map-tools,
+.global-command-bar,
+.strategy-guide,
+.castle-top-strip,
+.castle-overview-panel,
+.castle-bottom-info,
+.castle-slot-section,
+.modal-panel,
+.modal-scroll-view,
+.modal-fixed-footer {
+    background-image:url("project://database/Assets/Resources/UI/Generated/bg_type_a.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:3;
+    -unity-slice-right:3;
+    -unity-slice-top:3;
+    -unity-slice-bottom:3;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
 }

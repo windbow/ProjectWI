@@ -2,6 +2,16 @@
 
 현재 기획 기준은 `GameDesign.md`이며 전략 게임 데이터는 ScriptableObject에서 편집합니다. 방치형 던전 데이터는 사용하지 않습니다.
 
+## UI 배경 에셋
+
+- Background A Type: `Assets/Resources/UI/Generated/bg_type_a.png`
+- 원본 가운데 패널만 1587×508로 크롭하고 모서리 바깥 영역을 투명 처리한 RGBA Sprite입니다.
+- UI Toolkit에서 크기를 변경할 때 좌·우·상·하 3px 9-Slice를 유지합니다.
+- 모서리는 2px만 사선으로 잘라 거의 직사각형이며 외곽에는 단일 2px 금속 테두리만 사용합니다.
+- 최소 표시 크기는 6×6px보다 크게 사용합니다.
+- 캠페인 첫 화면은 기존 `popup_panel.png`를 유지하며 Background A Type 적용 대상에서 제외합니다.
+- 현재 행정 UI의 주요 패널 컨테이너와 전투 HUD 정보 패널은 이 에셋을 직접 참조하며, 버튼·진행바·이미지 슬롯·상태 선택 카드는 각 용도의 기존 스타일을 유지합니다.
+
 ## 1. 전략 데이터베이스
 
 에셋: `Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset`
@@ -247,9 +257,15 @@ UI 후속 작업은 `GameDocuments/UIHandoffReport.md`와 `GameDocuments/UIConce
 
 전투 캐릭터 화풍 검증용 중세 검사 스프라이트는 `Assets/Art/Characters/Battle_MedievalSwordsman_Test_V2.png`입니다. 약 4.5~5등신, 양손 검 전투 준비 자세, 작은 화면에서 읽히는 단순 색 덩어리와 투명 배경을 사용합니다. 현재 전투 캐릭터 데이터에는 연결하지 않은 단일 프레임 테스트 에셋입니다. 이전 `Character_MedievalSwordsman_Test_V1.png`은 일러스트 방향이어서 전투 에셋으로 사용하지 않습니다.
 
+중세 검사 공격 애니메이션 테스트 런은 `Assets/generated/sprites/medieval-swordsman-idle`에서 관리합니다. 게임 입력은 `sprite-sheet-alpha.png`이며 `manifest.json`의 `frame_layout.rows.attack`에 기록된 512×512 사각형 4개를 순서대로 재생합니다. 재생 속도는 8 FPS, 비반복이며 현재 전투 데이터에는 연결하지 않았습니다. `raw/attack.png`는 생성 중간 산출물이고 실제 런타임에서는 투명 아틀라스와 manifest를 사용합니다.
+
+동작 개선 후보는 `Assets/generated/sprites/medieval-swordsman-attack-v2`입니다. `references/motion-guides/attack.png`가 높은 당김, 앞발 내딛기, 대각선 타격, 낮은 후속 자세의 관절·검 궤적 기준을 소유합니다. 런타임 사용 방식은 동일하게 `sprite-sheet-alpha.png`와 `manifest.json`을 함께 사용하며 8 FPS 비반복 4프레임입니다. 기존 공격 시트는 비교용으로 보존하며 현재 권장 검토 대상은 v2입니다.
+
 전체 UI 제목·본문·입력 문구는 `Assets/Fonts/NotoSerifKR-VariableFont_wght.ttf`를 기본으로 사용합니다. 자원 수치, 성 수치, 지도 명패, 작은 슬롯 문구와 모든 버튼은 작은 크기에서도 획이 선명한 `Assets/Fonts/NotoSansKR-VariableFont_wght.ttf`를 사용하며 버튼 텍스트 외곽선은 적용하지 않습니다. 두 글꼴은 SIL Open Font License이며 각각의 라이선스 원문을 같은 폴더의 `OFL-NotoSerifKR.txt`, `OFL-NotoSansKR.txt`에 보관합니다.
 
-시안형 명령 아이콘은 `icon_flat_*.png`, 상단 날짜·자원 아이콘은 `hud_flat_*.png`, 버튼 타입은 `button_flat_normal.png`, `button_flat_primary.png`, `button_flat_danger.png`입니다. 버튼은 동일한 768×128 규격이며 USS에서 좌우 18, 상하 16의 9-Slice를 사용합니다. 원본과 알파 정리 아틀라스는 `Tools/UIAssetSources`에서 다시 가공할 수 있습니다.
+시안형 명령 아이콘은 `icon_flat_*.png`, 상단 날짜·자원 아이콘은 `hud_flat_*.png`, 버튼 타입은 `button_flat_normal.png`, `button_flat_primary.png`, `button_flat_danger.png`입니다. A/B 버튼은 동일한 768×128 규격과 형상을 사용하며 B는 푸른 색조만 다릅니다. 두 버튼은 2px 투명 모서리와 단일 2px 테두리로 구성하고 USS에서 상하좌우 3의 9-Slice를 사용합니다. 원본과 알파 정리 아틀라스는 `Tools/UIAssetSources`에서 다시 가공할 수 있습니다.
+
+공통 모달 헤더는 `popup_header.png`를 사용합니다. 1024×160 이미지의 양피지 면이 좌우 금속 프레임 안쪽까지 연결되며, USS에서 좌우 54·상하 20의 9-Slice로 크기를 조절합니다.
 
 버튼 업무 지시용 공식 별칭은 `GameDocuments/ButtonTypeGuide.md`를 기준으로 합니다. 전략·영지 관리의 기본·주요·위험 버튼은 A·B·C Type, 하단 전역 명령(군사~월간 보고)과 우측 패널 독립 행동 버튼은 D Type, 전투 HUD의 기본·주요·위험 버튼은 E·F·G Type, 넓은 대표 진행 행동은 H Type입니다. H Type은 `generated-ornate-action` USS 클래스로 연결하며 좌 112·우 32·상하 32의 9-Slice를 사용합니다. 타입명은 문서상 별칭이며 실제 에셋 파일명은 Unity 참조 보존을 위해 유지합니다.
 

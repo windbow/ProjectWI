@@ -14,7 +14,7 @@
 
 - 사용자와 한국어로 소통합니다.
 - 작업 시작 전 UnityMCP 연결과 `GameDocuments/ProjectStatus.md`를 확인합니다.
-- MCP 연결이 되어 있지 않다면, 우선 작업을 실행하지 말고 MCP 연결을 해야합니다. 저와 의논 하며 MCP 연결을 최우선으로 진행.
+- 게임내에 변경이 필요한 경우 MCP 연결이 되어 있지 않다면, 우선 작업을 실행하지 말고 MCP 연결을 해야합니다. 저와 의논 하며 MCP 연결을 최우선으로 진행.
 - 하이어라키, 컴포넌트, 프리팹, ScriptableObject 작업은 가능한 한 UnityMCP를 사용합니다.
 - 작업 완료 시 `ProjectStatus.md`, `DataManual.md`, `DataDocument.md`를 현재 구현에 맞게 갱신합니다.
 - 씬에는 Main Camera와 주 조명을 유지합니다.
