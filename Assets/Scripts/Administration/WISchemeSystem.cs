@@ -26,7 +26,7 @@ namespace ProjectWI.Administration
 
     public static class WISchemeSystem
     {
-        // 조건과 영향력을 확인해 담당 인물을 한 달 동안 점유하는 계략 임무를 예약합니다.
+        // 조건과 영향력을 확인해 담당 인물을 한 달 동안 점유하는 첩보 임무를 예약합니다.
         public static bool TrySchedule(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -48,14 +48,14 @@ namespace ProjectWI.Administration
             if (scheme == null || faction == null || agent == null || agentCastle == null || targetCastle == null ||
                 state.IsCharacterBusy(agentHeroId) || faction.Influence < scheme.InfluenceCost)
             {
-                message = "계략 조건이나 영향력이 부족합니다.";
+                message = "첩보 조건이나 영향력이 부족합니다.";
                 return false;
             }
             bool targetsOwnCastle = scheme.SchemeType == WISchemeType.Counterintelligence;
             if ((targetsOwnCastle && targetCastle.FactionId != initiatorFactionId) ||
                 (targetsOwnCastle == false && targetCastle.FactionId == initiatorFactionId))
             {
-                message = "계략 대상이 올바르지 않습니다.";
+                message = "첩보 대상이 올바르지 않습니다.";
                 return false;
             }
             if (scheme.SchemeType == WISchemeType.Alienation &&
@@ -79,7 +79,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 계략의 조건과 비용을 확인하고 지정된 판정값으로 결과를 즉시 적용합니다.
+        // 첩보의 조건과 비용을 확인하고 지정된 판정값으로 결과를 즉시 적용합니다.
         public static WISchemeResult Execute(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -100,14 +100,14 @@ namespace ProjectWI.Administration
             if (scheme == null || faction == null || agent == null || agentCastle == null || targetCastle == null ||
                 state.IsCharacterBusy(agentHeroId) || (consumeInfluence && faction.Influence < scheme.InfluenceCost))
             {
-                return new WISchemeResult(false, false, false, 0, 0, "계략 조건이나 영향력이 부족합니다.");
+                return new WISchemeResult(false, false, false, 0, 0, "첩보 조건이나 영향력이 부족합니다.");
             }
 
             bool targetsOwnCastle = scheme.SchemeType == WISchemeType.Counterintelligence;
             if ((targetsOwnCastle && targetCastle.FactionId != initiatorFactionId) ||
                 (targetsOwnCastle == false && targetCastle.FactionId == initiatorFactionId))
             {
-                return new WISchemeResult(false, false, false, 0, 0, "계략 대상이 올바르지 않습니다.");
+                return new WISchemeResult(false, false, false, 0, 0, "첩보 대상이 올바르지 않습니다.");
             }
 
             WICharacterRuntimeState targetCharacter = null;
@@ -142,7 +142,7 @@ namespace ProjectWI.Administration
                 $"{scheme.DisplayName.Get(database.UseEnglish)}에 {outcome}했습니다. {exposure}");
         }
 
-        // 담당 인물의 지력과 대상 성의 치안·방첩을 사용해 계략 발각 확률을 계산합니다.
+        // 담당 인물의 지력과 대상 성의 질서·방첩을 사용해 첩보 발각 확률을 계산합니다.
         public static int CalculateDetectionChance(WISchemeDefinition scheme, WIHeroDefinition agent,
             WICastleRuntimeState targetCastle, bool succeeded)
         {
@@ -157,7 +157,7 @@ namespace ProjectWI.Administration
                                failureBonus - agent.Intelligence / 3, 5, 90);
         }
 
-        // 계략의 기본 확률, 담당 지력, 대상 치안과 방첩을 합산해 성공 확률을 반환합니다.
+        // 첩보의 기본 확률, 담당 지력, 대상 질서와 방첩을 합산해 성공 확률을 반환합니다.
         public static int CalculateSuccessChance(WISchemeDefinition scheme, WIHeroDefinition agent,
             WICastleRuntimeState targetCastle)
         {
@@ -167,7 +167,7 @@ namespace ProjectWI.Administration
             return Mathf.Clamp(scheme.BaseSuccessChance + agent.Intelligence / 2 - defensePenalty, 10, 90);
         }
 
-        // 발각된 적대 계략의 두 세력 외교 단계를 한 단계 악화시킵니다.
+        // 발각된 적대 첩보의 두 진영 외교 단계를 한 단계 악화시킵니다.
         private static void WorsenDiplomaticRelation(WIAdministrationState state, string initiatorFactionId, string targetFactionId)
         {
             WIDiplomaticRelationState relation = state.GetOrCreateDiplomaticRelation(initiatorFactionId, targetFactionId);
@@ -187,7 +187,7 @@ namespace ProjectWI.Administration
             relation.AidCooldownMonths = 0;
         }
 
-        // 성공한 계략의 정보 공개, 방첩, 치안 또는 충성 효과를 적용합니다.
+        // 성공한 첩보의 정보 공개, 방첩, 질서 또는 충성 효과를 적용합니다.
         private static void ApplyEffect(WIAdministrationState state, WISchemeDefinition scheme, string factionId,
             WICastleRuntimeState targetCastle, WICharacterRuntimeState targetCharacter)
         {
@@ -232,7 +232,7 @@ namespace ProjectWI.Administration
             state.SchemeIntel.RemoveAll(intel => intel.RemainingMonths <= 0);
         }
 
-        // 한 달을 마친 계략 임무를 공통 즉시 판정 함수로 해결하고 담당 인물을 복귀시킵니다.
+        // 한 달을 마친 첩보 임무를 공통 즉시 판정 함수로 해결하고 담당 인물을 복귀시킵니다.
         public static void ResolveScheduledMissions(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -248,13 +248,13 @@ namespace ProjectWI.Administration
                     mission.AgentHeroId, mission.TargetCastleId, mission.TargetHeroId, mission.ResolutionRoll, false);
                 WIHeroDefinition agent = database.GetHero(mission.AgentHeroId);
                 WICastleDefinition target = database.GetCastle(mission.TargetCastleId);
-                summary.News.Add($"계략 결과 · {agent?.DisplayName.Get(database.UseEnglish)} · " +
+                summary.News.Add($"첩보 결과 · {agent?.DisplayName.Get(database.UseEnglish)} · " +
                     $"{target?.DisplayName.Get(database.UseEnglish)} · {result.Message} · " +
                     $"성공률 {result.SuccessChance}% · 발각률 {result.DetectionChance}%");
             }
         }
 
-        // 모략 성향 AI가 숨은 자원 없이 유휴 인물과 보유 영향력으로 한 번의 계략을 시도합니다.
+        // 모략 성향 AI가 숨은 자원 없이 유휴 인물과 보유 영향력으로 한 번의 첩보를 시도합니다.
         public static void ScheduleAISchemes(WIAdministrationDatabaseSO database, WIAdministrationState state, WITurnSummary summary)
         {
             foreach (WIFactionDefinition faction in database.Factions.Where(item =>
@@ -280,10 +280,10 @@ namespace ProjectWI.Administration
                 if (TrySchedule(database, state, "scheme_rumor", faction.Id, agentId,
                     target.CastleId, null, (state.Turn * 17 + target.Stability) % 100, out _))
                 {
-                    summary.News.Add($"적 계략 동향 · {database.GetFaction(faction.Id).DisplayName.Get(database.UseEnglish)}가 모략 임무를 시작했습니다.");
+                    summary.News.Add($"적 첩보 동향 · {database.GetFaction(faction.Id).DisplayName.Get(database.UseEnglish)}가 모략 임무를 시작했습니다.");
                     WIAdministrationTurnSystem.AddAIReasonReport(summary, faction.Id,
-                        faction.DisplayName.Get(database.UseEnglish), "계략",
-                        $"치안 하위 {WIAdministrationTurnSystem.GetAICandidateWindow(database, state, targets.Count)}개 중 " +
+                        faction.DisplayName.Get(database.UseEnglish), "첩보",
+                        $"질서 하위 {WIAdministrationTurnSystem.GetAICandidateWindow(database, state, targets.Count)}개 중 " +
                         $"{targetIndex + 1}순위 {database.GetCastle(target.CastleId).DisplayName.Get(database.UseEnglish)}({target.Stability})에 유언비어 배정");
                 }
             }

@@ -19,7 +19,7 @@ namespace ProjectWI.Administration
             return HasActiveInvestigation(state, observerFactionId, castle.CastleId);
         }
 
-        // 지정 세력이 해당 성에 남은 조사 정보를 가지고 있는지 반환합니다.
+        // 지정 진영이 해당 성에 남은 조사 정보를 가지고 있는지 반환합니다.
         public static bool HasActiveInvestigation(
             WIAdministrationState state,
             string observerFactionId,

@@ -1,18 +1,64 @@
 using System.IO;
 using NUnit.Framework;
 using ProjectWI.Administration;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace ProjectWI.Tests.Editor
 {
     public class WIUILayoutFormattingTests
     {
+        // 분리된 영지 관리 UXML을 하나의 검증 문자열로 결합합니다.
+        private static string ReadAdministrationLayout()
+        {
+            string[] paths = Directory.GetFiles("Assets/UI/Administration/Views", "*.uxml");
+            System.Array.Sort(paths, System.StringComparer.Ordinal);
+            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            foreach (string path in paths)
+            {
+                layout += "\n" + File.ReadAllText(path);
+            }
+
+            return layout;
+        }
+
+        // 기능별 partial로 분리된 영지 관리 컨트롤러를 하나의 검증 문자열로 결합합니다.
+        private static string ReadAdministrationController()
+        {
+            string[] paths = Directory.GetFiles("Assets/Scripts/Administration", "WIAdministrationUIController*.cs");
+            System.Array.Sort(paths, System.StringComparer.Ordinal);
+            string controller = string.Empty;
+            foreach (string path in paths)
+            {
+                controller += "\n" + File.ReadAllText(path);
+            }
+
+            return controller;
+        }
+
+        // 루트 UXML이 분리된 화면 템플릿을 실제 VisualElement 트리로 조립하는지 검증합니다.
+        [Test]
+        public void AdministrationLayout_ComposesSeparatedTemplates()
+        {
+            VisualTreeAsset layout = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(
+                "Assets/UI/Administration/WIAdministration.uxml");
+            Assert.IsNotNull(layout);
+
+            TemplateContainer root = layout.CloneTree();
+            Assert.IsNotNull(root.Q<VisualElement>("compact-hud"));
+            Assert.IsNotNull(root.Q<VisualElement>("global-view"));
+            Assert.IsNotNull(root.Q<VisualElement>("castle-view"));
+            Assert.IsNotNull(root.Q<VisualElement>("modal-layer"));
+            Assert.AreEqual(60, root.Query<Button>(className: "castle-node").ToList().Count);
+        }
+
         // 긴 캠페인 목표 문장이 모달 폭 안에서 줄바꿈되도록 전용 스타일이 유지되는지 검증합니다.
         [Test]
         public void ObjectiveModal_LongCopyUsesWrappingStyle()
         {
             string stylesheet = System.IO.File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
-            string controller = System.IO.File.ReadAllText("Assets/Scripts/Administration/WIAdministrationUIController.cs");
+            string controller = ReadAdministrationController();
 
             StringAssert.Contains(".objective-modal-copy", stylesheet);
             StringAssert.Contains("white-space:normal", stylesheet);
@@ -36,7 +82,7 @@ namespace ProjectWI.Tests.Editor
         public void CommonModal_LongContentUsesVerticalScrollView()
         {
             string stylesheet = System.IO.File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
-            string controller = System.IO.File.ReadAllText("Assets/Scripts/Administration/WIAdministrationUIController.cs");
+            string controller = ReadAdministrationController();
 
             StringAssert.Contains("new ScrollView(ScrollViewMode.Vertical)", controller);
             StringAssert.Contains("return scrollView.contentContainer", controller);
@@ -45,12 +91,12 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("overflow:hidden", stylesheet);
         }
 
-        // 월보 본문과 전투 행동 영역이 서로 다른 스크롤 영역으로 분리되는지 검증합니다.
+        // 월간 보고 본문과 전투 행동 영역이 서로 다른 스크롤 영역으로 분리되는지 검증합니다.
         [Test]
         public void MonthlyReport_BattleActionsUseFixedFooter()
         {
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
-            string controller = File.ReadAllText("Assets/Scripts/Administration/WIAdministrationUIController.cs");
+            string controller = ReadAdministrationController();
 
             StringAssert.Contains("CreateModalWithFooter", controller);
             StringAssert.Contains("AddPendingBattleActions(battleFooter)", controller);
@@ -106,7 +152,7 @@ namespace ProjectWI.Tests.Editor
                 Assert.IsTrue(File.Exists(Path.Combine("Assets/Resources/UI/Generated", assetName)), assetName);
             }
 
-            string administrationUxml = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string administrationUxml = ReadAdministrationLayout();
             string administrationUss = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
             string battleUxml = File.ReadAllText("Assets/UI/Battle/WIBattleHUD.uxml");
             StringAssert.Contains("class=\"global-command generated-normal\"", administrationUxml);
@@ -148,11 +194,11 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("-unity-slice-left:28", battle);
         }
 
-        // 성 내정의 영웅과 특화 시설 목록이 분리된 스크롤 영역을 사용하는지 검증합니다.
+        // 영지 관리의 영웅과 특화 시설 목록이 분리된 스크롤 영역을 사용하는지 검증합니다.
         [Test]
         public void CastleSlots_UseSeparatedScrollableSections()
         {
-            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string layout = ReadAdministrationLayout();
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
 
             StringAssert.Contains("slot-scroll hero-slot-scroll", layout);
@@ -180,13 +226,13 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("-unity-background-image-tint-color:rgb(217,234,255)", battle);
         }
 
-        // 전략 지도와 성 내정 화면이 시안형 성채 마커·좌우 패널·하단 관리 구조를 유지하는지 검증합니다.
+        // 전략 지도와 영지 관리 화면이 시안형 성채 마커·좌우 패널·하단 관리 구조를 유지하는지 검증합니다.
         [Test]
         public void StrategyAndCastleViews_UseConceptLayoutAndCastleMarkers()
         {
-            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string layout = ReadAdministrationLayout();
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
-            string controller = File.ReadAllText("Assets/Scripts/Administration/WIAdministrationUIController.cs");
+            string controller = ReadAdministrationController();
 
             StringAssert.Contains("global-castle-hero-cards", layout);
             StringAssert.Contains("objective-progress-fill", layout);
@@ -202,7 +248,7 @@ namespace ProjectWI.Tests.Editor
         [Test]
         public void StrategyTheme_UsesProjectFontsAndFlatCommandAssets()
         {
-            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string layout = ReadAdministrationLayout();
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
 
             Assert.IsTrue(File.Exists("Assets/Fonts/NotoSerifKR-VariableFont_wght.ttf"));
@@ -225,7 +271,7 @@ namespace ProjectWI.Tests.Editor
         [Test]
         public void GlobalCommands_UseDTypeWhileTurnButtonKeepsBType()
         {
-            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string layout = ReadAdministrationLayout();
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
 
             Assert.AreEqual(8, layout.Split(new[] { "class=\"global-command " }, System.StringSplitOptions.None).Length - 1);
@@ -237,11 +283,33 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("-unity-slice-bottom:20;", stylesheet);
         }
 
+        // 전략 UI의 플레이어 표시 문구가 판타지 공식 용어를 사용하는지 검증합니다.
+        [Test]
+        public void AdministrationUI_UsesFantasyTerminology()
+        {
+            string layout = ReadAdministrationLayout();
+            string controller = ReadAdministrationController();
+            string combined = layout + controller;
+
+            string[] retiredTerms = { "군주", "태수", "평정", "월보", "내정", "계략", "출정", "세력", "등용", "재야", "치안", "공적", "부대" };
+            foreach (string retiredTerm in retiredTerms)
+            {
+                StringAssert.DoesNotContain(retiredTerm, combined, $"폐기 용어가 남았습니다: {retiredTerm}");
+            }
+
+            StringAssert.Contains("text=\"영웅\"", layout);
+            StringAssert.Contains("text=\"첩보\"", layout);
+            StringAssert.Contains("text=\"의회\"", layout);
+            StringAssert.Contains("text=\"월간 보고\"", layout);
+            StringAssert.Contains("text=\"영지관 위임\"", layout);
+            StringAssert.Contains("text=\"진격 / 원정\"", layout);
+        }
+
         // 우측 목표·알림 및 성 명령 패널이 생성 에셋과 읽기 쉬운 버튼 서체를 사용하는지 검증합니다.
         [Test]
         public void RightPanels_UseGeneratedFramesAndSansButtonFont()
         {
-            string layout = File.ReadAllText("Assets/UI/Administration/WIAdministration.uxml");
+            string layout = ReadAdministrationLayout();
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
             string battleStylesheet = File.ReadAllText("Assets/UI/Battle/WIBattleHUD.uss");
 
@@ -336,15 +404,15 @@ namespace ProjectWI.Tests.Editor
         public void BuildResourceCalculationTooltip_IncludesDecisionEvidence()
         {
             string tooltip = WIAdministrationUIController.BuildResourceCalculationTooltip(
-                "금화", 1234567, 890, 3, "번영 × 규모 × 치안");
+                "금화", 1234567, 890, 3, "번영 × 규모 × 질서");
 
             StringAssert.Contains("1,234,567", tooltip);
             StringAssert.Contains("+890", tooltip);
             StringAssert.Contains("소유 성 3개", tooltip);
-            StringAssert.Contains("근거: 번영 × 규모 × 치안", tooltip);
+            StringAssert.Contains("근거: 번영 × 규모 × 질서", tooltip);
         }
 
-        // 계략 성공률이 기본 확률과 담당 지력에서 대상 치안·방첩을 차감해 계산되는지 검증합니다.
+        // 첩보 성공률이 기본 확률과 담당 지력에서 대상 질서·방첩을 차감해 계산되는지 검증합니다.
         [Test]
         public void CalculateSchemeSuccessChance_UsesVisibleFactors()
         {
@@ -359,7 +427,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(60, WISchemeSystem.CalculateSuccessChance(scheme, agent, target));
         }
 
-        // 다섯 세력이 색상 없이도 중복되지 않는 고유 코드로 구분되는지 검증합니다.
+        // 다섯 진영이 색상 없이도 중복되지 않는 고유 코드로 구분되는지 검증합니다.
         [Test]
         public void FactionAccessibilityCodes_AreUniqueAndStable()
         {

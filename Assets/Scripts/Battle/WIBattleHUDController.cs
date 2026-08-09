@@ -26,7 +26,7 @@ namespace ProjectWI.Battle
             playerSide = side;
         }
 
-        // 전투 HUD 요소와 부대 명령 버튼을 런타임 컨트롤러에 연결합니다.
+        // 전투 HUD 요소와 전투단 명령 버튼을 런타임 컨트롤러에 연결합니다.
         private void Awake()
         {
             VisualElement root = GetComponent<UIDocument>().rootVisualElement;
@@ -63,7 +63,7 @@ namespace ProjectWI.Battle
             RefreshCommandFeedback(runtime);
         }
 
-        // 선택한 부대 명령을 플레이어 진영에 적용합니다.
+        // 선택한 전투단 명령을 플레이어 진영에 적용합니다.
         private void SetCommand(WIBattleCommand command)
         {
             if (battleController == null || battleController.Runtime == null) return;

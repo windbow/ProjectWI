@@ -4,7 +4,7 @@ namespace ProjectWI.Administration
 {
     public static class WIRegionalEventSystem
     {
-        // 선택 결과의 자원 비용을 현재 세력이 감당할 수 있는지 확인합니다.
+        // 선택 결과의 자원 비용을 현재 진영이 감당할 수 있는지 확인합니다.
         public static bool CanChoose(WIAdministrationState state, WIRegionalEventChoiceDefinition choice)
         {
             return state != null && choice != null &&

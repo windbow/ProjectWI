@@ -512,7 +512,7 @@ namespace ProjectWI.Administration
             return state;
         }
 
-        // AI 성향에 대응하는 기본 세력 방침을 반환합니다.
+        // AI 성향에 대응하는 기본 진영 방침을 반환합니다.
         private static WIFactionPolicy GetPolicyForAIStrategy(WIAIStrategy strategy)
         {
             switch (strategy)
@@ -525,19 +525,19 @@ namespace ProjectWI.Administration
             }
         }
 
-        // ID로 세력의 독립 경제 상태를 찾습니다.
+        // ID로 진영의 독립 경제 상태를 찾습니다.
         public WIFactionRuntimeState GetFactionState(string factionId)
         {
             return Factions.Find(item => item.FactionId == factionId);
         }
 
-        // 플레이어 세력의 경제 상태를 반환합니다.
+        // 플레이어 진영의 경제 상태를 반환합니다.
         public WIFactionRuntimeState GetPlayerFactionState()
         {
             return Factions.Find(item => item.FactionId == PlayerFactionId);
         }
 
-        // 두 세력 사이의 외교 관계를 순서와 무관하게 찾거나 생성합니다.
+        // 두 진영 사이의 외교 관계를 순서와 무관하게 찾거나 생성합니다.
         public WIDiplomaticRelationState GetOrCreateDiplomaticRelation(string firstFactionId, string secondFactionId)
         {
             if (firstFactionId == secondFactionId || string.IsNullOrEmpty(firstFactionId) || string.IsNullOrEmpty(secondFactionId))
@@ -563,7 +563,7 @@ namespace ProjectWI.Administration
             return relation;
         }
 
-        // 신규 및 구버전 캠페인에 기본 세력 관계를 채웁니다.
+        // 신규 및 구버전 캠페인에 기본 진영 관계를 채웁니다.
         public void EnsureDefaultDiplomacy()
         {
             DiplomaticRelations = DiplomaticRelations ?? new List<WIDiplomaticRelationState>();
@@ -634,7 +634,7 @@ namespace ProjectWI.Administration
                 (item.ActiveProject.ManagerHeroId == heroId || item.ActiveProject.AssistantHeroId == heroId));
         }
 
-        // 인물이 사업, 개인 활동, 의뢰, 부대, 연구 또는 이동으로 행동 불가 상태인지 확인합니다.
+        // 인물이 사업, 개인 활동, 의뢰, 전투단, 연구 또는 이동으로 행동 불가 상태인지 확인합니다.
         public bool IsCharacterBusy(string heroId)
         {
             WICharacterRuntimeState character = GetCharacter(heroId);

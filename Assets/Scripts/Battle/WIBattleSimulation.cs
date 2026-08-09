@@ -440,7 +440,7 @@ namespace ProjectWI.Battle
             return nearest;
         }
 
-        // 진영에 현재 지정된 부대 명령을 반환합니다.
+        // 진영에 현재 지정된 전투단 명령을 반환합니다.
         private static WIBattleCommand GetCommand(WIBattleRuntimeState runtime, WIBattleSide side)
         {
             return side == WIBattleSide.Attacker ? runtime.AttackerCommand : runtime.DefenderCommand;

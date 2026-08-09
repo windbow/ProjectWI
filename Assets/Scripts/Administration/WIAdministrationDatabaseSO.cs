@@ -954,13 +954,13 @@ namespace ProjectWI.Administration
             return campaignEndings.Find(item => item.EndingType == endingType);
         }
 
-        // 세력 ID에 대응하는 멸망 사건 서사를 찾습니다.
+        // 진영 ID에 대응하는 멸망 사건 서사를 찾습니다.
         public WIFactionEliminationNarrativeDefinition GetFactionEliminationNarrative(string factionId)
         {
             return factionEliminationNarratives.Find(item => item.FactionId == factionId);
         }
 
-        // 식별자로 지역·세력 사건 정의를 찾습니다.
+        // 식별자로 지역·진영 사건 정의를 찾습니다.
         public WIRegionalEventDefinition GetRegionalEvent(string id)
         {
             return regionalEventDefinitions.Find(item => item.Id == id);
@@ -1000,7 +1000,7 @@ namespace ProjectWI.Administration
             return value == null ? uid : value.Get(useEnglish);
         }
 
-        // ID로 세력 데이터를 찾습니다.
+        // ID로 진영 데이터를 찾습니다.
         public WIFactionDefinition GetFaction(string id)
         {
             return factions.Find(item => item.Id == id);
@@ -1030,7 +1030,7 @@ namespace ProjectWI.Administration
             return heroLegacyDefinitions.Find(item => item.ProjectType == projectType);
         }
 
-        // 식별자로 등용 요구 사건 정의를 반환합니다.
+        // 식별자로 영입 요구 사건 정의를 반환합니다.
         public WIRecruitmentEventDefinition GetRecruitmentEvent(string id)
         {
             return recruitmentEventDefinitions.Find(item => item.Id == id);
@@ -1054,7 +1054,7 @@ namespace ProjectWI.Administration
             return titleDefinitions.Find(item => item.Id == id);
         }
 
-        // ID로 계략 정의를 찾습니다.
+        // ID로 첩보 정의를 찾습니다.
         public WISchemeDefinition GetScheme(string id)
         {
             return schemeDefinitions.Find(item => item.Id == id);

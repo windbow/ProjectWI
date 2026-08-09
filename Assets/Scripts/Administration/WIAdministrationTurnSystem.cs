@@ -26,7 +26,7 @@ namespace ProjectWI.Administration
                 session.PlayerInvolved && session.Status != WIBattleSessionStatus.Resolved);
         }
 
-        // 모든 세력의 월간 수입과 중점 사업을 한 턴 단위로 계산합니다.
+        // 모든 진영의 월간 수입과 중점 사업을 한 턴 단위로 계산합니다.
         public static WITurnSummary ExecuteTurn(WIAdministrationDatabaseSO database, WIAdministrationState state)
         {
             WITurnSummary summary = new WITurnSummary();
@@ -160,7 +160,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 관계 사건 선택 결과를 관계·공적·피로에 적용하고 중복 발생을 막습니다.
+        // 관계 사건 선택 결과를 관계·공훈·피로에 적용하고 중복 발생을 막습니다.
         public static bool ResolveRelationshipEvent(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -273,7 +273,7 @@ namespace ProjectWI.Administration
                 : $"{eventId}:{secondHeroId}:{firstHeroId}";
         }
 
-        // 지정 세력이 다음 달에 받을 성별 기본 수입과 연구 보너스 합계를 계산합니다.
+        // 지정 진영이 다음 달에 받을 성별 기본 수입과 연구 보너스 합계를 계산합니다.
         public static WITurnSummary GetFactionMonthlyIncome(WIAdministrationDatabaseSO database,
             WIAdministrationState state, string factionId)
         {
@@ -316,7 +316,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 우호 세력과 영향력을 사용해 불가침 협정을 체결합니다.
+        // 우호 진영과 영향력을 사용해 불가침 협정을 체결합니다.
         public static bool SignNonAggression(WIAdministrationState state, string initiatorFactionId, string targetFactionId)
         {
             WIFactionRuntimeState initiator = state.GetFactionState(initiatorFactionId);
@@ -332,7 +332,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 불가침 세력과 영향력을 사용해 동맹을 체결합니다.
+        // 불가침 진영과 영향력을 사용해 동맹을 체결합니다.
         public static bool FormAlliance(WIAdministrationState state, string initiatorFactionId, string targetFactionId)
         {
             WIFactionRuntimeState initiator = state.GetFactionState(initiatorFactionId);
@@ -349,7 +349,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 영향력을 지불하고 협정을 파기해 대상 세력에 선전포고합니다.
+        // 영향력을 지불하고 협정을 파기해 대상 진영에 선전포고합니다.
         public static bool DeclareWar(WIAdministrationState state, string initiatorFactionId, string targetFactionId)
         {
             WIFactionRuntimeState initiator = state.GetFactionState(initiatorFactionId);
@@ -384,7 +384,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 원소속 세력이 몸값을 지불해 상대 세력이 억류한 포로 한 명을 즉시 귀환시킵니다.
+        // 원소속 진영이 몸값을 지불해 상대 진영이 억류한 포로 한 명을 즉시 귀환시킵니다.
         public static bool RansomPrisoner(WIAdministrationDatabaseSO database, WIAdministrationState state,
             string requesterFactionId, string prisonerHeroId)
         {
@@ -402,7 +402,7 @@ namespace ProjectWI.Administration
             return ReleaseCapturedCharacter(state, prisoner);
         }
 
-        // 서로 상대 세력이 억류한 두 포로를 비용 없이 맞교환해 각 원소속 성으로 귀환시킵니다.
+        // 서로 상대 진영이 억류한 두 포로를 비용 없이 맞교환해 각 원소속 성으로 귀환시킵니다.
         public static bool ExchangePrisoners(WIAdministrationState state, string firstFactionId, string secondFactionId,
             string firstPrisonerHeroId, string secondPrisonerHeroId)
         {
@@ -418,7 +418,7 @@ namespace ProjectWI.Administration
             return ReleaseCapturedCharacter(state, first) && ReleaseCapturedCharacter(state, second);
         }
 
-        // 동맹 양측이 모두 교전 중인 제3세력의 성을 제한 기간 공동 공격 목표로 지정합니다.
+        // 동맹 양측이 모두 교전 중인 제3진영의 성을 제한 기간 공동 공격 목표로 지정합니다.
         public static bool ProposeJointAttack(WIAdministrationDatabaseSO database, WIAdministrationState state,
             string proposerFactionId, string allyFactionId, string targetCastleId)
         {
@@ -440,14 +440,14 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 두 세력이 현재 전쟁 상태인지 확인합니다.
+        // 두 진영이 현재 전쟁 상태인지 확인합니다.
         public static bool AreFactionsAtWar(WIAdministrationState state, string firstFactionId, string secondFactionId)
         {
             WIDiplomaticRelationState relation = state.GetOrCreateDiplomaticRelation(firstFactionId, secondFactionId);
             return relation != null && relation.Status == WIDiplomaticStatus.War;
         }
 
-        // 영토가 사라진 세력을 한 번만 멸망 처리하고 잔존 행동·부대·인물·외교 약속을 정리합니다.
+        // 영토가 사라진 진영을 한 번만 멸망 처리하고 잔존 행동·전투단·인물·외교 약속을 정리합니다.
         public static void ResolveFactionEliminations(WIAdministrationDatabaseSO database, WIAdministrationState state,
             WITurnSummary summary)
         {
@@ -499,14 +499,14 @@ namespace ProjectWI.Administration
 
                 WIFactionDefinition definition = database.GetFaction(faction.FactionId);
                 WIFactionEliminationNarrativeDefinition narrative = database.GetFactionEliminationNarrative(faction.FactionId);
-                string title = narrative?.Title.Get(database.UseEnglish) ?? "세력 멸망";
+                string title = narrative?.Title.Get(database.UseEnglish) ?? "진영 멸망";
                 string description = narrative?.Description.Get(database.UseEnglish) ?? "모든 영토를 상실했습니다.";
-                summary?.News.Add($"세력 멸망 · {definition?.DisplayName.Get(database.UseEnglish) ?? faction.FactionId} · " +
+                summary?.News.Add($"진영 멸망 · {definition?.DisplayName.Get(database.UseEnglish) ?? faction.FactionId} · " +
                                   $"{title} · 제 {state.Turn}턴 · {description}");
             }
         }
 
-        // 한 턴의 AI 판단 근거를 세력·분야별 한 건으로 제한해 월보에 추가합니다.
+        // 한 턴의 AI 판단 근거를 진영·분야별 한 건으로 제한해 월간 보고에 추가합니다.
         public static void AddAIReasonReport(WITurnSummary summary, string factionId, string factionName,
             string category, string reason)
         {
@@ -534,7 +534,7 @@ namespace ProjectWI.Administration
             return Mathf.Clamp(database.GetDifficulty(state.Difficulty)?.AICandidateWindow ?? 2, 1, Mathf.Max(1, candidateCount));
         }
 
-        // 외교 원조 대기 시간을 줄이고 AI 세력의 제한적인 관계 개선을 처리합니다.
+        // 외교 원조 대기 시간을 줄이고 AI 진영의 제한적인 관계 개선을 처리합니다.
         private static void ResolveDiplomaticTurn(WIAdministrationDatabaseSO database, WIAdministrationState state, WITurnSummary summary)
         {
             foreach (WIDiplomaticRelationState relation in state.DiplomaticRelations)
@@ -576,7 +576,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 같은 세력의 인접 성으로 인물의 한 달 이동을 시작합니다.
+        // 같은 진영의 인접 성으로 인물의 한 달 이동을 시작합니다.
         public static bool StartCharacterTransfer(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -607,7 +607,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 성에 주둔한 유휴 인물을 태수로 임명하거나 기존 태수를 교체합니다.
+        // 성에 주둔한 유휴 인물을 영지관로 임명하거나 기존 영지관을 교체합니다.
         public static bool AssignGovernor(WIAdministrationState state, string castleId, string heroId)
         {
             WICastleRuntimeState castle = state.GetCastle(castleId);
@@ -731,7 +731,7 @@ namespace ProjectWI.Administration
             castleState.ActiveProject = null;
         }
 
-        // 사업과 일치하는 담당 인물 특기의 고유 결과를 적용하고 월보 문구를 추가합니다.
+        // 사업과 일치하는 담당 인물 특기의 고유 결과를 적용하고 월간 보고 문구를 추가합니다.
         public static void ApplyTraitUniqueEffects(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -764,7 +764,7 @@ namespace ProjectWI.Administration
                         {
                             army.Supply = WISupplyState.Sufficient;
                         }
-                        result = "주둔 부대 보급 충분";
+                        result = "주둔 전투단 보급 충분";
                         break;
                     case WITraitType.Merchant:
                         if (faction != null && faction.FactionId == state.PlayerFactionId) summary.GoldGained += value;
@@ -817,7 +817,7 @@ namespace ProjectWI.Administration
                             army.CohesionExperience += value;
                             UpdateArmyProficiency(army);
                         }
-                        result = $"주둔 부대 숙련 경험 +{value}";
+                        result = $"주둔 전투단 숙련 경험 +{value}";
                         break;
                 }
 
@@ -828,7 +828,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 주둔 인물을 대장으로 지정해 새 부대를 생성합니다.
+        // 주둔 인물을 대장으로 지정해 새 전투단을 생성합니다.
         public static WIArmyState CreateArmy(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -843,7 +843,7 @@ namespace ProjectWI.Administration
             WIArmyState army = new WIArmyState
             {
                 ArmyId = $"army_{state.NextArmyNumber}",
-                DisplayName = $"제 {state.NextArmyNumber} 부대",
+                DisplayName = $"제 {state.NextArmyNumber} 전투단",
                 FactionId = castle.FactionId,
                 CurrentCastleId = castle.CastleId
             };
@@ -853,7 +853,7 @@ namespace ProjectWI.Administration
             return army;
         }
 
-        // 같은 성의 대기 인물을 지정된 역할로 부대에 추가합니다.
+        // 같은 성의 대기 인물을 지정된 역할로 전투단에 추가합니다.
         public static bool AddArmyMember(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -877,7 +877,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 대장이 아닌 부대원을 제외하고 편성 변경에 따른 합동 경험을 감소시킵니다.
+        // 대장이 아닌 전투단원을 제외하고 편성 변경에 따른 합동 경험을 감소시킵니다.
         public static bool RemoveArmyMember(
             WIAdministrationState state,
             WIArmyState army,
@@ -906,7 +906,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 주둔 중인 부대를 해산하고 모든 구성원을 현재 성으로 복귀시킵니다.
+        // 주둔 중인 전투단을 해산하고 모든 구성원을 현재 성으로 복귀시킵니다.
         public static bool DisbandArmy(WIAdministrationState state, WIArmyState army)
         {
             if (army == null || army.IsMoving || army.AwaitingBattle || army.ReorganizationMonths > 0)
@@ -932,7 +932,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 주둔 중인 부대에 다음 달 합동 훈련을 예약합니다.
+        // 주둔 중인 전투단에 다음 달 합동 훈련을 예약합니다.
         public static bool ScheduleJointTraining(WIArmyState army)
         {
             if (army == null || army.IsMoving || army.AwaitingBattle || army.ReorganizationMonths > 0 || army.JointTrainingScheduled)
@@ -944,7 +944,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 대장의 통솔에 따른 현재 부대의 권장 인원 상한을 반환합니다.
+        // 대장의 통솔에 따른 현재 전투단의 권장 인원 상한을 반환합니다.
         public static int GetRecommendedArmySize(WIAdministrationDatabaseSO database, WIArmyState army)
         {
             WIArmyMemberState commander = army.Members.Find(member => member.Role == WIUnitRole.Commander);
@@ -1005,7 +1005,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 이동 중인 부대의 남은 기간, 도착, 보급과 숙련을 처리합니다.
+        // 이동 중인 전투단의 남은 기간, 도착, 보급과 숙련을 처리합니다.
         private static void ResolveArmyMovement(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1053,7 +1053,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 예약된 합동 훈련을 처리해 부대 숙련과 구성원 경험을 높입니다.
+        // 예약된 합동 훈련을 처리해 전투단 숙련과 구성원 경험을 높입니다.
         private static void ResolveArmyTraining(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1085,7 +1085,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 합동 경험 수치에 따라 부대 숙련 단계를 갱신합니다.
+        // 합동 경험 수치에 따라 전투단 숙련 단계를 갱신합니다.
         private static void UpdateArmyProficiency(WIArmyState army)
         {
             army.Proficiency = army.CohesionExperience >= 80
@@ -1093,7 +1093,7 @@ namespace ProjectWI.Administration
                 : (army.CohesionExperience >= 30 ? WIUnitProficiency.Trained : WIUnitProficiency.Rookie);
         }
 
-        // 전투 대기 중인 부대와 성 수비 전력을 비교해 임시 전략 전투 결과를 결정합니다.
+        // 전투 대기 중인 전투단과 성 수비 전력을 비교해 임시 전략 전투 결과를 결정합니다.
         private static void ResolveStrategicBattles(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1133,7 +1133,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 전투 진입 시점의 참가 부대와 전력을 고정한 세션 데이터를 생성합니다.
+        // 전투 진입 시점의 참가 전투단과 전력을 고정한 세션 데이터를 생성합니다.
         public static WIBattleSessionState CreateBattleSession(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1280,7 +1280,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 인물 능력, 역할, 숙련, 보급과 피로를 조합해 부대 전투력을 계산합니다.
+        // 인물 능력, 역할, 숙련, 보급과 피로를 조합해 전투단 전투력을 계산합니다.
         public static int GetArmyBattlePower(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1309,7 +1309,7 @@ namespace ProjectWI.Administration
             return Mathf.Max(1, power);
         }
 
-        // 성 방어도와 주둔 인물 및 수비 부대 전투력을 합산합니다.
+        // 성 방어도와 주둔 인물 및 수비 전투단 전투력을 합산합니다.
         public static int GetCastleDefensePower(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1335,7 +1335,7 @@ namespace ProjectWI.Administration
             return Mathf.Max(1, power);
         }
 
-        // 패배 부대를 가까운 아군 성으로 후퇴시키고 한 달간 재편성 상태로 전환합니다.
+        // 패배 전투단을 가까운 아군 성으로 후퇴시키고 한 달간 재편성 상태로 전환합니다.
         private static void RetreatAndReorganizeArmy(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1379,7 +1379,7 @@ namespace ProjectWI.Administration
             TryCaptureDefeatedCharacter(database, state, army, defeatMargin, orderlyRetreat, captorFactionId, summary);
         }
 
-        // 승패와 전력 차이에 따라 피로, 부상, 경험과 공적을 반영합니다.
+        // 승패와 전력 차이에 따라 피로, 부상, 경험과 공훈을 반영합니다.
         private static void ApplyBattleConsequences(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1413,12 +1413,12 @@ namespace ProjectWI.Administration
                 WIHeroDefinition hero = database.GetHero(member.HeroId);
                 string result = victory ? "승리" : orderlyRetreat ? "질서 있는 후퇴" : "패배";
                 summary?.News.Add($"전투 인물 · {hero?.DisplayName.Get(database.UseEnglish) ?? member.HeroId} · {result} · " +
-                    $"공적 +{meritGain} · 경험 +{experienceGain} · 피로 +{fatigueGain}" +
+                    $"공훈 +{meritGain} · 경험 +{experienceGain} · 피로 +{fatigueGain}" +
                     (injured ? $" · 부상 {database.BattleInjuryMonths}개월" : string.Empty));
             }
         }
 
-        // 함께 승리한 부대원 쌍의 전우 승리를 누적하고 기준 도달 시 관계를 한 단계 개선합니다.
+        // 함께 승리한 전투단원 쌍의 전우 승리를 누적하고 기준 도달 시 관계를 한 단계 개선합니다.
         private static void ApplyBattleRelationshipConsequences(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1492,7 +1492,7 @@ namespace ProjectWI.Administration
                 $"{database.GetFaction(captorFactionId)?.DisplayName.Get(database.UseEnglish) ?? captorFactionId} 억류 {database.CaptureDurationMonths}개월");
         }
 
-        // 포로 억류 기간을 줄이고 만료된 인물을 원래 세력의 성으로 귀환시킵니다.
+        // 포로 억류 기간을 줄이고 만료된 인물을 원래 진영의 성으로 귀환시킵니다.
         private static void ResolveCapturedCharacters(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1510,7 +1510,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 포로 상태를 해제하고 원소속 세력이 보유한 첫 성으로 인물을 배치합니다.
+        // 포로 상태를 해제하고 원소속 진영이 보유한 첫 성으로 인물을 배치합니다.
         private static bool ReleaseCapturedCharacter(WIAdministrationState state, WICharacterRuntimeState character)
         {
             WICastleRuntimeState returnCastle = state.Castles.FirstOrDefault(item => item.FactionId == character.CapturedFromFactionId);
@@ -1522,7 +1522,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 재편성 중인 부대의 남은 기간을 줄이고 완료 소식을 기록합니다.
+        // 재편성 중인 전투단의 남은 기간을 줄이고 완료 소식을 기록합니다.
         private static void ResolveArmyReorganization(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1579,7 +1579,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 점령지의 태수와 주둔 부대 유무에 따라 월간 치안 안정을 처리합니다.
+        // 점령지의 영지관과 주둔 전투단 유무에 따라 월간 질서 안정을 처리합니다.
         private static void ResolveOccupationStability(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1604,11 +1604,11 @@ namespace ProjectWI.Administration
                     castle.Stability = Mathf.Clamp(castle.Stability - 3, 0, 100);
                 }
 
-                summary.News.Add($"점령지 안정 · {database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish)} · 치안 {castle.Stability} · 불안 {castle.OccupationUnrestMonths}개월");
+                summary.News.Add($"점령지 안정 · {database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish)} · 질서 {castle.Stability} · 불안 {castle.OccupationUnrestMonths}개월");
             }
         }
 
-        // 출발 성의 번영 상태로 부대 보급 상태를 판정합니다.
+        // 출발 성의 번영 상태로 전투단 보급 상태를 판정합니다.
         private static WISupplyState GetArmySupplyState(WICastleRuntimeState origin)
         {
             if (origin.Prosperity >= 50) return WISupplyState.Sufficient;
@@ -1616,7 +1616,7 @@ namespace ProjectWI.Administration
             return WISupplyState.Depleted;
         }
 
-        // 보급 상태에 따라 이동을 마친 부대원의 피로를 증가시킵니다.
+        // 보급 상태에 따라 이동을 마친 전투단원의 피로를 증가시킵니다.
         private static void ApplyMarchFatigue(WIAdministrationState state, WIArmyState army)
         {
             int fatigue = army.Supply == WISupplyState.Sufficient ? 5 : (army.Supply == WISupplyState.Shortage ? 12 : 20);
@@ -1935,7 +1935,7 @@ namespace ProjectWI.Administration
             summary.News.Add($"{hero.DisplayName.Get(database.UseEnglish)}와 {targetHero.DisplayName.Get(database.UseEnglish)} · 관계 {relationship.Level}");
         }
 
-        // 발견한 인재를 설득하고 누적 진척이 충족되면 세력에 영입합니다.
+        // 발견한 인재를 설득하고 누적 진척이 충족되면 진영에 영입합니다.
         private static void ResolveRecruitActivity(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -1952,7 +1952,7 @@ namespace ProjectWI.Administration
             WIHeroDefinition targetHero = database.GetHero(target.HeroId);
             if (character.Reputation < targetHero.RequiredReputation)
             {
-                summary.News.Add($"{targetHero.DisplayName.Get(database.UseEnglish)} 등용 보류 · 명성 {targetHero.RequiredReputation} 필요");
+                summary.News.Add($"{targetHero.DisplayName.Get(database.UseEnglish)} 영입 보류 · 명성 {targetHero.RequiredReputation} 필요");
                 return;
             }
 
@@ -1960,7 +1960,7 @@ namespace ProjectWI.Administration
             target.RecruitmentProgress = Mathf.Clamp(target.RecruitmentProgress + progress, 0, 100);
             if (target.RecruitmentProgress < 100)
             {
-                summary.News.Add($"{targetHero.DisplayName.Get(database.UseEnglish)} 등용 설득 · {target.RecruitmentProgress}%");
+                summary.News.Add($"{targetHero.DisplayName.Get(database.UseEnglish)} 영입 설득 · {target.RecruitmentProgress}%");
                 return;
             }
 
@@ -1970,7 +1970,7 @@ namespace ProjectWI.Administration
                 target.Recruited = true;
                 character.Merit += 10;
                 character.Reputation += 5;
-                summary.News.Add($"{targetHero.DisplayName.Get(database.UseEnglish)} 등용 성공");
+                summary.News.Add($"{targetHero.DisplayName.Get(database.UseEnglish)} 영입 성공");
                 return;
             }
 
@@ -1982,11 +1982,11 @@ namespace ProjectWI.Administration
                     RecruiterHeroId = character.HeroId,
                     CandidateHeroId = target.HeroId
                 });
-                summary.News.Add($"등용 요구 사건 · {recruitmentEvent.Title.Get(database.UseEnglish)} · {targetHero.DisplayName.Get(database.UseEnglish)}");
+                summary.News.Add($"영입 요구 사건 · {recruitmentEvent.Title.Get(database.UseEnglish)} · {targetHero.DisplayName.Get(database.UseEnglish)}");
             }
         }
 
-        // 등용 사건 선택지의 명성·공적·영토·교섭가 조건 충족 여부를 반환합니다.
+        // 영입 사건 선택지의 명성·공훈·영토·교섭가 조건 충족 여부를 반환합니다.
         public static bool CanChooseRecruitmentEventOption(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2009,7 +2009,7 @@ namespace ProjectWI.Administration
                    (recruiterDefinition != null && recruiterDefinition.Traits.Contains(WITraitType.Negotiator));
         }
 
-        // 등용 요구 사건의 선택 결과를 적용해 후보를 영입합니다.
+        // 영입 요구 사건의 선택 결과를 적용해 후보를 영입합니다.
         public static bool ResolveRecruitmentEvent(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2041,11 +2041,11 @@ namespace ProjectWI.Administration
             recruiter.Fatigue = Mathf.Clamp(recruiter.Fatigue + choice.RecruiterFatigueGain, 0, 100);
             state.PendingRecruitmentEvents.Remove(pendingEvent);
             WIHeroDefinition candidateDefinition = database.GetHero(candidate.HeroId);
-            summary?.News.Add($"등용 성공 · {candidateDefinition.DisplayName.Get(database.UseEnglish)} · {choice.ResultDescription.Get(database.UseEnglish)}");
+            summary?.News.Add($"영입 성공 · {candidateDefinition.DisplayName.Get(database.UseEnglish)} · {choice.ResultDescription.Get(database.UseEnglish)}");
             return true;
         }
 
-        // 공적, 명성과 특별 성취를 갖춘 일반 인물을 영웅 승격 후보로 등록합니다.
+        // 공훈, 명성과 특별 성취를 갖춘 일반 인물을 영웅 승격 후보로 등록합니다.
         private static void ResolvePromotionCandidates(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2141,7 +2141,7 @@ namespace ProjectWI.Administration
             return 1;
         }
 
-        // 조건과 비용을 확인해 세력의 연구를 시작합니다.
+        // 조건과 비용을 확인해 진영의 연구를 시작합니다.
         public static bool BeginResearch(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2179,7 +2179,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 공적과 영향력 조건을 확인해 인물에게 작위를 수여합니다.
+        // 공훈과 영향력 조건을 확인해 인물에게 작위를 수여합니다.
         public static bool AwardTitle(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2202,7 +2202,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 진행 중인 세력 연구의 남은 기간을 계산하고 완료 효과를 활성화합니다.
+        // 진행 중인 진영 연구의 남은 기간을 계산하고 완료 효과를 활성화합니다.
         private static void ResolveFactionResearch(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2271,7 +2271,7 @@ namespace ProjectWI.Administration
             return title == null ? 0 : title.ProjectBonus;
         }
 
-        // 인물이 해당 세력의 성이나 부대에 소속되어 있는지 확인합니다.
+        // 인물이 해당 진영의 성이나 전투단에 소속되어 있는지 확인합니다.
         private static bool IsHeroInFaction(WIAdministrationState state, string heroId, string factionId)
         {
             return state.Castles.Any(castle => castle.FactionId == factionId && castle.HeroIds.Contains(heroId)) ||
@@ -2308,7 +2308,7 @@ namespace ProjectWI.Administration
                 ManagerHeroId = manager.Id,
                 RemainingMonths = 1
             };
-            string reason = castleState.Stability < 35 ? $"치안 {castleState.Stability} 보완" :
+            string reason = castleState.Stability < 35 ? $"질서 {castleState.Stability} 보완" :
                 castleState.Defense < 35 ? $"방어 {castleState.Defense} 보완" : $"{GetAIStrategyReason(faction.AIStrategy)} 성향 우선";
             AddAIReasonReport(summary, faction.Id, faction.DisplayName.Get(database.UseEnglish), "사업",
                 $"{database.GetCastle(castleState.CastleId).DisplayName.Get(database.UseEnglish)}에서 {projectType} 선택 · {reason}");
@@ -2361,7 +2361,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 장기 평화로 전선이 하나뿐일 때 인접 AI 세력 사이에 새로운 전쟁 압력을 만듭니다.
+        // 장기 평화로 전선이 하나뿐일 때 인접 AI 진영 사이에 새로운 전쟁 압력을 만듭니다.
         public static bool EnsureAIWarPressure(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2417,11 +2417,11 @@ namespace ProjectWI.Administration
             string targetName = target.DisplayName.Get(database.UseEnglish);
             summary?.News.Add($"전선 격화 · {initiatorName}이 장기 교착을 깨고 {targetName}에 선전포고");
             AddAIReasonReport(summary, initiator.Id, initiatorName, "군사",
-                $"활성 전선 {activeWarFronts}/{database.AIMinimumActiveWarFronts} · 장기 교착 해소를 위해 인접 세력과 전쟁 개시");
+                $"활성 전선 {activeWarFronts}/{database.AIMinimumActiveWarFronts} · 장기 교착 해소를 위해 인접 진영과 전쟁 개시");
             return true;
         }
 
-        // 두 세력이 소유한 성 사이의 인접 경계 연결 수를 계산합니다.
+        // 두 진영이 소유한 성 사이의 인접 경계 연결 수를 계산합니다.
         private static int CountFactionBorderConnections(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2467,7 +2467,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // AI 세력이 전선 위협도를 평가해 복수 부대를 방어, 증원과 공격 임무에 배치합니다.
+        // AI 진영이 전선 위협도를 평가해 복수 전투단을 방어, 증원과 공격 임무에 배치합니다.
         private static void PlanAIActions(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2590,7 +2590,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // AI 부대가 지휘관 한 명으로만 출정하지 않도록 성에 최소 한 명을 남기고 전투 인원을 편성합니다.
+        // AI 전투단이 지휘관 한 명으로만 원정하지 않도록 성에 최소 한 명을 남기고 전투 인원을 편성합니다.
         private static void FillAIArmy(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2623,7 +2623,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 성의 적 인접 수, 적 부대 접근과 방어 상태를 조합한 전선 위협도를 반환합니다.
+        // 성의 적 인접 수, 적 전투단 접근과 방어 상태를 조합한 전선 위협도를 반환합니다.
         public static int GetCastleThreatScore(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2726,7 +2726,7 @@ namespace ProjectWI.Administration
             return definition != null && definition.AdjacentCastleIds.Any(id => state.GetCastle(id)?.FactionId == state.PlayerFactionId);
         }
 
-        // 태수 위임 성에 이번 달 사업과 담당자를 자동으로 배치합니다.
+        // 영지관 위임 성에 이번 달 사업과 담당자를 자동으로 배치합니다.
         private static void AssignDelegatedProject(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -2741,13 +2741,13 @@ namespace ProjectWI.Administration
             WIHeroDefinition governor = database.GetHero(castleState.GovernorHeroId);
             if (governor == null || castleState.HeroIds.Contains(governor.Id) == false)
             {
-                summary.DelegationReports.Add($"{database.GetCastle(castleState.CastleId).DisplayName.Get(database.UseEnglish)} · 태수 부재 · 주둔 인물을 태수로 임명하면 다음 달부터 위임 가능");
+                summary.DelegationReports.Add($"{database.GetCastle(castleState.CastleId).DisplayName.Get(database.UseEnglish)} · 영지관 부재 · 주둔 인물을 영지관로 임명하면 다음 달부터 위임 가능");
                 return;
             }
 
             if (state.IsCharacterBusy(governor.Id))
             {
-                summary.DelegationReports.Add($"{database.GetCastle(castleState.CastleId).DisplayName.Get(database.UseEnglish)} · 태수가 다른 임무 수행 중 · 임무 종료 후 위임 재개");
+                summary.DelegationReports.Add($"{database.GetCastle(castleState.CastleId).DisplayName.Get(database.UseEnglish)} · 영지관이 다른 임무 수행 중 · 임무 종료 후 위임 재개");
                 return;
             }
 
@@ -2788,7 +2788,7 @@ namespace ProjectWI.Administration
             summary.DelegationReports.Add($"[위임 계획] {castleName} · {reason} · 예상 +{expectedGain} · 비용 {budget}G · 기간 1개월");
         }
 
-        // 태수 운영 방침과 성 상태에 따라 이번 달 사업을 선택합니다.
+        // 영지관 운영 방침과 성 상태에 따라 이번 달 사업을 선택합니다.
         public static WICastleProjectType ChooseGovernorProject(WICastleRuntimeState castleState)
         {
             switch (castleState.GovernorPolicy)
@@ -2812,7 +2812,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 월보에 표시할 태수의 사업 선택 이유를 만듭니다.
+        // 월간 보고에 표시할 영지관의 사업 선택 이유를 만듭니다.
         public static string GetGovernorReason(
             WIAdministrationDatabaseSO database,
             WICastleRuntimeState castleState,
@@ -2830,11 +2830,11 @@ namespace ProjectWI.Administration
                     break;
                 case WIGovernorPolicy.Frontline:
                     reason = projectType == WICastleProjectType.Stability
-                        ? $"전선 방침 · 치안 {castleState.Stability}이 방어 {castleState.Defense} 이하"
-                        : $"전선 방침 · 방어 {castleState.Defense}이 치안 {castleState.Stability}보다 낮음";
+                        ? $"전선 방침 · 질서 {castleState.Stability}이 방어 {castleState.Defense} 이하"
+                        : $"전선 방침 · 방어 {castleState.Defense}이 질서 {castleState.Stability}보다 낮음";
                     break;
                 case WIGovernorPolicy.Talent:
-                    reason = "인재 방침으로 탐색과 등용 기반 우선";
+                    reason = "인재 방침으로 탐색과 영입 기반 우선";
                     break;
                 default:
                     reason = $"균형 방침 · 네 핵심 수치 중 {projectType} 대응 수치가 가장 낮음";
@@ -2857,7 +2857,7 @@ namespace ProjectWI.Administration
             WICastleRuntimeState castleState)
         {
             WIHeroDefinition governor = database.GetHero(castleState.GovernorHeroId);
-            if (governor == null) return "태수를 임명해야 위임 계획을 계산할 수 있습니다.";
+            if (governor == null) return "영지관을 임명해야 위임 계획을 계산할 수 있습니다.";
             WICastleProjectType projectType = ChooseGovernorProject(castleState);
             WIProjectInvestment investment = castleState.GovernorMonthlyBudget >= database.ProjectBalance.IntensiveCost
                 ? WIProjectInvestment.Intensive : WIProjectInvestment.Basic;
@@ -2871,7 +2871,7 @@ namespace ProjectWI.Administration
             return $"예상 계획 · {projectType} · {GetGovernorReason(database, castleState, projectType, governor)} · 성과 +{gain} · 비용 {cost}G · 1개월";
         }
 
-        // 세력 방침과 일치하는 사업에 적용할 소규모 성과 보너스를 반환합니다.
+        // 진영 방침과 일치하는 사업에 적용할 소규모 성과 보너스를 반환합니다.
         public static int GetFactionPolicyBonus(WIAdministrationDatabaseSO database, WIFactionPolicy policy, WICastleProjectType projectType)
         {
             bool matched =
@@ -2978,7 +2978,7 @@ namespace ProjectWI.Administration
             return matched ? database.ProjectBalance.TraitGainBonus : 0;
         }
 
-        // 번영, 기술, 치안과 성 규모를 바탕으로 월간 자원 수입을 계산합니다.
+        // 번영, 기술, 질서와 성 규모를 바탕으로 월간 자원 수입을 계산합니다.
         public static void AddCastleIncome(
             WICastleDefinition castleDefinition,
             WICastleRuntimeState castleState,

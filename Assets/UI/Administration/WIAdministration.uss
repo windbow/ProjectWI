@@ -1,5 +1,9 @@
 :root { --gold:#b68a3d; --gold-light:#e2c77e; --ink:#17130f; --paper:#d5c39b; --navy:#111a20; --red:#76231e; }
 .app { flex-grow:1; color:#eee3ca; background-color:#090908; }
+.administration-template { min-width:0; min-height:0; }
+.administration-hud-template { flex-shrink:0; }
+.administration-view-template { flex-grow:1; }
+.administration-overlay-template { position:absolute; left:0; right:0; top:0; bottom:0; }
 .ornament-background { position:absolute; left:0; right:0; top:0; bottom:0; background-color:#15110d; opacity:.9; }
 .frame-gold { border-width:2px; border-color:#62471f; border-top-color:var(--gold-light); }
 .frame-dark { background-color:rgba(14,13,11,.92); border-width:1px; border-color:#6d5734; }

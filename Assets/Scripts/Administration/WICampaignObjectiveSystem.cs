@@ -33,7 +33,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 달성된 목표를 완료 처리하고 보상과 월보 소식을 적용합니다.
+        // 달성된 목표를 완료 처리하고 보상과 월간 보고 소식을 적용합니다.
         public static bool Evaluate(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,

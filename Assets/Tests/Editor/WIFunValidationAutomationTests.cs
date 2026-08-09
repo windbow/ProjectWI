@@ -45,16 +45,16 @@ namespace ProjectWI.Tests.Editor
             }
             TestContext.WriteLine(
                 $"{policy}: 전투 {metrics.BattlesResolved}, 승/패 {metrics.PlayerVictories}/{metrics.PlayerDefeats}, " +
-                $"출정 {metrics.MarchesStarted}, 점령 변화 {metrics.OwnershipChanges}, 선택 {metrics.DecisionsResolved}, " +
+                $"원정 {metrics.MarchesStarted}, 점령 변화 {metrics.OwnershipChanges}, 선택 {metrics.DecisionsResolved}, " +
                 $"전력차 [{string.Join(", ", metrics.PlayerBattlePowerMargins)}]");
             UnityEngine.Debug.Log(
                 $"[FunValidation] {policy} {months}개월 · 전투 {metrics.BattlesResolved} · " +
-                $"승/패 {metrics.PlayerVictories}/{metrics.PlayerDefeats} · 출정 {metrics.MarchesStarted} · " +
+                $"승/패 {metrics.PlayerVictories}/{metrics.PlayerDefeats} · 원정 {metrics.MarchesStarted} · " +
                 $"영토 변화 {metrics.OwnershipChanges} · 플레이어 성 {metrics.FinalPlayerCastleCount} · " +
                 $"결과 {metrics.CampaignResult} · 선택 {metrics.DecisionsResolved}");
         }
 
-        // 정책별 장기 실행이 내정형 완전 방어와 공세형 조기 전멸의 양극단으로 돌아가지 않는지 검증합니다.
+        // 정책별 장기 실행이 성장형 완전 방어와 공세형 조기 전멸의 양극단으로 돌아가지 않는지 검증합니다.
         [TestCase(WIAutoPlayerPolicy.Administration, 24)]
         [TestCase(WIAutoPlayerPolicy.Balanced, 60)]
         [TestCase(WIAutoPlayerPolicy.Aggressive, 24)]
@@ -72,7 +72,7 @@ namespace ProjectWI.Tests.Editor
             Assert.GreaterOrEqual(metrics.FinalPlayerCastleCount, 1);
             if (policy != WIAutoPlayerPolicy.Administration)
             {
-                Assert.Greater(metrics.MarchesStarted, 0, $"{policy} 정책이 출정을 시작하지 못했습니다.");
+                Assert.Greater(metrics.MarchesStarted, 0, $"{policy} 정책이 원정을 시작하지 못했습니다.");
             }
         }
 
@@ -96,7 +96,7 @@ namespace ProjectWI.Tests.Editor
                 relation.Status == WIDiplomaticStatus.War), database.AIMinimumActiveWarFronts);
         }
 
-        // 신규 AI 전선이 실제 부대 이동으로 이어지는 세력과 시점을 기록합니다.
+        // 신규 AI 전선이 실제 전투단 이동으로 이어지는 진영과 시점을 기록합니다.
         [Test]
         public void AIFrontActivation_ThirtySixMonths_RecordsMovementByFaction()
         {
@@ -119,11 +119,11 @@ namespace ProjectWI.Tests.Editor
                 .Select(relation => $"{relation.FirstFactionId}-{relation.SecondFactionId}"));
             string armies = string.Join(" | ", state.Armies.Select(army =>
                 $"{army.FactionId}:{army.CurrentCastleId}:{army.Mission}:{army.IsOperational}"));
-            TestContext.WriteLine($"이동 세력: {string.Join(", ", movingFactions)} · 전쟁: {wars}");
+            TestContext.WriteLine($"이동 진영: {string.Join(", ", movingFactions)} · 전쟁: {wars}");
             Assert.GreaterOrEqual(state.DiplomaticRelations.Count(relation =>
                 relation.Status == WIDiplomaticStatus.War), database.AIMinimumActiveWarFronts);
             Assert.GreaterOrEqual(movingFactions.Count, 2,
-                $"신규 전쟁은 생겼지만 이동 세력은 {string.Join(", ", movingFactions)}뿐입니다. 전쟁: {wars} · 부대: {armies}");
+                $"신규 전쟁은 생겼지만 이동 진영은 {string.Join(", ", movingFactions)}뿐입니다. 전쟁: {wars} · 전투단: {armies}");
         }
 
         // 사업 선택 사건이 UI 없이도 공용 전략 로직을 통해 해결되는지 검증합니다.

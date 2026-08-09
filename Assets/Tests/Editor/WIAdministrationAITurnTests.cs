@@ -15,7 +15,7 @@ namespace ProjectWI.Tests.Editor
         private const string DatabasePath = "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset";
         private const string BattleConfigPath = "Assets/Data/ScriptableObject/Battle/WI_BattleConfig.asset";
 
-        // 시작 영웅이 있는 수도에서 출정 창의 부대 편성 경로를 거쳐 인접 적 성으로 이동할 수 있는지 검증합니다.
+        // 시작 영웅이 있는 수도에서 원정 창의 전투단 편성 경로를 거쳐 인접 적 성으로 이동할 수 있는지 검증합니다.
         [Test]
         public void StartingCampaign_CanCreateArmyAndMarchFromCapital()
         {
@@ -32,7 +32,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual("castle_01", army.TargetCastleId);
         }
 
-        // 플레이어 출정 부대가 적 성에 도착한 턴에 실시간 전투 진입용 대기 세션이 생성되는지 검증합니다.
+        // 플레이어 원정 전투단이 적 성에 도착한 턴에 실시간 전투 진입용 대기 세션이 생성되는지 검증합니다.
         [Test]
         public void PlayerMarch_ArrivalCreatesPendingRealtimeBattle()
         {
@@ -110,7 +110,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 모략 AI가 도전에서는 최저 치안 1순위, 여유에서는 상위 후보 범위의 다른 목표도 선택하는지 검증합니다.
+        // 모략 AI가 도전에서는 최저 질서 1순위, 여유에서는 상위 후보 범위의 다른 목표도 선택하는지 검증합니다.
         [Test]
         public void CampaignDifficulty_ChangesSchemeTargetQualityWithoutResourceBonus()
         {
@@ -182,7 +182,7 @@ namespace ProjectWI.Tests.Editor
             Assert.Contains("tutorial_global", loaded.CompletedTutorialIds);
         }
 
-        // 캠페인 승패 문구와 대륙 통일·세력 소멸 조건이 데이터로 구성됐는지 검증합니다.
+        // 캠페인 승패 문구와 대륙 통일·진영 소멸 조건이 데이터로 구성됐는지 검증합니다.
         [Test]
         public void CampaignRules_DefineMinimumVictoryAndDefeat()
         {
@@ -332,7 +332,7 @@ namespace ProjectWI.Tests.Editor
             Assert.Less(state.Gold, 1200);
         }
 
-        // 현재 인물·클래스·부대 역할 수가 병사 없는 군사 기획과 일치하는지 기록합니다.
+        // 현재 인물·클래스·전투단 역할 수가 병사 없는 군사 기획과 일치하는지 기록합니다.
         [Test]
         public void ContentAudit_ReportsCharacterAndCombatTypeCounts()
         {
@@ -341,7 +341,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(400, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Common));
             Assert.AreEqual(12, System.Enum.GetValues(typeof(WIHeroClass)).Length);
             Assert.AreEqual(6, System.Enum.GetValues(typeof(WIUnitRole)).Length);
-            TestContext.WriteLine("영웅 100 · 일반 인물 400 · 클래스 12 · 부대 역할 6 · 병사/병종 데이터 없음(기획 의도)");
+            TestContext.WriteLine("영웅 100 · 일반 인물 400 · 클래스 12 · 전투단 역할 6 · 병사/병종 데이터 없음(기획 의도)");
         }
 
         // 특기 8종의 표시 문구와 적용 사업이 모두 데이터에 있고 실제 +2 성과로 연결되는지 검증합니다.
@@ -446,7 +446,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 갈등 관계 사건의 과감한 선택이 관계·공적·피로를 바꾸고 같은 사건 재발을 막는지 검증합니다.
+        // 갈등 관계 사건의 과감한 선택이 관계·공훈·피로를 바꾸고 같은 사건 재발을 막는지 검증합니다.
         [Test]
         public void RelationshipEvent_ResolvesChoiceAndPreventsDuplicate()
         {
@@ -572,7 +572,7 @@ namespace ProjectWI.Tests.Editor
             };
         }
 
-        // 모든 인물이 세 종류의 데이터 기반 등용 요구 사건 중 하나를 참조하는지 검증합니다.
+        // 모든 인물이 세 종류의 데이터 기반 영입 요구 사건 중 하나를 참조하는지 검증합니다.
         [Test]
         public void RecruitmentEventDefinitions_AreAssignedToAllCharacters()
         {
@@ -610,7 +610,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsEmpty(state.PendingRecruitmentEvents);
         }
 
-        // 공적·영토·교섭가 선택지가 각각 실제 조건에 따라 잠기거나 열리는지 검증합니다.
+        // 공훈·영토·교섭가 선택지가 각각 실제 조건에 따라 잠기거나 열리는지 검증합니다.
         [Test]
         public void RecruitmentEventOptions_UseMeritTerritoryAndNegotiatorConditions()
         {
@@ -638,7 +638,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(WIAdministrationTurnSystem.CanChooseRecruitmentEventOption(database, state, faction, territoryChoice));
         }
 
-        // 대기 중인 등용 요구 사건이 저장·불러오기 후 유지되는지 검증합니다.
+        // 대기 중인 영입 요구 사건이 저장·불러오기 후 유지되는지 검증합니다.
         [Test]
         public void RecruitmentEvent_SaveRoundTripPreservesPendingChoice()
         {
@@ -725,7 +725,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(2, loaded.GetCastle("castle_00").TavernQuests.Last().RemainingMonths);
         }
 
-        // 태수 방침과 성 수치가 예상한 사업 선택 및 구체적 이유 문장으로 이어지는지 검증합니다.
+        // 영지관 방침과 성 수치가 예상한 사업 선택 및 구체적 이유 문장으로 이어지는지 검증합니다.
         [TestCase(WIGovernorPolicy.Prosperity, WICastleProjectType.Prosperity)]
         [TestCase(WIGovernorPolicy.Research, WICastleProjectType.Technology)]
         [TestCase(WIGovernorPolicy.Talent, WICastleProjectType.Recruitment)]
@@ -766,7 +766,7 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("1개월", preview);
         }
 
-        // 위임 월보가 계획과 실제 결과를 함께 남기고 값이 일치하는지 검증합니다.
+        // 위임 월간 보고가 계획과 실제 결과를 함께 남기고 값이 일치하는지 검증합니다.
         [Test]
         public void GovernorMonthlyReport_ComparesPlanAndActualResult()
         {
@@ -832,7 +832,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 방어 전문 분야가 소유 세력과 관계없이 전략 방어 전투력에 적용되는지 검증합니다.
+        // 방어 전문 분야가 소유 진영과 관계없이 전략 방어 전투력에 적용되는지 검증합니다.
         [Test]
         public void CastleSpecialty_DefensePowerAppliesToPlayerAndAI()
         {
@@ -847,7 +847,7 @@ namespace ProjectWI.Tests.Editor
             Assert.GreaterOrEqual(playerPower, runtime.Defense * 2 + runtime.Stability / 2 + definition.SpecialtyEffectValue);
         }
 
-        // 각 난이도에서 12개월을 진행하며 경제·성·부대·인물 상태가 장기적으로 유효한지 검증합니다.
+        // 각 난이도에서 12개월을 진행하며 경제·성·전투단·인물 상태가 장기적으로 유효한지 검증합니다.
         [TestCase(WICampaignDifficulty.Relaxed)]
         [TestCase(WICampaignDifficulty.Standard)]
         [TestCase(WICampaignDifficulty.Hard)]
@@ -867,13 +867,13 @@ namespace ProjectWI.Tests.Editor
             TestContext.WriteLine(
                 $"{difficulty}: 턴 {state.Turn}, {state.Year}년 {state.Month:00}월, " +
                 $"플레이어 G/M/I {state.Gold}/{state.ManaCrystal}/{state.Influence}, " +
-                $"부대 {state.Armies.Count}, 전투 {state.BattleSessions.Count}, 점령 {ownershipChanges}");
+                $"전투단 {state.Armies.Count}, 전투 {state.BattleSessions.Count}, 점령 {ownershipChanges}");
             Assert.AreEqual(13, state.Turn);
             Assert.AreEqual(database.StartingYear + 1, state.Year);
             Assert.AreEqual(database.StartingMonth, state.Month);
         }
 
-        // 세 난이도에서 AI가 36개월 동안 경제·사업·연구·부대를 중단 없이 운영하는지 검증합니다.
+        // 세 난이도에서 AI가 36개월 동안 경제·사업·연구·전투단을 중단 없이 운영하는지 검증합니다.
         [TestCase(WICampaignDifficulty.Relaxed)]
         [TestCase(WICampaignDifficulty.Standard)]
         [TestCase(WICampaignDifficulty.Hard)]
@@ -913,11 +913,11 @@ namespace ProjectWI.Tests.Editor
                 WIFactionRuntimeState factionState = state.GetFactionState(faction.Id);
                 Assert.Contains(faction.Id, factionsWithProjects.ToList(), $"AI 사업 완료가 없습니다: {faction.Id}");
                 Assert.IsNotEmpty(factionState.CompletedResearchIds, $"AI 연구 완료가 없습니다: {faction.Id}");
-                Assert.Contains(faction.Id, factionsWithArmies.ToList(), $"AI 부대 생성이 없습니다: {faction.Id}");
+                Assert.Contains(faction.Id, factionsWithArmies.ToList(), $"AI 전투단 생성이 없습니다: {faction.Id}");
             }
             Assert.GreaterOrEqual(completedAIProjects, 36, "AI 사업 완료 횟수가 장기 운영 기준보다 적습니다.");
             Assert.Contains("valdor", factionsWithMovement.ToList(), "공세 AI가 36개월 동안 한 번도 이동하지 않았습니다.");
-            Assert.GreaterOrEqual(factionsWithMovement.Count, 2, "전선 위협에 반응해 이동한 AI 세력이 너무 적습니다.");
+            Assert.GreaterOrEqual(factionsWithMovement.Count, 2, "전선 위협에 반응해 이동한 AI 진영이 너무 적습니다.");
             Assert.Greater(maximumBattleCount, 0, "36개월 동안 전투 세션이 생성되지 않았습니다.");
             Assert.AreEqual(37, state.Turn);
             Assert.AreEqual(database.StartingYear + 3, state.Year);
@@ -930,12 +930,12 @@ namespace ProjectWI.Tests.Editor
                     factionState.ManaCrystal, factionState.Influence);
             }));
             TestContext.WriteLine(
-                $"{difficulty}: 36개월 · AI 부대 {state.Armies.Count(army => army.FactionId != state.PlayerFactionId)} · " +
+                $"{difficulty}: 36개월 · AI 전투단 {state.Armies.Count(army => army.FactionId != state.PlayerFactionId)} · " +
                 $"사업 {completedAIProjects} · 전투 {state.BattleSessions.Count} · AI 연구 {aiFactions.Sum(faction => state.GetFactionState(faction.Id).CompletedResearchIds.Count)} · " +
                 $"AI 자원 {aiResources}");
         }
 
-        // 영토가 사라진 세력이 한 번만 멸망하고 연구·부대·계략·외교 약속이 정리되는지 검증합니다.
+        // 영토가 사라진 진영이 한 번만 멸망하고 연구·전투단·첩보·외교 약속이 정리되는지 검증합니다.
         [Test]
         public void FactionElimination_CleansRuntimeActionsAndReportsOnce()
         {
@@ -967,11 +967,11 @@ namespace ProjectWI.Tests.Editor
             Assert.IsFalse(state.Armies.Any(item => item.FactionId == "valdor"));
             Assert.IsFalse(state.SchemeMissions.Any(item => item.InitiatorFactionId == "valdor"));
             Assert.AreEqual(0, relation.JointAttackMonthsRemaining);
-            Assert.AreEqual(1, first.News.Count(item => item.Contains("세력 멸망")));
+            Assert.AreEqual(1, first.News.Count(item => item.Contains("진영 멸망")));
             Assert.IsFalse(state.GetCharacter("lyria").Recruited);
         }
 
-        // 멸망 세력과 최초 발생 턴이 저장·불러오기 후에도 유지되는지 검증합니다.
+        // 멸망 진영과 최초 발생 턴이 저장·불러오기 후에도 유지되는지 검증합니다.
         [Test]
         public void FactionElimination_SaveRoundTripPreservesState()
         {
@@ -1047,25 +1047,25 @@ namespace ProjectWI.Tests.Editor
         private static void AssertCampaignIntegrity(WIAdministrationDatabaseSO database, WIAdministrationState state, string context)
         {
             Assert.IsTrue(state.Factions.All(faction => faction.Gold >= 0 && faction.ManaCrystal >= 0 && faction.Influence >= 0),
-                $"음수 세력 자원: {context}");
+                $"음수 진영 자원: {context}");
             Assert.IsTrue(state.Castles.All(castle => database.GetFaction(castle.FactionId) != null),
-                $"무효 성 소유 세력: {context}");
+                $"무효 성 소유 진영: {context}");
             Assert.IsTrue(state.Castles.All(castle => castle.Prosperity >= 0 && castle.Prosperity <= 100 &&
                 castle.Technology >= 0 && castle.Technology <= 100 && castle.Stability >= 0 && castle.Stability <= 100 &&
                 castle.Defense >= 0 && castle.Defense <= 100), $"성 수치 범위 이탈: {context}");
 
             string[] armyHeroIds = state.Armies.SelectMany(army => army.Members.Select(member => member.HeroId)).ToArray();
-            Assert.AreEqual(armyHeroIds.Length, armyHeroIds.Distinct().Count(), $"여러 부대에 중복된 인물: {context}");
+            Assert.AreEqual(armyHeroIds.Length, armyHeroIds.Distinct().Count(), $"여러 전투단에 중복된 인물: {context}");
             foreach (WIArmyState army in state.Armies)
             {
-                Assert.IsNotNull(database.GetFaction(army.FactionId), $"무효 부대 세력: {army.ArmyId} · {context}");
-                Assert.IsNotNull(database.GetCastle(army.CurrentCastleId), $"무효 부대 현재 성: {army.ArmyId} · {context}");
+                Assert.IsNotNull(database.GetFaction(army.FactionId), $"무효 전투단 진영: {army.ArmyId} · {context}");
+                Assert.IsNotNull(database.GetCastle(army.CurrentCastleId), $"무효 전투단 현재 성: {army.ArmyId} · {context}");
                 if (string.IsNullOrEmpty(army.TargetCastleId) == false)
                 {
-                    Assert.IsNotNull(database.GetCastle(army.TargetCastleId), $"무효 부대 목표 성: {army.ArmyId} · {context}");
+                    Assert.IsNotNull(database.GetCastle(army.TargetCastleId), $"무효 전투단 목표 성: {army.ArmyId} · {context}");
                 }
                 Assert.AreEqual(1, army.Members.Count(member => member.Role == WIUnitRole.Commander),
-                    $"부대 대장 수 오류: {army.ArmyId} · {context}");
+                    $"전투단 대장 수 오류: {army.ArmyId} · {context}");
             }
 
             foreach (WICastleRuntimeState castle in state.Castles.Where(castle => castle.ActiveProject != null))
@@ -1075,7 +1075,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 네 가지 초기 계략이 ScriptableObject 데이터로 구성됐는지 검증합니다.
+        // 네 가지 초기 첩보가 ScriptableObject 데이터로 구성됐는지 검증합니다.
         [Test]
         public void SchemeDefinitions_ContainPlannedMvpCommands()
         {
@@ -1101,7 +1101,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(WIInformationVisibility.CanViewCastleDetails(state, "avalon", state.GetCastle("castle_01")));
         }
 
-        // 계략 예약이 영향력을 즉시 소비하고 담당 인물을 판정 전까지 점유하는지 검증합니다.
+        // 첩보 예약이 영향력을 즉시 소비하고 담당 인물을 판정 전까지 점유하는지 검증합니다.
         [Test]
         public void SchemeMission_ScheduleConsumesInfluenceAndOccupiesAgent()
         {
@@ -1120,7 +1120,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsEmpty(state.SchemeIntel);
         }
 
-        // 한 달이 지난 계략을 판정해 정보를 획득하고 담당 인물을 복귀시키는지 검증합니다.
+        // 한 달이 지난 첩보를 판정해 정보를 획득하고 담당 인물을 복귀시키는지 검증합니다.
         [Test]
         public void SchemeMission_ResolvesAfterOneMonthAndReleasesAgent()
         {
@@ -1135,10 +1135,10 @@ namespace ProjectWI.Tests.Editor
             Assert.IsEmpty(state.SchemeMissions);
             Assert.IsFalse(state.IsCharacterBusy("ares"));
             Assert.AreEqual(database.GetScheme("scheme_investigation").DurationMonths, state.SchemeIntel.Single().RemainingMonths);
-            Assert.IsTrue(summary.News.Any(item => item.Contains("계략 결과")));
+            Assert.IsTrue(summary.News.Any(item => item.Contains("첩보 결과")));
         }
 
-        // 진행 중인 계략의 담당 인물·대상·남은 기간이 저장 JSON 왕복 후 유지되는지 검증합니다.
+        // 진행 중인 첩보의 담당 인물·대상·남은 기간이 저장 JSON 왕복 후 유지되는지 검증합니다.
         [Test]
         public void SchemeMission_SaveRoundTripPreservesAssignment()
         {
@@ -1158,7 +1158,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(loaded.IsCharacterBusy("ares"));
         }
 
-        // 계략별 발각 기본값과 실패 가산치가 ScriptableObject 데이터에 구성됐는지 검증합니다.
+        // 첩보별 발각 기본값과 실패 가산치가 ScriptableObject 데이터에 구성됐는지 검증합니다.
         [Test]
         public void SchemeDefinitions_DefineDetectionBalance()
         {
@@ -1177,7 +1177,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 실패한 적대 계략이 발각되면 성공 효과 없이 외교 관계가 한 단계 악화되는지 검증합니다.
+        // 실패한 적대 첩보가 발각되면 성공 효과 없이 외교 관계가 한 단계 악화되는지 검증합니다.
         [Test]
         public void Scheme_FailedDetectionWorsensDiplomaticRelation()
         {
@@ -1200,7 +1200,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsEmpty(state.SchemeIntel);
         }
 
-        // 은밀하게 성공한 계략은 효과만 적용하고 외교 관계를 유지하는지 검증합니다.
+        // 은밀하게 성공한 첩보는 효과만 적용하고 외교 관계를 유지하는지 검증합니다.
         [Test]
         public void Scheme_UndetectedSuccessPreservesDiplomaticRelation()
         {
@@ -1221,7 +1221,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsNotEmpty(state.SchemeIntel);
         }
 
-        // 방첩·치안은 발각률을 높이고 담당 인물 지력은 발각률을 낮추는지 검증합니다.
+        // 방첩·질서는 발각률을 높이고 담당 인물 지력은 발각률을 낮추는지 검증합니다.
         [Test]
         public void Scheme_DetectionChanceUsesDefenseAndIntelligence()
         {
@@ -1275,7 +1275,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(WIInformationVisibility.CanViewCastleDetails(state, "avalon", alliedCastle));
         }
 
-        // 플레이어 참가 전투 접촉은 성 내정 수치가 아닌 해당 전장의 군사 정보만 공개하는지 검증합니다.
+        // 플레이어 참가 전투 접촉은 영지 관리 수치가 아닌 해당 전장의 군사 정보만 공개하는지 검증합니다.
         [Test]
         public void InformationVisibility_BattleContactRevealsMilitaryOnly()
         {
@@ -1294,7 +1294,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(WIInformationVisibility.CanViewMilitaryDetails(state, "avalon", enemyCastle));
         }
 
-        // 조사 정보의 관찰 세력·대상 성·남은 기간이 저장 JSON 왕복 후 유지되는지 검증합니다.
+        // 조사 정보의 관찰 진영·대상 성·남은 기간이 저장 JSON 왕복 후 유지되는지 검증합니다.
         [Test]
         public void InformationVisibility_InvestigationSaveRoundTripPreservesAccess()
         {
@@ -1313,7 +1313,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(2, loaded.SchemeIntel.Single().RemainingMonths);
         }
 
-        // 방첩이 적 계략 성공률을 낮추고 월간 진행 후 만료되는지 검증합니다.
+        // 방첩이 적 첩보 성공률을 낮추고 월간 진행 후 만료되는지 검증합니다.
         [Test]
         public void Scheme_CounterintelligenceReducesChanceAndExpires()
         {
@@ -1330,7 +1330,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(2, state.GetCastle("castle_00").CounterintelligenceMonths);
         }
 
-        // 유언비어와 인재 이간 성공 결과가 각각 치안과 충성 상태에 적용되는지 검증합니다.
+        // 유언비어와 인재 이간 성공 결과가 각각 질서와 충성 상태에 적용되는지 검증합니다.
         [Test]
         public void Scheme_RumorAndAlienationApplyPlannedEffects()
         {
@@ -1344,7 +1344,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(WILoyaltyState.Unsettled, state.GetCharacter("elwyn").LoyaltyState);
         }
 
-        // 성 좌표가 격자가 아닌 각 세력의 지리적 본거지에 배치되었는지 검증합니다.
+        // 성 좌표가 격자가 아닌 각 진영의 지리적 본거지에 배치되었는지 검증합니다.
         [Test]
         public void MapLayout_PlacesFactionsInGeographicRegions()
         {
@@ -1386,18 +1386,18 @@ namespace ProjectWI.Tests.Editor
                 Assert.IsFalse(string.IsNullOrWhiteSpace(castle.TerrainTrait.Korean), $"지형 특성 누락: {castle.Id}");
                 Assert.IsFalse(string.IsNullOrWhiteSpace(castle.TerrainTrait.English), $"영문 지형 특성 누락: {castle.Id}");
                 Assert.IsFalse(string.IsNullOrWhiteSpace(castle.Specialty.Korean), $"전문 분야 누락: {castle.Id}");
-                Assert.IsTrue(castle.Specialty.Korean.Contains("·"), $"랜드마크와 내정 개성 구분 누락: {castle.Id}");
+                Assert.IsTrue(castle.Specialty.Korean.Contains("·"), $"랜드마크와 영지 관리 개성 구분 누락: {castle.Id}");
             }
         }
 
-        // 지정한 세력에 속한 성들의 지도 중심 좌표를 계산합니다.
+        // 지정한 진영에 속한 성들의 지도 중심 좌표를 계산합니다.
         private static Vector2 GetFactionMapCenter(WIAdministrationDatabaseSO database, string factionId)
         {
             WICastleDefinition[] castles = database.Castles.Where(castle => castle.FactionId == factionId).ToArray();
             return new Vector2(castles.Average(castle => castle.NormalizedMapPosition.x), castles.Average(castle => castle.NormalizedMapPosition.y));
         }
 
-        // 신규 캠페인이 모든 세력 쌍의 관계와 아발론-발도르 전쟁을 초기화하는지 검증합니다.
+        // 신규 캠페인이 모든 진영 쌍의 관계와 아발론-발도르 전쟁을 초기화하는지 검증합니다.
         [Test]
         public void Diplomacy_InitializesAllFactionRelations()
         {
@@ -1451,7 +1451,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(4, loadedRelation.AidCooldownMonths);
         }
 
-        // 원소속 세력이 몸값을 지불하면 금화가 포획 세력으로 이동하고 포로가 즉시 귀환하는지 검증합니다.
+        // 원소속 진영이 몸값을 지불하면 금화가 포획 진영으로 이동하고 포로가 즉시 귀환하는지 검증합니다.
         [Test]
         public void Diplomacy_RansomTransfersGoldAndReleasesPrisoner()
         {
@@ -1534,7 +1534,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(2, restored.JointAttackMonthsRemaining);
         }
 
-        // 동맹 AI 부대가 공동 공격 목표와 인접한 집결지에서 해당 목표로 우선 출정하는지 검증합니다.
+        // 동맹 AI 전투단이 공동 공격 목표와 인접한 집결지에서 해당 목표로 우선 원정하는지 검증합니다.
         [Test]
         public void Diplomacy_JointAttackDirectsAlliedAIArmy()
         {
@@ -1564,7 +1564,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(alliedArmy.IsMoving);
         }
 
-        // 한 턴 실행 후 모든 AI 세력의 사업 또는 군사 판단 근거가 월보에 기록되는지 검증합니다.
+        // 한 턴 실행 후 모든 AI 진영의 사업 또는 군사 판단 근거가 월간 보고에 기록되는지 검증합니다.
         [Test]
         public void AIReasonReport_CoversEveryAIFactionEachTurn()
         {
@@ -1581,7 +1581,7 @@ namespace ProjectWI.Tests.Editor
             Assert.LessOrEqual(summary.AIReasonReports.Count, 12);
         }
 
-        // 동일 세력·분야의 판단은 한 번만 기록되고 전체 월보 상한을 넘지 않는지 검증합니다.
+        // 동일 진영·분야의 판단은 한 번만 기록되고 전체 월간 보고 상한을 넘지 않는지 검증합니다.
         [Test]
         public void AIReasonReport_DeduplicatesAndCapsEntries()
         {
@@ -1590,14 +1590,14 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationTurnSystem.AddAIReasonReport(summary, "valdor", "발도르", "군사", "중복 판단");
             for (int index = 0; index < 20; index += 1)
             {
-                WIAdministrationTurnSystem.AddAIReasonReport(summary, $"faction_{index}", $"세력 {index}", "사업", "판단");
+                WIAdministrationTurnSystem.AddAIReasonReport(summary, $"faction_{index}", $"진영 {index}", "사업", "판단");
             }
 
             Assert.AreEqual(12, summary.AIReasonReports.Count);
             Assert.AreEqual(1, summary.AIReasonReports.Count(item => item.Contains("valdor · 군사")));
         }
 
-        // AI 판단 근거가 저장·불러오기 후에도 최근 월보에 유지되는지 검증합니다.
+        // AI 판단 근거가 저장·불러오기 후에도 최근 월간 보고에 유지되는지 검증합니다.
         [Test]
         public void AIReasonReport_SaveRoundTripPreservesMonthlyReasons()
         {
@@ -1611,7 +1611,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(state.LastMonthlyReport.AIReasonReports.Single(), loaded.LastMonthlyReport.AIReasonReports.Single());
         }
 
-        // 모든 세력 문장이 올바른 단일 Sprite 설정과 원본 크기로 연결됐는지 검증합니다.
+        // 모든 진영 문장이 올바른 단일 Sprite 설정과 원본 크기로 연결됐는지 검증합니다.
         [Test]
         public void FactionEmblems_AreAssignedAsValidSprites()
         {
@@ -1621,7 +1621,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(5, database.Factions.Count);
             foreach (WIFactionDefinition faction in database.Factions)
             {
-                Assert.IsNotNull(faction.Emblem, $"{faction.Id} 세력 문장이 연결되지 않았습니다.");
+                Assert.IsNotNull(faction.Emblem, $"{faction.Id} 진영 문장이 연결되지 않았습니다.");
                 Assert.AreEqual(1254f, faction.Emblem.rect.width, $"{faction.Id} 문장 너비가 원본과 다릅니다.");
                 Assert.AreEqual(1254f, faction.Emblem.rect.height, $"{faction.Id} 문장 높이가 원본과 다릅니다.");
 
@@ -1635,7 +1635,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 5대 세력 수도에 제작된 전경 Sprite가 연결됐는지 검증합니다.
+        // 5대 진영 수도에 제작된 전경 Sprite가 연결됐는지 검증합니다.
         [Test]
         public void CapitalCastleImages_AreAssignedAsValidSprites()
         {
@@ -1707,7 +1707,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreNotSame(state.GetFactionState("avalon"), state.GetFactionState("valdor"));
         }
 
-        // 공세 AI가 실제 영향력을 소비해 플레이어 인접 성으로 출정하는지 검증합니다.
+        // 공세 AI가 실제 영향력을 소비해 플레이어 인접 성으로 원정하는지 검증합니다.
         [Test]
         public void ExecuteTurn_AggressiveAIConsumesInfluenceAndWarnsPlayer()
         {
@@ -1731,7 +1731,7 @@ namespace ProjectWI.Tests.Editor
             Assert.LessOrEqual(state.GetFactionState("valdor").Influence, influenceBefore + expectedIncome - 20);
         }
 
-        // 지휘관이 충분한 공세 세력이 영토 규모에 맞춰 복수 부대를 운용하는지 검증합니다.
+        // 지휘관이 충분한 공세 진영이 영토 규모에 맞춰 복수 전투단을 운용하는지 검증합니다.
         [Test]
         public void ExecuteTurn_AggressiveAIUsesMultipleArmiesWhenCommandersExist()
         {
@@ -1781,7 +1781,7 @@ namespace ProjectWI.Tests.Editor
             Assert.Greater(frontlineScore, rearScore);
         }
 
-        // 수비 전력이 높은 성을 공격한 약한 부대가 원래 성으로 후퇴하고 재편성하는지 검증합니다.
+        // 수비 전력이 높은 성을 공격한 약한 전투단이 원래 성으로 후퇴하고 재편성하는지 검증합니다.
         [Test]
         public void StrategicBattle_DefeatedArmyRetreatsAndReorganizes()
         {
@@ -1802,7 +1802,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual("avalon", state.GetCastle("castle_00").FactionId);
         }
 
-        // 충분히 강한 공격 부대가 승리하면 기존 점령 처리와 전투 보상이 함께 적용되는지 검증합니다.
+        // 충분히 강한 공격 전투단이 승리하면 기존 점령 처리와 전투 보상이 함께 적용되는지 검증합니다.
         [Test]
         public void StrategicBattle_VictoryOccupiesCastleAndRewardsMembers()
         {
@@ -1899,7 +1899,7 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("OpenMonthlyReportModal();", controller);
         }
 
-        // 서로의 출발 성으로 교차 출정한 두 부대가 한 전투 세션으로 합쳐지는지 검증합니다.
+        // 서로의 출발 성으로 교차 원정한 두 전투단이 한 전투 세션으로 합쳐지는지 검증합니다.
         [Test]
         public void ReciprocalInvasions_CreateSingleMeetingBattle()
         {
@@ -2049,7 +2049,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(character.InjuryMonths, loaded.GetCharacter("ares").InjuryMonths);
         }
 
-        // 포로가 설정된 억류 기간 후 원래 세력의 성으로 자동 귀환하는지 검증합니다.
+        // 포로가 설정된 억류 기간 후 원래 진영의 성으로 자동 귀환하는지 검증합니다.
         [Test]
         public void CapturedCharacter_ReturnsAfterConfiguredDuration()
         {
@@ -2108,7 +2108,7 @@ namespace ProjectWI.Tests.Editor
             Object.DestroyImmediate(serviceObject);
         }
 
-        // 캠페인의 자원, 성, 부대와 전투 세션이 JSON 왕복 후 유지되는지 검증합니다.
+        // 캠페인의 자원, 성, 전투단과 전투 세션이 JSON 왕복 후 유지되는지 검증합니다.
         [Test]
         public void CampaignSave_RoundTripPreservesRuntimeState()
         {
@@ -2235,7 +2235,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(baseline.ManaCrystal + 2, researched.ManaCrystal);
         }
 
-        // 공적과 영향력을 지불한 작위가 인물 상태와 부대 전투력에 반영되는지 검증합니다.
+        // 공훈과 영향력을 지불한 작위가 인물 상태와 전투단 전투력에 반영되는지 검증합니다.
         [Test]
         public void Title_AwardConsumesInfluenceAndAddsBattlePower()
         {
@@ -2257,7 +2257,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(powerBefore + 8, WIAdministrationTurnSystem.GetArmyBattlePower(database, state, army));
         }
 
-        // AI도 플레이어와 같은 연구 조건과 세력 마나를 사용해 연구를 완료하는지 검증합니다.
+        // AI도 플레이어와 같은 연구 조건과 진영 마나를 사용해 연구를 완료하는지 검증합니다.
         [Test]
         public void AIResearch_UsesSharedResearchRules()
         {
@@ -2660,7 +2660,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsFalse(state.GetCharacter("common_gareth").PromotedToHero);
         }
 
-        // 일반 인물 1차 확장이 10종 이상 클래스를 사용하고 각 세력 시작 성에 최소 두 명을 배치하는지 검증합니다.
+        // 일반 인물 1차 확장이 10종 이상 클래스를 사용하고 각 진영 시작 성에 최소 두 명을 배치하는지 검증합니다.
         [Test]
         public void CommonRoster_FirstExpansionBalancesClassesAndFactions()
         {
@@ -2682,7 +2682,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 신규 일반 인물의 ID·현지화·능력치·등용 사건 참조가 모두 유효한지 검증합니다.
+        // 신규 일반 인물의 ID·현지화·능력치·영입 사건 참조가 모두 유효한지 검증합니다.
         [Test]
         public void CommonRoster_FirstExpansionHasValidDataReferences()
         {
@@ -2699,7 +2699,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 공적과 명성뿐 아니라 특별 성취까지 갖춘 일반 인물만 승격 후보가 되는지 검증합니다.
+        // 공훈과 명성뿐 아니라 특별 성취까지 갖춘 일반 인물만 승격 후보가 되는지 검증합니다.
         [Test]
         public void ExecuteTurn_RegistersQualifiedCommonPromotionCandidate()
         {
@@ -2737,7 +2737,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsFalse(state.PendingHeroPromotionIds.Contains(character.HeroId));
         }
 
-        // 유휴 인물이 같은 세력의 인접 성으로 이동하고 다음 달에 도착하는지 검증합니다.
+        // 유휴 인물이 같은 진영의 인접 성으로 이동하고 다음 달에 도착하는지 검증합니다.
         [Test]
         public void CharacterTransfer_ArrivesAtAdjacentFriendlyCastle()
         {
@@ -2792,7 +2792,7 @@ namespace ProjectWI.Tests.Editor
                 database, state, state.PlayerFactionId, "mana_circulation", "ares"));
         }
 
-        // 활동 중인 인물은 태수가 될 수 없고 태수는 다른 임무에 중복 배정되지 않는지 검증합니다.
+        // 활동 중인 인물은 영지관이 될 수 없고 영지관은 다른 임무에 중복 배정되지 않는지 검증합니다.
         [Test]
         public void GovernorAssignment_EnforcesExclusiveDuty()
         {
@@ -2854,7 +2854,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(0, player.Influence);
         }
 
-        // 모든 세력이 자원 0에서 턴을 시작해도 수입 처리 후 음수 잔액이 남지 않는지 검증합니다.
+        // 모든 진영이 자원 0에서 턴을 시작해도 수입 처리 후 음수 잔액이 남지 않는지 검증합니다.
         [Test]
         public void ResourceDepletion_AllFactionsRemainSolventAfterTurn()
         {
@@ -2904,7 +2904,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(playerCharacterIds.All(heroId => state.IsCharacterBusy(heroId) == false));
         }
 
-        // 모든 인물이 임무 중일 때 연구·이동·부대 명령이 중복 배정 없이 거부되는지 검증합니다.
+        // 모든 인물이 임무 중일 때 연구·이동·전투단 명령이 중복 배정 없이 거부되는지 검증합니다.
         [Test]
         public void AllPlayerCharactersBusy_RejectsDuplicateAssignments()
         {
@@ -2968,7 +2968,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreSame(config.GetHeroSkill("ares"), config.GetCharacterSkill("ares", WIHeroClass.MagicSwordsman));
         }
 
-        // 아발론 플레이어가 소유 성만 직접 관리하고 타 세력 성은 관리하지 못하는지 검증합니다.
+        // 아발론 플레이어가 소유 성만 직접 관리하고 타 진영 성은 관리하지 못하는지 검증합니다.
         [Test]
         public void CastleManagement_AllowsOnlyPlayerOwnedCastles()
         {
@@ -2985,7 +2985,7 @@ namespace ProjectWI.Tests.Editor
             relation.Status = WIDiplomaticStatus.Alliance;
             Assert.IsTrue(WIInformationVisibility.CanViewCastleDetails(state, state.PlayerFactionId, foreignCastle));
             Assert.IsFalse(WIAdministrationTurnSystem.CanPlayerManageCastle(state, foreignCastle),
-                "동맹 성은 상세 정보를 공유해도 직접 내정할 수 없어야 합니다.");
+                "동맹 성은 상세 정보를 공유해도 직접 영지 관리할 수 없어야 합니다.");
         }
 
         // 아발론의 첫 목표가 시작 상태에서 미완료이며 수도 번영 조건과 보상을 정의하는지 검증합니다.
@@ -3004,7 +3004,7 @@ namespace ProjectWI.Tests.Editor
             Assert.Greater(objective.RewardGold + objective.RewardMana + objective.RewardInfluence, 0);
         }
 
-        // 수도 번영 목표 달성 시 한 번만 보상을 지급하고 월보에 기록하는지 검증합니다.
+        // 수도 번영 목표 달성 시 한 번만 보상을 지급하고 월간 보고에 기록하는지 검증합니다.
         [Test]
         public void AvalonOpeningObjective_CompletesAndRewardsOnlyOnce()
         {
@@ -3037,7 +3037,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual("avalon_secure_border", WICampaignObjectiveSystem.GetCurrent(database, loaded).Id);
         }
 
-        // 첫 내정부터 국경·세력 격파·대륙 통일까지 네 단계 목표가 순서대로 정의되는지 검증합니다.
+        // 첫 영지 관리부터 국경·진영 격파·대륙 통일까지 네 단계 목표가 순서대로 정의되는지 검증합니다.
         [Test]
         public void CampaignObjectives_DefineOrderedProgressionToUnification()
         {
@@ -3087,7 +3087,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(4, summary.News.Count(item => item.Contains("캠페인 목표 완료")));
         }
 
-        // 다섯 세력에 주요 인물 관계가 하나씩 있고 같은 시작 성에서 사건 조건을 갖추는지 검증합니다.
+        // 다섯 진영에 주요 인물 관계가 하나씩 있고 같은 시작 성에서 사건 조건을 갖추는지 검증합니다.
         [Test]
         public void StartingRelationships_CoverEveryFactionAndCreateRuntimeNetwork()
         {
@@ -3109,7 +3109,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 각 세력의 주요 관계가 플레이어 영지 안에서 실제 관계 사건 후보로 연결되는지 검증합니다.
+        // 각 진영의 주요 관계가 플레이어 영지 안에서 실제 관계 사건 후보로 연결되는지 검증합니다.
         [Test]
         public void StartingRelationships_AllResolveToTurnEventCandidates()
         {
@@ -3132,7 +3132,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 다섯 세력의 수도 사건이 고유 조건과 두 선택지를 갖는지 검증합니다.
+        // 다섯 진영의 수도 사건이 고유 조건과 두 선택지를 갖는지 검증합니다.
         [Test]
         public void RegionalEvents_CoverEveryFactionCapital()
         {
@@ -3147,7 +3147,7 @@ namespace ProjectWI.Tests.Editor
                 database.GetCastle(item.TargetCastleId) != null && item.Choices.Count == 2));
         }
 
-        // 플레이어가 소유한 대상 지역 사건만 발생하고 다른 세력 사건은 점령 전 차단되는지 검증합니다.
+        // 플레이어가 소유한 대상 지역 사건만 발생하고 다른 진영 사건은 점령 전 차단되는지 검증합니다.
         [Test]
         public void RegionalEvents_RequirePlayerOwnershipAndMinimumTurn()
         {
@@ -3192,7 +3192,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(0, loaded.PendingRegionalEvents.Count);
         }
 
-        // 점령 통치 선택지 3종과 다섯 세력의 멸망 서사가 모두 데이터화됐는지 검증합니다.
+        // 점령 통치 선택지 3종과 다섯 진영의 멸망 서사가 모두 데이터화됐는지 검증합니다.
         [Test]
         public void OccupationAndEliminationContent_CoversRulesAndFactions()
         {
@@ -3235,7 +3235,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(summary.News.Any(item => item.Contains("점령 통치 결정")));
         }
 
-        // 멸망 월보가 세력별 고유 제목과 설명을 사용하고 한 번만 기록되는지 검증합니다.
+        // 멸망 월간 보고가 진영별 고유 제목과 설명을 사용하고 한 번만 기록되는지 검증합니다.
         [Test]
         public void FactionElimination_UsesFactionNarrativeOnce()
         {

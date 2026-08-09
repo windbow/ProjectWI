@@ -22,10 +22,10 @@ namespace ProjectWI.Tests.Editor
                     $"{result.Months}개월 관리 메모리 증감 초과");
                 Assert.Less(result.SaveBytes, 2 * 1024 * 1024, $"{result.Months}개월 저장 크기 초과");
                 Assert.LessOrEqual(result.PendingCount, 100, $"{result.Months}개월 대기 사건 누적 초과");
-                Assert.LessOrEqual(result.LastReportEntryCount, 100, $"{result.Months}개월 월보 누적 초과");
+                Assert.LessOrEqual(result.LastReportEntryCount, 100, $"{result.Months}개월 월간 보고 누적 초과");
                 Assert.LessOrEqual(result.BattleSessionCount, 100, $"{result.Months}개월 전투 기록 누적 초과");
                 Assert.LessOrEqual(result.TransferCount, 100, $"{result.Months}개월 이동 기록 누적 초과");
-                Assert.LessOrEqual(result.SchemeMissionCount, 100, $"{result.Months}개월 계략 기록 누적 초과");
+                Assert.LessOrEqual(result.SchemeMissionCount, 100, $"{result.Months}개월 첩보 기록 누적 초과");
             }
 
             Assert.Less(results.Max(item => item.SaveBytes) - results.Min(item => item.SaveBytes), 64 * 1024,

@@ -25,7 +25,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsFalse(string.IsNullOrEmpty(brokenError));
         }
 
-        // 세력·성·인물 핵심 목록이 비어 있는 저장은 실행 불가능한 상태로 복구하지 않는지 검증합니다.
+        // 진영·성·인물 핵심 목록이 비어 있는 저장은 실행 불가능한 상태로 복구하지 않는지 검증합니다.
         [Test]
         public void TryDeserialize_EmptyCampaignCollections_AreRejected()
         {

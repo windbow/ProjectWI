@@ -4,7 +4,7 @@ namespace ProjectWI.Administration
 {
     public static class WICampaignResultSystem
     {
-        // 아직 종료되지 않은 캠페인의 대륙 통일 또는 세력 소멸 조건을 한 번만 판정합니다.
+        // 아직 종료되지 않은 캠페인의 대륙 통일 또는 진영 소멸 조건을 한 번만 판정합니다.
         public static bool Evaluate(WIAdministrationDatabaseSO database, WIAdministrationState state)
         {
             if (database == null || state == null || state.CampaignResult != WICampaignResult.Ongoing)

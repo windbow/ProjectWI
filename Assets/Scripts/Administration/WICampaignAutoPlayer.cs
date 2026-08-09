@@ -103,7 +103,7 @@ namespace ProjectWI.Administration
             return metrics;
         }
 
-        // 정책에 맞춰 플레이어 성의 위임 방침과 세력 방침을 지정합니다.
+        // 정책에 맞춰 플레이어 성의 위임 방침과 진영 방침을 지정합니다.
         private static void ConfigureAdministration(WIAdministrationState state, WIAutoPlayerPolicy policy)
         {
             switch (policy)
@@ -133,7 +133,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 정책에 따라 플레이어 부대를 편성하고 합법적인 인접 적 성으로 출정시킵니다.
+        // 정책에 따라 플레이어 전투단을 편성하고 합법적인 인접 적 성으로 원정시킵니다.
         private static void PrepareMilitaryAction(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -171,7 +171,7 @@ namespace ProjectWI.Administration
                 FillArmy(database, state, baseCastle, army, policy);
             }
 
-            // 공세형도 첫 두 달은 편성과 적 이동을 확인한 뒤 출정해 첫 턴 상호 침공으로 전멸하지 않게 합니다.
+            // 공세형도 첫 두 달은 편성과 적 이동을 확인한 뒤 원정해 첫 턴 상호 침공으로 전멸하지 않게 합니다.
             bool allowMarch = policy == WIAutoPlayerPolicy.Aggressive
                 ? state.Turn >= 3
                 : state.Turn % 3 == 0;
@@ -206,7 +206,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 자동 플레이가 피로 누적 또는 현격한 열세에서 반복 출정하지 않도록 공격 가능성을 판정합니다.
+        // 자동 플레이가 피로 누적 또는 현격한 열세에서 반복 원정하지 않도록 공격 가능성을 판정합니다.
         private static bool CanAutoAttack(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -226,17 +226,17 @@ namespace ProjectWI.Administration
                 defender.IsOperational).ToList();
             int attackPower = WIAdministrationTurnSystem.GetArmyBattlePower(database, state, army);
             int defensePower = WIAdministrationTurnSystem.GetCastleDefensePower(database, state, target, defenders);
-            // 서로의 성을 동시에 공격하면 회전 전투로 병합되므로 아군 출발 성으로 오는 적 부대도 예상 수비 전력에 포함합니다.
+            // 서로의 성을 동시에 공격하면 회전 전투로 병합되므로 아군 출발 성으로 오는 적 전투단도 예상 수비 전력에 포함합니다.
             defensePower += state.Armies.Where(enemy =>
                     enemy.FactionId == target.FactionId && enemy.IsOperational && enemy.IsMoving &&
                     enemy.TargetCastleId == army.CurrentCastleId && defenders.Contains(enemy) == false)
                 .Sum(enemy => WIAdministrationTurnSystem.GetArmyBattlePower(database, state, enemy));
-            // 출정 명령 뒤 실제 전투가 열리기 전까지 수비 사업과 증원으로 전력이 변할 수 있으므로 안전 여유를 둡니다.
+            // 원정 명령 뒤 실제 전투가 열리기 전까지 수비 사업과 증원으로 전력이 변할 수 있으므로 안전 여유를 둡니다.
             int requiredPercent = policy == WIAutoPlayerPolicy.Aggressive ? 115 : 125;
             return attackPower * 100 >= defensePower * requiredPercent;
         }
 
-        // 성의 대기 인물로 정책별 권장 규모까지 부대원을 채웁니다.
+        // 성의 대기 인물로 정책별 권장 규모까지 전투단원을 채웁니다.
         private static void FillArmy(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -311,7 +311,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 정책별 점수로 사업·관계·지역·점령·등용·흔적 선택을 자동 해결합니다.
+        // 정책별 점수로 사업·관계·지역·점령·영입·흔적 선택을 자동 해결합니다.
         private static void ResolvePendingDecisions(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,

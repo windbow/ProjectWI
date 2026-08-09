@@ -56,7 +56,7 @@ namespace ProjectWI.Battle
             }
         }
 
-        // 지정한 진영의 현재 부대 명령과 선택 집중 목표를 변경합니다.
+        // 지정한 진영의 현재 전투단 명령과 선택 집중 목표를 변경합니다.
         public void SetCommand(WIBattleSide side, WIBattleCommand command, string focusHeroId = "")
         {
             if (runtime == null || runtime.Finished)
