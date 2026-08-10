@@ -5,6 +5,8 @@
 ## UI 배경 에셋
 
 - Background A Type: `Assets/Resources/UI/Generated/bg_type_a.png`
+- Background B Type: `Assets/Resources/UI/Generated/bg_type_b.png`
+- Background C Type: `Assets/Resources/UI/Generated/bg_type_c.png`
 - 원본 가운데 패널만 1587×508로 크롭하고 모서리 바깥 영역을 투명 처리한 RGBA Sprite입니다.
 - UI Toolkit에서 크기를 변경할 때 좌·우·상·하 3px 9-Slice를 유지합니다.
 - 모서리는 2px만 사선으로 잘라 거의 직사각형이며 외곽에는 단일 2px 금속 테두리만 사용합니다.
@@ -29,6 +31,8 @@
 - `CampaignVariants`: 시작 영토 또는 핵심 관계만 변경하는 반복 플레이 시작 조건
 
 시작 변형은 `Classic`, `BorderGarrison`, `DividedCourt` 세 종류입니다. 국경 수비대는 `castle_01`을 아발론 소유로 바꾸며, 분열된 궁정은 아레스·알덴의 친애를 갈등으로 덮어씁니다. 난이도와 시작 자원은 변형과 무관합니다.
+
+캠페인 시작 화면은 940px 폭과 최소 650px 높이의 고정 패널을 사용합니다. 캠페인 소개는 제목 장식 아래에서 난이도 제목 바로 위에 배치하고, 난이도·시작 조건 카드의 설명은 여러 문장일 때 마침표 뒤에서 줄을 바꿉니다. 난이도 안내 문구는 하단 프레임 안쪽 여백을 확보합니다.
 
 점령 통치 선택 ID는 저장 상태의 이력에 누적됩니다. 회유와 현지 자치 합계가 군정보다 같거나 많으면 `Concord`, 군정이 더 많으면 `Dominion` 결말입니다. 이력이 없는 구버전 캠페인은 화합 결말을 사용합니다.
 
@@ -263,11 +267,15 @@ UI 후속 작업은 `GameDocuments/UIHandoffReport.md`와 `GameDocuments/UIConce
 
 전체 UI 제목·본문·입력 문구는 `Assets/Fonts/NotoSerifKR-VariableFont_wght.ttf`를 기본으로 사용합니다. 자원 수치, 성 수치, 지도 명패, 작은 슬롯 문구와 모든 버튼은 작은 크기에서도 획이 선명한 `Assets/Fonts/NotoSansKR-VariableFont_wght.ttf`를 사용하며 버튼 텍스트 외곽선은 적용하지 않습니다. 두 글꼴은 SIL Open Font License이며 각각의 라이선스 원문을 같은 폴더의 `OFL-NotoSerifKR.txt`, `OFL-NotoSansKR.txt`에 보관합니다.
 
-시안형 명령 아이콘은 `icon_flat_*.png`, 상단 날짜·자원 아이콘은 `hud_flat_*.png`, 버튼 타입은 `button_flat_normal.png`, `button_flat_primary.png`, `button_flat_danger.png`입니다. A/B 버튼은 동일한 768×128 규격과 형상을 사용하며 B는 푸른 색조만 다릅니다. 두 버튼은 2px 투명 모서리와 단일 2px 테두리로 구성하고 USS에서 상하좌우 3의 9-Slice를 사용합니다. 원본과 알파 정리 아틀라스는 `Tools/UIAssetSources`에서 다시 가공할 수 있습니다.
+시안형 명령 아이콘은 `icon_flat_*.png`, 상단 날짜·자원 아이콘은 `hud_flat_*.png`, 버튼 타입은 `button_flat_normal.png`, `button_flat_primary.png`, `button_flat_danger.png`입니다. A/B 버튼은 동일한 768×128 규격과 형상을 사용하며 B는 푸른 색조만 다릅니다. 두 버튼은 2px 투명 모서리와 단일 2px 테두리로 구성하고 USS에서 상하좌우 3의 9-Slice를 사용합니다. 전역 지도 좌측 성 요약 패널과 오른쪽의 독립된 목표·알림 패널을 포함한 공통 패널 배경은 `bg_type_a.png`와 상하좌우 3의 9-Slice를 사용합니다. 조금 더 강조가 필요한 패널에는 원본 대비 약 1/2 두께의 `bg_type_b.png`를 `.bg-type-b` 클래스로 지정하며 상하좌우 16의 9-Slice를 사용합니다. 청동 테두리·대각 모서리와 어두운 중앙 면만 사용하는 `bg_type_c.png`는 `.bg-type-c` 클래스로 지정하며 좌우 72·상하 40의 9-Slice를 사용합니다. 원본과 가공 소스는 `Tools/UIAssetSources`에서 다시 가공할 수 있습니다.
 
-공통 모달 헤더는 `popup_header.png`를 사용합니다. 1024×160 이미지의 양피지 면이 좌우 금속 프레임 안쪽까지 연결되며, USS에서 좌우 54·상하 20의 9-Slice로 크기를 조절합니다.
+공통 모달 헤더는 사용자가 선택한 은색 금속 프레임 이미지를 바탕으로 테두리를 기존 약 1/4 두께로 얇게 재작성한 `popup_header.png`를 사용합니다. 에셋과 Unity Sprite 표시 영역은 1024×297이며, 공통 모달에서 최소 80px 높이와 좌우 20·상하 10의 9-Slice로 표시합니다. 가공 전 선택 원본은 `Tools/UIAssetSources/popup_header_selected_source.png`, 얇은 프레임 생성 원본은 `Tools/UIAssetSources/popup_header_thin_imagegen_source.png`에 보존합니다.
 
 버튼 업무 지시용 공식 별칭은 `GameDocuments/ButtonTypeGuide.md`를 기준으로 합니다. 전략·영지 관리의 기본·주요·위험 버튼은 A·B·C Type, 하단 전역 명령(군사~월간 보고)과 우측 패널 독립 행동 버튼은 D Type, 전투 HUD의 기본·주요·위험 버튼은 E·F·G Type, 넓은 대표 진행 행동은 H Type입니다. H Type은 `generated-ornate-action` USS 클래스로 연결하며 좌 112·우 32·상하 32의 9-Slice를 사용합니다. 타입명은 문서상 별칭이며 실제 에셋 파일명은 Unity 참조 보존을 위해 유지합니다.
+
+전역 지도의 `다음 턴` 버튼은 H Type(`button_type_h.png`)을 사용하고 버튼 문자는 `NotoSerifKR` 굵은 명조체로 표시합니다. 다른 공통 버튼 스타일에 덮이지 않도록 `#turn-button` 전용 규칙에서 이미지를 직접 지정합니다. 실제 표시 크기는 240×72이며 비대칭 화살촉 장식을 원형 그대로 보존하기 위해 이 버튼에서는 9-Slice를 사용하지 않고 `scale-to-fit`으로 표시합니다. H Type의 일반 제작 기준 슬라이스 정보는 `ButtonTypeGuide.md`에 유지합니다.
+
+전역 지도 하단의 `군사`부터 `월간 보고`까지 명령 버튼은 `button_flat_normal.png`와 상하좌우 3의 9-Slice를 사용합니다. 버튼 내부 아이콘과 단축키 표기는 별도 요소로 유지합니다.
 
 플레이어 표시 용어는 `GameDocuments/FantasyTerminologyGuide.md`를 기준으로 합니다. 진영·통치자·영지 관리·영지관·의회·월간 보고·영웅·첩보·원정·전투단·영입·방랑·질서·공훈을 공식 한국어로 사용합니다. 저장 호환성을 위해 `Faction`, `Governor`, `Scheme`, `Army`, `Recruitment`, `Stability` 등 영문 클래스·필드·열거형과 데이터 ID는 유지합니다. `성`은 물리적 지도 거점, `영지`는 관리 단위와 관리 행위를 뜻합니다.
 

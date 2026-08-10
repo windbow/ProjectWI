@@ -50,13 +50,13 @@
 .objective-modal-progress { white-space:normal; flex-shrink:0; margin-top:2px; margin-bottom:8px; -unity-font-style:bold; }
 .campaign-start-layer { position:absolute; left:0; right:0; top:0; bottom:0; align-items:center; justify-content:center; background-color:#11100d; }
 .campaign-start-backdrop { position:absolute; left:0; right:0; top:0; bottom:0; background-color:#182329; opacity:.72; }
-.campaign-start-panel { width:900px; padding:38px 46px 32px; background-color:rgba(20,18,14,.97); color:#e8d8b2; }
+.campaign-start-panel { width:940px; min-height:650px; padding:42px 50px 42px; background-color:rgba(20,18,14,.97); color:#e8d8b2; }
 .campaign-kicker { color:#b8934d; font-size:14px; letter-spacing:5px; -unity-text-align:middle-center; }
 .campaign-title { margin-top:8px; color:#f0d492; font-size:38px; -unity-font-style:bold; -unity-text-align:middle-center; }
-.campaign-description { margin:12px 30px 24px; color:#c8bda4; font-size:15px; white-space:normal; -unity-text-align:middle-center; }
+.campaign-description { margin:50px 30px 14px; color:#c8bda4; font-size:15px; white-space:normal; -unity-text-align:middle-center; }
 .difficulty-heading { margin-bottom:10px; color:#e7ce94; font-size:18px; -unity-font-style:bold; }
 .difficulty-options { flex-direction:row; justify-content:space-between; }
-.difficulty-card { width:31.8%; min-height:154px; padding:18px; background-color:#28251f; border-width:2px; border-color:#5f5137; color:#d8c9a8; white-space:normal; -unity-text-align:upper-left; }
+.difficulty-card { width:31.8%; min-height:166px; padding:18px; background-color:#28251f; border-width:2px; border-color:#5f5137; color:#d8c9a8; white-space:normal; -unity-text-align:upper-left; }
 .difficulty-card:hover { background-color:#393126; border-color:#ad8742; }
 .difficulty-card.selected { background-color:#493722; border-color:#e1b75e; color:#f3dda8; }
 .variant-heading { margin-top:14px; margin-bottom:8px; color:#e7ce94; font-size:16px; -unity-font-style:bold; }
@@ -66,7 +66,7 @@
 .variant-card.selected { background-color:#493722; border-width:2px; border-color:#e1b75e; color:#f3dda8; }
 .campaign-start-button { height:54px; margin-top:22px; background-color:#7a2a22; border-width:2px; border-color:#c39543; color:#f2ddb0; font-size:18px; -unity-font-style:bold; }
 .campaign-continue-button { height:42px; margin-top:8px; background-color:#302c24; border-color:#806839; color:#d9c79f; }
-.difficulty-note { margin-top:12px; color:#968d7c; font-size:11px; -unity-text-align:middle-center; }
+.difficulty-note { margin-top:6px; margin-bottom:10px; color:#968d7c; font-size:11px; -unity-text-align:middle-center; }
 
 /* 흑백 전략 UI 테마: 지도와 세력색은 유지하고 조작·정보 계층을 무채색으로 통일합니다. */
 :root { --gold:#d9dde1; --gold-light:#f4f5f6; --ink:#08090a; --paper:#e6e7e8; --navy:#111417; --red:#7b2725; }
@@ -210,7 +210,7 @@
 .facility-slot-grid .slot { width:100%; margin-right:0; }
 .modal-layer { background-color:rgba(1,4,7,.82); }
 .modal-panel { width:620px; max-height:90%; padding:0; background-color:#0c141b; color:#edf2f4; border-width:1px; border-color:#71808b; }
-.modal-header { min-height:64px; padding:14px 16px; align-items:center; background-color:#e9edf0; border-bottom-width:2px; border-bottom-color:#566672; }
+.modal-header { min-height:80px; padding:14px 16px; align-items:center; background-color:#e9edf0; border-bottom-width:2px; border-bottom-color:#566672; }
 .modal-title { margin:0 14px 0 0; color:#10161b; font-size:23px; }
 .modal-close { width:110px; height:38px; margin:0; background-color:#111a22; color:#ffffff; border-color:#52616d; }
 .modal-scroll-view { margin:0; background-color:#0c141b; }
@@ -261,7 +261,9 @@
 .map-side-panel { position:absolute; top:16px; bottom:18px; width:248px; padding:22px 18px 18px; color:#e9eef1; overflow:hidden; }
 .concept-side-panel { background-color:rgba(6,11,16,.95); border-width:1px; border-top-width:2px; border-color:#566672; border-top-color:#9aa8b3; }
 .castle-summary-panel { left:16px; }
-.campaign-summary-panel { right:16px; width:268px; }
+.campaign-summary-panel { right:16px; bottom:auto; width:268px; height:43%; }
+.campaign-alert-panel { right:16px; top:46%; bottom:18px; width:268px; }
+.campaign-alert-panel .alert-heading { margin-top:0; }
 .map-heading { left:280px; right:300px; width:auto; }
 .map { left:280px; right:300px; top:86px; bottom:30px; }
 .faction-legend { left:292px; top:98px; width:195px; }
@@ -304,10 +306,10 @@
     -unity-slice-bottom:48;
 }
 .modal-panel .modal-header {
-    -unity-slice-left:54;
-    -unity-slice-right:54;
-    -unity-slice-top:20;
-    -unity-slice-bottom:20;
+    -unity-slice-left:20;
+    -unity-slice-right:20;
+    -unity-slice-top:10;
+    -unity-slice-bottom:10;
 }
 
 /* 시작과 이어하기 버튼은 동일한 클릭 영역과 시각 높이를 사용합니다. */
@@ -494,7 +496,7 @@
 /* 시안형 하단 명령 바와 신규 단색 명령 아이콘입니다. */
 .global-command-bar {
     height:78px;
-    padding:9px 12px;
+    padding:3px 12px;
     background-color:#070d13;
     border-width:1px;
     border-color:#4b5964;
@@ -505,11 +507,11 @@
     margin-right:2px;
     padding-left:44px;
     padding-right:10px;
-    background-image:url("project://database/Assets/Resources/UI/Generated/right_action_button.png");
-    -unity-slice-left:28;
-    -unity-slice-right:28;
-    -unity-slice-top:20;
-    -unity-slice-bottom:20;
+    background-image:url("project://database/Assets/Resources/UI/Generated/button_flat_normal.png");
+    -unity-slice-left:3;
+    -unity-slice-right:3;
+    -unity-slice-top:3;
+    -unity-slice-bottom:3;
     color:#e8e3d9;
     font-size:17px;
     -unity-text-align:middle-center;
@@ -562,6 +564,23 @@
     -unity-font-style:normal;
     -unity-text-outline-width:0;
     -unity-text-outline-color:rgba(0,0,0,0);
+}
+.app .turn-button {
+    -unity-font-definition:url("project://database/Assets/Fonts/NotoSerifKR-VariableFont_wght.ttf");
+    -unity-font-style:bold;
+}
+#turn-button {
+    width:240px;
+    height:72px;
+    background-image:url("project://database/Assets/Resources/UI/Generated/button_type_h.png");
+    -unity-background-scale-mode:scale-to-fit;
+    -unity-slice-left:0;
+    -unity-slice-right:0;
+    -unity-slice-top:0;
+    -unity-slice-bottom:0;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    -unity-background-image-tint-color:#ffffff;
 }
 
 /* 전략 지도와 성 화면 우측 패널은 동일한 흑청색·은색 시각 체계를 사용합니다. */
@@ -620,7 +639,7 @@
     color:#f0eee8;
     border-width:0;
 }
-.campaign-summary-panel .side-panel-news {
+.campaign-alert-panel .side-panel-news {
     min-height:68px;
     padding:12px 16px;
     background-image:url("project://database/Assets/Resources/UI/Generated/right_notice_row.png");
@@ -632,7 +651,7 @@
     color:#d8dde0;
     border-width:0;
 }
-.campaign-summary-panel .battle-alert-button {
+.campaign-alert-panel .battle-alert-button {
     min-height:68px;
     padding:12px 16px;
     background-image:url("project://database/Assets/Resources/UI/Generated/right_danger_row.png");
@@ -676,6 +695,26 @@
 }
 
 /* 단색으로 채우던 주요 패널 컨테이너를 Background A Type 9-Slice 이미지로 통일합니다. */
+.bg-type-b {
+    background-image:url("project://database/Assets/Resources/UI/Generated/bg_type_b.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:16;
+    -unity-slice-right:16;
+    -unity-slice-top:16;
+    -unity-slice-bottom:16;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+}
+.bg-type-c {
+    background-image:url("project://database/Assets/Resources/UI/Generated/bg_type_c.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:72;
+    -unity-slice-right:72;
+    -unity-slice-top:40;
+    -unity-slice-bottom:40;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+}
 .compact-hud,
 .map-heading,
 .faction-legend,
@@ -683,6 +722,9 @@
 .global-command-bar,
 .strategy-guide,
 .castle-top-strip,
+.castle-summary-panel,
+.campaign-summary-panel,
+.campaign-alert-panel,
 .castle-overview-panel,
 .castle-bottom-info,
 .castle-slot-section,

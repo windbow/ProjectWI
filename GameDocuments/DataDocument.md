@@ -101,8 +101,14 @@
 - `Assets/Resources/UI/Generated/icon_flat_*.png`: 군사·영웅·외교·첩보·연구·통치·의회·월간 보고·다음 턴 명령 아이콘
 - `Assets/Resources/UI/Generated/hud_flat_*.png`: 날짜·금화·마나·영향력 HUD 아이콘
 - `Assets/Resources/UI/Generated/button_flat_*.png`: 일반·선택·위험 9-Slice 버튼 배경. A(`normal`)와 B(`primary`)는 2px 투명 모서리와 단일 2px 테두리의 동일 형상이며 B만 푸른 색조를 사용함
-- `Assets/Resources/UI/Generated/popup_header.png`: 공통 모달 제목 영역의 9-Slice 배경. 좌우의 남색 홈을 제거하고 양피지 면이 외곽 금속 프레임까지 이어지는 1024×160 헤더
+- `Assets/Resources/UI/Generated/bg_type_a.png`: 전역 지도 좌측 성 요약 패널과 오른쪽 목표·알림 분할 패널을 포함한 주요 공통 패널의 3px 9-Slice 배경
+- `Assets/Resources/UI/Generated/bg_type_b.png`: 초기 검은 금속 패널의 테두리를 원본 대비 약 1/2로 줄인 1587×508 강조 패널 배경. `.bg-type-b` 클래스와 상하좌우 16px 9-Slice를 사용함
+- `Assets/Resources/UI/Generated/bg_type_c.png`: 외곽 석재 프레임 없이 청동 테두리, 대각 모서리와 어두운 중앙 면만 가진 1587×508 강조 패널 배경. `.bg-type-c` 클래스와 좌우 72·상하 40px 9-Slice를 사용함
+- `Assets/Resources/UI/Generated/popup_header.png`: 은색 금속 테두리를 기존 약 1/4 두께로 줄인 1024×297 공통 모달 헤더. Unity Sprite 영역도 전체 1024×297로 설정하며 좌우 20·상하 10 슬라이스를 사용함
+- `Tools/UIAssetSources/popup_header_selected_source.png`: 검은 바깥 여백을 제거한 1774×515 선택 원본
 - `GameDocuments/ButtonTypeGuide.md`: 현행 버튼 이미지의 A~H Type 공식 별칭, 사용처와 업무 지시 기준
+- 전역 지도 `다음 턴`: `generated-ornate-action` 클래스와 `#turn-button` 전용 규칙으로 `button_type_h.png`를 적용. 240×72 표시 크기에서 9-Slice 없이 `scale-to-fit`으로 원형을 보존하며 `NotoSerifKR` 굵은 명조체를 사용함
+- 전역 지도 하단 일반 명령 버튼: `button_flat_normal.png`와 3px 9-Slice를 사용하며 아이콘·문자·단축키 요소는 유지함
 - `GameDocuments/FantasyTerminologyGuide.md`: 삼국지식 이전 표현과 판타지 공식 표시 용어의 대응표, 성·영지 구분 및 내부 식별자 유지 기준
 - `GameDocuments/UIReferences/ProjectWI_ButtonTypeCatalog.png`: 기존 A~G 버튼 에셋 7종을 모은 시각 카탈로그
 - `Assets/Resources/UI/Generated/button_type_h.png`: 왼쪽 화살촉 장식과 은·황동 이중 테두리를 갖춘 H Type 대표 진행 버튼 배경
@@ -116,6 +122,7 @@
 - `WIBattleHUDController.cs`: 전투 상태, 전투단 명령과 영웅 스킬 버튼 연결
 - `WIBattleSceneBootstrap.cs`: 영속 캠페인에서 전투 세션을 받아 결과를 반환
 - `WICampaignRuntimeService.cs`: 씬 전환 사이 캠페인 상태와 대기 전투 ID 보존
+- `WIAdministrationUIController.Campaign.cs`: 난이도·시작 조건 선택 카드 구성과 마침표 단위 설명 줄바꿈
 - `WICampaignSaveSystem.cs`: 버전 저장 봉투, JSON 직렬화와 안전한 파일 입출력
 - `WISystemSettingsConfigSO.cs`: 언어, 화면, 프레임과 오디오 기본값
 - `WISystemSettingsService.cs`: 사용자 설정 로드, 적용과 PlayerPrefs 영속화

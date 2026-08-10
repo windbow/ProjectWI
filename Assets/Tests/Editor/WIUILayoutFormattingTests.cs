@@ -124,7 +124,7 @@ namespace ProjectWI.Tests.Editor
             string battle = File.ReadAllText("Assets/UI/Battle/WIBattleHUD.uss");
 
             StringAssert.Contains("--wi-panel:#0d151d", administration);
-            StringAssert.Contains(".modal-header { min-height:64px", administration);
+            StringAssert.Contains(".modal-header { min-height:80px", administration);
             StringAssert.Contains(".turn-button { width:190px", administration);
             StringAssert.Contains(".modal-fixed-footer { max-height:225px", administration);
             StringAssert.Contains("전략 화면 V2와 동일한 청회색", battle);
@@ -137,7 +137,7 @@ namespace ProjectWI.Tests.Editor
         {
             string[] assetNames =
             {
-                "button_normal.png", "button_primary.png", "button_danger.png", "popup_panel.png", "bg_type_a.png",
+                "button_normal.png", "button_primary.png", "button_danger.png", "popup_panel.png", "bg_type_a.png", "bg_type_b.png", "bg_type_c.png",
                 "popup_header.png",
                 "icon_military.png", "icon_heroes.png", "icon_diplomacy.png", "icon_scheme.png",
                 "icon_research.png", "icon_council.png", "icon_report.png", "icon_turn.png",
@@ -173,10 +173,24 @@ namespace ProjectWI.Tests.Editor
         {
             string administration = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
             string battle = File.ReadAllText("Assets/UI/Battle/WIBattleHUD.uss");
+            string worldLayout = File.ReadAllText("Assets/UI/Administration/Views/WIAdministrationWorldView.uxml");
 
             Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/bg_type_a.png"));
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/bg_type_b.png"));
+            Assert.IsTrue(File.Exists("Assets/Resources/UI/Generated/bg_type_c.png"));
+            StringAssert.Contains(".bg-type-b {", administration);
+            StringAssert.Contains("UI/Generated/bg_type_b.png", administration);
+            StringAssert.Contains(".bg-type-c {", administration);
+            StringAssert.Contains("UI/Generated/bg_type_c.png", administration);
+            StringAssert.Contains("-unity-slice-left:72;", administration);
+            StringAssert.Contains("-unity-slice-top:40;", administration);
             StringAssert.Contains(".compact-hud,", administration);
             StringAssert.Contains(".castle-overview-panel,", administration);
+            StringAssert.Contains(".castle-summary-panel,", administration);
+            StringAssert.Contains(".campaign-summary-panel,", administration);
+            StringAssert.Contains(".campaign-alert-panel,", administration);
+            StringAssert.Contains("campaign-summary-panel concept-side-panel", worldLayout);
+            StringAssert.Contains("campaign-alert-panel concept-side-panel", worldLayout);
             StringAssert.Contains("UI/Generated/bg_type_a.png", administration);
             StringAssert.Contains(".battle-status,", battle);
             StringAssert.Contains(".bottom-bar {", battle);
@@ -191,12 +205,19 @@ namespace ProjectWI.Tests.Editor
         public void GeneratedUIArtwork_HeaderTitleAndCommandIconsRemainLegible()
         {
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
+            string headerMetadata = File.ReadAllText("Assets/Resources/UI/Generated/popup_header.png.meta");
 
             StringAssert.Contains(".modal-panel .modal-header .modal-title { color:#10161b; }", stylesheet);
             StringAssert.Contains(".global-command .generated-command-icon { position:absolute", stylesheet);
             StringAssert.Contains(".global-command { padding-left:31px", stylesheet);
             StringAssert.Contains(".turn-button .generated-command-icon { left:7px", stylesheet);
             StringAssert.Contains("UI/Generated/popup_header.png", stylesheet);
+            StringAssert.Contains("-unity-slice-left:20;", stylesheet);
+            StringAssert.Contains("-unity-slice-right:20;", stylesheet);
+            StringAssert.Contains("-unity-slice-top:10;", stylesheet);
+            StringAssert.Contains("-unity-slice-bottom:10;", stylesheet);
+            StringAssert.Contains("width: 1024", headerMetadata);
+            StringAssert.Contains("height: 297", headerMetadata);
         }
 
         // 생성 버튼과 패널의 모서리가 크기 변경에도 늘어나지 않도록 9-Slice 규칙을 검증합니다.
@@ -277,6 +298,8 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains(".app Label, .app Button, .app TextField, .app Toggle", stylesheet);
             StringAssert.Contains(".resource-chip, .side-panel-stats, .castle-stat", stylesheet);
             StringAssert.Contains("button_flat_normal.png", stylesheet);
+            StringAssert.Contains(".global-command {", stylesheet);
+            StringAssert.Contains("UI/Generated/button_flat_normal.png", stylesheet);
             StringAssert.Contains("button_flat_primary.png", stylesheet);
             StringAssert.Contains("button_flat_danger.png", stylesheet);
             StringAssert.Contains("-unity-slice-left:3;", stylesheet);
@@ -298,7 +321,17 @@ namespace ProjectWI.Tests.Editor
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
 
             Assert.AreEqual(8, layout.Split(new[] { "class=\"global-command " }, System.StringSplitOptions.None).Length - 1);
-            StringAssert.Contains("class=\"turn-button generated-primary\"", layout);
+            StringAssert.Contains("class=\"turn-button generated-ornate-action\"", layout);
+            StringAssert.Contains(".app .turn-button {", stylesheet);
+            StringAssert.Contains("NotoSerifKR-VariableFont_wght.ttf", stylesheet);
+            StringAssert.Contains("#turn-button {", stylesheet);
+            StringAssert.Contains("UI/Generated/button_type_h.png", stylesheet);
+            StringAssert.Contains("width:240px;", stylesheet);
+            StringAssert.Contains("height:72px;", stylesheet);
+            StringAssert.Contains("-unity-background-scale-mode:scale-to-fit;", stylesheet);
+            StringAssert.Contains("-unity-slice-left:0;", stylesheet);
+            StringAssert.Contains("-unity-slice-right:0;", stylesheet);
+            StringAssert.Contains("-unity-slice-top:0;", stylesheet);
             StringAssert.Contains("background-image:url(\"project://database/Assets/Resources/UI/Generated/right_action_button.png\");", stylesheet);
             StringAssert.Contains("-unity-slice-left:28;", stylesheet);
             StringAssert.Contains("-unity-slice-right:28;", stylesheet);
@@ -467,6 +500,23 @@ namespace ProjectWI.Tests.Editor
             CollectionAssert.DoesNotContain(codes, "??");
             Assert.AreEqual("AV", codes[0]);
             Assert.AreEqual("NC", codes[4]);
+        }
+
+        // 캠페인 시작 화면이 확대된 패널과 문장 단위 카드 줄바꿈 규칙을 유지하는지 검증합니다.
+        [Test]
+        public void CampaignStartScreen_UsesExpandedLayoutAndSentenceBreaks()
+        {
+            string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
+            string overlay = File.ReadAllText("Assets/UI/Administration/Views/WIAdministrationOverlays.uxml");
+            string controller = File.ReadAllText("Assets/Scripts/Administration/WIAdministrationUIController.Campaign.cs");
+
+            StringAssert.Contains(".campaign-start-panel { width:940px; min-height:650px", stylesheet);
+            StringAssert.Contains(".campaign-description { margin:50px 30px 14px", stylesheet);
+            StringAssert.Contains(".difficulty-note { margin-top:6px; margin-bottom:10px", stylesheet);
+            StringAssert.Contains("left: 64px; right: 64px", overlay);
+            StringAssert.Contains("name=\"Label_Desc\"", overlay);
+            StringAssert.Contains("FormatCampaignCardDescription", controller);
+            StringAssert.Contains("Replace(\". \", \".\\n\")", controller);
         }
     }
 }

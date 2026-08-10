@@ -18,7 +18,7 @@ namespace ProjectWI.Administration
             foreach (WICampaignDifficultyDefinition definition in database.DifficultyDefinitions)
             {
                 Button button = new Button(() => SelectDifficulty(definition.Difficulty));
-                button.text = $"{definition.DisplayName.Get(database.UseEnglish)}\n\n{definition.Description.Get(database.UseEnglish)}";
+                button.text = $"{definition.DisplayName.Get(database.UseEnglish)}\n\n{FormatCampaignCardDescription(definition.Description.Get(database.UseEnglish))}";
                 button.AddToClassList("difficulty-card");
                 difficultyOptions.Add(button);
                 difficultyButtons[definition.Difficulty] = button;
@@ -39,12 +39,20 @@ namespace ProjectWI.Administration
             foreach (WICampaignVariantDefinition definition in database.CampaignVariants)
             {
                 Button button = new Button(() => SelectCampaignVariant(definition.Variant));
-                button.text = $"{definition.DisplayName.Get(database.UseEnglish)}\n{definition.Description.Get(database.UseEnglish)}";
+                button.text = $"{definition.DisplayName.Get(database.UseEnglish)}\n{FormatCampaignCardDescription(definition.Description.Get(database.UseEnglish))}";
                 button.AddToClassList("variant-card");
                 variantOptions.Add(button);
                 variantButtons[definition.Variant] = button;
             }
             SelectCampaignVariant(WICampaignVariant.Classic);
+        }
+
+        // 캠페인 선택 카드의 여러 문장을 마침표 단위로 나누어 읽기 쉽게 표시합니다.
+        private static string FormatCampaignCardDescription(string description)
+        {
+            return string.IsNullOrWhiteSpace(description)
+                ? string.Empty
+                : description.Replace(". ", ".\n");
         }
 
         // 선택한 시작 변형 카드의 강조 상태를 갱신합니다.
