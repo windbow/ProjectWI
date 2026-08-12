@@ -15,10 +15,21 @@ namespace ProjectWI.Administration
         {
             if (WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state))
             {
-                OpenMonthlyReportModal();
+                UGUIMonthlyReportRequested?.Invoke();
                 return;
             }
-            StartCoroutine(ExecuteTurnRoutine());
+            StartCoroutine(ExecuteUGUITurnRoutine());
+        }
+
+        // UGUI 연산 안내 뒤 기존 턴 계산을 실행하고 월간 보고 UGUI를 엽니다.
+        private IEnumerator ExecuteUGUITurnRoutine()
+        {
+            ShowUGUITurnProcessing();
+            yield return null;
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+            WICampaignRuntimeService.Instance?.AutoSave();
+            RefreshAll();
+            ShowUGUITurnReport();
         }
 
         // 한 프레임 동안 연산 안내를 노출하고 턴 결과를 UI에 반영합니다.

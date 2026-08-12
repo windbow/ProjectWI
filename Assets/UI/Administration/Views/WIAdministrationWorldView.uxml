@@ -330,7 +330,7 @@
                 <ui:VisualElement class="generated-command-icon icon-report"/>
             </ui:Button>
             <ui:VisualElement class="command-spacer"/>
-            <ui:Button name="turn-button" text="다음 턴" class="turn-button generated-ornate-action" style="width: 256px; height: 80px; background-size: 256% 80%; background-position-x: center; background-position-y: center; -unity-background-scale-mode: scale-to-fit;"/>
+            <ui:Button name="turn-button" text="다음 턴" enable-rich-text="true" emoji-fallback-support="true" parse-escape-sequences="false" selectable="false" focusable="false" double-click-selects-word="true" triple-click-selects-line="true" display-tooltip-when-elided="true" class="turn-button generated-ornate-action" style="width: 256px; height: 80px; background-size: 256% 80%; background-position-x: center; background-position-y: center; -unity-background-scale-mode: scale-to-fit; -unity-text-align: middle-center; -unity-font-definition: url(&quot;project://database/Assets/Fonts/NotoSerifKR-VariableFont_wght.ttf?fileID=12800000&amp;guid=77d473b3b79b6934b8867e6721576471&amp;type=3#NotoSerifKR-VariableFont_wght&quot;); -unity-text-outline-width: 0; letter-spacing: 0; word-spacing: 0; -unity-paragraph-spacing: 0; -unity-text-auto-size: none; transform-origin: center; translate: 0 0;"/>
         </ui:VisualElement>
         <ui:VisualElement class="strategy-guide frame-dark">
             <ui:VisualElement enabled="true" class="guide-portrait image-placeholder" style="background-image: url(&quot;project://database/Assets/Art/Characters/Portrait_common_gareth_V1.png?fileID=2800000&amp;guid=51d5dc92d9270c44c9fa2156929f0afd&amp;type=3#Portrait_common_gareth_V1&quot;);"/>

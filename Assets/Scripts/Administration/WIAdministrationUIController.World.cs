@@ -13,6 +13,7 @@ namespace ProjectWI.Administration
         // UXML에 미리 배치된 성 노드에 데이터와 선택 이벤트를 연결합니다.
         private void BuildMap()
         {
+            if (LegacyToolkitPresentationEnabled == false) return;
             castleButtons.Clear();
             mapConnectionLayer = map.Q<WIMapConnectionLayer>("map-connection-layer");
             foreach (WICastleDefinition castle in database.Castles)
@@ -132,6 +133,13 @@ namespace ProjectWI.Administration
         private void SelectCastle(string castleId)
         {
             selectedCastle = state.GetCastle(castleId);
+            if (selectedCastle == null) return;
+            if (LegacyToolkitPresentationEnabled == false)
+            {
+                ActivateUGUITerritoryVisibility();
+                NotifyUGUIWorldChanged();
+                return;
+            }
             WICastleDefinition castle = database.GetCastle(castleId);
             bool ownCastle = WIAdministrationTurnSystem.CanPlayerManageCastle(state, selectedCastle);
             bool detailed = WIInformationVisibility.CanViewCastleDetails(state, state.PlayerFactionId, selectedCastle);
@@ -203,20 +211,32 @@ namespace ProjectWI.Administration
         // 대륙 전략 화면을 표시하고 영지 관리 화면을 숨깁니다.
         private void ShowGlobalView()
         {
+            if (LegacyToolkitPresentationEnabled == false)
+            {
+                RestoreUGUIWorldVisibility();
+                return;
+            }
             RefreshMapConnections();
             globalViewHost.style.display = DisplayStyle.Flex;
             castleViewHost.style.display = DisplayStyle.None;
             globalView.style.display = DisplayStyle.Flex;
             castleView.style.display = DisplayStyle.None;
+            RestoreUGUIWorldVisibility();
         }
 
         // 선택한 성의 영지 관리 화면을 표시하고 대륙 전략 화면을 숨깁니다.
         private void ShowCastleView()
         {
+            if (LegacyToolkitPresentationEnabled == false)
+            {
+                ActivateUGUITerritoryVisibility();
+                return;
+            }
             globalViewHost.style.display = DisplayStyle.None;
             castleViewHost.style.display = DisplayStyle.Flex;
             globalView.style.display = DisplayStyle.None;
             castleView.style.display = DisplayStyle.Flex;
+            ActivateUGUITerritoryVisibility();
         }
 
         // 외부 UI나 검증 도구에서 지정한 성의 영지 관리 화면으로 이동합니다.
@@ -228,13 +248,15 @@ namespace ProjectWI.Administration
             }
 
             SelectCastle(castleId);
-            Debug.Log($"성 화면 전환: {castleId} · 전역 {globalView.style.display.value} · 성 {castleView.style.display.value}");
+            Debug.Log(LegacyToolkitPresentationEnabled
+                ? $"성 화면 전환: {castleId} · 전역 {globalView.style.display.value} · 성 {castleView.style.display.value}"
+                : $"UGUI 성 화면 전환: {castleId}");
         }
 
         // 해상도 QA에서 모달 없이 전역 지도 화면을 즉시 표시합니다.
         public void OpenGlobalPreviewForQA()
         {
-            BeginCampaign(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
+            BeginCampaignForQA(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
             CloseModal();
             ShowGlobalView();
             RefreshAll();
@@ -243,7 +265,7 @@ namespace ProjectWI.Administration
         // 해상도 QA에서 아발론 소유 성 화면을 모달 없이 즉시 표시합니다.
         public void OpenCastlePreviewForQA()
         {
-            BeginCampaign(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
+            BeginCampaignForQA(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
             CloseModal();
             SelectCastle("castle_00");
             RefreshAll();

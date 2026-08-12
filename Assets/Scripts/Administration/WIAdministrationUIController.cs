@@ -14,13 +14,12 @@ namespace ProjectWI.Administration
         Faction, Council, MonthlyReport, EndTurn
     }
 
-    [RequireComponent(typeof(UIDocument))]
     public partial class WIAdministrationUIController : MonoBehaviour
     {
+        private const bool LegacyToolkitPresentationEnabled = false;
         [SerializeField] private WIAdministrationDatabaseSO database;
 
         private WIAdministrationState state;
-        private UIDocument uiDocument;
         private VisualElement root;
         private VisualElement map;
         private VisualElement mapBackground;
@@ -34,8 +33,6 @@ namespace ProjectWI.Administration
         private VisualElement castleViewHost;
         private VisualElement modalLayer;
         private VisualElement campaignStartLayer;
-        private VisualElement difficultyOptions;
-        private VisualElement variantOptions;
         private Label factionLabel;
         private Label dateLabel;
         private Label turnDescription;
@@ -75,17 +72,11 @@ namespace ProjectWI.Administration
         private Button objectiveButton;
         private WICastleRuntimeState selectedCastle;
         private readonly Dictionary<string, Button> castleButtons = new Dictionary<string, Button>();
-        private readonly Dictionary<WICampaignDifficulty, Button> difficultyButtons = new Dictionary<WICampaignDifficulty, Button>();
-        private readonly Dictionary<WICampaignVariant, Button> variantButtons = new Dictionary<WICampaignVariant, Button>();
         private bool mapNodesBound;
-        private WICampaignDifficulty selectedDifficulty = WICampaignDifficulty.Standard;
-        private WICampaignVariant selectedVariant = WICampaignVariant.Classic;
 
         // UI 문서와 버튼 이벤트를 초기화합니다.
         private void Awake()
         {
-            uiDocument = GetComponent<UIDocument>();
-            root = uiDocument.rootVisualElement;
             if (database == null)
             {
                 Debug.LogError("전략 데이터베이스가 할당되지 않았습니다.");
@@ -97,21 +88,32 @@ namespace ProjectWI.Administration
             state = campaignService == null
                 ? WIAdministrationState.Create(database)
                 : campaignService.GetOrCreateState(database);
-            CacheElements();
-            BindGlobalButtons();
-            BindKeyboardShortcuts();
-            BuildMap();
+            if (LegacyToolkitPresentationEnabled)
+            {
+                UIDocument uiDocument = GetComponent<UIDocument>();
+                if (uiDocument == null)
+                {
+                    Debug.LogError("레거시 UI Toolkit 표시가 활성화됐지만 UIDocument가 없습니다.");
+                    enabled = false;
+                    return;
+                }
+                root = uiDocument.rootVisualElement;
+                CacheElements();
+            }
             RefreshAll();
             SelectInitialCastle();
-            BuildCampaignStartScreen();
-            campaignStartLayer.style.display = campaignService == null || campaignService.HasCampaignStarted == false
-                ? DisplayStyle.Flex
-                : DisplayStyle.None;
             if (campaignService != null && campaignService.HasCampaignStarted &&
                 WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state))
             {
-                OpenMonthlyReportModal();
+                StartCoroutine(OpenPendingBattleReportUGUIAfterInitialization());
             }
+        }
+
+        // 모든 UGUI 프리팹의 구독이 준비된 다음 미결 전투가 포함된 월간 보고를 엽니다.
+        private IEnumerator OpenPendingBattleReportUGUIAfterInitialization()
+        {
+            yield return null;
+            UGUIMonthlyReportRequested?.Invoke();
         }
 
         // 자주 사용하는 UI 요소를 이름으로 캐시합니다.
@@ -128,8 +130,6 @@ namespace ProjectWI.Administration
             castleViewHost = root.Q<VisualElement>("castle-view-host");
             modalLayer = root.Q<VisualElement>("modal-layer");
             campaignStartLayer = root.Q<VisualElement>("campaign-start-layer");
-            difficultyOptions = root.Q<VisualElement>("difficulty-options");
-            variantOptions = root.Q<VisualElement>("variant-options");
             factionLabel = root.Q<Label>("faction-label");
             dateLabel = root.Q<Label>("date-label");
             turnDescription = root.Q<Label>("turn-description");
@@ -209,28 +209,26 @@ namespace ProjectWI.Administration
             root.Q<Button>("turn-button").clicked += BeginTurn;
             root.Q<Button>("back-to-map-button").clicked += ShowGlobalView;
             specialFacilityButton.clicked += OpenSpecialFacilityModal;
-            root.Q<Button>("focus-project-button").clicked += OpenFocusProjectModal;
-            root.Q<Button>("march-button").clicked += OpenCastleMarchModal;
-            root.Q<Button>("assign-button").clicked += OpenHeroAssignmentModal;
-            root.Q<Button>("character-activity-button").clicked += OpenCharacterActivityModal;
-            root.Q<Button>("basic-facility-button").clicked += OpenBasicFacilityModal;
-            root.Q<Button>("heroes-button").clicked += OpenHeroListModal;
-            root.Q<Button>("military-button").clicked += OpenMilitaryModal;
-            root.Q<Button>("diplomacy-button").clicked += OpenDiplomacyModal;
-            root.Q<Button>("scheme-button").clicked += OpenSchemeModal;
-            root.Q<Button>("research-button").clicked += OpenResearchModal;
-            root.Q<Button>("faction-button").clicked += OpenFactionOverviewModal;
+            root.Q<Button>("focus-project-button").clicked += () => UGUIFocusProjectRequested?.Invoke();
+            root.Q<Button>("march-button").clicked += () => UGUIMarchRequested?.Invoke();
+            root.Q<Button>("assign-button").clicked += () => UGUIHeroAssignmentRequested?.Invoke();
+            root.Q<Button>("character-activity-button").clicked += () => UGUICharacterActivityRequested?.Invoke();
+            root.Q<Button>("basic-facility-button").clicked += () => UGUIBasicFacilityRequested?.Invoke();
+            root.Q<Button>("heroes-button").clicked += () => UGUIHeroesRequested?.Invoke();
+            root.Q<Button>("military-button").clicked += () => UGUIMilitaryRequested?.Invoke();
+            root.Q<Button>("diplomacy-button").clicked += () => UGUIDiplomacyRequested?.Invoke();
+            root.Q<Button>("scheme-button").clicked += () => UGUISchemeRequested?.Invoke();
+            root.Q<Button>("research-button").clicked += () => UGUIResearchRequested?.Invoke();
+            root.Q<Button>("faction-button").clicked += () => UGUIFactionRequested?.Invoke();
             root.Q<Button>("castle-record-button").clicked += OpenCastleRecordModal;
-            root.Q<Button>("delegation-button").clicked += OpenDelegationModal;
-            root.Q<Button>("council-button").clicked += OpenFactionPolicyModal;
-            root.Q<Button>("monthly-report-button").clicked += OpenMonthlyReportModal;
+            root.Q<Button>("delegation-button").clicked += () => UGUIDelegationRequested?.Invoke();
+            root.Q<Button>("council-button").clicked += () => UGUICouncilRequested?.Invoke();
+            root.Q<Button>("monthly-report-button").clicked += () => UGUIMonthlyReportRequested?.Invoke();
             root.Q<Button>("information-button").clicked += () => ShowMessage("대륙 지도에서 성을 선택하면 영지 관리 화면으로 이동합니다.");
-            root.Q<Button>("system-button").clicked += OpenSystemModal;
-            root.Q<Button>("new-campaign-button").clicked += StartNewCampaign;
-            root.Q<Button>("continue-campaign-button").clicked += ContinueAutoSave;
+            root.Q<Button>("system-button").clicked += OpenUGUISystem;
             root.Q<Button>("capital-manage-button").clicked += OpenGlobalSummaryCastle;
-            battleAlertButton.clicked += OpenMonthlyReportModal;
-            objectiveButton.clicked += () => ShowCurrentObjective(false);
+            battleAlertButton.clicked += () => UGUIMonthlyReportRequested?.Invoke();
+            objectiveButton.clicked += () => OpenUGUICampaignObjective(false);
         }
 
         // 좌측 전역 요약 패널이 가리키는 플레이어 성을 영지 관리 화면으로 엽니다.
@@ -288,14 +286,14 @@ namespace ProjectWI.Administration
             {
                 case WIAdministrationShortcutAction.CloseModal: CloseModal(); break;
                 case WIAdministrationShortcutAction.ReturnToGlobal: ShowGlobalView(); break;
-                case WIAdministrationShortcutAction.Military: OpenMilitaryModal(); break;
-                case WIAdministrationShortcutAction.Heroes: OpenHeroListModal(); break;
-                case WIAdministrationShortcutAction.Diplomacy: OpenDiplomacyModal(); break;
-                case WIAdministrationShortcutAction.Scheme: OpenSchemeModal(); break;
-                case WIAdministrationShortcutAction.Research: OpenResearchModal(); break;
-                case WIAdministrationShortcutAction.Faction: OpenFactionOverviewModal(); break;
-                case WIAdministrationShortcutAction.Council: OpenFactionPolicyModal(); break;
-                case WIAdministrationShortcutAction.MonthlyReport: OpenMonthlyReportModal(); break;
+                case WIAdministrationShortcutAction.Military: UGUIMilitaryRequested?.Invoke(); break;
+                case WIAdministrationShortcutAction.Heroes: UGUIHeroesRequested?.Invoke(); break;
+                case WIAdministrationShortcutAction.Diplomacy: UGUIDiplomacyRequested?.Invoke(); break;
+                case WIAdministrationShortcutAction.Scheme: UGUISchemeRequested?.Invoke(); break;
+                case WIAdministrationShortcutAction.Research: UGUIResearchRequested?.Invoke(); break;
+                case WIAdministrationShortcutAction.Faction: UGUIFactionRequested?.Invoke(); break;
+                case WIAdministrationShortcutAction.Council: UGUICouncilRequested?.Invoke(); break;
+                case WIAdministrationShortcutAction.MonthlyReport: UGUIMonthlyReportRequested?.Invoke(); break;
                 case WIAdministrationShortcutAction.EndTurn: BeginTurn(); break;
             }
             keyboardEvent.StopImmediatePropagation();
@@ -327,6 +325,11 @@ namespace ProjectWI.Administration
         // 전역 HUD와 지도 뱃지를 최신 상태로 갱신합니다.
         private void RefreshAll()
         {
+            if (LegacyToolkitPresentationEnabled == false)
+            {
+                NotifyUGUIWorldChanged();
+                return;
+            }
             WIFactionDefinition playerFaction = null;
             foreach (WIFactionDefinition faction in database.Factions)
             {
@@ -412,6 +415,7 @@ namespace ProjectWI.Administration
                 string selectedCastleId = selectedCastle.CastleId;
                 SelectCastle(selectedCastleId);
             }
+            NotifyUGUIWorldChanged();
         }
 
         // 시안형 전역 화면의 좌측 성 현황과 우측 목표·전투 알림을 현재 상태로 갱신합니다.
@@ -480,7 +484,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // UID에 해당하는 단순 안내 모달을 표시합니다.
+        // UID 또는 직접 작성한 문장을 공통 UGUI 안내 모달로 표시합니다.
         private void ShowMessage(string uid)
         {
             string message = database.GetText(uid);
@@ -488,9 +492,7 @@ namespace ProjectWI.Administration
             {
                 message = uid;
             }
-
-            VisualElement panel = CreateModal(message);
-            panel.Add(new Label(message));
+            ShowUGUIMessage("안내", message);
         }
 
         // 담당 가능한 인물이 없을 때 턴 진행과 인물 복귀 방법을 공통으로 안내합니다.
@@ -574,8 +576,14 @@ namespace ProjectWI.Administration
         // 현재 열린 모달을 닫습니다.
         private void CloseModal()
         {
+            if (LegacyToolkitPresentationEnabled == false || modalLayer == null)
+            {
+                ResumeUGUIAfterLegacyModal();
+                return;
+            }
             modalLayer.Clear();
             modalLayer.style.display = DisplayStyle.None;
+            ResumeUGUIAfterLegacyModal();
         }
     }
 }

@@ -1,17 +1,32 @@
 # ProjectWI 씬 및 에셋 구조
 
+## 시스템 UGUI 연결
+
+- `WIAdministrationSystemSnapshot`은 `WISystemSettingsService.Settings`, `WICampaignRuntimeService.AutoSaveEnabled`, 저장 슬롯 0~3 존재 여부를 읽어 고정 UGUI에 전달합니다.
+- 설정 변경은 기존 `WISystemSettingsState`에 반영하며 적용 시 `Apply()`와 `Save()`를 호출합니다. 캠페인 저장과 불러오기는 기존 `SaveSlot`·`LoadSlot` API를 사용합니다.
+- `WIAdministrationModalUGUIController`는 활성 인스턴스를 정적 집합으로 관리해 전역 단축키 차단 여부와 Escape로 닫을 최상위 Canvas를 제공합니다. 실제 명령 키 판정은 `WIAdministrationWorldUGUIController`가 Input System으로 처리합니다.
+- `WIAdministrationUIController` 초기화 시 미결 전투가 발견되면 `OpenPendingBattleReportUGUIAfterInitialization` 코루틴이 한 프레임 대기한 뒤 `UGUIMonthlyReportRequested`를 발생시킵니다.
+- 캠페인 시작 데이터는 UGUI 타이틀 컨트롤러가 `WIAdministrationDatabaseSO.DifficultyDefinitions`와 `CampaignVariants`를 읽어 프리팹의 고정 카드 배열에 표시합니다. 선택 결과만 `BeginCampaign`으로 전달되며 행정 컨트롤러는 카드 오브젝트를 생성하지 않습니다.
+- UGUI 지도 노드의 식별자·버튼·마커 배열은 `WIAdministrationWorldUGUI.prefab`에 직렬화됩니다. 소유 진영, 선택 상태와 정보 공개 문구는 `TryGetUGUIMapSnapshot`을 통해 갱신하며 기존 UI Toolkit `BuildMap()`은 실제 UGUI 초기화·캠페인 재구성·설정·불러오기 경로에서 호출하지 않습니다.
+- `UGUI Screen Bootstrap`에는 캠페인 타이틀, 월드, 영지와 기능 모달을 합친 23개 프리팹 에셋 참조가 `WIAdministrationUGUIScreenBootstrap.screenPrefabs`에 직렬화됩니다. 씬 자식은 저장하지 않고 `Awake()`에서 완성 프리팹을 생성합니다.
+
 ## 1. MainScene 하이어라키
 
 - `Main Camera`: 2D 전략 화면 렌더링 카메라입니다.
 - `Global Light 2D`: 2D 렌더러의 전역 조명입니다.
 - `EventSystem`: PC와 모바일 UI 입력을 처리합니다.
+- `UGUI Screen Bootstrap`: 23개 완성 UGUI 화면 프리팹 참조를 보관하고 플레이 시작 시 인스턴스를 구성합니다. 편집 모드에는 화면 자식이 저장되지 않습니다.
 - `ManagerObjects`: 전략 게임 시스템 오브젝트의 루트입니다.
   - `AdministrationUI`: 영지 관리 UI 프리팹 인스턴스입니다.
 
 ## 2. AdministrationUI
 
-- `UIDocument`
-  - `WIAdministration.uxml`: 화면 템플릿을 조립하는 루트
+- `WIAdministrationUI.prefab`은 `UIDocument` 없이 `WIAdministrationUIController`만 유지하며 캠페인 상태와 기능별 UGUI 이벤트·스냅샷을 연결합니다.
+- 인물·시설 UGUI 데이터는 `WIAdministrationUIController.UGUIBridge` 계열에서 기존 인물·성·시설 ScriptableObject 및 런타임 상태를 스냅샷으로 변환합니다.
+- `WIAdministrationUIController.Characters.cs`에는 등급과 특기 표시 문자열 헬퍼만 남고 UI Toolkit 모달 생성 코드는 없습니다.
+- `WIAdministrationUIController.RealmGovernance.cs`에는 `AssignCastleProject`, 확장 가능 조건, 사업·투자 표시와 선택 성 관리 권한 검사만 남습니다. 연구·의회·시스템의 상태 변경은 `UGUIResearchBridge`, `UGUICouncilBridge`, `UGUISystemBridge`가 기존 시스템 API에 전달합니다.
+- `WIAdministrationUIController.RealmRelations.cs`에는 UGUI 표시용 문자열 변환 헬퍼만 남고 UI Toolkit 화면 및 명령 실행 코드는 없습니다. 외교 실행은 `ExecuteUGUIDiplomacyAction`, 첩보 예약은 `ScheduleUGUIScheme`, 진영 정세 변환은 `TryGetUGUIFactionOverview` 계열 브리지에서 담당합니다.
+- `WIAdministrationUIController.RealmReports.cs`에는 UGUI 표시용 조건·방침 문자열 헬퍼만 남고 UI Toolkit 보고·사건·위임 화면 생성 코드는 없습니다. 사건 결과는 `ExecuteUGUIEventChoice`, 위임 변경은 `ExecuteUGUIDelegationAction`, 보고 표시는 `TryGetUGUIMonthlyReport` 계열 API가 기존 상태와 시스템을 사용합니다.
   - `Views/WIAdministrationHud.uxml`: 상단 HUD
   - `Views/WIAdministrationWorldView.uxml`: 전략 지도와 전역 명령
   - `Views/WIAdministrationTerritoryView.uxml`: 선택 영지 관리
@@ -23,6 +38,19 @@
   - UXML에 고정 배치된 60개 지도 노드와 HUD 데이터 갱신
   - 성 선택 및 Bottom Sheet
   - 영웅 배치, 기본 시설 안내, 특화 시설 선택
+
+## 2-1. UGUI 캠페인 타이틀
+
+- `Assets/Prefabs/Administration/WICampaignTitleUGUI.prefab`
+  - `Canvas`, `CanvasScaler`, `GraphicRaycaster`
+  - `Backdrop`: 전체 화면 차광
+  - `CampaignPanel`: `popup_panel.png` 기반 중앙 패널
+  - 난이도 카드 3개와 시작 조건 카드 3개
+  - 새 캠페인 및 자동 저장 이어하기 버튼
+- `WICampaignTitleUGUIController`
+  - ScriptableObject 문구를 고정 카드에 표시
+  - 선택 카드 강조 상태 관리
+  - 기존 `WIAdministrationUIController`의 캠페인 시작·불러오기 흐름 호출
   - 성 상태 표시와 월간 중점 사업 지정
   - 진영 의회, 영지관 위임과 월간 보고 표시
   - 인물 현황과 월간 개인 활동 배정
@@ -140,3 +168,34 @@
 - `GameDocuments/UIHandoffReport.md`: 전략 지도·영지 관리 목표 시안, 현재 UXML/USS 구조, 재사용 에셋, 후속 수정 순서와 완료 기준
 - `GameDocuments/UIConcepts/ProjectWI_Strategy_UI_Concept_V1.png`: 전략 지도 목표 시안
 - `GameDocuments/UIConcepts/ProjectWI_Castle_Administration_UI_Concept_V1.png`: 영지 관리 목표 시안
+# UGUI 표시 데이터
+
+- 월드 UGUI는 기존 `WIAdministrationDatabaseSO`, `WIAdministrationState`, `WICampaignObjectiveSystem`, `WIAdministrationTurnSystem`의 데이터를 읽기 전용 `WIAdministrationWorldSnapshot`으로 변환하여 표시합니다.
+- UGUI 전용 마스터 데이터나 중복 밸런스 데이터는 추가하지 않았습니다.
+- 지도 노드의 ID·이름·진영·선택 상태는 기존 60개 `WICastleDefinition`과 `WICastleRuntimeState`를 `WIAdministrationMapNodeSnapshot`으로 변환해 표시합니다.
+- 영지 화면은 선택된 `WICastleRuntimeState`와 성·영웅·시설 정의를 `WIAdministrationTerritorySnapshot` 및 슬롯 스냅샷으로 변환합니다. UI 전용 영웅·시설 데이터는 복제하지 않습니다.
+- 중점 사업 선택 화면은 `WIAdministrationFocusProjectSnapshot`과 담당자 스냅샷을 사용하며, 비용과 예상 성과는 기존 사업 밸런스 데이터 및 계산 시스템에서 즉시 산출합니다.
+- 영웅 배치 화면은 기존 `WICharacterRuntimeState`, 성별 `HeroIds`, 인물 정의를 `WIAdministrationHeroAssignmentSnapshot`으로 변환하며 별도 인물 데이터를 만들지 않습니다.
+- 인재 활동 화면은 기존 `WICharacterRuntimeState.Activity`, `ActivityTargetHeroId`, 피로·부상·명성·발견 상태를 `WIAdministrationCharacterActivitySnapshot`으로 변환합니다. 탐색·교류·영입·훈련·휴식 결과 계산은 기존 `WIAdministrationTurnSystem`의 월말 처리를 그대로 사용합니다.
+- 특화 시설 선택 화면은 `WIAdministrationDatabaseSO.SpecialFacilities`, 성의 `SpecialFacilityIds`, `PendingSpecialFacilityChoice`를 `WIAdministrationSpecialFacilitySnapshot`으로 변환하며 UI 전용 시설 데이터는 추가하지 않습니다.
+- 기본 시설 화면의 선술집 의뢰는 성의 `TavernQuests`와 `WITavernQuestDefinition`을 `WIAdministrationBasicFacilitySnapshot`으로 변환합니다. 담당자 적성은 기존 `WIAdministrationTurnSystem.GetQuestAptitude`로 계산합니다.
+- 영지관 위임 화면은 성의 `GovernorHeroId`, `GovernorPolicy`, `GovernorMonthlyBudget`, `DelegatedToGovernor`를 `WIAdministrationDelegationSnapshot`으로 변환합니다. 예상 사업은 기존 `WIAdministrationTurnSystem.GetDelegationPreview` 결과를 표시합니다.
+- 원정 화면은 기존 `WIArmyState`, 성 인접 경로와 진영 관계를 `WIAdministrationMarchSnapshot`으로 변환합니다. 새 전투단은 `CreateArmy`, 이동·원정은 `BeginArmyMarch`를 호출하며 별도 전투단 데이터를 만들지 않습니다.
+- 성 상세 기록 화면은 선택된 성 정의와 런타임 상태를 `WIAdministrationCastleRecordSnapshot`으로 변환합니다. 상세 공개 여부는 기존 `WIInformationVisibility` 판정을 그대로 사용합니다.
+- 캠페인 목표 상세 화면은 `WICampaignObjectiveSystem.GetCurrent`와 `GetProgress` 결과를 `WIAdministrationObjectiveSnapshot`으로 변환하며 목표 마스터 데이터를 복제하지 않습니다.
+- 월간 보고 화면은 `LastMonthlyReport`, 미결 선택 사건 컬렉션과 `BattleSessions`를 `WIAdministrationMonthlyReportSnapshot`으로 변환합니다. 사건 선택은 기존 모달을 유지하고 전투는 `WICampaignRuntimeService.StartBattle`에 연결합니다.
+- 군사 화면은 `BattleSessions`, 플레이어 소유 `WIArmyState`, 성 인접 경로와 대기 영웅을 단계별 `WIAdministrationMilitarySnapshot`으로 변환합니다. 편성·단원 관리·훈련·해산·원정은 기존 `WIAdministrationTurnSystem`을 호출하며 UI 전용 군사 데이터는 복제하지 않습니다.
+- 영웅 전역 화면은 `WICharacterRuntimeState`와 `WIHeroDefinition`, `WITitleDefinition`을 `WIAdministrationHeroesSnapshot` 카드로 변환합니다. 승격과 작위 수여는 기존 `PromoteCommonCharacter`, `AwardTitle`을 호출하며 영웅·작위 데이터를 중복 생성하지 않습니다.
+- `MainScene/UGUI Screen Bootstrap`은 UGUI 프리팹 에셋 참조만 보관하는 런타임 생성 루트입니다. 각 화면은 `Assets/Prefabs/Administration`의 독립 프리팹이며 `WIAdministrationUGUISceneUtility`가 빌더 재생성 시 참조 목록을 갱신합니다.
+- `Assets/Prefabs/Administration/WIAdministrationUI.prefab`의 루트 컴포넌트는 `Transform`과 `WIAdministrationUIController`뿐입니다. `UIDocument` 없이 캠페인 상태 초기화와 UGUI 이벤트·스냅샷 브리지를 제공합니다.
+- 군사 UGUI 상태 변경은 `ExecuteUGUIMilitaryAction`이 기존 `WIAdministrationTurnSystem` API를 호출합니다. 레거시 군사 partial에는 UI 생성 코드 없이 `GetArmyMarchFailureMessage`와 `GetUnitRoleDisplayName` 헬퍼만 남습니다.
+- 외교 화면은 `WIDiplomaticRelationState`, 진영 런타임 자원, 포로 상태와 공동 공격 후보를 `WIAdministrationDiplomacySnapshot`으로 변환합니다. 모든 외교 명령은 기존 `WIAdministrationTurnSystem`의 확정 명령 API를 호출하며 관계 데이터를 복제하지 않습니다.
+- 첩보 화면은 `WISchemeDefinition`, `WISchemeMissionState`, `WISchemeIntelState`, 대기 인물과 성 상태를 `WIAdministrationSchemeSnapshot`으로 변환합니다. 성공률은 기존 `WISchemeSystem.CalculateSuccessChance`, 임무 예약은 `TrySchedule`을 사용하며 UI 전용 첩보 데이터를 추가하지 않습니다.
+- 연구 화면은 `WIResearchDefinition`, `WIFactionRuntimeState`의 완료·진행 상태, 플레이어 성 기술과 대기 인물을 `WIAdministrationResearchSnapshot`으로 변환합니다. 연구 시작은 기존 `WIAdministrationTurnSystem.BeginResearch`를 호출하며 연구 마스터 데이터를 복제하지 않습니다.
+- 진영 정세 화면은 `WIFactionDefinition`, `WIFactionRuntimeState`, 성 소유권, 외교 상태와 시작 인물 관계를 `WIAdministrationFactionSnapshot`으로 변환합니다. 다른 진영의 비공개 자원은 포함하지 않으며 읽기 전용 카드만 사용합니다.
+- 의회 화면은 `WIFactionPolicy` 6종과 플레이어 `WIFactionRuntimeState.Policy`를 `WIAdministrationCouncilSnapshot`으로 변환합니다. 방침 선택은 별도 UI 데이터를 만들지 않고 기존 `WIAdministrationState.FactionPolicy` 속성에 저장하여 월말 사업 보너스 계산에서 그대로 사용합니다.
+- 선택 사건 화면은 월간 보고의 `WIAdministrationReportActionType`과 각 대기 사건 목록 위치를 `WIAdministrationEventChoiceSnapshot`으로 변환합니다. 선택 결과는 `WIRegionalEventSystem`, `WIOccupationEventSystem`, `WIAdministrationTurnSystem`의 기존 판정 API와 `InstallHeroLegacy`에 전달하며 UI 전용 사건 결과 데이터는 만들지 않습니다.
+- 턴 후속 화면은 `WIAdministrationState.CampaignResult`, 캠페인 엔딩 정의와 `WITutorialSystem.GetPending` 결과를 `WIAdministrationTurnFollowupSnapshot`으로 변환합니다. 캠페인 결과 확인 상태와 튜토리얼 완료·전체 건너뛰기는 기존 캠페인 상태에 저장하고 자동 저장하며, 턴 결과 본문은 중복 데이터 없이 기존 월간 보고 스냅샷을 사용합니다.
+- 캠페인 시작 후속 흐름은 기존 `WICampaignObjectiveSystem.GetCurrent` 결과를 목표 UGUI로 표시하고 `WIAdministrationModalUGUIController.Closed`를 통해 튜토리얼로 연결합니다. 자동 저장 오류와 목표 누락 안내는 `WIAdministrationTurnFollowupMode.Message` 스냅샷을 사용하며 별도의 메시지 마스터 데이터를 추가하지 않습니다.
+- 인물 이동 대상 화면은 출발 성의 `AdjacentCastleIds`, 같은 진영 여부, 목적지 `HeroIds`, `CharacterTransfers` 예약 수를 `WIAdministrationCharacterActivitySnapshot` 카드로 변환합니다. 확정 시 기존 `WIAdministrationTurnSystem.StartCharacterTransfer`를 호출하므로 UI 전용 이동 상태나 별도 경로 데이터는 추가하지 않습니다.
+- 공통 `ShowMessage`는 `WIAdministrationDatabaseSO.GetText`로 UID를 번역한 뒤 `WIAdministrationTurnFollowupMode.Message`와 제목·본문 문자열로 변환합니다. 기존 호출부의 오류·성공 결과 데이터는 변경하지 않고 UI Toolkit 모달 생성만 제거했습니다.

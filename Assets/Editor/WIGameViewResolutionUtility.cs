@@ -23,6 +23,82 @@ namespace ProjectWI.Editor
         [MenuItem("WI/QA/Preview/Avalon Castle")]
         private static void OpenCastlePreview() => FindController()?.OpenCastlePreviewForQA();
 
+        [MenuItem("WI/QA/Preview/Focus Project UGUI")]
+        private static void OpenFocusProjectUGUIPreview() => FindController()?.OpenFocusProjectUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Hero Assignment UGUI")]
+        private static void OpenHeroAssignmentUGUIPreview() => FindController()?.OpenHeroAssignmentUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Character Activity UGUI")]
+        private static void OpenCharacterActivityUGUIPreview() => FindController()?.OpenCharacterActivityUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Special Facility UGUI")]
+        private static void OpenSpecialFacilityUGUIPreview() => FindController()?.OpenSpecialFacilityUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Basic Facility UGUI")]
+        private static void OpenBasicFacilityUGUIPreview() => FindController()?.OpenBasicFacilityUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Delegation UGUI")]
+        private static void OpenDelegationUGUIPreview() => FindController()?.OpenDelegationUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/March UGUI")]
+        private static void OpenMarchUGUIPreview() => FindController()?.OpenMarchUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Castle Record UGUI")]
+        private static void OpenCastleRecordUGUIPreview() => FindController()?.OpenCastleRecordUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Objective UGUI")]
+        private static void OpenObjectiveUGUIPreview() => FindController()?.OpenObjectiveUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Monthly Report UGUI")]
+        private static void OpenMonthlyReportUGUIPreview() => FindController()?.OpenMonthlyReportUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Military UGUI")]
+        private static void OpenMilitaryUGUIPreview() => FindController()?.OpenMilitaryUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Heroes UGUI")]
+        private static void OpenHeroesUGUIPreview() => FindController()?.OpenHeroesUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Diplomacy UGUI")]
+        private static void OpenDiplomacyUGUIPreview() => FindController()?.OpenDiplomacyUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Scheme UGUI")]
+        private static void OpenSchemeUGUIPreview() => FindController()?.OpenSchemeUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Research UGUI")]
+        private static void OpenResearchUGUIPreview() => FindController()?.OpenResearchUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Faction UGUI")]
+        private static void OpenFactionUGUIPreview() => FindController()?.OpenFactionUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/Council UGUI")]
+        private static void OpenCouncilUGUIPreview() => FindController()?.OpenCouncilUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/System UGUI")]
+        private static void OpenSystemUGUIPreview()
+        {
+            WIAdministrationUIController controller = FindController();
+            if (controller == null) return;
+            controller.OpenGlobalPreviewForQA();
+            controller.OpenUGUISystem();
+        }
+
+        [MenuItem("WI/QA/Preview/Advance Turn UGUI")]
+        private static void AdvanceTurnUGUIPreview() => FindController()?.AdvanceTurnUGUIForQA();
+
+        [MenuItem("WI/QA/Preview/New Campaign Onboarding UGUI")]
+        private static void OpenNewCampaignOnboardingUGUIPreview()
+        {
+            WIAdministrationUIController controller = FindController();
+            if (controller == null) return;
+            controller.BeginCampaign(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
+            WICampaignTitleUGUIController title = UnityEngine.Object.FindFirstObjectByType<WICampaignTitleUGUIController>(FindObjectsInactive.Include);
+            if (title != null) title.gameObject.SetActive(false);
+        }
+
+        [MenuItem("WI/QA/Preview/Common Message UGUI")]
+        private static void OpenCommonMessageUGUIPreview() => FindController()?.OpenMessageUGUIForQA();
+
         [MenuItem("WI/QA/Preview/Long Content Global")]
         private static void OpenLongContentGlobalPreview() => FindController()?.OpenLongContentGlobalPreviewForQA();
 

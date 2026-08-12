@@ -1895,8 +1895,8 @@ namespace ProjectWI.Tests.Editor
             });
             Assert.IsTrue(WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state));
             string controller = System.IO.File.ReadAllText("Assets/Scripts/Administration/WIAdministrationUIController.cs");
-            StringAssert.Contains("if (WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state))", controller);
-            StringAssert.Contains("OpenMonthlyReportModal();", controller);
+            StringAssert.Contains("WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state)", controller);
+            StringAssert.Contains("UGUIMonthlyReportRequested?.Invoke();", controller);
         }
 
         // 서로의 출발 성으로 교차 원정한 두 전투단이 한 전투 세션으로 합쳐지는지 검증합니다.
