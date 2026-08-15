@@ -19,6 +19,13 @@ namespace ProjectWI.Battle
         ControlPoint
     }
 
+    public enum WIBattleZoomLevel
+    {
+        A,
+        B,
+        C
+    }
+
     [Serializable]
     public class WIBattleObjectiveDefinition
     {
@@ -75,8 +82,13 @@ namespace ProjectWI.Battle
     public class WIBattleConfigSO : ScriptableObject
     {
         [SerializeField] private Vector2 arenaSize = new Vector2(18f, 10f);
+        [SerializeField] private Vector2 arenaBackgroundSize = new Vector2(57.024f, 32.076f);
         [SerializeField] private float formationColumnSpacing = 1.4f;
         [SerializeField] private float formationRowSpacing = 1.2f;
+        [SerializeField] private bool useHiddenGrid = true;
+        [SerializeField, Min(0.1f)] private float gridCellWidth = 0.6f;
+        [SerializeField, Min(0.1f)] private float gridCellHeight = 0.3f;
+        [SerializeField, Min(0.001f)] private float gridArrivalDistance = 0.015f;
         [SerializeField] private int baseHealth = 100;
         [SerializeField] private int healthPerMight = 3;
         [SerializeField] private int baseMana = 30;
@@ -95,6 +107,9 @@ namespace ProjectWI.Battle
         [SerializeField] private float holdKnockbackResistance = 0.7f;
         [SerializeField] private float formationReturnSpeed = 2.5f;
         [SerializeField] private float placeholderCharacterSize = 0.65f;
+        [SerializeField] private float battleSpriteScale = 1f;
+        [SerializeField] private bool showCharacterHealthBars;
+        [SerializeField] private bool showCharacterLabels;
         [SerializeField] private float placeholderProjectileSize = 0.18f;
         [SerializeField] private float placeholderAttackEffectDuration = 0.22f;
         [SerializeField] private Color attackerPlaceholderColor = new Color(0.82f, 0.2f, 0.16f);
@@ -106,18 +121,27 @@ namespace ProjectWI.Battle
         [SerializeField] private float projectileFriendlyFireSafeDistance = 0.8f;
         [SerializeField] private float skillVisualDuration = 0.65f;
         [SerializeField] private float cameraPanSpeed = 7f;
-        [SerializeField] private float cameraZoomSpeed = 0.65f;
         [SerializeField] private float cameraMinimumZoom = 3.5f;
-        [SerializeField] private float cameraMaximumZoom = 6.2f;
+        [SerializeField] private float cameraMiddleZoom = 8f;
+        [SerializeField] private float cameraMaximumZoom = 12f;
         [SerializeField] private float characterSelectionRadius = 0.8f;
         [SerializeField] private List<WIBattleSkillDefinition> heroSkills = new List<WIBattleSkillDefinition>();
         [SerializeField] private List<WIBattleClassSkillDefinition> classSkills = new List<WIBattleClassSkillDefinition>();
         [SerializeField] private List<WIBattleObjectiveDefinition> battleObjectives = new List<WIBattleObjectiveDefinition>();
+        [SerializeField] private Sprite arenaBackground;
+        [SerializeField] private GameObject arenaPrefab;
         [SerializeField] private Sprite placeholderSprite;
+        [SerializeField] private Material characterDefaultMaterial;
+        [SerializeField] private Material characterFarOutlineMaterial;
 
         public Vector2 ArenaSize => arenaSize;
+        public Vector2 ArenaBackgroundSize => arenaBackgroundSize;
         public float FormationColumnSpacing => formationColumnSpacing;
         public float FormationRowSpacing => formationRowSpacing;
+        public bool UseHiddenGrid => useHiddenGrid;
+        public float GridCellWidth => Mathf.Max(0.1f, gridCellWidth);
+        public float GridCellHeight => Mathf.Max(0.1f, gridCellHeight);
+        public float GridArrivalDistance => Mathf.Max(0.001f, gridArrivalDistance);
         public int BaseHealth => baseHealth;
         public int HealthPerMight => healthPerMight;
         public int BaseMana => baseMana;
@@ -136,6 +160,9 @@ namespace ProjectWI.Battle
         public float HoldKnockbackResistance => holdKnockbackResistance;
         public float FormationReturnSpeed => formationReturnSpeed;
         public float PlaceholderCharacterSize => placeholderCharacterSize;
+        public float BattleSpriteScale => battleSpriteScale;
+        public bool ShowCharacterHealthBars => showCharacterHealthBars;
+        public bool ShowCharacterLabels => showCharacterLabels;
         public float PlaceholderProjectileSize => placeholderProjectileSize;
         public float PlaceholderAttackEffectDuration => placeholderAttackEffectDuration;
         public Color AttackerPlaceholderColor => attackerPlaceholderColor;
@@ -147,14 +174,18 @@ namespace ProjectWI.Battle
         public float ProjectileFriendlyFireSafeDistance => projectileFriendlyFireSafeDistance;
         public float SkillVisualDuration => skillVisualDuration;
         public float CameraPanSpeed => cameraPanSpeed;
-        public float CameraZoomSpeed => cameraZoomSpeed;
         public float CameraMinimumZoom => cameraMinimumZoom;
+        public float CameraMiddleZoom => cameraMiddleZoom;
         public float CameraMaximumZoom => cameraMaximumZoom;
         public float CharacterSelectionRadius => characterSelectionRadius;
         public IReadOnlyList<WIBattleSkillDefinition> HeroSkills => heroSkills;
         public IReadOnlyList<WIBattleClassSkillDefinition> ClassSkills => classSkills;
         public IReadOnlyList<WIBattleObjectiveDefinition> BattleObjectives => battleObjectives;
+        public Sprite ArenaBackground => arenaBackground;
+        public GameObject ArenaPrefab => arenaPrefab;
         public Sprite PlaceholderSprite => placeholderSprite;
+        public Material CharacterDefaultMaterial => characterDefaultMaterial;
+        public Material CharacterFarOutlineMaterial => characterFarOutlineMaterial;
 
         // 영웅 ID에 대응하는 액티브 스킬 설정을 반환합니다.
         public WIBattleSkillDefinition GetHeroSkill(string heroId)

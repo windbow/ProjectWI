@@ -2,6 +2,30 @@
 
 현재 기획 기준은 `GameDesign.md`이며 전략 게임 데이터는 ScriptableObject에서 편집합니다. 방치형 던전 데이터는 사용하지 않습니다.
 
+전투씬 에셋의 설정값과 제작·검증 절차는 `GameDocuments/BattleSceneAssetSettingsGuide.md`를 우선 기준으로 사용합니다. 아래 과거 하이브리드 청크 항목은 비교·복구용 기록이며 현재 전장 기준이 아닙니다.
+
+- 숨은 8방향 사각 좌표망은 `WI_BattleConfig`의 `Use Hidden Grid`로 전환합니다. 현재 `Grid Cell Width=0.6`, `Grid Cell Height=0.3`, `Grid Arrival Distance=0.015`이며 기본 전투 화면에는 선을 표시하지 않습니다.
+- 캐릭터 밀도를 조절할 때 Sprite Scale을 변경하지 말고 먼저 `Grid Cell Width`와 `Grid Cell Height`를 조정합니다. Cell Height를 낮추면 행 간격이 줄어 몸체 겹침이 커집니다.
+
+- A 근거리 기준 아레스 전투 Sprite는 `Ares_Battle_1WU_A_OutlineBake_V1.png`입니다. 외곽선을 포함한 가시 실루엣 높이 256px, PPU 256, Transform Scale 1을 한 세트로 유지해야 정확히 1월드 유닛입니다. 파일에 투명 여백이나 외곽선을 추가하면 최종 가시 높이를 다시 256px로 정규화합니다.
+
+- 공용 캐릭터 접지 그림자는 `Assets/Art/Battle/Effects/WI_CharacterShadow_Oval_V1.png`입니다. 기본 크기는 256×128, 256 PPU이며 캐릭터 체형에 따라 Transform X Scale만 조정합니다. 강도를 높일 때 Sprite 자체를 중복 배치하지 말고 SpriteRenderer 색상 알파를 조정합니다.
+- 접지 그림자는 `WIBattleCharacter.prefab`의 미리 배치된 `GroundShadow` 자식에서 관리합니다. 런타임에 새 오브젝트를 만들지 않으며 `WIBattleCharacterView`가 본체의 Y 깊이 정렬보다 1 낮은 순서를 자동 적용합니다.
+
+## 과거 전장 아트 보관
+
+- V1~V5와 요새 청크 실험 전장 프리팹 및 전용 생성 코드는 제거했습니다.
+- 실험에 사용한 이미지 원본과 청크는 `Assets/TrashAsset/Art/Battle`에 기존 상대 경로와 GUID를 유지해 보관합니다.
+- 현재 편집 대상은 `Assets/Prefabs/Battle/WIBattleCharacterScaleArenaV6.prefab`입니다.
+
+## 전투 2D 라이팅 편집
+
+- 씬: `Assets/Scenes/BattleScene.unity`
+- `Global Light 2D`는 중립 백색 전역광이며 현재 강도는 1입니다.
+- `Battle Lighting/Arena Key Light 2D`와 `Arena Fill Light 2D`는 향후 노멀맵 검증용으로 보존하지만 현재 비활성입니다.
+- 현재 지면은 Unlit 머티리얼을 사용하며 아레스와 환경물에는 전용 노멀맵이 없습니다.
+- 화면 전체에 노란색이나 주황색 색조를 입히지 않으며, 그림자는 대형 장애물에 `ShadowCaster2D`를 별도로 배치하기 전까지 비활성 상태를 유지합니다.
+
 ## UGUI 캠페인 타이틀 편집
 
 - 프리팹: `Assets/Prefabs/Administration/WICampaignTitleUGUI.prefab`
@@ -337,7 +361,7 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 월간 보고 UGUI는 하단 월간 보고 버튼과 오른쪽 전투 알림에서 열립니다. 지난달 자원·위임·AI 판단·뉴스를 스크롤로 확인하고, 오른쪽 행동 목록에서 선택 사건을 처리하거나 미결 전투를 시작합니다.
 - 군사 UGUI는 하단 군사 버튼에서 열리며 미결 플레이어 전투와 플레이어 전투단의 인원·숙련·보급·상태를 최대 8개 고정 카드로 표시합니다. 같은 프리팹에서 전투 시작, 편성 성·대장·역할·단원 선택, 단원 제외, 합동 훈련, 해산, 인접 성 이동·원정을 단계별로 처리합니다.
 - 영웅 UGUI는 하단 영웅 버튼에서 열리며 영입 영웅과 발견 인재를 페이지 가능한 8개 카드로 표시합니다. 영웅 카드를 선택하면 공훈·명성·충성·특기를 확인하고 승격 대기 인물의 영웅 승격 또는 조건을 충족한 작위 수여를 처리할 수 있습니다.
-- `MainScene`에는 개별 UGUI 화면 인스턴스를 저장하지 않습니다. `UGUI Screen Bootstrap`이 `Assets/Prefabs/Administration`의 완성 프리팹 참조를 보관하고 플레이 시작 때 화면을 생성합니다.
+- `MainScene`에는 개별 UGUI 화면 인스턴스를 저장하지 않습니다. `WIUIScreenManager`가 `Assets/Prefabs/Administration`의 완성 프리팹 참조를 보관하고 플레이 시작 때 화면을 비활성 상태로 생성합니다. Scene에서 확인할 화면의 루트만 수동으로 활성화하면 다른 화면과 겹치지 않게 편집할 수 있습니다.
 - 외교 UGUI는 하단 외교 버튼에서 열리며 존속 중인 다른 진영과 전쟁·중립·우호·불가침·동맹 상태를 표시합니다. 대상 진영을 선택하면 현재 관계에 맞춰 포로 처리, 관계 개선, 협정, 원조, 공동 공격 또는 선전포고 명령을 실행합니다.
 - 첩보 UGUI는 하단 첩보 버튼에서 열리며 진행 중 임무와 조사·방첩·유언비어·인재 이간을 표시합니다. 첩보 종류, 대기 담당 인물, 대상 성을 차례로 선택하며 인재 이간은 조사로 정보가 공개된 성의 주둔 인물까지 선택합니다.
 - 연구 UGUI는 하단 연구 버튼에서 열리며 완료 연구, 진행 중 연구와 미완료 연구를 함께 표시합니다. 마나·최고 기술·선행 연구·진행 중 연구 조건을 충족한 연구를 선택한 뒤 플레이어 진영의 대기 인물을 지력 순으로 비교해 담당자로 지정합니다.
@@ -353,10 +377,40 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 캠페인 저장 상태에 미결 플레이어 전투가 있으면 MainScene 초기화 직후 월간 보고 UGUI가 자동으로 열립니다. 화면별 `OnEnable` 구독보다 먼저 요청이 소실되지 않도록 한 프레임 뒤에 표시합니다.
 - 캠페인 난이도와 시작 조건 카드는 `WICampaignTitleUGUI.prefab`에 고정 배치되어 있으며 `WICampaignTitleUGUIController`만 선택 상태와 버튼 입력을 관리합니다. 행정 UI Toolkit UXML에는 더 이상 런타임 카드가 생성되지 않습니다.
 - 실제 플레이 입력은 UGUI 프리팹의 버튼만 사용합니다. 행정 초기화는 UI Toolkit 전역 버튼을 바인딩하거나 UXML 성 노드를 다시 구성하지 않으며, UGUI 지도는 `WIAdministrationWorldUGUI.prefab`에 저장된 60개 고정 버튼을 사용합니다.
-- MainScene의 `UGUI Screen Bootstrap`에는 화면 자식이 없으며 `WIAdministrationUGUIScreenBootstrap.screenPrefabs`에 23개 완성 프리팹 에셋만 연결됩니다. 플레이 시 해당 프리팹을 자식으로 생성합니다. 빌더는 새 프리팹을 자동 등록하며 수동 복구는 `WI/UI/Configure UGUI Scene Visibility` 메뉴를 사용합니다.
+- MainScene의 화면 관리자에는 화면 자식이 없으며 `WIUIScreenManager.screenPrefabs`에 23개 완성 프리팹 에셋만 연결됩니다. 플레이 시 해당 프리팹을 비활성 자식으로 생성합니다. 빌더는 새 프리팹을 자동 등록하며 수동 복구는 `WI/UI/Configure UGUI Scene Visibility` 메뉴를 사용합니다.
 - `WIAdministrationUI.prefab`은 이름을 유지하지만 더 이상 UI 화면이나 `UIDocument`를 포함하지 않습니다. 캠페인 상태와 기능별 UGUI 스냅샷·명령을 연결하는 런타임 브리지 프리팹입니다.
 - 군사 목록·전투단 편성·상세·이동/원정은 `WIAdministrationMilitaryUGUIController`와 `WIAdministrationUIController.UGUIMilitaryBridge`만 사용합니다. 이전 UI Toolkit 군사 모달 진입 메서드는 삭제됐습니다.
 - `WIAdministrationUIController.Characters.cs`에는 UGUI 카드 표시용 `GetGradeDisplayName`, `GetTraitDisplayText`만 남습니다. 인물 선택과 시설 명령은 각 UGUI 컨트롤러가 고정 프리팹 카드를 갱신해 처리합니다.
 - `WIAdministrationUIController.RealmGovernance.cs`에는 중점 사업의 실제 배정·확장 조건 검사와 사업/투자 표시 헬퍼만 남습니다. 중점 사업·연구·의회·시스템 화면은 각각의 완성 UGUI 프리팹과 전용 브리지에서 표시하고 입력을 처리합니다.
 - `WIAdministrationUIController.RealmRelations.cs`에는 충성 상태·외교 상태·관계 설명·AI 성향의 UGUI 표시 헬퍼만 남습니다. 외교 명령과 첩보 예약은 각각 `UGUIDiplomacyBridge`, `UGUISchemeBridge`가 기존 게임 시스템에 직접 전달하며 진영 정세는 `UGUIFactionBridge`가 읽기 전용 스냅샷으로 구성합니다.
 - `WIAdministrationUIController.RealmReports.cs`에는 영입 선택 조건과 진영·영지관 방침의 UGUI 표시 헬퍼만 남습니다. 월간 보고는 `UGUIBridge`, 선택 사건은 `UGUIEventChoiceBridge`, 위임 설정은 고정 `WIAdministrationDelegationUGUI.prefab` 흐름에서 처리합니다.
+- 성 상세 기록과 특화 시설 선택은 각각 `WIAdministrationCastleRecordUGUI.prefab`, `WIAdministrationSpecialFacilityUGUI.prefab`만 사용합니다. 이전 `OpenCastleRecordModal`, `OpenSpecialFacilityModal` UI Toolkit 진입점은 삭제됐습니다.
+- 턴 진행은 `WIAdministrationUIController.Turn.cs`의 `BeginTurn`에서 미결 전투를 검사한 뒤 `ExecuteUGUITurnRoutine`을 실행합니다. 처리 안내·월간 보고·캠페인 결과·첫해 튜토리얼은 `WIAdministrationMonthlyReportUGUI.prefab`과 `WIAdministrationTurnFollowupUGUI.prefab`만 사용합니다.
+- 행정 런타임 컨트롤러는 더 이상 UI Toolkit 네임스페이스나 `UIDocument`, `VisualElement`, 동적 `CreateModal`을 사용하지 않습니다. 월드·영지 전환은 완성 UGUI 프리팹의 활성 상태를 바꾸고 모든 표시 데이터는 기능별 UGUI 스냅샷을 통해 갱신합니다.
+- `Assets/UI/Administration`의 UXML/USS는 과거 시안 비교 및 문서용 레거시 에셋으로만 남아 있으며 MainScene과 `WIAdministrationUI.prefab` 런타임에는 연결되지 않습니다. 과거 지도 연결선을 그리던 `WIMapConnectionLayer` 런타임 스크립트는 제거했고 레거시 UXML의 같은 위치는 일반 `VisualElement`로 치환했습니다.
+- 아레스는 `Ares_Portrait_Face_V1.png` 얼굴 초상화와 `Ares_Battle_1WU_A_OutlineBake_V1.png` 전투용 투명 전신을 사용합니다. `Ares_Battle_FullBody_V1.png`는 파생 제작용 고해상도 원본으로만 보존하며 애니메이션은 아직 적용하지 않습니다.
+- 전투 카메라는 참가자 수와 초기 진형 범위를 계산해 이를 포함하는 A(6)·B(8)·C(10) 중 한 단계로 시작합니다. 마우스 휠 한 번마다 인접 단계로만 이동하며 `Home` 키는 자동 계산된 시작 단계로 복원합니다.
+- Unity Editor 상단 `ProjectWI`와 `WI` 메뉴의 전체 기능, 실행 조건과 데이터·Prefab 변경 주의사항은 `GameDocuments/UnityToolMenuManual.md`를 기준으로 확인합니다.
+- 전투 전장은 `WI_BattleConfig.arenaPrefab`에 연결된 `WIBattleCharacterScaleArenaV6.prefab`을 사용합니다. 프리팹이 없을 때만 `arenaBackground`의 `Battle_FortressField_V5_4K`를 폴백으로 표시합니다.
+- 전투 HUD 프레임은 `Assets/Art/UI/Battle`에 상단 상태바, 캐릭터 정보, 명령바, 스킬바의 투명 단일 Sprite로 분리되어 있습니다. 이미지에는 문구·수치·초상화·스킬 아이콘이 포함되지 않으므로 UGUI의 TMP, Image와 Fill 컴포넌트를 위에 배치해 사용합니다.
+- 전투 HUD는 `Assets/UI/Battle/WIBattleHUD.uxml`의 네 고정 컨테이너가 `Assets/Art/UI/Battle`의 상단 상태·캐릭터 정보·명령바·스킬바 이미지를 직접 참조합니다. 프레임 내부의 문구와 버튼은 기존 `WIBattleHUDController`가 갱신하며, 배경 이미지 자체에는 게임 데이터가 포함되지 않습니다.
+- 전투 캐릭터 Transform은 `WI_BattleConfig`의 `Battle Sprite Scale = 1`을 사용합니다. 화면상 전신 크기는 알파 실루엣 높이 256px와 `256 PPU` 조합으로 통일하며 현재 아레스는 정확히 1유닛 높이입니다. `Arena Background Size`는 이동·충돌 판정 영역을 바꾸지 않고 배경 프리팹의 카메라 이동 범위를 정하며 현재 축척 검증 전장 기준은 `36×20`입니다.
+- 현재 축척 검증 전장은 `Assets/Prefabs/Battle/WIBattleCharacterScaleArenaV6.prefab`입니다. 아레스 약 1유닛 높이와 36×20.25 배경을 사용하며 카메라 C 단계는 10입니다. 정적 성벽·야영지·망루·방책과 접지 그림자를 하나의 완성 그림에 포함하고, 중앙은 큰 양각형 무늬 없이 넓은 저대비 흙 색면으로 유지합니다. 기존 V1~V5는 비교용으로 보존합니다.
+- V4의 좌우 천막은 `Tent_1_NeutralDay_V2`, `Tent_3_NeutralDay_V2`를 사용합니다. 원본 파일은 비교·복구용으로 유지하며 밝기 통일 시 프리팹 SpriteRenderer의 Color를 중복 적용하지 않습니다.
+- 천막 접지 그림자는 각 천막의 `GroundShadow` 자식에서 조정합니다. 기본 Sorting Order는 -105이고 지면 -110보다 앞, 천막 -99보다 뒤에 표시됩니다. 그림자 강도는 SpriteRenderer 알파, 크기와 폭은 자식 Transform Scale로 조정하며 실시간 ShadowCaster2D는 사용하지 않습니다.
+- 현재 배경 제작 원본은 `Assets/Art/Battle/GroundLayers/CharacterScaleArenaV6/Battle_CompleteArena_CharacterScale_V6_4K.png`입니다. 1유닛 캐릭터보다 훨씬 작은 표면 디테일과 넓은 회갈색 흙 색면을 사용하며 1920×1080 네 장으로 픽셀 무손실 분할했습니다. 106.6667 PPU, Mipmap 비활성, Bilinear, Clamp, 무압축을 사용합니다.
+- 캐릭터 깊이는 월드 Y가 작을수록 큰 Sorting Order를 받도록 매 프레임 갱신됩니다. 따라서 같은 X 부근에서 겹칠 때 화면 아래쪽 캐릭터가 앞에 표시됩니다.
+- 현재 A/B/C 모두 `WI_BattleCharacter_Unlit.mat`을 사용하고 외곽선은 전투 Sprite에 직접 베이크합니다. 셰이더 외곽선 머티리얼 두 종류는 비교·복구용으로만 보존합니다.
+- 플레이 모드에서 `ProjectWI/Verification/Battle Zoom/A Near`, `B Middle`, `C Far` 메뉴로 각 단계를 즉시 비교할 수 있습니다.
+- 현재 지면은 `WI_BattleGround_Unlit.mat`을 사용하고 BattleScene은 백색 Global Light 2D 강도 1만 활성화합니다. `Arena Key Light 2D`와 `Arena Fill Light 2D`는 비활성화되어 노란 조명과 방향성 명암이 없습니다. 노멀맵 단계에서는 지면을 Sprite Lit로 전환한 뒤 중립 광원에서 별도 검증합니다.
+- 맵 그래픽 검증 중에는 `WI_BattleConfig`의 `showCharacterLabels`와 `showCharacterHealthBars`를 비활성화합니다. 다시 표시할 때는 해당 ScriptableObject 체크 항목만 켜며 전투 로직 코드를 변경하지 않습니다.
+- 전투 카메라는 직교 크기 `6~14` 범위에서 마우스 휠로 조절합니다. 최대 14는 16:9 화면에서도 현재 배경 경계 안에 머무는 값이며, `Home`은 참가 인원에 맞춰 계산된 시작 시점으로 돌아갑니다.
+- 현재 전투 배경은 `WIBattleCharacterScaleArenaV6.prefab`의 V6 청크 네 장입니다. V6 4K 마스터와 ImageGen 원본은 향후 재가공을 위해 현 위치에 유지합니다.
+- `Battle_FortressField_V5_4K`는 `arenaPrefab`이 없을 때 사용하는 폴백 Sprite이므로 유지합니다.
+- 전투 카메라의 이동 경계는 `arenaBackgroundSize`를 사용합니다. 기본 줌에서는 큰 맵의 일부를 보며 WASD·방향키로 이동할 수 있고, 최대 줌아웃에서는 더 넓은 범위를 확인합니다. 실제 전투 판정 영역 `arenaSize`는 이번 단계에서 변경하지 않았습니다.
+- 과거 대형 청크 실험 원본과 조립 미리보기는 `Assets/TrashAsset/Art/Battle/Backgrounds` 아래에 보관합니다.
+- 아레스의 `Ares_Battle_FullBody_V1.png`는 고해상도 원본으로만 보존합니다. 실제 전투는 `Ares_Battle_1WU_A_OutlineBake_V1.png`를 Transform Scale 1, 256 PPU로 사용해 외곽선 포함 가시 높이 1유닛으로 표시합니다. Mipmap 활성, Bilinear, Alpha Is Transparency, 무압축으로 임포트하며 `WI/Battle/Configure Ares Battle Sprite Defaults` 메뉴로 동일 설정을 다시 적용할 수 있습니다. 다른 캐릭터의 변환 절차는 `BattleSceneAssetSettingsGuide.md` 3.2를 따릅니다.
+- 전장 전용 검토 후보 `Ares_Battle_Unit_V1.png`는 기존과 비슷한 약 7등신 비율을 유지한 256×384 투명 Sprite입니다. 실제 인물 높이 328px와 328 PPU를 사용하며, 검토 확정 전까지 `WIHeroDefinition.battleSprite`에는 연결하지 않습니다.
+- 현재 검증 데이터의 전체 캐릭터 500명은 `Ares_Battle_1WU_A_OutlineBake_V1.png`를 공용 `battleSprite`로 사용합니다. 과거 일괄 배정·해제 테스트 메뉴는 데이터 훼손 위험을 줄이기 위해 제거했습니다.
+- 30대30 밀도 검증은 Unity 메뉴 `ProjectWI/Verification/Start 30v30 Battle Density Test`로 실행합니다. 캠페인 저장과 분리된 테스트 세션에 양측 영웅 1명·커먼급 29명을 자동 편성하고 MainScene에서 BattleScene으로 진입합니다.
+- 확대 검증용 실험 지면은 `Assets/Art/Battle/Backgrounds/GroundExperiment_V2/Battle_Ground_NeutralDay_V2_4K.png`입니다. 4096×4096 단일 대형 지면 후보이며 무압축·Mipmap 비활성 설정을 사용합니다. 반복 배치 시 이음선이 있으므로 Tile/Repeat 용도로 사용하지 않으며 현재 전투 설정에는 연결하지 않습니다.

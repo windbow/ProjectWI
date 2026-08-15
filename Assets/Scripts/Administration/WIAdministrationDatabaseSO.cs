@@ -597,6 +597,7 @@ namespace ProjectWI.Administration
         [SerializeField] private WICharacterGrade grade = WICharacterGrade.Hero;
         [SerializeField] private List<WITraitType> traits = new List<WITraitType>();
         [SerializeField] private Sprite portrait;
+        [SerializeField] private Sprite battleSprite;
         [SerializeField] private int leadership = 50;
         [SerializeField] private int might = 50;
         [SerializeField] private int intelligence = 50;
@@ -615,6 +616,7 @@ namespace ProjectWI.Administration
         public WICharacterGrade Grade => grade;
         public IReadOnlyList<WITraitType> Traits => traits;
         public Sprite Portrait => portrait;
+        public Sprite BattleSprite => battleSprite;
         public int Leadership => leadership;
         public int Might => might;
         public int Intelligence => intelligence;

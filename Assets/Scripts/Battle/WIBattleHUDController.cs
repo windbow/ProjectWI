@@ -49,6 +49,10 @@ namespace ProjectWI.Battle
         // 현재 생존 인원과 전투 시간을 표시하고 영웅 스킬 버튼을 보충합니다.
         private void Update()
         {
+            if (statusLabel == null)
+            {
+                return;
+            }
             WIBattleRuntimeState runtime = battleController == null ? null : battleController.Runtime;
             if (runtime == null)
             {

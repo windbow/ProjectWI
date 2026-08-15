@@ -13,8 +13,13 @@ MonoBehaviour:
   m_Name: WI_BattleConfig
   m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Battle.WIBattleConfigSO
   arenaSize: {x: 18, y: 10}
+  arenaBackgroundSize: {x: 36, y: 20.25}
   formationColumnSpacing: 1.4
   formationRowSpacing: 1.2
+  useHiddenGrid: 1
+  gridCellWidth: 0.6
+  gridCellHeight: 0.3
+  gridArrivalDistance: 0.015
   baseHealth: 100
   healthPerMight: 3
   baseMana: 30
@@ -33,6 +38,9 @@ MonoBehaviour:
   holdKnockbackResistance: 0.7
   formationReturnSpeed: 2.5
   placeholderCharacterSize: 0.65
+  battleSpriteScale: 1
+  showCharacterHealthBars: 0
+  showCharacterLabels: 0
   placeholderProjectileSize: 0.18
   placeholderAttackEffectDuration: 0.22
   attackerPlaceholderColor: {r: 0.82, g: 0.2, b: 0.16, a: 1}
@@ -44,9 +52,9 @@ MonoBehaviour:
   projectileFriendlyFireSafeDistance: 0.8
   skillVisualDuration: 0.65
   cameraPanSpeed: 7
-  cameraZoomSpeed: 0.65
-  cameraMinimumZoom: 3.5
-  cameraMaximumZoom: 6.2
+  cameraMinimumZoom: 6
+  cameraMiddleZoom: 8
+  cameraMaximumZoom: 10
   characterSelectionRadius: 0.8
   heroSkills:
   - heroId: ares
@@ -292,4 +300,8 @@ MonoBehaviour:
     durationSeconds: 120
     controlDurationSeconds: 18
     controlRadius: 2
+  arenaBackground: {fileID: 21300000, guid: aadb20e638a958b42a600f5eca06ecd4, type: 3}
+  arenaPrefab: {fileID: 162355369505947602, guid: e6335956ab4fefb469be06d4d1fbf8ae, type: 3}
   placeholderSprite: {fileID: 0}
+  characterDefaultMaterial: {fileID: 2100000, guid: e6490c0cc933d534782b66eca552d219, type: 2}
+  characterFarOutlineMaterial: {fileID: 2100000, guid: e6490c0cc933d534782b66eca552d219, type: 2}

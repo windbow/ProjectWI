@@ -99,21 +99,6 @@ namespace ProjectWI.Editor
         [MenuItem("WI/QA/Preview/Common Message UGUI")]
         private static void OpenCommonMessageUGUIPreview() => FindController()?.OpenMessageUGUIForQA();
 
-        [MenuItem("WI/QA/Preview/Long Content Global")]
-        private static void OpenLongContentGlobalPreview() => FindController()?.OpenLongContentGlobalPreviewForQA();
-
-        [MenuItem("WI/QA/Preview/Long Content Castle")]
-        private static void OpenLongContentCastlePreview() => FindController()?.OpenLongContentCastlePreviewForQA();
-
-        [MenuItem("WI/QA/Preview/Interaction States")]
-        private static void OpenInteractionStatePreview() => FindController()?.OpenInteractionStatePreviewForQA();
-
-        [MenuItem("WI/QA/Preview/Calculation Tooltips")]
-        private static void OpenCalculationTooltipPreview() => FindController()?.OpenCalculationTooltipPreviewForQA();
-
-        [MenuItem("WI/QA/Preview/Color Vision")]
-        private static void OpenColorVisionPreview() => FindController()?.OpenColorVisionPreviewForQA();
-
         [MenuItem("WI/QA/Capture/Current Game View")]
         private static void CaptureCurrentGameView()
         {

@@ -1,6 +1,40 @@
 # ProjectWI 프로젝트 상태
 
-**마지막 갱신:** 2026-08-12
+- 2026-08-15: Unity 상단 `ProjectWI`·`WI` 메뉴를 실제 `MenuItem` 선언과 호출 관계 기준으로 전수 점검함. 현재 ScriptableObject에 결과가 확정됐거나 최신 값을 덮어쓸 위험이 있는 데이터·이미지 일회성 시더 10개 파일과 중복 Verification 메뉴를 제거함. Character Data Viewer가 직접 호출하는 500명 결정론적 로스터 시더, UGUI Prefab Build, 화면 QA, 전투·캠페인 테스트 랩과 성능 벤치마크는 유지함. `UnityToolMenuManual.md`를 남은 각 메뉴의 실행 모드, 처리 단계, 변경 대상, 출력, 위험과 권장 용도가 드러나도록 전면 개정함.
+
+- 2026-08-15: 전투 아트 반복 작업에서 남은 미사용 코드를 정리함. 과거 V1~V5 및 요새 청크 실험 전장만 생성하던 `WIBattleGroundTextureBaker`, 구형 단일 배경을 다시 연결하던 `WIBattleVisualAssetSeeder`, 전체 인물에게 아레스 Sprite를 일괄 배정·해제하던 테스트 메뉴를 제거함. 현재 설정에서 참조되지 않는 전장 프리팹 10개를 삭제하고, 전용 구버전·실험 이미지 61개는 GUID와 상대 폴더 구조를 유지해 `Assets/TrashAsset/Art/Battle`로 이동함. 현재 V6 프리팹·청크·마스터·ImageGen 원본과 공용 환경물은 유지함.
+
+- 2026-08-15: 납작 육각 좌표망에서 화면 정면 상·하 이동이 나오지 않는 문제를 반영해 숨은 사각 셀의 8방향 이동으로 교체함. `WIHiddenBattleGrid`는 폭 0.6·높이 0.3의 셀 좌표↔월드 좌표 변환, 상하좌우와 네 대각선 이웃, 최근접 빈 셀 탐색을 제공함. 초기 진형·점유·목적지 예약·연속 보간은 유지하고 기존 육각 구현과 테스트는 제거함. 근접 캐릭터는 목표 주변 여덟 셀 중 비어 있고 자신에게 가까운 공격 위치로 접근한 뒤 기존 월드 거리로 타격하며, 원거리 투사체와 광역 스킬도 월드 판정을 유지함. 좌표 왕복·8방향·60개 중복 없는 배정 EditMode 테스트 3/3 통과 및 Unity Console Error 0건을 확인함.
+
+- 2026-08-15: 실시간 집단 전투의 공간 판정을 배경 위에 보이지 않는 납작 육각 좌표망으로 전환하는 1차 구현을 적용함. `WIFlatHexGrid`에 축 좌표↔압축 월드 좌표 변환, 6방향 이웃, 전장 내부의 최근접 빈 셀 탐색을 추가하고 `WI_BattleConfig`에 `Use Hidden Hex Grid=true`, Cell Width 0.68, Vertical Scale 0.52, Arrival Distance 0.015를 저장함. 30대30 초기 진형은 약 0.306유닛 행 간격의 셀에 중복 없이 배치하며 캐릭터 몸체는 겹치고 발 위치만 분리됨. 실시간 이동은 인접 셀 목적지를 예약한 뒤 셀 중심 사이를 연속 보간하며, 육각 사용 중 기존 원형 충돌 밀어내기는 비활성화함. 좌표 왕복·압축 투영·60개 중복 없는 배정 EditMode 테스트 3/3 통과 및 Unity Console Error 0건을 확인함.
+
+- 2026-08-15: 런타임 외곽선 셰이더의 알파 노이즈와 확대 시 울퉁불퉁한 경계를 피하기 위해 `Ares_Battle_1WU_A_OutlineBake_V1.png`을 제작함. 캐릭터 내부 구멍은 제외하고 바깥 배경과 연결된 실루엣에만 중립 청흑색 `#10141A`을 84%→50%→20% 3단계로 확장했으며, 외곽선까지 포함한 최종 높이를 256px로 재정규화해 256 PPU·Scale 1의 정확한 1유닛 기준을 유지함. 전체 500명 테스트 데이터에 새 Sprite를 연결하고 A/B/C 모두 일반 Unlit 머티리얼을 사용하도록 셰이더 외곽선을 비활성화함. Unity 컴파일 및 Console Error 0건을 확인함.
+
+- 2026-08-15: 다른 캐릭터도 동일하게 제작할 수 있도록 `BattleSceneAssetSettingsGuide.md`에 고해상도 원화를 1유닛 전투 Sprite로 변환하는 1차 표준을 기록함. 알파 경계 계산, 투명 여백 제거, 종횡비 유지, Premultiplied Alpha Lanczos 축소, 256px 가시 높이, 256 PPU·Scale 1 계산식, 파일명, Unity 임포트 설정, Pivot·A/B/C 검증 절차를 명시함. 과거 1178 PPU 원화 축소 기준과 Strong 외곽선 임시 상태도 현재 구현에 맞게 정정함.
+
+- 2026-08-15: A 근거리 줌 기준 아레스의 큰 원화를 PPU로만 축소하던 방식을 중단하고 `Ares_Battle_1WU_A_V1.png` 전투용 Sprite를 추가함. 원본 1121×1403에서 실제 알파 경계 865×1176을 추출한 뒤 premultiplied-alpha Lanczos로 188×256에 축소해 가시 높이를 정확히 256px로 맞춤. Unity는 256 PPU, Transform Scale 1이므로 가시 캐릭터 높이는 정확히 1월드 유닛이며 Bilinear, Mipmap 활성, 무압축을 적용함. 전체 500명 테스트 데이터의 전투 Sprite를 새 파일로 교체하고, A·B 기본 Unlit/C 기존 외곽선 조합으로 강한 외곽선 실험을 해제함. 컴파일 및 Console Error 0건을 확인함.
+
+- 2026-08-15: 기존 아레스 전투 Sprite를 교체하지 않고 시안의 진한 실루엣을 비교하기 위한 `WI_BattleCharacter_UnlitOutlineStrong.mat`을 추가함. 기존 외곽선 머티리얼은 보존하고 Strong 후보는 짙은 중립 청흑색 `(0.02, 0.024, 0.03, 0.98)`, 20 source texel, Softness 0.3으로 설정해 A/B/C 전 단계에 임시 적용함. 또한 파일만 존재하던 `WI_CharacterShadow_Oval_V1.png`을 `WIBattleCharacter.prefab/GroundShadow` SpriteRenderer에 실제 연결하고, 캐릭터 Y 깊이 정렬 바로 뒤(`character sorting order - 1`)를 따라가도록 구성함. Unity 컴파일 및 Console Error 0건을 확인함.
+
+- 2026-08-15: V4 전장의 천막 두 종류에 URP 실시간 그림자 대신 독립 접지 그림자 Sprite를 적용함. `Tent_1_Shadow_V1.png`, `Tent_3_Shadow_V1.png`을 384×192 RGBA로 제작하고 중립 흑회색, 최대 알파 약 20%, 짧은 방향성의 부드러운 천막 바닥 실루엣으로 정규화함. 각 천막의 `GroundShadow` 자식 SpriteRenderer에 연결해 지면 청크(-110)와 천막(-99) 사이 Sorting Order -105를 사용하며, 천막 이동·배율을 따라가면서 자식 Scale과 알파는 독립 조정할 수 있게 구성함. V4 지면 합성 미리보기와 Prefab 계층 15개를 확인했으며 Unity Console Error 0건을 확인함.
+
+- 2026-08-15: V4 지면과 환경물 대비 통일의 첫 단계로 `Tent_1_NeutralDay_V2.png`, `Tent_3_NeutralDay_V2.png`을 제작해 현재 `WIBattleCharacterScaleArenaV4.prefab`의 좌우 천막에 연결함. ImageGen 편집 후보에서 중립 회갈색 캔버스 기준을 잡은 뒤, 체크무늬가 굽혀진 생성 배경은 사용하지 않고 기존 원본의 RGB·알파·실루엣을 보존하는 색보정으로 최종 에셋을 제작함. 흰 캔버스 최고 밝기와 채도를 낮추고 넓은 반투명 스튜디오 후광을 제거했으며 위치·Scale 0.48은 유지함. Prefab Stage 전체 미리보기와 Unity Console Error 0건을 확인함.
+
+- 2026-08-15: 모든 전투 캐릭터가 공용으로 사용할 수 있는 256×128 투명 타원형 접지 그림자 `WI_CharacterShadow_Oval_V1.png`을 제작함. 중립 흑회색 RGB와 중심 최대 알파 약 51%를 사용하고 방향성 꼬리 없이 대칭으로 부드럽게 사라지도록 구성함. Unity Sprite/Single, 256 PPU, Bilinear, Mipmap 비활성, Clamp, 무압축, 물리 Shape 비활성으로 설정했으며 이번 단계에서는 캐릭터 프리팹에 자동 부착하지 않음.
+
+- 2026-08-15: 전투 배경 후속 작업으로 `Battle_GroundLayered_CharacterScale_V4_4K`을 제작함. V3의 상단 진입로와 좌우 하단 분기 구도를 유지하면서 중앙 집결지는 저밀도 다져진 흙으로 정돈하고, 길 가장자리부터 외곽으로 갈수록 풀·자갈·석재 밀도가 높아지는 명암·디테일 계층을 적용함. 노란 조명과 방향성 그림자가 없는 중립 대낮 Unlit 알베도로 생성했으며 3840×2160 마스터를 1920×1080 네 청크로 분할해 재조립 픽셀 완전 일치를 확인함. `WIBattleCharacterScaleArenaV4.prefab`은 V3 환경물 축척과 배치를 유지하고 지면만 V4로 교체했으며 현재 `WI_BattleConfig.arenaPrefab`에 연결함. Prefab Stage 전체 미리보기와 Unity Console Error 0건을 확인함.
+
+- 2026-08-15: 전투 카메라의 연속 휠 줌을 A(근거리 6)·B(중거리 8)·C(원거리 10) 세 단계로 변경함. 마우스 휠 한 번마다 인접 단계만 이동하고 Home은 참가자 진형을 포함하는 단계로 복원함. 캐릭터 프리팹 기본 머티리얼은 일반 Unlit로 복구하고 C에서만 공용 외곽선 머티리얼로 전환함. 외곽선 셰이더는 안쪽·바깥쪽 알파 샘플과 `fwidth` 기반 `smoothstep`으로 경계 그라데이션과 화면 공간 안티앨리어싱을 보강함. A/B에서는 외곽선 샘플 비용이 발생하지 않으며 컴파일과 Unity Console Error 0건을 확인함. 플레이 모드 수동 검증용 A/B/C 메뉴도 추가함.
+
+- 2026-08-15: 시안처럼 지면 위 캐릭터 실루엣을 분리하기 위해 URP 2D 단일 패스 `ProjectWI/Battle/Sprite Unlit Outline` 셰이더와 `WI_BattleCharacter_UnlitOutline.mat`을 제작해 `WIBattleCharacter.prefab`에 연결함. 원본 알파 주변 8방향을 두 거리에서 샘플링하며 추가 Sprite 복제 없이 Unlit 본체와 짙은 청회색 외곽선을 함께 출력함. 아레스 600 PPU와 줌 6~10을 기준으로 12 source texel과 20 source texel을 30대30 캡처로 비교하고 기본값을 16으로 확정함. Y 기반 깊이 정렬과 텍스트·HP 비활성 설정은 유지했으며 최종 Unity Console Error 0건을 확인함.
+
+- 2026-08-15: V2 지면의 길 구도를 유지하면서 중립 회갈색 중간톤과 작은 자갈·잔디, 길 가장자리 대비를 강화한 `Battle_GroundLayered_CharacterScale_V3_4K`을 ImageGen 편집으로 제작. 3840×2160 마스터를 1920×1080 네 청크로 기계 분할해 재조립 픽셀 완전 일치를 확인하고 `WIBattleCharacterScaleArenaV3.prefab` 및 현재 `WI_BattleConfig`에 연결함. 캐릭터 SpriteRenderer는 `1000 - RoundToInt(worldY × 100)`으로 갱신해 화면 아래쪽 캐릭터가 앞에 표시되도록 변경했으며 런타임에서 Y -6 캐릭터 1600, Y -1.2 캐릭터 1120을 확인함. 30대30 캡처 `Battle_30v30_V3_YDepth.png`를 저장했고 HUD 전환 시 null 방어를 보완한 뒤 Unity Console Error 0건을 확인함.
+
+- 2026-08-15: 맵 그래픽과 60명 캐릭터 실루엣을 방해하지 않도록 `WI_BattleConfig`에 `showCharacterLabels`, `showCharacterHealthBars` 표시 설정을 추가하고 모두 비활성화. `WIBattleCharacterView`는 설정이 켜졌을 때만 이름·등급·역할 TextMesh와 HP 바를 생성하도록 변경함. 30대30 재실행 캡처 `Battle_30v30_NoLabelsNoHealth_V2.png`에서 전장 표기가 제거되고 캐릭터와 V2 지면만 표시되는 것을 확인했으며 Unity Console Error 0건을 확인함. 청크 경계와 확대 선명도는 양호하고, 다음 맵 작업은 밝은 지면·석재·천막 사이의 중간 명암층과 길 가장자리 대비 조정으로 확정함.
+
+- 2026-08-15: 캐릭터 약 2유닛 축척용 지면을 3840×2160 `Battle_GroundLayered_CharacterScale_V2_4K` 마스터로 고해상도화. V1의 길·집결지 구도와 중립 색을 유지하면서 기존 4K 중립 지면의 고주파 자갈·흙·잔디 질감을 30% 합성하고, 1920×1080 네 청크로 재샘플링 없이 분할해 재조립 픽셀 완전 일치를 확인함. 네 청크를 106.6667 PPU·Bilinear·Mipmap 비활성·무압축·Clamp 및 `WI_BattleGround_Unlit`으로 설정한 `WIBattleCharacterScaleArenaV2.prefab`을 제작해 현재 `WI_BattleConfig`에 연결. 30대30 실행에서 전체 36×20.25 지면의 청크 경계와 확대 선명도를 확인했으며 최종 Unity Console Error 0건을 확인함.
+
+**마지막 갱신:** 2026-08-14
 
 전체 개발 순서와 현재 체크 상태는 프로젝트 루트의 `PlanChecklist.md`를 기준으로 관리합니다.
 
@@ -16,6 +50,79 @@
 - **종합 UI 분석 및 설계 문서 구획 완료**: `GameDocuments/ProjectWI_UI_Structure_Document.md`
 
 ## 구현 완료
+
+- 2026-08-15: 전투씬 에셋 작업의 단일 기준 문서 `GameDocuments/BattleSceneAssetSettingsGuide.md`를 작성. 현재 캐릭터 약 2유닛 축척, 아레스 600 PPU, 지면 36×20.25·46.6667 PPU, 카메라 6~10, Unlit 지면과 중립 백색 전역광 설정을 기록하고 캐릭터·지면 레이어·환경물·고해상도 청크·노멀맵·URP 2D 라이팅의 제작 및 검증 절차, 노란 조명 금지와 파일 이름 규칙을 정리함. 이후 전투 에셋 변경 시 이 문서를 함께 갱신하는 기준으로 지정함.
+
+- 2026-08-15: 반복 타일만으로 표현하기 어려운 길·잔디 경계·마모 지형을 하나의 2D 레이어 합성 결과로 제작한 `Battle_GroundLayered_CharacterScale_V1.png`를 추가하고 현재 `WIBattleCharacterScaleArenaV1.prefab`의 지면으로 연결. 36×20.25 월드, 캐릭터 약 2유닛 축척을 기준으로 성문에서 중앙 집결지로 이어진 넓은 길과 양측 분기, 다져진 흙·자갈·희박한 풀·석재 파편의 비반복 전이를 구성함. 노란·주황·노을 색감과 방향성 명암·그림자를 배제한 중립 평광 알베도로 제작하고 지면에는 `Sprite-Unlit-Default` 전용 머티리얼을 적용. BattleScene의 방향성 키·필 Light 2D를 비활성화하고 백색 Global Light 2D만 강도 1로 유지했으며 30대30 실행 캡처와 Unity 콘솔 오류 0건을 확인함.
+
+- 2026-08-15: 캐릭터 높이 약 2유닛을 전장 축척 기준으로 삼는 `WIBattleCharacterScaleArenaV1.prefab`을 제작하고 현재 `WI_BattleConfig.arenaPrefab`에 연결. 보이지 않던 14% 알파 `CentralGroundDetail` 중첩 대신 `Battle_GroundTile_Courtyard_V2`를 36×20 크기의 불투명 반복 지면으로 직접 사용하고, 성문·텐트·망루·방책을 캐릭터와 비교 가능한 실제 월드 크기로 재배치함. 전장 크기에 맞춰 최대 줌아웃을 14에서 10으로 복구했으며 30대30 실행 캡처에서 배경 외곽 노출 없이 시설물과 캐릭터 축척이 읽히고 Unity 콘솔 오류 0건을 확인함.
+
+- 2026-08-15: 전장 확대·축소에 맞춘 과도한 캐릭터 보정을 제거하고 아레스 전투 Sprite를 기본 2D 캐릭터 표시 기준으로 복구. 원본 종횡비와 Transform Scale 1, 600 PPU(약 1.45×1.96 월드 단위), 무압축은 유지하고 Mipmap·Preserve Coverage를 끈 Bilinear 샘플링으로 변경했으며 공용 비주얼 재배정 도구도 같은 설정을 사용하도록 동기화함.
+
+- 2026-08-14: 실제 전투 밀도 검증을 반복 실행할 수 있도록 `ProjectWI/Verification/Start 30v30 Battle Density Test` 메뉴를 추가. 아레스·상대 영웅 각 1명과 중복 없는 커먼급 각 29명을 클래스 권장 역할로 편성해 기존 Battle Test Lab과 BattleScene 경로로 실행하며, 실제 런타임 캐릭터 뷰 60개와 참가 상태 60명을 확인하고 최대 줌아웃 HUD 포함·제외 캡처를 저장함. 지면 위 캐릭터 실루엣은 구분되지만 60명의 이름·등급·역할 상시 표기 중첩과 세로로 긴 진형을 다음 가독성 개선 과제로 확인함.
+
+- 2026-08-14: 실제 전투 이미지가 아레스만 준비된 상태에서 30명 이상 전투 밀도를 검증할 수 있도록 `WI_AdministrationDatabase`의 영웅급·일반급 전체 500명 `battleSprite`에 `Ares_Battle_FullBody_V1`을 테스트용으로 임시 배정. `ProjectWI/Data/Assign Ares Battle Sprite To All Characters (Test)`와 원복용 `Clear Shared Ares Battle Sprites (Test)` 메뉴를 추가했으며 데이터 참조 500/500, 빈 참조 0건과 전용 EditMode 2/2 통과, Unity 콘솔 오류·경고 0건을 확인함.
+
+- 2026-08-14: 줌인 품질 검증용 하이브리드 청크 전장 `WIBattleFortressHybridChunkArenaV2.prefab`을 추가하고 현재 `WI_BattleConfig.arenaPrefab`에 연결. 넓은 성채 구도 원본을 재샘플링 없이 2×2 매크로 청크로 분리하고, 중앙 43×21 구역에는 중립 대낮 색감의 1254×1254 반복 지면 디테일을 14% 농도로 겹쳤으며 성문·텐트·망루는 독립 환경 모듈로 유지. 첫 타일의 십자 경계를 확인해 균일한 두 번째 버전으로 교체했고, 기존 기계 분할·개별 재묘사·시안 하이브리드 프리팹은 비교용으로 보존. 캐릭터 Scale 1과 카메라 6~14는 변경하지 않음
+
+- 2026-08-14: 개별 AI 재묘사 청크의 지면 축척·경계 불일치 실험을 대체하는 기계 분할 전장 `WIBattleFortressMechanicalChunkArenaV1.prefab`을 추가하고 현재 설정에 연결. 하나의 중립 대낮 3840×2160 완성본 `Battle_FortressField_V3_4K`을 재샘플링 없이 1920×1080 네 청크로 분할했으며 재결합 결과 원본과 픽셀 단위 완전 일치 확인. 전체 월드 57.024×32.076에서 약 67.34 px/unit을 유지하고, 카메라 이동 제한도 18×10 전투 판정 영역이 아니라 전체 배경 크기를 사용하도록 변경. 캐릭터 Scale 1, 아레스 600 PPU, 줌 6~14는 유지
+
+- 2026-08-14: 전투맵 URP 2D 라이팅 1차 패스를 적용. `BattleScene`의 백색 Global Light 2D를 강도 0.92로 조정하고 노멀맵 반응을 활성화했으며, 전장 중앙에 약한 청백색 키 라이트와 중립색 필 라이트를 추가해 노란·주황 색조 없이 교전 영역을 강조. 현재 배경과 아레스는 Sprite-Lit 머티리얼로 기본 조명을 받으며, 전용 노멀맵과 ShadowCaster2D는 후속 품질 단계로 유지
+
+- 2026-08-14: 시안 화풍의 대형 청크 전장 실험 `WIBattleFortressChunkArenaV1.prefab`을 추가. 단순 업스케일 대신 실제로 더 넓은 성채 안뜰 구도를 새로 생성하고, 4개 구역을 각각 1672×941로 별도 고해상도 재묘사해 총 3344×1882 상당의 2×2 독립 Sprite 청크로 구성. 전체 월드 57.024×32.076에서 청크별 2048 제한 내 원본 해상도를 유지하며, 기존 모듈형·시안 하이브리드 프리팹은 비교용으로 보존. AI 구역 재묘사 특성상 중앙 경계에 약한 명암·구조 변화가 남는 점을 실험 한계로 기록
+
+- 2026-08-14: 최대 줌아웃에서 아레스 전신 Sprite의 세부 픽셀이 뭉치는 현상을 1차 개선. 캐릭터 Scale 1, 600 PPU와 카메라는 유지하고 `Ares_Battle_FullBody_V1`에 Mipmap, Trilinear, Mip Maps Preserve Coverage, Alpha Is Transparency, 무압축 임포트를 적용. 공용 비주얼 배정 도구를 다시 실행해도 동일 설정이 유지되도록 전투 Sprite 분기와 재적용 메뉴를 추가
+
+- 2026-08-14: 여러 전장 표현 방식을 보존하며 비교하기 위해 기존 모듈형 `WIBattleFortressArena.prefab`은 유지하고 `WIBattleFortressConceptHybridArena.prefab`을 추가. 실제 시안에서 UI·캐릭터만 제거한 `Battle_FortressField_V1`을 기본 시야 24×13.5에 완성형 중앙 맵으로 배치하고, 최대 줌아웃 57.024×32.076의 외곽만 고밀도 지면 타일과 독립 환경물로 확장. `WI_BattleConfig.arenaPrefab`은 새 하이브리드 버전을 참조하며 캐릭터 Scale 1과 기존 카메라 6~14 설정은 유지
+
+- 2026-08-14: 모듈형 전장의 1차 중립 회색 지면이 전투 시안보다 비어 있고 저렴하게 보이던 문제를 개선. 시안의 흙·마모 석재·잔디·잔해 밀도를 참고한 중립 대낮의 `Battle_GroundTile_Courtyard_V2`를 제작하고 Repeat/Trilinear/Mipmap/Full Rect 타일로 적용. 성문·텐트·망루·방책은 중앙 교전 공간을 감싸는 화면 가장자리 세트로 크기와 위치를 재조정
+
+- 2026-08-14: 타원형 알파 마스크 전경이 거대한 흐린 패치와 외곽 지면 고리를 만들던 1차 레이어 프리팹을 폐기. 투명 PNG 모듈로 성벽·성문 1종, 텐트 3종, 망루 2종, 방책 3종을 제작하고 `WIBattleFortressArena.prefab`에 지면 타일과 8개 독립 환경 GameObject를 고정 배치. 전경 합성 이미지나 중앙 마스크 없이 전 화면에 동일 지면 타일이 표시됨
+
+
+- 2026-08-14: V4 지면에도 생성형 이미지 특유의 구불구불한 획이 남아 확대 시 차이가 작았던 문제를 재수정. ImageGen 지면을 사용하지 않고 방향성 없는 Perlin 저주파 색 변화·미세 입자·드문 자갈만 결정론적으로 굽는 `WIBattleGroundTextureBaker`를 추가하고, 중앙 교전 구역을 원본과 섞지 않고 완전히 교체한 `Battle_FortressField_V5_4K`를 적용. 캐릭터·카메라 설정은 유지
+
+- 2026-08-14: 기본 카메라에서 지면의 늘어진 AI 붓 자국이 드러나던 문제를 해결하기 위해 노란·주황·노을 조명을 배제한 중립 대낮의 흙·잔디 지면 에셋 `Battle_Ground_NeutralDay_V1`을 제작. 기존 성벽·텐트 구도를 유지하면서 중앙 교전 구역을 잔잔한 저주파 지면으로 자연스럽게 재합성한 3840×2160 `Battle_FortressField_V4_4K`를 전투 설정에 연결
+
+- 2026-08-14: 확대된 57.024×32.076 전투 배경 범위에 맞춰 카메라 최대 줌아웃을 10에서 14로 확장. 최소 줌 6, 캐릭터 Scale 1, 아레스 600 PPU는 유지하며 마우스 휠과 60인 자동 시점에서 더 넓은 전장을 표시
+
+- 2026-08-14: 전투 배경을 직전 47.52×26.73에서 57.024×32.076으로 다시 20% 확대. 캐릭터 Scale 1과 아레스 600 PPU는 유지
+
+- 2026-08-14: 전투 배경을 직전 39.6×22.275에서 47.52×26.73으로 추가 20% 확대. 캐릭터 Scale 1과 아레스 600 PPU는 그대로 유지
+
+- 2026-08-14: 전투 시안 비율 피드백에 따라 4K 전투 배경의 월드 표시 크기만 36×20.25에서 39.6×22.275로 10% 확대. 캐릭터 Scale 1, 아레스 600 PPU, 카메라와 실제 전투 판정 영역 18×10은 유지
+
+- 2026-08-14: 전투 캐릭터 Transform 배율을 공통 1로 고정하고 이미지 자체의 PPU 규격으로 화면 크기를 관리하도록 정리. 아레스 전투 Sprite는 600 PPU를 사용해 1178px 전신이 약 1.96 월드 단위로 표시되며, 4K V3 배경과 카메라 설정은 유지
+
+- 2026-08-13: 전투 캐릭터가 4K 전장 시안보다 작게 보인다는 피드백을 반영해 공통 `battleSpriteScale`을 0.65에서 0.75로 확대. 배경 36×20.25와 카메라 6~10 범위는 유지
+
+- 2026-08-13: 줌인 시 전투 배경의 낮은 픽셀 밀도가 드러나는 문제를 보완하기 위해 중립 대낮 색감과 세부 지형 묘사를 강화한 `Battle_FortressField_V3_4K.png` 3840×2160 에셋을 제작. 배경 표시 영역을 36×20.25, 최대 줌아웃을 10으로 맞춰 화면과 배경 종횡비를 통일하고, 캐릭터 배율은 시안 비율에 가까운 0.65로 복구
+
+- 2026-08-13: 황갈색·노란 조명이 강한 `Battle_FortressField_V1`은 보존하고, 동일 전장 구도를 맑은 대낮의 중립 회색 석재·밝은 흙·자연 녹색으로 다시 조명한 `Battle_FortressField_V2`를 제작. 전투 판정 영역 18×10은 유지하면서 배경 표시만 42×24로 확장하고, 전투 Sprite 배율을 50%, 최소 카메라 줌을 6으로 조정해 소규모 전투에서도 시안에 가까운 캐릭터 비율을 사용
+
+- 2026-08-13: 전투 일러스트가 전장에 비해 크게 표시되던 문제를 수정. 원본 PNG와 18×10 전장은 유지하고 `WI_BattleConfig.battleSpriteScale` 공통 설정을 추가해 전투 Sprite를 기본 65% 배율로 표시하도록 변경. 향후 모든 캐릭터 전투 이미지에 동일하게 적용되며 플레이스홀더 크기는 기존 값을 유지
+
+- 2026-08-13: 아레스 전투 시안의 흑철·금장 HUD를 재사용 가능한 UI 에셋으로 재제작. 글자·수치·초상·아이콘을 제거한 상단 전투 상태바, 캐릭터 정보 패널, 4칸 명령바, 4칸 스킬바를 각각 투명 PNG로 분리하고 Unity 단일 Sprite·알파 투명·밉맵 비활성 설정 적용. 투명 통합 시트와 재처리용 크로마 원본도 함께 보존
+
+- 2026-08-13: 아레스 30 대 30 전투 시안에서 UI·문자·캐릭터·체력바·선택 표시를 모두 제거하고 가려진 지형을 복원한 `Battle_FortressField_V1.png` 제작. 전투 설정에 `arenaBackground`를 추가해 실제 전투 배경으로 연결하고 Sprite 크기는 런타임 Transform으로 18×10 전장에 맞추며, 배경 미지정 시 기존 절차형 격자로 대체
+
+- 2026-08-13: Unity 상단의 프로젝트 전용 `ProjectWI` 19개와 `WI` 50개 메뉴를 코드 기준으로 전수 조사해 `GameDocuments/UnityToolMenuManual.md` 작성. 데이터 Seed/Assign, UGUI 프리팹 Build, QA Preview, 테스트 랩과 성능 검증의 기능·실행 조건·변경 대상·주의도를 구분해 기록
+
+- 2026-08-12: 최대 30 대 30 전투 가독성을 위해 직교 카메라 최대 줌아웃을 6.2에서 12로 확대하고, 참가자 수와 초기 진형 범위에 따른 자동 시작 배율을 추가. 60명 전투는 최대 줌아웃, 소규모 전투는 인원에 비례한 가까운 시점을 사용하며 마우스 휠 3.5~12 조절과 Home 자동 시점 복원을 유지
+
+- 2026-08-12: 제공된 아레스 원본 PNG가 알파 없는 RGB 크로마키 이미지임을 확인하고 녹색 배경을 제거한 `Ares_Battle_FullBody_V1.png`와 얼굴 중심 `Ares_Portrait_Face_V1.png`를 제작. `WIHeroDefinition.battleSprite`를 추가해 전투에서 아레스만 전신 일러스트를 표시하고 다른 인물은 기존 플레이스홀더를 유지하도록 연결했으며, 아레스 기존 UI 초상화도 새 얼굴 Sprite로 임시 교체. 애니메이션은 미적용
+
+- 2026-08-12: 행정 UGUI 프리팹 로더의 클래스명을 `WIAdministrationUGUIScreenBootstrap`에서 `WIUIScreenManager`로 변경. 기존 스크립트 GUID와 MainScene의 23개 프리팹 참조는 유지
+
+- 2026-08-12: `WIUIScreenManager`가 등록된 UGUI 프리팹을 생성한 직후 루트 오브젝트를 비활성화하도록 변경. 플레이 모드 Hierarchy에서 모든 화면이 동시에 활성화되어 Scene 선택을 방해하지 않으며, 검토할 화면만 수동으로 활성화해 편집 가능
+
+- 2026-08-12: 비전투 런타임의 마지막 UI Toolkit 형식인 `WIMapConnectionLayer`를 제거하고 레거시 월드 UXML의 사용자 정의 태그를 일반 `VisualElement`로 치환. `Assets/Scripts`와 `Assets/Editor`의 비전투 C# 기준 `UnityEngine.UIElements`, `UIDocument`, `VisualTreeAsset`, `PanelSettings` 참조 0건을 확인했으며 UGUI 이행+레이아웃 EditMode 검사 65/65 및 Unity 콘솔 오류 0건 통과. 전투 테스트용 UI Toolkit은 사용자 요청 범위에 따라 유지
+
+- 2026-08-12: 행정 런타임 컨트롤러의 공통 UI Toolkit 표시 기반을 완전히 제거. `WIAdministrationUIController`와 World/Territory/Turn partial에서 `UIDocument`, `VisualElement`, `CreateModal`, 레거시 HUD·지도 갱신 및 UI Toolkit 전용 QA 화면 코드를 삭제하고 캠페인 상태·선택 성·UGUI 이벤트/스냅샷 브리지와 공용 표시 헬퍼만 유지. 기존 레이아웃 검사를 UGUI 프리팹 기준으로 전환했으며 UGUI 이행+레이아웃 EditMode 검사 65/65 통과
+
+- 2026-08-12: 턴 처리 계열의 레거시 UI Toolkit 구현을 `WIAdministrationUIController.Turn.cs`에서 제거. 이전 턴 연산/요약, 전투 진입, 캠페인 결과와 튜토리얼 모달 코드를 삭제하고 `BeginTurn`과 UGUI 전용 코루틴만 유지했으며, 월간 보고 레이아웃 회귀 검사도 UGUI 프리팹의 스크롤 본문과 6개 고정 행동 슬롯을 검사하도록 전환. UGUI 이행 및 관련 검사 37/37 통과
+
+- 2026-08-12: 성 상세 기록과 특화 시설 선택의 레거시 UI Toolkit 모달을 `WIAdministrationUIController.Territory.cs`에서 제거하고 숨은 영지 버튼을 `UGUICastleRecordRequested`, `UGUISpecialFacilityRequested` 이벤트로 직접 연결. UGUI 성 기록 스냅샷이 공유하는 전문 분야 설명과 차기 공통 레거시 정리 전까지 필요한 기존 슬롯 표시 헬퍼만 유지했으며 UGUI 이행 EditMode 검사 35/35 통과
 
 - 2026-08-12: 월간 보고·영지관 위임·선택 사건 계열의 레거시 UI Toolkit 구현을 `WIAdministrationUIController.RealmReports.cs`에서 제거. 월간 보고, 위임 설정, 사업·관계·지역·점령·영입 사건과 영웅의 흔적 모달 및 중복 실행 코드를 삭제하고 숨은 버튼·전투 알림·L 단축키를 UGUI 이벤트로 직접 연결했으며, 해당 partial에는 UGUI 카드 표시용 조건·방침 문자열 헬퍼만 유지. UGUI 이행 검사 34개와 미결 전투 차단 검사까지 총 35/35 통과
 
@@ -59,7 +166,7 @@
 - 2026-08-11: 미결 플레이어 전투가 있는 저장 상태의 MainScene 초기 진입을 UGUI로 이식. 행정 컨트롤러 `Awake()`에서 UI Toolkit 월간 보고 모달을 직접 만들던 호출을 제거하고, 모든 프리팹 구독이 완료된 다음 프레임에 월간 보고 UGUI를 요청하도록 변경
 - 2026-08-11: 캠페인 시작 화면의 숨은 UI Toolkit 동적 생성을 제거. 거대 행정 컨트롤러가 UXML 난이도·시작 조건 버튼을 런타임에 생성하고 선택 딕셔너리를 관리하던 코드를 삭제하고, 고정 `WICampaignTitleUGUI.prefab`과 `WICampaignTitleUGUIController`만 입력·표시를 담당하도록 단일화. 행정 컨트롤러에는 기존 캠페인 상태 생성·불러오기 API만 유지
 - 2026-08-11: 실제 UGUI 실행 경로에서 숨은 UI Toolkit 전역 입력과 지도 바인딩을 중단. 행정 초기화 시 UXML 전역·영지 버튼 이벤트 연결과 60개 성 노드/연결선 갱신을 실행하지 않으며, 새 캠페인·설정 적용·기본값 복원·저장 불러오기에서도 `BuildMap()`을 호출하지 않도록 정리. UGUI 지도는 프리팹에 고정된 노드와 `WIAdministrationMapUGUIController` 스냅샷만 사용
-- 2026-08-11: MainScene에 나열되던 23개 UGUI 화면 인스턴스를 제거하고 `UGUI Screen Bootstrap` 하나로 정리. `WIAdministrationUGUIScreenBootstrap`이 직렬화된 완성 프리팹 에셋 23개를 플레이 시작 때 생성하며, 각 빌더는 씬 인스턴스 대신 프리팹 참조만 자동 등록. 행정 전역/영지 갱신은 UI Toolkit 표시 요소를 건드리지 않고 UGUI 상태 알림만 사용하도록 전환했으며 UGUI 이행 EditMode 검사 28/28, 전체 프리팹 Missing Script 0건, 플레이 월드 진입 오류 0건 확인
+- 2026-08-11: MainScene에 나열되던 23개 UGUI 화면 인스턴스를 제거하고 화면 관리자 하나로 정리. 현재 `WIUIScreenManager`가 직렬화된 완성 프리팹 에셋 23개를 플레이 시작 때 생성하며, 각 빌더는 씬 인스턴스 대신 프리팹 참조만 자동 등록. 행정 전역/영지 갱신은 UI Toolkit 표시 요소를 건드리지 않고 UGUI 상태 알림만 사용하도록 전환했으며 UGUI 이행 EditMode 검사 28/28, 전체 프리팹 Missing Script 0건, 플레이 월드 진입 오류 0건 확인
 - 2026-08-11: 행정 런타임 프리팹의 UI Toolkit 필수 의존성 제거. `WIAdministrationUIController`의 `RequireComponent(UIDocument)`와 UGUI 모드 초기화의 `rootVisualElement` 조회를 제거하고, `WIAdministrationUI.prefab` 및 MainScene 인스턴스에서 `UIDocument` 컴포넌트를 UnityMCP로 삭제. 행정 컨트롤러는 캠페인 상태와 UGUI 브리지 역할만 유지
 - 2026-08-11: 호출이 끊긴 UI Toolkit 군사 모달 구현 제거. 전투 세션·전투단 목록/상세·편성 성/대장/역할/인물·이동/원정 9개 `CreateModal` 흐름과 미사용 UGUI 레거시 우회 API를 삭제하고, 원정 실패 사유와 역할 표시 헬퍼만 UGUI 군사 브리지용으로 유지. 잔여 레거시 입력도 군사·원정 UGUI 이벤트로 전달
 - 팝업 헤더 PNG는 변경하지 않고 Unity Sprite 표시 영역을 실제 크기인 1024×297로 맞춰 상단 프레임 잘림을 수정
@@ -347,3 +454,8 @@
 - 2026-08-04: 시작 인물은 있으나 플레이어 전투단이 0개인 상태에서 성 원정 창이 편성 경로를 제공하지 않던 P1 UX 결함 수정. 원정 창에서 새 전투단 대장 선택으로 직접 이동하고 적 성 영향력 비용과 실패 이유를 표시. EditMode 196/196 및 새 Windows 빌드 통합 스모크 통과.
 - 2026-08-04: `별빛 수도의 재건` 목표 팝업의 긴 상황·설명 문장이 오른쪽으로 넘치던 문제를 전용 자동 줄바꿈 라벨로 수정. 진행·보상도 작은 폭에서 줄바꿈되며 EditMode 197/197, Windows 빌드 오류·경고 0건과 통합 스모크 통과.
 - 2026-08-04: 원정 전투단 도착 시 전투 세션은 생성되지만 실제 진입이 숨겨져 있던 문제를 수정. 턴 결과에 `전투 발생`과 전력·전투 시작 버튼을 표시하고 모든 공통 모달의 긴 Label·Button 문구를 기본 줄바꿈 처리. EditMode 199/199, Windows 빌드 오류·경고 0건과 통합 스모크 통과.
+- 2026-08-13: 전투 시안에서 분리한 투명 HUD 에셋 4종을 실제 `WIBattleHUD.uxml`에 배치. 기존 컨트롤러 조회 이름과 전투 명령 연결은 유지하면서 상단 상태, 선택 인물, 명령, 스킬 영역을 각각 전용 배경 컨테이너로 분리하고 이전 `bg_type_a` 및 개별 버튼 텍스처 중첩을 제거함. Unity 에셋 재임포트 후 콘솔 오류 0건 확인.
+- 2026-08-14: `Battle_Ground_NeutralDay_V1`을 기준으로 중립적인 대낮 색감과 확대용 미세 자갈·흙·희박한 풀 디테일을 강화한 실험 지면 `GroundExperiment_V2/Battle_Ground_NeutralDay_V2_4K.png`를 제작. 4096×4096, 무압축, Mipmap 비활성으로 임포트했으며 Unity 콘솔 오류·경고 0건을 확인함. 2×2 반복 QA에서는 이음선이 보여 현재는 단일 대형 지면 후보로만 보존하고 실제 전장에는 연결하지 않음.
+- 2026-08-15: 최초 전투 시안의 회화적 밀도와 캐릭터 축척을 함께 검증하기 위한 완성형 청크 전장 V5를 적용함. 성벽·성문·야영지·망루·방책과 접지 그림자를 하나의 3840×2160 중립 대낮 배경에 함께 제작하고 1920×1080 네 청크로 기계 분할해 재조립 픽셀 완전 일치를 확인함. 다크 판타지의 검은 비네팅·압축된 암부와 GPT 이미지 특유의 노란/금색 조명을 배제하고 회갈색 흙, 절제된 올리브 잔디, 중립 회색 석재를 사용함. `WIBattleCharacterScaleArenaV5.prefab`의 기존 독립 환경물은 중복을 막기 위해 비활성화하고 현재 `WI_BattleConfig.arenaPrefab`에 연결함.
+- 2026-08-15: 60명 전투의 캐릭터 밀도 재검증을 위해 아레스 전투 Sprite의 Transform Scale 1은 유지하고 PPU를 600에서 1178로 변경하여 원본 1178px 높이가 약 1월드 유닛으로 표시되도록 조정함. 공용 비주얼 재설정 메뉴도 1178 PPU 기준으로 동기화함. 동시에 V5의 캐릭터보다 큰 양각형 지면 무늬를 제거하고 넓은 회갈색 흙 색면·희미한 올리브 변화·드문 소형 자갈 중심으로 다시 그린 `Battle_CompleteArena_CharacterScale_V6_4K`을 제작함. 1920×1080 네 청크의 재조립 픽셀 완전 일치를 확인하고 `WIBattleCharacterScaleArenaV6.prefab` 및 현재 `WI_BattleConfig.arenaPrefab`에 연결함.
+- 2026-08-15: 기존 아레스 원화와 비슷한 약 7등신 비율을 유지한 단일 전장용 후보 `Ares_Battle_Unit_V1.png`을 제작함. 흰 장발·검은 판금 갑옷·절제된 금장·짙은 남보라 망토·장검의 정체성을 유지하고 작은 화면에서 읽히도록 세부 장식과 명암 덩어리를 정리함. 녹색 크로마 원본을 투명화한 뒤 256×384 셀에 비율 유지 배치했으며 실제 캐릭터 알파 높이는 328px, 투명 모서리 검사를 통과함. Unity Sprite/Single, 328 PPU, Bilinear, Mipmap 비활성, 무압축, Max 512로 설정했으며 현재 데이터에는 연결하지 않은 검토 후보임. 정식 component-row 추출은 Windows에서 `fcntl` 잠금을 지원하지 않아 중단하고 단일 이미지 cutout 경로만 사용함.

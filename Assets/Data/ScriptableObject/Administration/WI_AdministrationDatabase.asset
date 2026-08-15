@@ -1986,7 +1986,8 @@ MonoBehaviour:
     heroClass: 0
     grade: 0
     traits: 0500000003000000
-    portrait: {fileID: 21300000, guid: 516b37312f8e9864386a01cae560d130, type: 3}
+    portrait: {fileID: 21300000, guid: b033f36c488f64744af930888190c131, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 55
     might: 55
     intelligence: 48
@@ -2010,6 +2011,7 @@ MonoBehaviour:
     grade: 0
     traits: 04000000
     portrait: {fileID: 21300000, guid: b022ccf8ec4770a40bbf8857b9c28070, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
     might: 59
     intelligence: 53
@@ -2033,6 +2035,7 @@ MonoBehaviour:
     grade: 0
     traits: 0000000006000000
     portrait: {fileID: 21300000, guid: 1c6d8f245555daf458be4280333acfd1, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 76
     might: 83
     intelligence: 83
@@ -2056,6 +2059,7 @@ MonoBehaviour:
     grade: 0
     traits: 06000000
     portrait: {fileID: 21300000, guid: f98f64766ab92b04aa75a8ff5ceb73c9, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 64
     might: 67
     intelligence: 63
@@ -2079,6 +2083,7 @@ MonoBehaviour:
     grade: 0
     traits: 02000000
     portrait: {fileID: 21300000, guid: 885c72d9d8b48c5428e53d195ae7edb2, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 61
     might: 63
     intelligence: 58
@@ -2102,6 +2107,7 @@ MonoBehaviour:
     grade: 0
     traits: 0400000005000000
     portrait: {fileID: 21300000, guid: e8a6045655ecafe4b833a743f62b86ed, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 70
     might: 75
     intelligence: 73
@@ -2125,6 +2131,7 @@ MonoBehaviour:
     grade: 0
     traits: 03000000
     portrait: {fileID: 21300000, guid: 0497da93ec170504eb45b697fd9c9805, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 67
     might: 71
     intelligence: 68
@@ -2148,6 +2155,7 @@ MonoBehaviour:
     grade: 0
     traits: 07000000
     portrait: {fileID: 21300000, guid: 87c33ba3da4192349a49ffc468c440b4, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 73
     might: 79
     intelligence: 78
@@ -2171,6 +2179,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 77
     might: 59
     intelligence: 79
@@ -2194,6 +2203,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 73
     might: 74
     intelligence: 95
@@ -2217,6 +2227,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 71
     might: 66
     intelligence: 90
@@ -2240,6 +2251,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 78
     intelligence: 77
@@ -2263,6 +2275,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 64
     might: 76
     intelligence: 70
@@ -2286,6 +2299,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 93
     might: 76
     intelligence: 58
@@ -2309,6 +2323,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 89
     might: 68
     intelligence: 61
@@ -2332,6 +2347,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 81
     might: 93
     intelligence: 66
@@ -2355,6 +2371,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 74
     might: 74
     intelligence: 81
@@ -2378,6 +2395,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 81
     intelligence: 67
@@ -2401,6 +2419,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 67
     might: 66
     intelligence: 81
@@ -2424,6 +2443,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 62
     intelligence: 95
@@ -2447,6 +2467,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 81
     might: 72
     intelligence: 80
@@ -2470,6 +2491,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 73
     might: 56
     intelligence: 74
@@ -2493,6 +2515,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 62
     might: 67
     intelligence: 89
@@ -2516,6 +2539,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
     might: 81
     intelligence: 84
@@ -2539,6 +2563,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 64
     might: 94
     intelligence: 87
@@ -2562,6 +2587,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 92
     might: 78
     intelligence: 62
@@ -2585,6 +2611,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 88
     might: 71
     intelligence: 58
@@ -2608,6 +2635,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 69
     might: 89
     intelligence: 70
@@ -2631,6 +2659,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 74
     might: 89
     intelligence: 85
@@ -2654,6 +2683,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 67
     might: 76
     intelligence: 55
@@ -2677,6 +2707,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 72
     might: 65
     intelligence: 80
@@ -2700,6 +2731,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 62
     might: 60
     intelligence: 85
@@ -2723,6 +2755,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 82
     might: 67
     intelligence: 92
@@ -2746,6 +2779,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 59
     might: 71
     intelligence: 75
@@ -2769,6 +2803,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 72
     might: 69
     intelligence: 82
@@ -2792,6 +2827,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
     might: 79
     intelligence: 74
@@ -2815,6 +2851,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 72
     might: 76
     intelligence: 83
@@ -2838,6 +2875,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 98
     might: 76
     intelligence: 60
@@ -2861,6 +2899,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 82
     might: 74
     intelligence: 73
@@ -2884,6 +2923,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 73
     might: 88
     intelligence: 67
@@ -2907,6 +2947,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 74
     might: 94
     intelligence: 82
@@ -2930,6 +2971,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 66
     might: 77
     intelligence: 68
@@ -2953,6 +2995,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 59
     might: 71
     intelligence: 89
@@ -2976,6 +3019,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 72
     might: 57
     intelligence: 83
@@ -2999,6 +3043,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 81
     might: 72
     intelligence: 97
@@ -3022,6 +3067,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 70
     might: 74
     intelligence: 94
@@ -3045,6 +3091,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 55
     might: 73
     intelligence: 80
@@ -3068,6 +3115,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 73
     might: 83
     intelligence: 96
@@ -3091,6 +3139,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 61
     might: 86
     intelligence: 71
@@ -3114,6 +3163,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 91
     might: 76
     intelligence: 55
@@ -3137,6 +3187,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 84
     might: 55
     intelligence: 67
@@ -3160,6 +3211,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 79
     might: 87
     intelligence: 56
@@ -3183,6 +3235,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 64
     might: 88
     intelligence: 82
@@ -3206,6 +3259,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 62
     might: 81
     intelligence: 58
@@ -3229,6 +3283,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 63
     might: 71
     intelligence: 86
@@ -3252,6 +3307,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 57
     might: 63
     intelligence: 92
@@ -3275,6 +3331,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 76
     might: 56
     intelligence: 80
@@ -3298,6 +3355,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 70
     might: 66
     intelligence: 86
@@ -3321,6 +3379,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 69
     might: 58
     intelligence: 79
@@ -3344,6 +3403,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 62
     might: 85
     intelligence: 93
@@ -3367,6 +3427,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 69
     might: 86
     intelligence: 79
@@ -3390,6 +3451,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 83
     might: 83
     intelligence: 68
@@ -3413,6 +3475,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 92
     might: 56
     intelligence: 60
@@ -3436,6 +3499,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 79
     might: 94
     intelligence: 72
@@ -3459,6 +3523,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 55
     might: 88
     intelligence: 76
@@ -3482,6 +3547,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
     might: 88
     intelligence: 55
@@ -3505,6 +3571,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 70
     might: 64
     intelligence: 90
@@ -3528,6 +3595,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 63
     might: 63
     intelligence: 84
@@ -3551,6 +3619,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 88
     might: 65
     intelligence: 85
@@ -3574,6 +3643,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 63
     might: 72
     intelligence: 92
@@ -3597,6 +3667,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 57
     might: 62
     intelligence: 96
@@ -3620,6 +3691,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 69
     might: 80
     intelligence: 79
@@ -3643,6 +3715,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 57
     might: 88
     intelligence: 82
@@ -3666,6 +3739,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 85
     might: 69
     intelligence: 72
@@ -3689,6 +3763,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 89
     might: 73
     intelligence: 57
@@ -3712,6 +3787,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 83
     might: 79
     intelligence: 68
@@ -3735,6 +3811,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 68
     might: 94
     intelligence: 85
@@ -3758,6 +3835,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 73
     might: 82
     intelligence: 69
@@ -3781,6 +3859,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 60
     might: 68
     intelligence: 97
@@ -3804,6 +3883,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
     might: 63
     intelligence: 90
@@ -3827,6 +3907,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 90
     might: 69
     intelligence: 74
@@ -3850,6 +3931,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 74
     might: 73
     intelligence: 95
@@ -3873,6 +3955,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 70
     might: 58
     intelligence: 89
@@ -3896,6 +3979,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 71
     might: 78
     intelligence: 92
@@ -3919,6 +4003,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 69
     might: 94
     intelligence: 82
@@ -3942,6 +4027,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 90
     might: 79
     intelligence: 70
@@ -3965,6 +4051,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 82
     might: 63
     intelligence: 70
@@ -3988,6 +4075,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 88
     might: 77
     intelligence: 57
@@ -4011,6 +4099,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 68
     might: 98
     intelligence: 83
@@ -4034,6 +4123,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 66
     might: 90
     intelligence: 67
@@ -4057,6 +4147,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 70
     might: 69
     intelligence: 76
@@ -4080,6 +4171,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 59
     might: 74
     intelligence: 80
@@ -4103,6 +4195,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 90
     might: 58
     intelligence: 78
@@ -4126,6 +4219,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 73
     might: 55
     intelligence: 93
@@ -4149,6 +4243,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 63
     might: 59
     intelligence: 86
@@ -4172,6 +4267,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
     might: 86
     intelligence: 83
@@ -4195,6 +4291,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 60
     might: 75
     intelligence: 69
@@ -4218,6 +4315,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 89
     might: 88
     intelligence: 70
@@ -4241,6 +4339,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 76
     might: 65
     intelligence: 71
@@ -4264,6 +4363,7 @@ MonoBehaviour:
     grade: 0
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 80
     might: 92
     intelligence: 62
@@ -4287,6 +4387,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 47
     intelligence: 54
@@ -4310,6 +4411,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 53
     intelligence: 38
@@ -4333,6 +4435,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 21300000, guid: 51d5dc92d9270c44c9fa2156929f0afd, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 54
     might: 62
     intelligence: 28
@@ -4356,6 +4459,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 46
     intelligence: 46
@@ -4379,6 +4483,7 @@ MonoBehaviour:
     grade: 1
     traits: 01000000
     portrait: {fileID: 21300000, guid: 10d652a42d932c2409a09a4342c88f5d, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 28
     intelligence: 58
@@ -4402,6 +4507,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 21300000, guid: f5469fc649a917048a0f8eff48c56b6e, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 65
     intelligence: 30
@@ -4425,6 +4531,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 21300000, guid: 1bc8d346e22972343861ca26361c5e60, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 55
     intelligence: 47
@@ -4448,6 +4555,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 21300000, guid: e1feeca0debceb7409510d1cfd13f123, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 68
     intelligence: 25
@@ -4471,6 +4579,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 21300000, guid: ef07c0d3dc8a0564187e9ccc38bb05e5, type: 3}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 60
     intelligence: 52
@@ -4494,6 +4603,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 36
     intelligence: 54
@@ -4517,6 +4627,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 39
     intelligence: 62
@@ -4540,6 +4651,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 48
     intelligence: 61
@@ -4563,6 +4675,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 54
     intelligence: 55
@@ -4586,6 +4699,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 51
     intelligence: 39
@@ -4609,6 +4723,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 45
     intelligence: 44
@@ -4632,6 +4747,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 49
     intelligence: 49
@@ -4655,6 +4771,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 58
     intelligence: 45
@@ -4678,6 +4795,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 58
     intelligence: 40
@@ -4701,6 +4819,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 33
     might: 39
     intelligence: 52
@@ -4724,6 +4843,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 49
     intelligence: 53
@@ -4747,6 +4867,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 31
     intelligence: 61
@@ -4770,6 +4891,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 33
     might: 35
     intelligence: 55
@@ -4793,6 +4915,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 38
     intelligence: 58
@@ -4816,6 +4939,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 51
     intelligence: 54
@@ -4839,6 +4963,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 33
     might: 59
     intelligence: 54
@@ -4862,6 +4987,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 53
     intelligence: 44
@@ -4885,6 +5011,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 42
     intelligence: 36
@@ -4908,6 +5035,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 49
     intelligence: 49
@@ -4931,6 +5059,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 57
     intelligence: 58
@@ -4954,6 +5083,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 53
     intelligence: 35
@@ -4977,6 +5107,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 46
     intelligence: 55
@@ -5000,6 +5131,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 36
     intelligence: 50
@@ -5023,6 +5155,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 57
     might: 44
     intelligence: 53
@@ -5046,6 +5179,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 38
     intelligence: 45
@@ -5069,6 +5203,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 41
     might: 46
     intelligence: 55
@@ -5092,6 +5227,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 49
     intelligence: 55
@@ -5115,6 +5251,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 59
     intelligence: 50
@@ -5138,6 +5275,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 53
     intelligence: 32
@@ -5161,6 +5299,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 61
     might: 46
     intelligence: 40
@@ -5184,6 +5323,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 50
     intelligence: 40
@@ -5207,6 +5347,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 55
     intelligence: 44
@@ -5230,6 +5371,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 53
     intelligence: 40
@@ -5253,6 +5395,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 43
     intelligence: 52
@@ -5276,6 +5419,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 48
     intelligence: 66
@@ -5299,6 +5443,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 54
     might: 38
     intelligence: 48
@@ -5322,6 +5467,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 48
     intelligence: 50
@@ -5345,6 +5491,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 40
     intelligence: 63
@@ -5368,6 +5515,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 52
     intelligence: 57
@@ -5391,6 +5539,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 56
     intelligence: 54
@@ -5414,6 +5563,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 52
     might: 47
     intelligence: 37
@@ -5437,6 +5587,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 62
     might: 39
     intelligence: 43
@@ -5460,6 +5611,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 62
     intelligence: 30
@@ -5483,6 +5635,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 57
     intelligence: 51
@@ -5506,6 +5659,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 48
     intelligence: 47
@@ -5529,6 +5683,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 33
     might: 34
     intelligence: 55
@@ -5552,6 +5707,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 41
     intelligence: 51
@@ -5575,6 +5731,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
     might: 36
     intelligence: 58
@@ -5598,6 +5755,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 41
     intelligence: 42
@@ -5621,6 +5779,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 39
     intelligence: 51
@@ -5644,6 +5803,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 60
     intelligence: 60
@@ -5667,6 +5827,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 45
     intelligence: 55
@@ -5690,6 +5851,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 63
     might: 46
     intelligence: 31
@@ -5713,6 +5875,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 35
     intelligence: 44
@@ -5736,6 +5899,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 59
     intelligence: 40
@@ -5759,6 +5923,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 59
     intelligence: 47
@@ -5782,6 +5947,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 52
     intelligence: 42
@@ -5805,6 +5971,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 45
     intelligence: 52
@@ -5828,6 +5995,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 36
     intelligence: 50
@@ -5851,6 +6019,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 60
     might: 39
     intelligence: 55
@@ -5874,6 +6043,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 33
     might: 40
     intelligence: 49
@@ -5897,6 +6067,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 36
     intelligence: 47
@@ -5920,6 +6091,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 40
     intelligence: 46
@@ -5943,6 +6115,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 61
     intelligence: 52
@@ -5966,6 +6139,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 46
     intelligence: 38
@@ -5989,6 +6163,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 32
     intelligence: 42
@@ -6012,6 +6187,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 59
     might: 60
     intelligence: 48
@@ -6035,6 +6211,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 54
     intelligence: 53
@@ -6058,6 +6235,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 58
     intelligence: 48
@@ -6081,6 +6259,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 37
     intelligence: 56
@@ -6104,6 +6283,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 31
     intelligence: 62
@@ -6127,6 +6307,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 37
     intelligence: 49
@@ -6150,6 +6331,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 32
     intelligence: 44
@@ -6173,6 +6355,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 41
     intelligence: 49
@@ -6196,6 +6379,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 47
     intelligence: 47
@@ -6219,6 +6403,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 44
     intelligence: 53
@@ -6242,6 +6427,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 52
     might: 41
     intelligence: 46
@@ -6265,6 +6451,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 64
     might: 39
     intelligence: 37
@@ -6288,6 +6475,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 54
     might: 62
     intelligence: 47
@@ -6311,6 +6499,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 51
     intelligence: 49
@@ -6334,6 +6523,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 61
     intelligence: 47
@@ -6357,6 +6547,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 41
     intelligence: 46
@@ -6380,6 +6571,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 33
     intelligence: 53
@@ -6403,6 +6595,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 36
     intelligence: 53
@@ -6426,6 +6619,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 31
     intelligence: 52
@@ -6449,6 +6643,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 41
     intelligence: 59
@@ -6472,6 +6667,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 47
     intelligence: 53
@@ -6495,6 +6691,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 41
     might: 45
     intelligence: 46
@@ -6518,6 +6715,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 60
     might: 56
     intelligence: 30
@@ -6541,6 +6739,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 41
     intelligence: 44
@@ -6564,6 +6763,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 51
     intelligence: 34
@@ -6587,6 +6787,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 53
     intelligence: 56
@@ -6610,6 +6811,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 45
     intelligence: 42
@@ -6633,6 +6835,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 37
     intelligence: 46
@@ -6656,6 +6859,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 47
     intelligence: 57
@@ -6679,6 +6883,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 36
     intelligence: 55
@@ -6702,6 +6907,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 41
     intelligence: 62
@@ -6725,6 +6931,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 32
     intelligence: 47
@@ -6748,6 +6955,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 46
     intelligence: 64
@@ -6771,6 +6979,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 57
     intelligence: 53
@@ -6794,6 +7003,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 52
     might: 55
     intelligence: 43
@@ -6817,6 +7027,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 61
     might: 45
     intelligence: 35
@@ -6840,6 +7051,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 51
     might: 50
     intelligence: 38
@@ -6863,6 +7075,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 57
     intelligence: 53
@@ -6886,6 +7099,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 41
     might: 43
     intelligence: 40
@@ -6909,6 +7123,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 42
     intelligence: 55
@@ -6932,6 +7147,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 46
     intelligence: 57
@@ -6955,6 +7171,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 48
     intelligence: 58
@@ -6978,6 +7195,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 47
     intelligence: 57
@@ -7001,6 +7219,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 41
     might: 31
     intelligence: 62
@@ -7024,6 +7243,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 56
     intelligence: 48
@@ -7047,6 +7267,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 59
     intelligence: 48
@@ -7070,6 +7291,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
     might: 52
     intelligence: 45
@@ -7093,6 +7315,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 42
     intelligence: 44
@@ -7116,6 +7339,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 45
     intelligence: 36
@@ -7139,6 +7363,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 48
     intelligence: 39
@@ -7162,6 +7387,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 61
     intelligence: 43
@@ -7185,6 +7411,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 47
     intelligence: 46
@@ -7208,6 +7435,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 46
     intelligence: 58
@@ -7231,6 +7459,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 44
     intelligence: 53
@@ -7254,6 +7483,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 41
     might: 39
     intelligence: 65
@@ -7277,6 +7507,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 37
     intelligence: 50
@@ -7300,6 +7531,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 43
     intelligence: 51
@@ -7323,6 +7555,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 46
     intelligence: 48
@@ -7346,6 +7579,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 51
     might: 57
     intelligence: 44
@@ -7369,6 +7603,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 50
     might: 39
     intelligence: 39
@@ -7392,6 +7627,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 62
     intelligence: 41
@@ -7415,6 +7651,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 54
     intelligence: 49
@@ -7438,6 +7675,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 59
     intelligence: 36
@@ -7461,6 +7699,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 45
     intelligence: 58
@@ -7484,6 +7723,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 35
     intelligence: 50
@@ -7507,6 +7747,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 31
     intelligence: 53
@@ -7530,6 +7771,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 41
     intelligence: 60
@@ -7553,6 +7795,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 34
     intelligence: 54
@@ -7576,6 +7819,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 54
     intelligence: 52
@@ -7599,6 +7843,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 41
     might: 66
     intelligence: 48
@@ -7622,6 +7867,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 55
     intelligence: 42
@@ -7645,6 +7891,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 54
     might: 46
     intelligence: 35
@@ -7668,6 +7915,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 57
     might: 65
     intelligence: 32
@@ -7691,6 +7939,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 59
     intelligence: 59
@@ -7714,6 +7963,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 45
     intelligence: 36
@@ -7737,6 +7987,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 39
     intelligence: 59
@@ -7760,6 +8011,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 49
     intelligence: 55
@@ -7783,6 +8035,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 52
     might: 34
     intelligence: 62
@@ -7806,6 +8059,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 38
     intelligence: 48
@@ -7829,6 +8083,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 40
     intelligence: 55
@@ -7852,6 +8107,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 46
     intelligence: 62
@@ -7875,6 +8131,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 55
     intelligence: 49
@@ -7898,6 +8155,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 62
     might: 59
     intelligence: 31
@@ -7921,6 +8179,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 60
     might: 47
     intelligence: 40
@@ -7944,6 +8203,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 48
     intelligence: 41
@@ -7967,6 +8227,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 48
     intelligence: 50
@@ -7990,6 +8251,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 55
     intelligence: 49
@@ -8013,6 +8275,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 44
     intelligence: 57
@@ -8036,6 +8299,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 48
     intelligence: 57
@@ -8059,6 +8323,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 39
     intelligence: 45
@@ -8082,6 +8347,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 44
     intelligence: 52
@@ -8105,6 +8371,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 48
     intelligence: 60
@@ -8128,6 +8395,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 47
     intelligence: 45
@@ -8151,6 +8419,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 54
     intelligence: 54
@@ -8174,6 +8443,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 54
     might: 55
     intelligence: 44
@@ -8197,6 +8467,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 54
     might: 49
     intelligence: 35
@@ -8220,6 +8491,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 46
     intelligence: 33
@@ -8243,6 +8515,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 45
     intelligence: 49
@@ -8266,6 +8539,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 50
     intelligence: 45
@@ -8289,6 +8563,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 43
     intelligence: 46
@@ -8312,6 +8587,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 31
     intelligence: 54
@@ -8335,6 +8611,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 59
     might: 34
     intelligence: 44
@@ -8358,6 +8635,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 48
     intelligence: 49
@@ -8381,6 +8659,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 33
     might: 40
     intelligence: 47
@@ -8404,6 +8683,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 61
     intelligence: 46
@@ -8427,6 +8707,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 56
     intelligence: 47
@@ -8450,6 +8731,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 51
     might: 46
     intelligence: 36
@@ -8473,6 +8755,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 34
     intelligence: 37
@@ -8496,6 +8779,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 51
     might: 65
     intelligence: 37
@@ -8519,6 +8803,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 54
     intelligence: 49
@@ -8542,6 +8827,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 51
     intelligence: 47
@@ -8565,6 +8851,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 38
     intelligence: 61
@@ -8588,6 +8875,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 47
     intelligence: 53
@@ -8611,6 +8899,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 42
     intelligence: 52
@@ -8634,6 +8923,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 33
     intelligence: 55
@@ -8657,6 +8947,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 35
     intelligence: 53
@@ -8680,6 +8971,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 47
     intelligence: 48
@@ -8703,6 +8995,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 50
     intelligence: 58
@@ -8726,6 +9019,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 43
     intelligence: 43
@@ -8749,6 +9043,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 40
     intelligence: 45
@@ -8772,6 +9067,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 54
     might: 59
     intelligence: 35
@@ -8795,6 +9091,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 51
     intelligence: 38
@@ -8818,6 +9115,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 65
     intelligence: 46
@@ -8841,6 +9139,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 34
     intelligence: 45
@@ -8864,6 +9163,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 37
     intelligence: 52
@@ -8887,6 +9187,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 54
     might: 38
     intelligence: 58
@@ -8910,6 +9211,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 42
     intelligence: 61
@@ -8933,6 +9235,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 32
     intelligence: 62
@@ -8956,6 +9259,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 46
     intelligence: 46
@@ -8979,6 +9283,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 45
     intelligence: 54
@@ -9002,6 +9307,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 46
     intelligence: 41
@@ -9025,6 +9331,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 49
     intelligence: 31
@@ -9048,6 +9355,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 41
     might: 48
     intelligence: 36
@@ -9071,6 +9379,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 44
     intelligence: 59
@@ -9094,6 +9403,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 33
     might: 45
     intelligence: 36
@@ -9117,6 +9427,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 48
     intelligence: 62
@@ -9140,6 +9451,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 33
     intelligence: 56
@@ -9163,6 +9475,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 57
     might: 40
     intelligence: 65
@@ -9186,6 +9499,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 44
     intelligence: 58
@@ -9209,6 +9523,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 33
     intelligence: 50
@@ -9232,6 +9547,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 49
     intelligence: 53
@@ -9255,6 +9571,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 48
     intelligence: 57
@@ -9278,6 +9595,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 52
     might: 55
     intelligence: 41
@@ -9301,6 +9619,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 45
     intelligence: 31
@@ -9324,6 +9643,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 55
     might: 59
     intelligence: 42
@@ -9347,6 +9667,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 48
     intelligence: 46
@@ -9370,6 +9691,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 53
     intelligence: 34
@@ -9393,6 +9715,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 39
     intelligence: 48
@@ -9416,6 +9739,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 42
     intelligence: 61
@@ -9439,6 +9763,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 49
     intelligence: 55
@@ -9462,6 +9787,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 40
     intelligence: 51
@@ -9485,6 +9811,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 34
     intelligence: 57
@@ -9508,6 +9835,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 60
     intelligence: 55
@@ -9531,6 +9859,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 45
     intelligence: 52
@@ -9554,6 +9883,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 60
     might: 50
     intelligence: 32
@@ -9577,6 +9907,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 54
     might: 40
     intelligence: 48
@@ -9600,6 +9931,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 66
     intelligence: 36
@@ -9623,6 +9955,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 56
     intelligence: 55
@@ -9646,6 +9979,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 50
     intelligence: 34
@@ -9669,6 +10003,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 34
     intelligence: 62
@@ -9692,6 +10027,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 35
     intelligence: 56
@@ -9715,6 +10051,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 38
     intelligence: 64
@@ -9738,6 +10075,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 34
     intelligence: 53
@@ -9761,6 +10099,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 48
     intelligence: 57
@@ -9784,6 +10123,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 58
     intelligence: 57
@@ -9807,6 +10147,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 51
     intelligence: 41
@@ -9830,6 +10171,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 61
     intelligence: 43
@@ -9853,6 +10195,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 43
     intelligence: 33
@@ -9876,6 +10219,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 63
     intelligence: 38
@@ -9899,6 +10243,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 33
     might: 61
     intelligence: 57
@@ -9922,6 +10267,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 61
     intelligence: 49
@@ -9945,6 +10291,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 34
     intelligence: 53
@@ -9968,6 +10315,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 46
     intelligence: 54
@@ -9991,6 +10339,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 36
     intelligence: 51
@@ -10014,6 +10363,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 39
     intelligence: 54
@@ -10037,6 +10387,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 37
     intelligence: 48
@@ -10060,6 +10411,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 51
     intelligence: 55
@@ -10083,6 +10435,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 60
     intelligence: 39
@@ -10106,6 +10459,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 55
     might: 47
     intelligence: 48
@@ -10129,6 +10483,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 50
     might: 46
     intelligence: 45
@@ -10152,6 +10507,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 48
     intelligence: 47
@@ -10175,6 +10531,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 57
     intelligence: 53
@@ -10198,6 +10555,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 61
     intelligence: 31
@@ -10221,6 +10579,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 36
     intelligence: 45
@@ -10244,6 +10603,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 30
     intelligence: 54
@@ -10267,6 +10627,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 31
     intelligence: 61
@@ -10290,6 +10651,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 46
     intelligence: 65
@@ -10313,6 +10675,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 38
     intelligence: 47
@@ -10336,6 +10699,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 56
     intelligence: 62
@@ -10359,6 +10723,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 57
     intelligence: 41
@@ -10382,6 +10747,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 43
     intelligence: 42
@@ -10405,6 +10771,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 63
     might: 46
     intelligence: 31
@@ -10428,6 +10795,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 55
     might: 55
     intelligence: 40
@@ -10451,6 +10819,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 44
     intelligence: 58
@@ -10474,6 +10843,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 53
     intelligence: 40
@@ -10497,6 +10867,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 36
     intelligence: 49
@@ -10520,6 +10891,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 36
     intelligence: 61
@@ -10543,6 +10915,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 52
     might: 42
     intelligence: 53
@@ -10566,6 +10939,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 41
     intelligence: 61
@@ -10589,6 +10963,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 38
     intelligence: 50
@@ -10612,6 +10987,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 47
     intelligence: 62
@@ -10635,6 +11011,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 44
     intelligence: 47
@@ -10658,6 +11035,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 53
     intelligence: 44
@@ -10681,6 +11059,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 63
     might: 34
     intelligence: 39
@@ -10704,6 +11083,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 60
     intelligence: 35
@@ -10727,6 +11107,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 57
     intelligence: 57
@@ -10750,6 +11131,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 50
     intelligence: 46
@@ -10773,6 +11155,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 40
     intelligence: 50
@@ -10796,6 +11179,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 41
     might: 41
     intelligence: 48
@@ -10819,6 +11203,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 30
     intelligence: 44
@@ -10842,6 +11227,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 38
     intelligence: 58
@@ -10865,6 +11251,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 33
     intelligence: 46
@@ -10888,6 +11275,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 55
     intelligence: 59
@@ -10911,6 +11299,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 52
     intelligence: 49
@@ -10934,6 +11323,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 50
     might: 58
     intelligence: 38
@@ -10957,6 +11347,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 34
     intelligence: 46
@@ -10980,6 +11371,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 57
     intelligence: 31
@@ -11003,6 +11395,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 54
     intelligence: 43
@@ -11026,6 +11419,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 58
     intelligence: 30
@@ -11049,6 +11443,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 41
     intelligence: 54
@@ -11072,6 +11467,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 30
     intelligence: 61
@@ -11095,6 +11491,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 45
     intelligence: 46
@@ -11118,6 +11515,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 41
     intelligence: 53
@@ -11141,6 +11539,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 33
     intelligence: 51
@@ -11164,6 +11563,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 61
     intelligence: 48
@@ -11187,6 +11587,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 55
     intelligence: 47
@@ -11210,6 +11611,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 51
     might: 48
     intelligence: 47
@@ -11233,6 +11635,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 41
     intelligence: 39
@@ -11256,6 +11659,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 51
     intelligence: 30
@@ -11279,6 +11683,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 52
     intelligence: 40
@@ -11302,6 +11707,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 50
     intelligence: 37
@@ -11325,6 +11731,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 49
     intelligence: 54
@@ -11348,6 +11755,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 39
     intelligence: 59
@@ -11371,6 +11779,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 46
     intelligence: 63
@@ -11394,6 +11803,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 47
     intelligence: 43
@@ -11417,6 +11827,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 46
     intelligence: 45
@@ -11440,6 +11851,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 42
     intelligence: 52
@@ -11463,6 +11875,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 56
     intelligence: 56
@@ -11486,6 +11899,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 55
     might: 39
     intelligence: 39
@@ -11509,6 +11923,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 59
     might: 47
     intelligence: 40
@@ -11532,6 +11947,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 61
     intelligence: 35
@@ -11555,6 +11971,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 30
     might: 55
     intelligence: 49
@@ -11578,6 +11995,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 54
     intelligence: 46
@@ -11601,6 +12019,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 30
     intelligence: 48
@@ -11624,6 +12043,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 37
     intelligence: 51
@@ -11647,6 +12067,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 57
     might: 39
     intelligence: 60
@@ -11670,6 +12091,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 36
     intelligence: 55
@@ -11693,6 +12115,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 32
     intelligence: 54
@@ -11716,6 +12139,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 59
     intelligence: 53
@@ -11739,6 +12163,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 55
     intelligence: 49
@@ -11762,6 +12187,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 50
     intelligence: 45
@@ -11785,6 +12211,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 35
     intelligence: 41
@@ -11808,6 +12235,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 50
     might: 44
     intelligence: 34
@@ -11831,6 +12259,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 53
     intelligence: 53
@@ -11854,6 +12283,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 53
     intelligence: 32
@@ -11877,6 +12307,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 31
     intelligence: 61
@@ -11900,6 +12331,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 31
     intelligence: 49
@@ -11923,6 +12355,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 38
     intelligence: 55
@@ -11946,6 +12379,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 42
     intelligence: 61
@@ -11969,6 +12403,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 30
     intelligence: 54
@@ -11992,6 +12427,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 53
     intelligence: 54
@@ -12015,6 +12451,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 53
     intelligence: 60
@@ -12038,6 +12475,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 56
     intelligence: 35
@@ -12061,6 +12499,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 50
     might: 45
     intelligence: 31
@@ -12084,6 +12523,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 44
     might: 54
     intelligence: 49
@@ -12107,6 +12547,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 57
     intelligence: 44
@@ -12130,6 +12571,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 65
     intelligence: 31
@@ -12153,6 +12595,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 38
     intelligence: 44
@@ -12176,6 +12619,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 39
     intelligence: 55
@@ -12199,6 +12643,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 44
     intelligence: 55
@@ -12222,6 +12667,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 35
     intelligence: 56
@@ -12245,6 +12691,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 37
     might: 37
     intelligence: 53
@@ -12268,6 +12715,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 41
     intelligence: 50
@@ -12291,6 +12739,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 32
     might: 58
     intelligence: 55
@@ -12314,6 +12763,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 60
     might: 51
     intelligence: 40
@@ -12337,6 +12787,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 63
     might: 48
     intelligence: 30
@@ -12360,6 +12811,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 49
     intelligence: 42
@@ -12383,6 +12835,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 62
     intelligence: 52
@@ -12406,6 +12859,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 62
     intelligence: 40
@@ -12429,6 +12883,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 46
     intelligence: 64
@@ -12452,6 +12907,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 34
     intelligence: 58
@@ -12475,6 +12931,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 47
     intelligence: 44
@@ -12498,6 +12955,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 45
     intelligence: 48
@@ -12521,6 +12979,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 38
     intelligence: 54
@@ -12544,6 +13003,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 42
     might: 50
     intelligence: 46
@@ -12567,6 +13027,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 58
     intelligence: 53
@@ -12590,6 +13051,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 65
     might: 42
     intelligence: 33
@@ -12613,6 +13075,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 65
     might: 44
     intelligence: 36
@@ -12636,6 +13099,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 50
     intelligence: 35
@@ -12659,6 +13123,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 59
     intelligence: 43
@@ -12682,6 +13147,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 44
     intelligence: 43
@@ -12705,6 +13171,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 47
     intelligence: 44
@@ -12728,6 +13195,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 38
     might: 42
     intelligence: 54
@@ -12751,6 +13219,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 53
     might: 31
     intelligence: 52
@@ -12774,6 +13243,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 48
     might: 41
     intelligence: 58
@@ -12797,6 +13267,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 44
     intelligence: 56
@@ -12820,6 +13291,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 53
     intelligence: 59
@@ -12843,6 +13315,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 49
     intelligence: 46
@@ -12866,6 +13339,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 60
     might: 50
     intelligence: 30
@@ -12889,6 +13363,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 50
     might: 35
     intelligence: 31
@@ -12912,6 +13387,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 41
     might: 45
     intelligence: 36
@@ -12935,6 +13411,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 46
     intelligence: 50
@@ -12958,6 +13435,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 40
     might: 63
     intelligence: 31
@@ -12981,6 +13459,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 49
     might: 46
     intelligence: 51
@@ -13004,6 +13483,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 36
     intelligence: 60
@@ -13027,6 +13507,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 51
     might: 42
     intelligence: 61
@@ -13050,6 +13531,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 35
     might: 30
     intelligence: 49
@@ -13073,6 +13555,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 49
     intelligence: 61
@@ -13096,6 +13579,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 31
     might: 48
     intelligence: 57
@@ -13119,6 +13603,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 50
     intelligence: 55
@@ -13142,6 +13627,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 44
     intelligence: 31
@@ -13165,6 +13651,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 64
     might: 43
     intelligence: 34
@@ -13188,6 +13675,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 43
     might: 44
     intelligence: 42
@@ -13211,6 +13699,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 36
     might: 63
     intelligence: 44
@@ -13234,6 +13723,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 50
     intelligence: 46
@@ -13257,6 +13747,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 33
     intelligence: 44
@@ -13280,6 +13771,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 46
     intelligence: 59
@@ -13303,6 +13795,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 46
     might: 39
     intelligence: 55
@@ -13326,6 +13819,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 47
     might: 30
     intelligence: 49
@@ -13349,6 +13843,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 39
     might: 32
     intelligence: 47
@@ -13372,6 +13867,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 45
     might: 45
     intelligence: 62
@@ -13395,6 +13891,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 34
     might: 61
     intelligence: 58
@@ -13418,6 +13915,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 59
     might: 55
     intelligence: 41
@@ -13441,6 +13939,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 56
     might: 48
     intelligence: 35
@@ -13464,6 +13963,7 @@ MonoBehaviour:
     grade: 1
     traits: 
     portrait: {fileID: 0}
+    battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
     might: 53
     intelligence: 42

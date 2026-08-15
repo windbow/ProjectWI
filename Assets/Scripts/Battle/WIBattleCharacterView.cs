@@ -5,8 +5,13 @@ namespace ProjectWI.Battle
     [RequireComponent(typeof(SpriteRenderer))]
     public class WIBattleCharacterView : MonoBehaviour
     {
+        private const int CharacterSortingBase = 1000;
+        private const float CharacterSortingPrecision = 100f;
         private WIBattleCharacterState state;
         private SpriteRenderer spriteRenderer;
+        private SpriteRenderer groundShadowRenderer;
+        private Material defaultMaterial;
+        private Material farOutlineMaterial;
         private Transform healthFill;
         private GameObject focusMarker;
         private GameObject selectionMarker;
@@ -14,25 +19,60 @@ namespace ProjectWI.Battle
         public string HeroId => state?.HeroId;
 
         // 전투 캐릭터 상태를 표시 오브젝트와 연결하고 임시 진영 색상을 적용합니다.
-        public void Bind(WIBattleCharacterState characterState, WIBattleConfigSO config)
+        public void Bind(WIBattleCharacterState characterState, WIBattleConfigSO config, Sprite battleSprite)
         {
             state = characterState;
             spriteRenderer = GetComponent<SpriteRenderer>();
-            spriteRenderer.sprite = config.PlaceholderSprite != null
+            BindGroundShadow();
+            defaultMaterial = config.CharacterDefaultMaterial;
+            farOutlineMaterial = config.CharacterFarOutlineMaterial;
+            spriteRenderer.sprite = battleSprite != null
+                ? battleSprite
+                : config.PlaceholderSprite != null
                 ? config.PlaceholderSprite
                 : state.Grade == ProjectWI.Administration.WICharacterGrade.Hero
                     ? WIBattlePlaceholderSprites.GetCircle()
                     : WIBattlePlaceholderSprites.GetSquare();
-            spriteRenderer.color = state.Side == WIBattleSide.Attacker
-                ? config.AttackerPlaceholderColor
-                : config.DefenderPlaceholderColor;
+            spriteRenderer.color = battleSprite != null
+                ? Color.white
+                : state.Side == WIBattleSide.Attacker
+                    ? config.AttackerPlaceholderColor
+                    : config.DefenderPlaceholderColor;
             spriteRenderer.sortingOrder = 10;
-            transform.localScale = Vector3.one * config.PlaceholderCharacterSize;
-            CreateHealthBar();
-            CreateLabel();
+            transform.localScale = battleSprite == null
+                ? Vector3.one * config.PlaceholderCharacterSize
+                : Vector3.one * config.BattleSpriteScale;
+            if (config.ShowCharacterHealthBars == true)
+            {
+                CreateHealthBar();
+            }
+            if (config.ShowCharacterLabels == true)
+            {
+                CreateLabel();
+            }
             CreateFocusMarker();
             CreateSelectionMarker();
             Refresh();
+        }
+
+        // 프리팹에 미리 배치된 공용 접지 그림자를 찾아 캐릭터 깊이 정렬과 연결합니다.
+        private void BindGroundShadow()
+        {
+            Transform shadowTransform = transform.Find("GroundShadow");
+            groundShadowRenderer = shadowTransform == null
+                ? null
+                : shadowTransform.GetComponent<SpriteRenderer>();
+        }
+
+        // 원거리 C 단계에서만 외곽선 머티리얼을 공유 적용합니다.
+        public void SetFarOutlineEnabled(bool enabled)
+        {
+            if (spriteRenderer == null) return;
+            Material targetMaterial = enabled == true ? farOutlineMaterial : defaultMaterial;
+            if (targetMaterial != null && spriteRenderer.sharedMaterial != targetMaterial)
+            {
+                spriteRenderer.sharedMaterial = targetMaterial;
+            }
         }
 
         // 집중 공격 대상으로 지정된 인물을 둘러쌀 반투명 표적 원을 생성합니다.
@@ -116,6 +156,11 @@ namespace ProjectWI.Battle
         {
             if (state == null) return;
             transform.position = new Vector3(state.Position.x, state.Position.y, 0f);
+            spriteRenderer.sortingOrder = CharacterSortingBase - Mathf.RoundToInt(state.Position.y * CharacterSortingPrecision);
+            if (groundShadowRenderer != null)
+            {
+                groundShadowRenderer.sortingOrder = spriteRenderer.sortingOrder - 1;
+            }
             if (healthFill != null)
             {
                 float ratio = state.MaxHealth <= 0 ? 0f : Mathf.Clamp01((float)state.Health / state.MaxHealth);

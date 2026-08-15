@@ -37,7 +37,7 @@
                 <ui:Button name="capital-manage-button" text="수도 관리" class="side-action generated-primary"/>
             </ui:VisualElement>
             <ui:VisualElement name="map" class="map">
-                <wi:WIMapConnectionLayer xmlns:wi="ProjectWI.Administration" name="map-connection-layer"/>
+                <ui:VisualElement name="map-connection-layer"/>
                 <ui:Button name="castle-castle_00" class="castle-node" style="left: 18%; top: 48%;">
                     <ui:VisualElement class="castle-node-marker"/>
                     <ui:Label text="castle_00" class="castle-node-name"/>

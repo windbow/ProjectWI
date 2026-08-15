@@ -229,3 +229,131 @@
     background-color:rgba(0,0,0,0);
     border-width:0;
 }
+
+/* 전투 시안에서 분리한 네 프레임을 HUD의 실제 배경 계층으로 배치합니다. */
+.battle-top-status-frame {
+    position:absolute;
+    left:8%;
+    right:8%;
+    top:12px;
+    height:108px;
+    align-items:center;
+    justify-content:center;
+    background-image:url("project://database/Assets/Art/UI/Battle/Battle_Top_Status_Frame_V1.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+
+.battle-top-status-frame .battle-status {
+    min-width:0;
+    margin-top:7px;
+    padding:0;
+    background-image:none;
+    background-color:rgba(0,0,0,0);
+    color:rgb(238,224,188);
+    font-size:18px;
+}
+
+.bottom-bar {
+    left:12px;
+    right:12px;
+    bottom:8px;
+    height:178px;
+    padding:0;
+    align-items:flex-end;
+    background-image:none;
+    background-color:rgba(0,0,0,0);
+}
+
+.battle-character-info-frame {
+    width:365px;
+    height:178px;
+    flex-direction:row;
+    align-items:center;
+    background-image:url("project://database/Assets/Art/UI/Battle/Battle_Character_Info_Frame_V1.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+
+.battle-portrait-slot {
+    width:39%;
+    height:72%;
+    margin-left:7%;
+}
+
+.battle-character-info-frame .selection-info {
+    position:relative;
+    left:auto;
+    top:auto;
+    width:47%;
+    max-width:none;
+    margin-left:2%;
+    padding:7px;
+    background-image:none;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    white-space:normal;
+    font-size:13px;
+}
+
+.battle-command-frame {
+    width:524px;
+    height:127px;
+    margin-left:auto;
+    margin-right:auto;
+    padding:20px 26px 15px 26px;
+    justify-content:flex-end;
+    background-image:url("project://database/Assets/Art/UI/Battle/Battle_Command_Bar_Frame_V1.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+
+.battle-command-frame .command-feedback {
+    margin:0 0 5px 0;
+    padding:0;
+    align-self:center;
+    background-image:none;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    font-size:12px;
+}
+
+.command-group {
+    width:100%;
+    justify-content:space-between;
+}
+
+.battle-command-frame .command-button {
+    min-width:0;
+    width:23%;
+    min-height:48px;
+    height:48px;
+    margin:0;
+    background-image:none;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    font-size:15px;
+}
+
+.battle-skill-frame {
+    width:376px;
+    height:107px;
+    padding:29px 20px 17px 20px;
+    background-image:url("project://database/Assets/Art/UI/Battle/Battle_Skill_Bar_Frame_V1.png");
+    -unity-background-scale-mode:stretch-to-fill;
+}
+
+.battle-skill-frame .skill-group {
+    width:100%;
+    height:100%;
+    justify-content:space-between;
+}
+
+.battle-skill-frame .skill-button {
+    min-width:0;
+    width:23%;
+    min-height:0;
+    height:100%;
+    margin:0;
+    background-image:none;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+    font-size:13px;
+}

@@ -47,7 +47,7 @@ ProjectWI의 UI는 역할과 실행 환경에 따라 2가지 기술 스택으로
 * **주요 구성 패널**:
   1. **천하 전략도 지도 패널 (`#map-frame`)**:
      * **60개 성 노드 (`#castle-castle_00` ~ `#castle-castle_59`)**: 60개 성이 지도 상의 상대 위치(`left: %`, `top: %`)에 사각 버튼으로 정적배치. 성 소유 진영 색상의 마커 및 성 이름 표시.
-     * **도로망 커스텀 레이어 (`#map-connection-layer`)**: `WIMapConnectionLayer` 커스텀 VisualElement를 사용해 성과 성 사이의 연결 도로를 2D Vector로 렌더링.
+     * **지도 연결선 자리 (`#map-connection-layer`)**: 과거 UXML 시안에는 일반 `VisualElement`만 남아 있으며 실제 런타임 지도는 UGUI 프리팹의 고정 성 노드를 사용합니다.
   2. **좌측 선택 성 정보 요약 카드 (`.castle-summary-panel`)**:
      * 성 전경 이미지 (`#global-castle-image`), 성 명칭 (`#global-castle-name`), 소유 세력 (`#global-castle-owner`), 4대 성 수치 (`#global-castle-stats`), 주둔 영웅 4명 카드 (`#global-castle-hero-cards`).
   3. **하단 전역 명령 툴바 (Global Command Bar)**:
@@ -152,7 +152,7 @@ ProjectWI의 UI는 역할과 실행 환경에 따라 2가지 기술 스택으로
 | **USS** | [`Assets/UI/Administration/WIAdministration.uss`](file:///c:/Fork/ProjectWI/Assets/UI/Administration/WIAdministration.uss) | 내정/지도/모달 전체 CSS 스타일시트 |
 | **USS** | [`Assets/UI/Battle/WIBattleHUD.uss`](file:///c:/Fork/ProjectWI/Assets/UI/Battle/WIBattleHUD.uss) | 전투 HUD 스타일시트 |
 | **C#** | [`Assets/Scripts/Administration/WIAdministrationUIController.cs`](file:///c:/Fork/ProjectWI/Assets/Scripts/Administration/WIAdministrationUIController.cs) | 내정 UI 컨트롤러 (데이터 바인딩, 뷰 전환) |
-| **C#** | [`Assets/Scripts/Administration/WIMapConnectionLayer.cs`](file:///c:/Fork/ProjectWI/Assets/Scripts/Administration/WIMapConnectionLayer.cs) | 지도 도로망 커스텀 VisualElement |
+| **C#** | [`Assets/Scripts/Administration/WIAdministrationMapUGUIController.cs`](file:///c:/Fork/ProjectWI/Assets/Scripts/Administration/WIAdministrationMapUGUIController.cs) | UGUI 지도 성 노드의 소유·선택 상태와 입력 갱신 |
 | **C#** | [`Assets/Scripts/Battle/WIBattleHUDController.cs`](file:///c:/Fork/ProjectWI/Assets/Scripts/Battle/WIBattleHUDController.cs) | 전투 HUD 컨트롤러 (명령, 스킬, 이벤트) |
 | **C# (Editor)** | [`Assets/Editor/WICharacterDataViewerWindow.cs`](file:///c:/Fork/ProjectWI/Assets/Editor/WICharacterDataViewerWindow.cs) | 에디터 캐릭터 데이터 뷰어 (Virtual Scroll Windowing) |
 | **C# (Editor)** | [`Assets/Editor/WIMassCharacterSeeder.cs`](file:///c:/Fork/ProjectWI/Assets/Editor/WIMassCharacterSeeder.cs) | 에디터 500명 인물 생성 및 1/3 성 배치 시더 |

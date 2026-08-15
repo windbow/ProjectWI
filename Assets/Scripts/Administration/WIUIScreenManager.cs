@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationUGUIScreenBootstrap : MonoBehaviour
+    public sealed class WIUIScreenManager : MonoBehaviour
     {
         [SerializeField] private GameObject[] screenPrefabs;
 
@@ -11,7 +11,13 @@ namespace ProjectWI.Administration
         {
             foreach (GameObject prefab in screenPrefabs)
             {
-                if (prefab != null) Instantiate(prefab, transform);
+                if (prefab == null)
+                {
+                    continue;
+                }
+
+                GameObject screen = Instantiate(prefab, transform);
+                screen.SetActive(false);
             }
         }
     }

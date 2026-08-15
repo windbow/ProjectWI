@@ -67,6 +67,11 @@ namespace ProjectWI.Battle
         public string DisplayName;
         public Vector2 Position;
         public Vector2 FormationPosition;
+        public int GridColumn;
+        public int GridRow;
+        public int GridDestinationColumn;
+        public int GridDestinationRow;
+        public bool HasGridDestination;
         public int MaxHealth;
         public int Health;
         public int MaxMana;

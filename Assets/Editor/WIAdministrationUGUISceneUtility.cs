@@ -48,9 +48,9 @@ namespace ProjectWI.EditorTools
         // 기존 씬 인스턴스의 원본과 신규 프리팹을 수집하고 씬 자식을 제거합니다.
         private static void ConfigureBootstrap(GameObject root, GameObject additionalPrefab)
         {
-            WIAdministrationUGUIScreenBootstrap bootstrap = root.GetComponent<WIAdministrationUGUIScreenBootstrap>();
-            if (bootstrap == null) bootstrap = root.AddComponent<WIAdministrationUGUIScreenBootstrap>();
-            SerializedObject serialized = new SerializedObject(bootstrap);
+            WIUIScreenManager screenManager = root.GetComponent<WIUIScreenManager>();
+            if (screenManager == null) screenManager = root.AddComponent<WIUIScreenManager>();
+            SerializedObject serialized = new SerializedObject(screenManager);
             SerializedProperty screens = serialized.FindProperty("screenPrefabs");
             List<GameObject> prefabs = new List<GameObject>();
             for (int index = 0; index < screens.arraySize; index += 1)

@@ -1,17 +1,26 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:Style src="project://database/Assets/UI/Battle/WIBattleHUD.uss" />
     <ui:VisualElement name="battle-hud" class="battle-hud">
-        <ui:Label name="battle-status" text="전투 세션 대기 중" class="battle-status" />
-        <ui:Label name="command-feedback" text="명령 대기 · 1 전진 / 2 사수 / 3 집중 / R 후퇴" class="command-feedback" />
-        <ui:Label name="selection-info" text="인물 클릭 · WASD/방향키 이동 · 휠 확대 · Home 복귀" class="selection-info" />
+        <ui:VisualElement class="battle-top-status-frame">
+            <ui:Label name="battle-status" text="전투 세션 대기 중" class="battle-status" />
+        </ui:VisualElement>
         <ui:VisualElement class="bottom-bar">
-            <ui:VisualElement class="command-group">
-                <ui:Button name="advance-command" text="전진" class="command-button generated-normal" />
-                <ui:Button name="hold-command" text="위치 사수" class="command-button generated-normal" />
-                <ui:Button name="focus-command" text="집중 공격" class="command-button generated-normal" />
-                <ui:Button name="retreat-command" text="후퇴" class="command-button retreat generated-danger" />
+            <ui:VisualElement class="battle-character-info-frame">
+                <ui:VisualElement class="battle-portrait-slot" />
+                <ui:Label name="selection-info" text="인물 클릭 · WASD/방향키 이동 · 휠 확대 · Home 복귀" class="selection-info" />
             </ui:VisualElement>
-            <ui:VisualElement name="skill-buttons" class="skill-group" />
+            <ui:VisualElement class="battle-command-frame">
+                <ui:Label name="command-feedback" text="명령 대기 · 1 전진 / 2 사수 / 3 집중 / R 후퇴" class="command-feedback" />
+                <ui:VisualElement class="command-group">
+                    <ui:Button name="advance-command" text="전진" class="command-button" />
+                    <ui:Button name="hold-command" text="위치 사수" class="command-button" />
+                    <ui:Button name="focus-command" text="집중 공격" class="command-button" />
+                    <ui:Button name="retreat-command" text="후퇴" class="command-button retreat" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="battle-skill-frame">
+                <ui:VisualElement name="skill-buttons" class="skill-group" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

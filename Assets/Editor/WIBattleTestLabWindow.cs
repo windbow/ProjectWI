@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectWI.Administration;
+using ProjectWI.Battle;
 using ProjectWI.Systems;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -41,6 +42,100 @@ namespace ProjectWI.Editor
         public static void OpenWindow()
         {
             GetWindow<WIBattleTestLabWindow>("전투 테스트 랩").minSize = new Vector2(760f, 520f);
+        }
+
+        // 아레스와 커먼급 29명 대 상대 영웅과 커먼급 29명의 전투 밀도 검증을 바로 시작합니다.
+        [MenuItem("ProjectWI/Verification/Start 30v30 Battle Density Test")]
+        public static void StartThirtyVsThirtyBattleDensityTest()
+        {
+            WIAdministrationDatabaseSO battleDatabase =
+                AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            if (battleDatabase == null)
+            {
+                Debug.LogError($"데이터베이스를 찾을 수 없습니다: {DatabasePath}");
+                return;
+            }
+
+            List<WIHeroDefinition> heroes = battleDatabase.Heroes
+                .Where(item => item.Grade == WICharacterGrade.Hero)
+                .ToList();
+            List<WIHeroDefinition> commons = battleDatabase.Heroes
+                .Where(item => item.Grade == WICharacterGrade.Common)
+                .ToList();
+            if (heroes.Count < 2 || commons.Count < 58)
+            {
+                Debug.LogError("30대30 전투 밀도 검증에는 영웅 2명과 커먼급 58명이 필요합니다.");
+                return;
+            }
+
+            WIHeroDefinition allyHero = battleDatabase.GetHero("ares") ?? heroes[0];
+            WIHeroDefinition enemyHero = heroes.First(item => item.Id != allyHero.Id);
+            LaunchData data = new LaunchData();
+            data.allies.Add(CreateTestMember(battleDatabase, allyHero));
+            data.enemies.Add(CreateTestMember(battleDatabase, enemyHero));
+            for (int index = 0; index < 29; index++)
+            {
+                data.allies.Add(CreateTestMember(battleDatabase, commons[index]));
+                data.enemies.Add(CreateTestMember(battleDatabase, commons[index + 29]));
+            }
+
+            EditorPrefs.SetString(LaunchDataKey, JsonUtility.ToJson(data));
+            EditorSceneManager.OpenScene(MainScenePath);
+            EditorApplication.isPlaying = true;
+            Debug.Log("30대30 전투 밀도 검증을 예약했습니다. 양측은 영웅 1명과 커먼급 29명으로 구성됩니다.");
+        }
+
+        [MenuItem("ProjectWI/Verification/Battle Zoom/A Near")]
+        // 실행 중인 전투 카메라를 근거리 A 단계로 변경합니다.
+        public static void SetBattleZoomA()
+        {
+            SetBattleZoom(WIBattleZoomLevel.A);
+        }
+
+        [MenuItem("ProjectWI/Verification/Battle Zoom/B Middle")]
+        // 실행 중인 전투 카메라를 중거리 B 단계로 변경합니다.
+        public static void SetBattleZoomB()
+        {
+            SetBattleZoom(WIBattleZoomLevel.B);
+        }
+
+        [MenuItem("ProjectWI/Verification/Battle Zoom/C Far")]
+        // 실행 중인 전투 카메라를 원거리 C 단계로 변경합니다.
+        public static void SetBattleZoomC()
+        {
+            SetBattleZoom(WIBattleZoomLevel.C);
+        }
+
+        // 플레이 모드의 전투 카메라를 지정한 고정 줌 단계로 전환합니다.
+        private static void SetBattleZoom(WIBattleZoomLevel zoomLevel)
+        {
+            if (EditorApplication.isPlaying == false)
+            {
+                Debug.LogWarning("전투 줌 단계는 플레이 모드에서 검증할 수 있습니다.");
+                return;
+            }
+
+            WIBattleCameraController cameraController =
+                UnityEngine.Object.FindFirstObjectByType<WIBattleCameraController>();
+            if (cameraController == null)
+            {
+                Debug.LogWarning("실행 중인 전투 카메라를 찾을 수 없습니다.");
+                return;
+            }
+
+            cameraController.SetZoomLevel(zoomLevel);
+            Debug.Log($"전투 카메라를 {zoomLevel} 단계로 변경했습니다.");
+        }
+
+        // 캐릭터 클래스의 권장 역할을 적용한 전투 테스트 참가 데이터를 만듭니다.
+        private static TestMember CreateTestMember(WIAdministrationDatabaseSO battleDatabase, WIHeroDefinition character)
+        {
+            WIHeroClassDefinition classDefinition = battleDatabase.GetHeroClass(character.HeroClass);
+            return new TestMember
+            {
+                heroId = character.Id,
+                role = classDefinition == null ? WIUnitRole.Melee : classDefinition.RecommendedRole
+            };
         }
 
         // 창이 열릴 때 전투에 사용할 내정 데이터베이스를 불러옵니다.

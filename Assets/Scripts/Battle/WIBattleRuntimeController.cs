@@ -31,11 +31,38 @@ namespace ProjectWI.Battle
         {
             PreparePlaceholderArena();
             runtime = WIBattleRuntimeBuilder.Build(config, database, session);
+            if (cameraController != null)
+            {
+                cameraController.ZoomLevelChanged -= HandleZoomLevelChanged;
+                cameraController.ZoomLevelChanged += HandleZoomLevelChanged;
+            }
+            cameraController?.FrameCombatants(runtime.Characters);
             foreach (WIBattleCharacterState character in runtime.Characters)
             {
                 WIBattleCharacterView view = Instantiate(characterPrefab, characterRoot == null ? transform : characterRoot);
-                view.Bind(character, config);
+                WIHeroDefinition hero = database.GetHero(character.HeroId);
+                view.Bind(character, config, hero?.BattleSprite);
                 views.Add(view);
+            }
+            HandleZoomLevelChanged(cameraController == null ? WIBattleZoomLevel.C : cameraController.CurrentZoomLevel);
+        }
+
+        // 카메라 C 단계에서만 모든 캐릭터의 소프트 외곽선을 활성화합니다.
+        private void HandleZoomLevelChanged(WIBattleZoomLevel zoomLevel)
+        {
+            bool enableFarOutline = zoomLevel == WIBattleZoomLevel.C;
+            foreach (WIBattleCharacterView view in views)
+            {
+                view.SetFarOutlineEnabled(enableFarOutline);
+            }
+        }
+
+        // 카메라 단계 변경 이벤트 연결을 해제합니다.
+        private void OnDestroy()
+        {
+            if (cameraController != null)
+            {
+                cameraController.ZoomLevelChanged -= HandleZoomLevelChanged;
             }
         }
 
@@ -121,12 +148,26 @@ namespace ProjectWI.Battle
                 if (cameraController == null) cameraController = battleCamera.gameObject.AddComponent<WIBattleCameraController>();
                 cameraController.Initialize(config);
             }
-            GameObject arena = new GameObject("PlaceholderArenaGrid");
+            if (config.ArenaPrefab != null)
+            {
+                GameObject arenaPrefabInstance = Instantiate(config.ArenaPrefab, transform);
+                arenaPrefabInstance.name = config.ArenaPrefab.name;
+                return;
+            }
+
+            GameObject arena = new GameObject(config.ArenaBackground == null ? "PlaceholderArenaGrid" : "BattleArenaBackground");
             arena.transform.SetParent(transform, false);
             arena.transform.position = new Vector3(0f, 0f, 2f);
             SpriteRenderer renderer = arena.AddComponent<SpriteRenderer>();
-            renderer.sprite = WIBattlePlaceholderSprites.GetArenaGrid();
+            renderer.sprite = config.ArenaBackground != null
+                ? config.ArenaBackground
+                : WIBattlePlaceholderSprites.GetArenaGrid();
             renderer.sortingOrder = -100;
+            Vector2 spriteSize = renderer.sprite.bounds.size;
+            arena.transform.localScale = new Vector3(
+                config.ArenaBackgroundSize.x / Mathf.Max(0.01f, spriteSize.x),
+                config.ArenaBackgroundSize.y / Mathf.Max(0.01f, spriteSize.y),
+                1f);
         }
 
         // 시뮬레이션이 예약한 근접 섬광과 원거리 발사체 도형을 생성하고 이동시킵니다.

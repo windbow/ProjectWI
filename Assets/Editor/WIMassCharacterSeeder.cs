@@ -356,7 +356,7 @@ namespace ProjectWI.Editor
         {
             switch (id)
             {
-                case "ares": WriteCoreCharacter(character, 0, 0, 55, 55, 48, 50, 42, 0, "recruit_trust", true, "Portrait_ares_V1.png", 5, 3); break;
+                case "ares": WriteCoreCharacter(character, 0, 0, 55, 55, 48, 50, 42, 0, "recruit_trust", true, "Ares/Ares_Portrait_Face_V1.png", 5, 3); break;
                 case "lyria": WriteCoreCharacter(character, 1, 6, 58, 59, 53, 53, 46, 0, "recruit_trust", true, "Portrait_lyria_V1.png", 4); break;
                 case "brom": WriteCoreCharacter(character, 2, 1, 61, 63, 58, 56, 50, 5, "recruit_service", true, "Portrait_brom_V1.png", 2); break;
                 case "selene": WriteCoreCharacter(character, 0, 7, 64, 67, 63, 59, 54, 5, "recruit_service", true, "Portrait_selene_V1.png", 6); break;
@@ -401,6 +401,11 @@ namespace ProjectWI.Editor
             character.FindPropertyRelative("activeSkillAvailable").boolValue = activeSkillAvailable;
             character.FindPropertyRelative("portrait").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(
                 $"Assets/Art/Characters/{portraitFile}");
+            if (character.FindPropertyRelative("id").stringValue == "ares")
+            {
+                character.FindPropertyRelative("battleSprite").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(
+                    "Assets/Art/Characters/Ares/Ares_Battle_1WU_A_OutlineBake_V1.png");
+            }
 
             SerializedProperty traitProperty = character.FindPropertyRelative("traits");
             traitProperty.arraySize = traits.Length;
