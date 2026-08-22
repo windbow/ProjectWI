@@ -1,5 +1,9 @@
 # ProjectWI 프로젝트 상태
 
+- 2026-08-23: 성 내정 명령 패널 시안의 외곽 박스를 위한 무문자 정사각형 배경 `bg_type_f.png`를 제작함. 512×512 규격에 중립적인 흑청색 내부 질감과 시안의 절제된 회갈색 금속 외곽선·작은 모서리 장식만 유지하고 문구·아이콘·버튼·구분선은 제외했으며, Unity Sprite/Single 및 사방 10px 9-Slice Border로 임포트함. 프리팹과 UI는 변경하지 않았고 Unity 재임포트 및 Console Error 0건 확인.
+
+- 2026-08-23: `WIAdministrationWorldUGUI`의 175×68 명령 버튼에 사용하는 `bg_type_e.png`를 원본 시안의 무문자 냉색 흑청 버튼 배경으로 재제작함. 기존 1718×636 대형 에셋 때문에 100px 9-Slice 테두리가 과도하게 표시되던 문제를 해결하기 위해 최종 이미지를 175×68로 맞추고 Sprite Rect 175×68, Border 사방 10px로 조정했으며 기존 GUID와 Sprite 내부 ID를 유지해 프리팹 참조는 변경하지 않음. Unity 재임포트 및 Console Error 0건 확인.
+
 - 2026-08-22: 성 내정의 `진격/출정`과 `성 상세` 화면도 공용 모달 UI 대상에 포함함. 기존 프리팹의 전투단 선택·성 이미지·상세 기록 본문 배치는 재생성하지 않고 유지하면서 `administration_modal_shell_v1` 외곽, 공용 제목 헤더, X 닫기 버튼과 평면 버튼만 적용함. 두 빌더에도 공용 처리 호출을 추가해 향후 재생성 시 구형 기본 UI로 돌아가지 않도록 했으며 공용 UI 회귀 검사 범위를 8개 화면으로 확장함.
 
 - 2026-08-22: 목표 상세 시안의 외곽을 바탕으로 무문자 냉색 금속 `administration_modal_shell_v1.png`을 제작해 중점 사업·인사 배치·인재 활동·특화 시설·기본 시설·태수 위임 6개 프리팹의 공용 셸로 적용함. 사용자가 직접 조정한 `WIAdministrationObjectiveUGUI`의 이미지·텍스트 배치는 공용화 대상에서 제외하고 기존 `objective_modal_frame_v1.png` 기반 구성으로 복원함. UGUI 이행 EditMode 42/42 및 Console Error 0건 통과.

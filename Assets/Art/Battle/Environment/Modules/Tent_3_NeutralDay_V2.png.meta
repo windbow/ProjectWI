@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b3d51b960e107634fa262cdb2167e6c1
+guid: b19c751467d24aa48bf56692d67930f6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7414457941657582754
-    second: right_objective_card_0
+      213: 6067283617222407595
+    second: Tent_3_NeutralDay_V2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -88,7 +88,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: right_objective_card_0
+      name: Tent_3_NeutralDay_V2_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 640
-        height: 320
+        y: 37
+        width: 659
+        height: 669
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 30, y: 30, z: 30, w: 30}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e530d6919cd8a1990800000000000000
-      internalID: -7414457941657582754
+      spriteID: ba5b614dd42533450800000000000000
+      internalID: 6067283617222407595
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 56d27be254eaa1044848dc83288a64f2
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      right_objective_card_0: -7414457941657582754
+      Tent_3_NeutralDay_V2_0: 6067283617222407595
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

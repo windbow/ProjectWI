@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c72e4c3849cce5d4ab4645d4bc767b4e
+guid: 60f046076203dc74982439bf74ef759b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5890779137013663567
-    second: territory_bottom_panel_v1_0
+      213: -4274237306794796684
+    second: Battle_CompleteArena_CharacterScale_V6_ImageGen_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,13 +46,13 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 18, y: 18, z: 18, w: 18}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: territory_bottom_panel_v1_0
+      name: Battle_CompleteArena_CharacterScale_V6_ImageGen_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 7
-        width: 506
-        height: 157
+        x: 0
+        y: 0
+        width: 1672
+        height: 941
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f474bf71a6040c150800000000000000
-      internalID: 5890779137013663567
+      spriteID: 47916cab0dbdea4c0800000000000000
+      internalID: -4274237306794796684
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      territory_bottom_panel_v1_0: 5890779137013663567
+      Battle_CompleteArena_CharacterScale_V6_ImageGen_0: -4274237306794796684
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

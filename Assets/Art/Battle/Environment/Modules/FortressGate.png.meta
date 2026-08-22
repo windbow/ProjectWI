@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9cc490981813429449c56dc193d38cc0
+guid: a2a143e51366f554ba2ca8f596b9dd90
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4882801665630420822
-    second: button_flat_danger_0
+      213: 6252948498063583343
+    second: FortressGate_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 2
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -46,9 +46,9 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: button_flat_danger_0
+      name: FortressGate_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 768
-        height: 128
+        y: 13
+        width: 1774
+        height: 859
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 65f3694ae3233c340800000000000000
-      internalID: 4882801665630420822
+      spriteID: f6864e9878fe6c650800000000000000
+      internalID: 6252948498063583343
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      button_flat_danger_0: 4882801665630420822
+      FortressGate_0: 6252948498063583343
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

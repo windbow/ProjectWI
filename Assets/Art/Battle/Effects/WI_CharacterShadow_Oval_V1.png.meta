@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b3d51b960e107634fa262cdb2167e6c1
+guid: f9f1dfc0703698949a7ac4e920f3a878
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7414457941657582754
-    second: right_objective_card_0
+      213: 2017684651855182320
+    second: WI_CharacterShadow_Oval_V1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,14 +46,14 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 1
+  spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -72,10 +72,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 256
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: right_objective_card_0
+      name: WI_CharacterShadow_Oval_V1_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 640
-        height: 320
+        x: 9
+        y: 45
+        width: 238
+        height: 70
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 30, y: 30, z: 30, w: 30}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e530d6919cd8a1990800000000000000
-      internalID: -7414457941657582754
+      spriteID: 0f9f59e2081400c10800000000000000
+      internalID: 2017684651855182320
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 56d27be254eaa1044848dc83288a64f2
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      right_objective_card_0: -7414457941657582754
+      WI_CharacterShadow_Oval_V1_0: 2017684651855182320
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

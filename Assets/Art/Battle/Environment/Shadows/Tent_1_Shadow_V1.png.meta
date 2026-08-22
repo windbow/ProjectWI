@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b3d51b960e107634fa262cdb2167e6c1
+guid: 3737f6c6eb4198d459686d7a420d1fb0
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7414457941657582754
-    second: right_objective_card_0
+      213: -4322938234397828686
+    second: Tent_1_Shadow_V1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -88,7 +88,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: right_objective_card_0
+      name: Tent_1_Shadow_V1_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 640
-        height: 320
+        x: 27
+        y: 55
+        width: 336
+        height: 109
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 30, y: 30, z: 30, w: 30}
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e530d6919cd8a1990800000000000000
-      internalID: -7414457941657582754
+      spriteID: 2b953c86496d104c0800000000000000
+      internalID: -4322938234397828686
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 56d27be254eaa1044848dc83288a64f2
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      right_objective_card_0: -7414457941657582754
+      Tent_1_Shadow_V1_0: -4322938234397828686
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

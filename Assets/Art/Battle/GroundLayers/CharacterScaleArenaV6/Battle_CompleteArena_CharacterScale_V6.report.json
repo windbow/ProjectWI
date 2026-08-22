@@ -1,0 +1,48 @@
+{
+  "source": "C:\\Fork\\ProjectWI\\Assets\\Art\\Battle\\GroundLayers\\CharacterScaleArenaV6\\Source\\Battle_CompleteArena_CharacterScale_V6_ImageGen.png",
+  "master": {
+    "path": "C:\\Fork\\ProjectWI\\Assets\\Art\\Battle\\GroundLayers\\CharacterScaleArenaV6\\Battle_CompleteArena_CharacterScale_V6_4K.png",
+    "size": [
+      3840,
+      2160
+    ],
+    "sha256": "9352eaeb7eb052a38ba5d9025cd7d1a201081fe56695349219fa434d87c0fc70"
+  },
+  "chunks": [
+    {
+      "path": "C:\\Fork\\ProjectWI\\Assets\\Art\\Battle\\GroundLayers\\CharacterScaleArenaV6\\Battle_CompleteArena_CharacterScale_V6_TL.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "0b46d8ce33d777b8a052d72f6c74d1bb66f134914d2cbe8d45a5af57bc4970ad"
+    },
+    {
+      "path": "C:\\Fork\\ProjectWI\\Assets\\Art\\Battle\\GroundLayers\\CharacterScaleArenaV6\\Battle_CompleteArena_CharacterScale_V6_TR.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "f374f9a1fc2dc55c445937cdc4dd79f9d590dd7a36d2c8ae7b42862b5a712fa2"
+    },
+    {
+      "path": "C:\\Fork\\ProjectWI\\Assets\\Art\\Battle\\GroundLayers\\CharacterScaleArenaV6\\Battle_CompleteArena_CharacterScale_V6_BL.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "d813bb937ef16bfce023b2e50b85b3f0c088831dc3518b45733488c8505fa64e"
+    },
+    {
+      "path": "C:\\Fork\\ProjectWI\\Assets\\Art\\Battle\\GroundLayers\\CharacterScaleArenaV6\\Battle_CompleteArena_CharacterScale_V6_BR.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "45ca0e1c0227cafeed64a507f7e5c2596708d789bcf83aba95721785c4559b97"
+    }
+  ],
+  "reconstructionPixelPerfect": true,
+  "lighting": "neutral-daylight-baked-static-shadows",
+  "layout": "baked-fortress-tents-watchtowers-barricades-open-center"
+}
