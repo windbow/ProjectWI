@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9fdac97fdd453144abfb264b254c14d6
+guid: ded92cfd2f697c547b5f74034df10ce7
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8193468194193299224
-    second: button_flat_normal_0
+      213: 3075669483568185795
+    second: administration_modal_shell_v1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,13 +46,13 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 8, y: 8, z: 8, w: 8}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: button_flat_normal_0
+      name: administration_modal_shell_v1_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 768
-        height: 128
+        width: 1448
+        height: 1086
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8e8a5a69614fa4e80800000000000000
-      internalID: -8193468194193299224
+      spriteID: 3c147968919feaa20800000000000000
+      internalID: 3075669483568185795
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      button_flat_normal_0: -8193468194193299224
+      administration_modal_shell_v1_0: 3075669483568185795
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

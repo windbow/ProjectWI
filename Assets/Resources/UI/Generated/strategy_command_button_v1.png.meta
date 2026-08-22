@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 9fdac97fdd453144abfb264b254c14d6
+guid: 6f4f762c4c916f048a5bfc5761838d13
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8193468194193299224
-    second: button_flat_normal_0
+      213: 8010574803436508067
+    second: strategy_command_button_v1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -52,7 +52,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 8, y: 8, z: 8, w: 8}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: button_flat_normal_0
+      name: strategy_command_button_v1_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 48
         y: 0
-        width: 768
-        height: 128
+        width: 2121
+        height: 644
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8e8a5a69614fa4e80800000000000000
-      internalID: -8193468194193299224
+      spriteID: 3a3178587574b2f60800000000000000
+      internalID: 8010574803436508067
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      button_flat_normal_0: -8193468194193299224
+      strategy_command_button_v1_0: 8010574803436508067
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
