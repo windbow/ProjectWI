@@ -12,6 +12,8 @@ namespace ProjectWI.Administration
         [SerializeField] private GameObject modalRoot;
         [SerializeField] private TMP_Text titleLabel;
         [SerializeField] private Button closeButton;
+        private Canvas rootCanvas;
+        private GraphicRaycaster rootRaycaster;
 
         public event Action Closed;
 
@@ -31,8 +33,11 @@ namespace ProjectWI.Administration
         // 공통 닫기 버튼을 연결하고 초기에는 모달을 숨깁니다.
         private void Awake()
         {
+            rootCanvas = GetComponent<Canvas>();
+            rootRaycaster = GetComponent<GraphicRaycaster>();
             closeButton.onClick.AddListener(Hide);
             modalRoot.SetActive(false);
+            SetCanvasVisible(false);
         }
 
         // 활성 모달 목록에 이 프리팹의 공통 모달을 등록합니다.
@@ -51,6 +56,7 @@ namespace ProjectWI.Administration
         public void Show(string title)
         {
             titleLabel.text = title;
+            SetCanvasVisible(true);
             modalRoot.SetActive(true);
         }
 
@@ -64,7 +70,21 @@ namespace ProjectWI.Administration
         public void Hide()
         {
             modalRoot.SetActive(false);
+            SetCanvasVisible(false);
             Closed?.Invoke();
+        }
+
+        // 숨긴 모달의 전체 화면 Canvas가 Scene 선택과 런타임 입력을 가로막지 않도록 표시 상태를 동기화합니다.
+        private void SetCanvasVisible(bool visible)
+        {
+            if (rootCanvas != null)
+            {
+                rootCanvas.enabled = visible;
+            }
+            if (rootRaycaster != null)
+            {
+                rootRaycaster.enabled = visible;
+            }
         }
 
         // 가장 높은 Canvas 순서로 표시 중인 모달을 닫습니다.

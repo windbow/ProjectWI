@@ -2450,6 +2450,33 @@ namespace ProjectWI.Tests.Editor
             Object.DestroyImmediate(cameraObject);
         }
 
+        // 30 대 30 전투에서는 카메라가 최대 배율로 자동 줌아웃되고 Home 복원 시 같은 시점을 유지하는지 검증합니다.
+        [Test]
+        public void BattleCamera_SixtyCombatantsUseMaximumZoomOut()
+        {
+            WIBattleConfigSO config = AssetDatabase.LoadAssetAtPath<WIBattleConfigSO>(BattleConfigPath);
+            GameObject cameraObject = new GameObject("BattleCameraSixtyTest");
+            Camera camera = cameraObject.AddComponent<Camera>();
+            camera.aspect = 16f / 9f;
+            WIBattleCameraController controller = cameraObject.AddComponent<WIBattleCameraController>();
+            controller.Initialize(config);
+            List<WIBattleCharacterState> characters = new List<WIBattleCharacterState>();
+            for (int index = 0; index < 60; index++)
+            {
+                characters.Add(new WIBattleCharacterState
+                {
+                    Position = new Vector2(index < 30 ? -6f : 6f, (index % 15 - 7) * 0.8f)
+                });
+            }
+
+            controller.FrameCombatants(characters);
+            Assert.AreEqual(config.CameraMaximumZoom, camera.orthographicSize, 0.001f);
+            controller.Zoom(-100f);
+            controller.ResetView();
+            Assert.AreEqual(config.CameraMaximumZoom, camera.orthographicSize, 0.001f);
+            Object.DestroyImmediate(cameraObject);
+        }
+
         // 20·40·60명 장시간 교전이 시간 목표 안에서 끝나고 임시 상태가 무한 증가하지 않는지 검증합니다.
         [TestCase(20)]
         [TestCase(40)]

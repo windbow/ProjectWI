@@ -11,6 +11,7 @@ namespace ProjectWI.Administration
         [SerializeField] private Image[] castleMarkers;
         [SerializeField] private TMP_Text[] castleLabels;
         [SerializeField] private string[] castleIds;
+        [SerializeField] private WIAdministrationMapConnectionGraphic connectionGraphic;
         [SerializeField] private Sprite avalonMarker;
         [SerializeField] private Sprite valdorMarker;
         [SerializeField] private Sprite ironheartMarker;
@@ -68,15 +69,24 @@ namespace ProjectWI.Administration
             }
 
             int count = Mathf.Min(castleButtons.Length, snapshot.MapNodes.Count);
+            if (connectionGraphic != null)
+            {
+                connectionGraphic.SetConnections(snapshot.MapConnections);
+            }
             for (int index = 0; index < count; index += 1)
             {
                 WIAdministrationMapNodeSnapshot node = snapshot.MapNodes[index];
                 castleLabels[index].text = node.DisplayName;
                 castleMarkers[index].sprite = ResolveMarker(node.FactionId);
                 castleMarkers[index].color = node.Selected ? selectedColor : normalColor;
-                castleButtons[index].image.color = node.Selected
-                    ? new Color32(255, 214, 84, 42)
-                    : Color.clear;
+                castleMarkers[index].rectTransform.localScale = node.Selected
+                    ? new Vector3(1.65f, 1.65f, 1f)
+                    : Vector3.one;
+                castleLabels[index].fontSize = node.Selected ? 15f : 12f;
+                castleLabels[index].color = node.Selected
+                    ? new Color32(255, 255, 255, 255)
+                    : new Color32(232, 236, 238, 255);
+                castleButtons[index].image.color = Color.clear;
             }
         }
 

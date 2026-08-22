@@ -23,6 +23,10 @@ namespace ProjectWI.Administration
 
         private readonly List<WICampaignDifficultyDefinition> difficultyDefinitions = new List<WICampaignDifficultyDefinition>();
         private readonly List<WICampaignVariantDefinition> variantDefinitions = new List<WICampaignVariantDefinition>();
+        // 선택되지 않은 카드에 사용하는 일반 버튼 배경입니다.
+        private Sprite normalCardSprite;
+        // 선택된 카드에 사용하는 주요 버튼 배경입니다.
+        private Sprite selectedCardSprite;
         private WICampaignDifficulty selectedDifficulty = WICampaignDifficulty.Standard;
         private WICampaignVariant selectedVariant = WICampaignVariant.Classic;
 
@@ -66,6 +70,8 @@ namespace ProjectWI.Administration
             BindVariantCards();
             newCampaignButton.onClick.AddListener(StartNewCampaign);
             continueCampaignButton.onClick.AddListener(ContinueCampaign);
+            normalCardSprite = continueCampaignButton.image.sprite;
+            selectedCardSprite = newCampaignButton.image.sprite;
 
             WICampaignRuntimeService service = WICampaignRuntimeService.Instance;
             continueCampaignButton.interactable = service != null && service.HasSave(0);
@@ -139,7 +145,8 @@ namespace ProjectWI.Administration
         // 선택 여부에 맞춰 카드 배경과 글자색을 적용합니다.
         private void ApplyCardState(Button button, TMP_Text label, bool selected)
         {
-            button.image.color = selected ? selectedCardColor : normalCardColor;
+            button.image.sprite = selected ? selectedCardSprite : normalCardSprite;
+            button.image.color = Color.white;
             label.color = selected ? selectedTextColor : normalTextColor;
         }
 

@@ -10,8 +10,10 @@ namespace ProjectWI.Administration
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text descriptionLabel;
         [SerializeField] private TMP_Text messageLabel;
+        [SerializeField] private GameObject tutorialContent;
         [SerializeField] private Button[] choiceButtons;
         [SerializeField] private TMP_Text[] choiceLabels;
+        [SerializeField] private TMP_Text[] choiceDescriptionLabels;
 
         // 고정 선택 카드에 턴 후속 처리 함수를 연결합니다.
         private void Awake()
@@ -47,13 +49,25 @@ namespace ProjectWI.Administration
             if (administrationController.TryGetUGUITurnFollowupSnapshot(out WIAdministrationTurnFollowupSnapshot snapshot) == false) return;
             modal.Show(snapshot.Title);
             descriptionLabel.text = snapshot.Description;
+            tutorialContent.SetActive(snapshot.Mode == WIAdministrationTurnFollowupMode.Tutorial);
             messageLabel.gameObject.SetActive(snapshot.Mode == WIAdministrationTurnFollowupMode.Processing);
             messageLabel.text = snapshot.Mode == WIAdministrationTurnFollowupMode.Processing ? "월간 결과를 계산하고 있습니다." : string.Empty;
             for (int index = 0; index < choiceButtons.Length; index += 1)
             {
                 bool visible = index < snapshot.Choices.Count;
                 choiceButtons[index].gameObject.SetActive(visible);
-                if (visible) choiceLabels[index].text = snapshot.Choices[index];
+                if (visible)
+                {
+                    string choice = snapshot.Choices[index];
+                    int lineBreak = choice.IndexOf('\n');
+                    choiceLabels[index].text = lineBreak >= 0 ? choice[..lineBreak] : choice;
+                    choiceDescriptionLabels[index].text = lineBreak >= 0 ? choice[(lineBreak + 1)..] : string.Empty;
+                    choiceDescriptionLabels[index].gameObject.SetActive(lineBreak >= 0);
+                }
+                else
+                {
+                    choiceDescriptionLabels[index].gameObject.SetActive(false);
+                }
             }
         }
 

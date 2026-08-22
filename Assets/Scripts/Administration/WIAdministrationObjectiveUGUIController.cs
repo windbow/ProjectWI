@@ -11,6 +11,10 @@ namespace ProjectWI.Administration
         [SerializeField] private TMP_Text situationLabel;
         [SerializeField] private TMP_Text descriptionLabel;
         [SerializeField] private TMP_Text progressLabel;
+        [SerializeField] private TMP_Text rewardGoldLabel;
+        [SerializeField] private TMP_Text rewardManaLabel;
+        [SerializeField] private TMP_Text rewardInfluenceLabel;
+        [SerializeField] private Image progressFill;
         [SerializeField] private Button confirmButton;
 
         // 목표 확인 버튼을 공통 모달 닫기에 연결합니다.
@@ -57,6 +61,10 @@ namespace ProjectWI.Administration
             situationLabel.text = snapshot.Situation;
             descriptionLabel.text = snapshot.Description;
             progressLabel.text = snapshot.Progress;
+            rewardGoldLabel.text = snapshot.RewardGold;
+            rewardManaLabel.text = snapshot.RewardMana;
+            rewardInfluenceLabel.text = snapshot.RewardInfluence;
+            progressFill.fillAmount = snapshot.ProgressNormalized;
         }
     }
 }

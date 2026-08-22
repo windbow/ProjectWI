@@ -58,12 +58,13 @@ namespace ProjectWI.Tests.Editor
         public void ObjectiveModal_LongCopyUsesWrappingStyle()
         {
             string stylesheet = System.IO.File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
-            string controller = ReadAdministrationController();
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/Administration/WIAdministrationObjectiveUGUI.prefab");
 
             StringAssert.Contains(".objective-modal-copy", stylesheet);
             StringAssert.Contains("white-space:normal", stylesheet);
-            StringAssert.Contains("AddToClassList(\"objective-modal-copy\")", controller);
-            StringAssert.Contains("AddToClassList(\"objective-modal-progress\")", controller);
+            Assert.That(prefab, Is.Not.Null);
+            Assert.That(prefab.GetComponent<WIAdministrationObjectiveUGUIController>(), Is.Not.Null);
         }
 
         // 모든 공통 모달의 일반 문구와 버튼이 폭 안에서 줄바꿈되는 기본 규칙을 검증합니다.
@@ -82,29 +83,29 @@ namespace ProjectWI.Tests.Editor
         public void CommonModal_LongContentUsesVerticalScrollView()
         {
             string stylesheet = System.IO.File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
-            string controller = ReadAdministrationController();
 
-            StringAssert.Contains("new ScrollView(ScrollViewMode.Vertical)", controller);
-            StringAssert.Contains("return scrollView.contentContainer", controller);
             StringAssert.Contains(".modal-scroll-view", stylesheet);
             StringAssert.Contains("max-height:88%", stylesheet);
             StringAssert.Contains("overflow:hidden", stylesheet);
         }
 
-        // 월간 보고 본문과 전투 행동 영역이 서로 다른 스크롤 영역으로 분리되는지 검증합니다.
+        // 월간 보고 UGUI가 스크롤 본문과 고정 행동 슬롯을 프리팹에 보유하는지 검증합니다.
         [Test]
         public void MonthlyReport_BattleActionsUseFixedFooter()
         {
-            string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
-            string controller = ReadAdministrationController();
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/Administration/WIAdministrationMonthlyReportUGUI.prefab");
+            WIAdministrationMonthlyReportUGUIController controller =
+                prefab.GetComponent<WIAdministrationMonthlyReportUGUIController>();
+            SerializedObject serialized = new SerializedObject(controller);
 
-            StringAssert.Contains("CreateModalWithFooter", controller);
-            StringAssert.Contains("AddPendingBattleActions(battleFooter)", controller);
-            StringAssert.Contains("modal-fixed-footer", stylesheet);
-            StringAssert.Contains("전투 해결 필요", controller);
+            Assert.That(prefab, Is.Not.Null);
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(serialized.FindProperty("scrollRect").objectReferenceValue, Is.Not.Null);
+            Assert.That(serialized.FindProperty("actionButtons").arraySize, Is.EqualTo(6));
         }
 
-        // 전투 장면이 좁은 포인트 광원 대신 전장 전체를 비추는 글로벌 2D 광원을 사용하는지 검증합니다.
+        // 전투 장면이 중립 글로벌 광원과 약한 전장 강조광을 함께 사용하는지 검증합니다.
         [Test]
         public void BattleScene_UsesGlobalLightForFullVisibility()
         {
@@ -112,7 +113,10 @@ namespace ProjectWI.Tests.Editor
 
             StringAssert.Contains("m_Name: Global Light 2D", battleScene);
             StringAssert.Contains("m_LightType: 4", battleScene);
-            StringAssert.Contains("m_Intensity: 1.1", battleScene);
+            StringAssert.Contains("m_Intensity: 0.92", battleScene);
+            StringAssert.Contains("m_UseNormalMap: 1", battleScene);
+            StringAssert.Contains("m_Name: Arena Key Light 2D", battleScene);
+            StringAssert.Contains("m_Name: Arena Fill Light 2D", battleScene);
             StringAssert.Contains("m_ShadowsEnabled: 0", battleScene);
         }
 
@@ -272,7 +276,10 @@ namespace ProjectWI.Tests.Editor
         {
             string layout = ReadAdministrationLayout();
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
-            string controller = ReadAdministrationController();
+            GameObject worldPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/Administration/WIAdministrationWorldUGUI.prefab");
+            GameObject territoryPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/Administration/WIAdministrationTerritoryUGUI.prefab");
 
             StringAssert.Contains("global-castle-hero-cards", layout);
             StringAssert.Contains("objective-progress-fill", layout);
@@ -280,8 +287,8 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains(".castle-node-avalon .castle-node-marker", stylesheet);
             StringAssert.Contains("UI/Generated/map_castle_necropolis.png", stylesheet);
             StringAssert.Contains(".castle-overview-panel .governor-full", stylesheet);
-            StringAssert.Contains("ApplyMapNodeFactionClass(node, castleState.FactionId)", controller);
-            StringAssert.Contains("RefreshGlobalHeroCards(castle)", controller);
+            Assert.That(worldPrefab.GetComponent<WIAdministrationWorldUGUIController>(), Is.Not.Null);
+            Assert.That(territoryPrefab.GetComponent<WIAdministrationTerritoryUGUIController>(), Is.Not.Null);
         }
 
         // 시안형 명조·고딕 폰트와 평면 버튼·명령 아이콘이 UXML/USS에 직접 연결되는지 검증합니다.
@@ -508,15 +515,19 @@ namespace ProjectWI.Tests.Editor
         {
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
             string overlay = File.ReadAllText("Assets/UI/Administration/Views/WIAdministrationOverlays.uxml");
-            string controller = File.ReadAllText("Assets/Scripts/Administration/WIAdministrationUIController.Campaign.cs");
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/Administration/WICampaignTitleUGUI.prefab");
+            WICampaignTitleUGUIController controller = prefab.GetComponent<WICampaignTitleUGUIController>();
+            SerializedObject serialized = new SerializedObject(controller);
 
             StringAssert.Contains(".campaign-start-panel { width:940px; min-height:650px", stylesheet);
             StringAssert.Contains(".campaign-description { margin:50px 30px 14px", stylesheet);
             StringAssert.Contains(".difficulty-note { margin-top:6px; margin-bottom:10px", stylesheet);
             StringAssert.Contains("left: 64px; right: 64px", overlay);
             StringAssert.Contains("name=\"Label_Desc\"", overlay);
-            StringAssert.Contains("FormatCampaignCardDescription", controller);
-            StringAssert.Contains("Replace(\". \", \".\\n\")", controller);
+            Assert.That(controller, Is.Not.Null);
+            Assert.That(serialized.FindProperty("difficultyButtons").arraySize, Is.EqualTo(3));
+            Assert.That(serialized.FindProperty("variantButtons").arraySize, Is.EqualTo(3));
         }
     }
 }

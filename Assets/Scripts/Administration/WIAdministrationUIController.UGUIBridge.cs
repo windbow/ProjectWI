@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using ProjectWI.Systems;
 
@@ -57,11 +58,11 @@ namespace ProjectWI.Administration
                 CampaignStarted = WICampaignRuntimeService.Instance != null && WICampaignRuntimeService.Instance.HasCampaignStarted,
                 WorldVisible = uguiWorldVisible && uguiSuspendedForLegacyModal == false,
                 FactionName = playerFaction == null ? database.GetText("UI_GAME_TITLE") : playerFaction.DisplayName.Get(database.UseEnglish),
-                Date = $"{state.Year}년 {state.Month:00}월 · 제 {state.Turn}턴",
+                Date = $"{state.Year}년 {state.Month:00}월",
                 TurnDescription = $"진영 방침: {GetFactionPolicyDisplayName(state.FactionPolicy)} · {state.Month:00}월 명령을 검토하십시오.",
-                Gold = $"금화  {FormatHudNumber(state.Gold, database.UseEnglish)}  (+{FormatHudNumber(forecast.GoldGained, database.UseEnglish)})",
-                Mana = $"마나  {FormatHudNumber(state.ManaCrystal, database.UseEnglish)}  (+{FormatHudNumber(forecast.ManaGained, database.UseEnglish)})",
-                Influence = $"영향력  {FormatHudNumber(state.Influence, database.UseEnglish)}  (+{FormatHudNumber(forecast.InfluenceGained, database.UseEnglish)})",
+                Gold = $"금화  {FormatHudNumber(state.Gold, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.GoldGained, database.UseEnglish)}/월)</color></size>",
+                Mana = $"마나  {FormatHudNumber(state.ManaCrystal, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.ManaGained, database.UseEnglish)}/월)</color></size>",
+                Influence = $"영향력  {FormatHudNumber(state.Influence, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.InfluenceGained, database.UseEnglish)}/월)</color></size>",
                 CastleName = castleDefinition?.DisplayName.Get(database.UseEnglish) ?? castle?.CastleId ?? string.Empty,
                 CastleOwner = castle == null ? string.Empty : $"{castle.CastleSize} · {castleOwner?.DisplayName.Get(database.UseEnglish) ?? castle.FactionId}",
                 CastleStats = castle == null ? string.Empty : $"번영 {castle.Prosperity}  ·  기술 {castle.Technology}\n질서 {castle.Stability}  ·  방어 {castle.Defense}",
@@ -77,8 +78,29 @@ namespace ProjectWI.Administration
                 HasBattleAlert = unresolvedBattleCount > 0 || state.LastMonthlyReport != null,
                 MonthlyNews = string.IsNullOrEmpty(latestNews) ? "새로운 월간 보고가 없습니다." : $"최근 소식\n{latestNews}",
                 CanEndTurn = unresolvedBattleCount == 0,
-                EndTurnText = unresolvedBattleCount == 0 ? "다음 턴  T" : $"전투 해결 필요 · {unresolvedBattleCount}건"
+                EndTurnText = unresolvedBattleCount == 0 ? "다음 턴" : $"전투 해결 필요 · {unresolvedBattleCount}건"
             };
+            if (castle != null)
+            {
+                WIHeroDefinition governor = database.GetHero(castle.GovernorHeroId);
+                snapshot.CastleDetailRows.Add($"영지관                         {governor?.DisplayName.Get(database.UseEnglish) ?? "미배치"}");
+                snapshot.CastleDetailRows.Add($"번영                                      {castle.Prosperity}");
+                snapshot.CastleDetailRows.Add($"기술                                      {castle.Technology}");
+                snapshot.CastleDetailRows.Add($"질서                                      {castle.Stability}");
+                snapshot.CastleDetailRows.Add($"방어                                {castle.Defense}/100");
+                snapshot.CastleDetailRows.Add($"주둔 전투단                            {armyCount}개");
+                foreach (string heroId in castle.HeroIds.Take(4))
+                {
+                    WIHeroDefinition hero = database.GetHero(heroId);
+                    WICharacterRuntimeState character = state.GetCharacter(heroId);
+                    snapshot.CastleHeroCards.Add(new WIAdministrationWorldHeroSnapshot
+                    {
+                        DisplayName = hero?.DisplayName.Get(database.UseEnglish) ?? heroId,
+                        LevelText = $"Lv.{1 + (character?.Experience ?? 0) / 100}",
+                        Portrait = hero?.Portrait
+                    });
+                }
+            }
             foreach (WICastleDefinition definition in database.Castles)
             {
                 WICastleRuntimeState castleState = state.GetCastle(definition.Id);
@@ -91,6 +113,51 @@ namespace ProjectWI.Administration
                     Selected = selectedCastle != null && selectedCastle.CastleId == definition.Id,
                     Tooltip = $"{owner?.DisplayName.Get(database.UseEnglish) ?? castleState?.FactionId}\n{definition.DisplayName.Get(database.UseEnglish)}"
                 });
+            }
+            HashSet<string> visitedConnections = new HashSet<string>();
+            foreach (WICastleDefinition definition in database.Castles)
+            {
+                WICastleRuntimeState originState = state.GetCastle(definition.Id);
+                foreach (string adjacentId in definition.AdjacentCastleIds)
+                {
+                    string connectionId = string.CompareOrdinal(definition.Id, adjacentId) < 0
+                        ? $"{definition.Id}|{adjacentId}"
+                        : $"{adjacentId}|{definition.Id}";
+                    if (visitedConnections.Add(connectionId) == false)
+                    {
+                        continue;
+                    }
+
+                    WICastleDefinition adjacent = database.GetCastle(adjacentId);
+                    WICastleRuntimeState adjacentState = state.GetCastle(adjacentId);
+                    if (originState == null || adjacent == null || adjacentState == null)
+                    {
+                        continue;
+                    }
+
+                    bool frontline = originState.FactionId != adjacentState.FactionId;
+                    bool selectedRoute = selectedCastle != null &&
+                        (selectedCastle.CastleId == definition.Id || selectedCastle.CastleId == adjacentId);
+                    WIFactionDefinition owner = database.GetFaction(originState.FactionId);
+                    UnityEngine.Color ownerColor = owner?.Color ?? UnityEngine.Color.gray;
+                    UnityEngine.Color32 routeColor = selectedRoute
+                        ? new UnityEngine.Color32(184, 226, 255, 245)
+                        : frontline
+                            ? new UnityEngine.Color32(190, 58, 52, 165)
+                            : new UnityEngine.Color32(
+                                (byte)(ownerColor.r * 170f), (byte)(ownerColor.g * 170f),
+                                (byte)(ownerColor.b * 170f), 92);
+                    snapshot.MapConnections.Add(new WIAdministrationMapConnectionSnapshot
+                    {
+                        Start = new UnityEngine.Vector2(definition.NormalizedMapPosition.x,
+                            1f - definition.NormalizedMapPosition.y),
+                        End = new UnityEngine.Vector2(adjacent.NormalizedMapPosition.x,
+                            1f - adjacent.NormalizedMapPosition.y),
+                        Color = routeColor,
+                        Frontline = frontline,
+                        Selected = selectedRoute
+                    });
+                }
             }
             return true;
         }
@@ -106,6 +173,8 @@ namespace ProjectWI.Administration
 
             WICastleDefinition definition = database.GetCastle(selectedCastle.CastleId);
             WIFactionDefinition owner = database.GetFaction(selectedCastle.FactionId);
+            WIFactionDefinition playerFaction = database.Factions.FirstOrDefault(faction => faction.PlayerFaction == true);
+            WITurnSummary forecast = WIAdministrationTurnSystem.GetFactionMonthlyIncome(database, state, state.PlayerFactionId);
             bool manageable = WIAdministrationTurnSystem.CanPlayerManageCastle(state, selectedCastle);
             bool detailed = WIInformationVisibility.CanViewCastleDetails(state, state.PlayerFactionId, selectedCastle);
             WIHeroDefinition governor = detailed ? database.GetHero(selectedCastle.GovernorHeroId) : null;
@@ -116,16 +185,25 @@ namespace ProjectWI.Administration
                 Visible = uguiWorldVisible == false && uguiSuspendedForLegacyModal == false,
                 Manageable = manageable,
                 CanChooseSpecialFacility = manageable && selectedCastle.PendingSpecialFacilityChoice,
+                FactionName = playerFaction == null ? database.GetText("UI_GAME_TITLE") : playerFaction.DisplayName.Get(database.UseEnglish),
+                Date = $"{state.Year}년 {state.Month:00}월",
+                Gold = $"금화  {FormatHudNumber(state.Gold, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.GoldGained, database.UseEnglish)}/월)</color></size>",
+                Mana = $"마나  {FormatHudNumber(state.ManaCrystal, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.ManaGained, database.UseEnglish)}/월)</color></size>",
+                Influence = $"영향력  {FormatHudNumber(state.Influence, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.InfluenceGained, database.UseEnglish)}/월)</color></size>",
                 CastleTitle = definition?.DisplayName.Get(database.UseEnglish) ?? selectedCastle.CastleId,
                 CastleInfo = detailed
                     ? $"{ownerName} · {selectedCastle.CastleSize} · {definition?.TerrainTrait.Get(database.UseEnglish)} · 인물 {selectedCastle.HeroIds.Count}/{selectedCastle.GetHeroSlotCount()}"
                     : $"{ownerName} 소유 · 상세 정보 미확보",
                 CastleImage = definition?.CastleImage,
                 GovernorPortrait = governor?.Portrait,
+                GovernorName = governor == null ? "영지관 미배치" : governor.DisplayName.Get(database.UseEnglish),
                 Prosperity = detailed ? $"번영 {selectedCastle.Prosperity} · {GetCastleStatusName(selectedCastle.Prosperity)}" : "번영 ??",
                 Technology = detailed ? $"기술 {selectedCastle.Technology} · {GetCastleStatusName(selectedCastle.Technology)}" : "기술 ??",
                 Stability = detailed ? $"질서 {selectedCastle.Stability} · {GetCastleStatusName(selectedCastle.Stability)}" : "질서 ??",
                 Defense = detailed ? $"방어 {selectedCastle.Defense} · {GetCastleStatusName(selectedCastle.Defense)}" : "방어 ??",
+                Income = detailed
+                    ? $"금화 {forecast.GoldGained}  ·  마나 {forecast.ManaGained}  ·  영향력 {forecast.InfluenceGained}"
+                    : "수입 정보 미확보",
                 ProjectStatus = detailed
                     ? selectedCastle.DelegatedToGovernor && selectedCastle.ActiveProject == null
                         ? $"영지관 위임 · {GetGovernorPolicyDisplayName(selectedCastle.GovernorPolicy)} · 월 {selectedCastle.GovernorMonthlyBudget}G"
@@ -925,7 +1003,11 @@ namespace ProjectWI.Administration
                 Title = objective.Title.Get(database.UseEnglish),
                 Situation = objective.Situation.Get(database.UseEnglish),
                 Description = objective.Description.Get(database.UseEnglish),
-                Progress = $"진행 {progress}/{objective.TargetValue} · 보상 G {objective.RewardGold} / M {objective.RewardMana} / I {objective.RewardInfluence}"
+                Progress = $"{progress} / {objective.TargetValue}",
+                RewardGold = $"G {objective.RewardGold}",
+                RewardMana = $"M {objective.RewardMana}",
+                RewardInfluence = $"I {objective.RewardInfluence}",
+                ProgressNormalized = objective.TargetValue <= 0 ? 0f : UnityEngine.Mathf.Clamp01((float)progress / objective.TargetValue)
             };
             return true;
         }

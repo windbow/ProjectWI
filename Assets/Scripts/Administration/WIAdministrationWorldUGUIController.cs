@@ -17,8 +17,9 @@ namespace ProjectWI.Administration
         [SerializeField] private TMP_Text influenceLabel;
         [SerializeField] private TMP_Text castleNameLabel;
         [SerializeField] private TMP_Text castleOwnerLabel;
-        [SerializeField] private TMP_Text castleStatsLabel;
-        [SerializeField] private TMP_Text castleHeroesLabel;
+        [SerializeField] private TMP_Text[] castleDetailRows;
+        [SerializeField] private Image[] castleHeroPortraits;
+        [SerializeField] private TMP_Text[] castleHeroLabels;
         [SerializeField] private Image mapImage;
         [SerializeField] private Image castleImage;
         [SerializeField] private TMP_Text objectiveTitleLabel;
@@ -28,16 +29,21 @@ namespace ProjectWI.Administration
         [SerializeField] private Button battleAlertButton;
         [SerializeField] private TMP_Text monthlyNewsLabel;
         [SerializeField] private Button castleManageButton;
+        [SerializeField] private Button castleRecordButton;
         [SerializeField] private Button objectiveButton;
         [SerializeField] private Button[] commandButtons;
         [SerializeField] private WIAdministrationShortcutAction[] commandActions;
         [SerializeField] private Button endTurnButton;
         [SerializeField] private TMP_Text endTurnLabel;
         [SerializeField] private Button systemButton;
+        private Canvas rootCanvas;
+        private GraphicRaycaster rootRaycaster;
 
         // 고정 배치된 UGUI 월드 화면을 기존 게임 기능과 연결합니다.
         private void Awake()
         {
+            rootCanvas = GetComponent<Canvas>();
+            rootRaycaster = GetComponent<GraphicRaycaster>();
             if (administrationController == null)
             {
                 administrationController = FindFirstObjectByType<WIAdministrationUIController>();
@@ -51,6 +57,7 @@ namespace ProjectWI.Administration
             }
 
             castleManageButton.onClick.AddListener(administrationController.OpenUGUIGlobalSummaryCastle);
+            castleRecordButton.onClick.AddListener(administrationController.OpenUGUIGlobalSummaryCastle);
             objectiveButton.onClick.AddListener(administrationController.OpenUGUIObjective);
             battleAlertButton.onClick.AddListener(administrationController.OpenUGUIBattleAlert);
             endTurnButton.onClick.AddListener(() => administrationController.ExecuteUGUIShortcut(WIAdministrationShortcutAction.EndTurn));
@@ -117,11 +124,14 @@ namespace ProjectWI.Administration
             if (administrationController.TryGetUGUIWorldSnapshot(out WIAdministrationWorldSnapshot snapshot) == false)
             {
                 contentRoot.SetActive(false);
+                SetCanvasVisible(false);
                 return;
             }
 
-            contentRoot.SetActive(snapshot.CampaignStarted && snapshot.WorldVisible);
-            if (snapshot.CampaignStarted == false || snapshot.WorldVisible == false)
+            bool visible = snapshot.CampaignStarted && snapshot.WorldVisible;
+            contentRoot.SetActive(visible);
+            SetCanvasVisible(visible);
+            if (visible == false)
             {
                 return;
             }
@@ -134,8 +144,13 @@ namespace ProjectWI.Administration
             influenceLabel.text = snapshot.Influence;
             castleNameLabel.text = snapshot.CastleName;
             castleOwnerLabel.text = snapshot.CastleOwner;
-            castleStatsLabel.text = snapshot.CastleStats;
-            castleHeroesLabel.text = snapshot.CastleHeroes;
+            for (int index = 0; index < castleDetailRows.Length; index += 1)
+            {
+                castleDetailRows[index].text = index < snapshot.CastleDetailRows.Count
+                    ? snapshot.CastleDetailRows[index]
+                    : string.Empty;
+            }
+            RefreshCastleHeroCards(snapshot);
             mapImage.sprite = snapshot.MapImage;
             mapImage.enabled = snapshot.MapImage != null;
             castleImage.sprite = snapshot.CastleImage;
@@ -148,6 +163,33 @@ namespace ProjectWI.Administration
             monthlyNewsLabel.text = snapshot.MonthlyNews;
             endTurnButton.interactable = snapshot.CanEndTurn;
             endTurnLabel.text = snapshot.EndTurnText;
+        }
+
+        // 선택 성에 주둔한 최대 네 명의 영웅 초상과 이름을 카드에 반영합니다.
+        private void RefreshCastleHeroCards(WIAdministrationWorldSnapshot snapshot)
+        {
+            int count = Mathf.Min(castleHeroPortraits.Length, castleHeroLabels.Length);
+            for (int index = 0; index < count; index += 1)
+            {
+                bool occupied = index < snapshot.CastleHeroCards.Count;
+                WIAdministrationWorldHeroSnapshot hero = occupied ? snapshot.CastleHeroCards[index] : null;
+                castleHeroPortraits[index].sprite = hero?.Portrait;
+                castleHeroPortraits[index].enabled = occupied && hero?.Portrait != null;
+                castleHeroLabels[index].text = occupied ? $"{hero.LevelText}\n{hero.DisplayName}" : string.Empty;
+            }
+        }
+
+        // 월드 화면이 숨겨진 동안 Canvas와 입력 레이캐스터가 다른 화면 선택을 가로막지 않게 합니다.
+        private void SetCanvasVisible(bool visible)
+        {
+            if (rootCanvas != null)
+            {
+                rootCanvas.enabled = visible;
+            }
+            if (rootRaycaster != null)
+            {
+                rootRaycaster.enabled = visible;
+            }
         }
     }
 }

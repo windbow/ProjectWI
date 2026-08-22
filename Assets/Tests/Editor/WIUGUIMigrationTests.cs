@@ -31,8 +31,44 @@ namespace ProjectWI.Tests.Editor
         private const string CouncilPrefabPath = "Assets/Prefabs/Administration/WIAdministrationCouncilUGUI.prefab";
         private const string EventChoicePrefabPath = "Assets/Prefabs/Administration/WIAdministrationEventChoiceUGUI.prefab";
         private const string TurnFollowupPrefabPath = "Assets/Prefabs/Administration/WIAdministrationTurnFollowupUGUI.prefab";
+        private const string TurnFollowupInfoPanelPath = "Assets/Resources/UI/Generated/turn_followup_info_panel_v1.png";
         private const string SystemPrefabPath = "Assets/Prefabs/Administration/WIAdministrationSystemUGUI.prefab";
         private const string AdministrationRuntimePrefabPath = "Assets/Prefabs/Administration/WIAdministrationUI.prefab";
+        private const string AdministrationDatabasePath = "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset";
+
+        // 아레스의 얼굴 초상화와 전투 전신 Sprite가 올바른 원본 에셋을 사용하는지 확인합니다.
+        [Test]
+        public void AresUsesFacePortraitAndBattleSprite()
+        {
+            ProjectWI.Administration.WIAdministrationDatabaseSO database =
+                AssetDatabase.LoadAssetAtPath<ProjectWI.Administration.WIAdministrationDatabaseSO>(AdministrationDatabasePath);
+            ProjectWI.Administration.WIHeroDefinition ares = database.GetHero("ares");
+
+            Assert.That(ares, Is.Not.Null);
+            Assert.That(ares.Portrait, Is.Not.Null);
+            Assert.That(ares.BattleSprite, Is.Not.Null);
+            Assert.That(AssetDatabase.GetAssetPath(ares.Portrait), Is.EqualTo("Assets/Art/Characters/Ares/Ares_Portrait_Face_V1.png"));
+            Assert.That(AssetDatabase.GetAssetPath(ares.BattleSprite), Is.EqualTo("Assets/Art/Characters/Ares/Ares_Battle_1WU_A_OutlineBake_V1.png"));
+            Assert.That(ares.BattleSprite.texture.format, Is.Not.EqualTo(TextureFormat.RGB24));
+        }
+
+        // 전투 인원 밀도 테스트를 위해 전체 캐릭터가 아레스 전투 Sprite를 공유하는지 확인합니다.
+        [Test]
+        public void AllCharactersUseAresBattleSpriteForBattleDensityTest()
+        {
+            ProjectWI.Administration.WIAdministrationDatabaseSO database =
+                AssetDatabase.LoadAssetAtPath<ProjectWI.Administration.WIAdministrationDatabaseSO>(AdministrationDatabasePath);
+
+            Assert.That(database.Heroes.Count, Is.EqualTo(500));
+            foreach (ProjectWI.Administration.WIHeroDefinition character in database.Heroes)
+            {
+                Assert.That(character.BattleSprite, Is.Not.Null, character.Id);
+                Assert.That(
+                    AssetDatabase.GetAssetPath(character.BattleSprite),
+                    Is.EqualTo("Assets/Art/Characters/Ares/Ares_Battle_1WU_A_OutlineBake_V1.png"),
+                    character.Id);
+            }
+        }
 
         // 캠페인 타이틀 프리팹이 레거시 Text 없이 Dynamic TMP 폰트만 사용하는지 확인합니다.
         [Test]
@@ -192,29 +228,96 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 등록된 완성 UGUI 프리팹이 부트스트랩 초기화에서 생성되는지 확인합니다.
+        // 성 상세 기록과 특화 시설 선택이 레거시 UI Toolkit 모달 진입점을 보유하지 않는지 확인합니다.
+        [Test]
+        public void AdministrationControllerContainsNoLegacyTerritoryModalEntryPoints()
+        {
+            System.Type controllerType = typeof(ProjectWI.Administration.WIAdministrationUIController);
+            System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance |
+                                                   System.Reflection.BindingFlags.NonPublic |
+                                                   System.Reflection.BindingFlags.Public;
+            string[] legacyMethods = { "OpenCastleRecordModal", "OpenSpecialFacilityModal" };
+
+            foreach (string method in legacyMethods)
+            {
+                Assert.That(controllerType.GetMethod(method, flags), Is.Null, $"레거시 영지 모달 메서드가 남아 있습니다: {method}");
+            }
+        }
+
+        // 턴 처리·전투 알림·캠페인 결과·튜토리얼이 레거시 UI Toolkit 화면 메서드를 보유하지 않는지 확인합니다.
+        [Test]
+        public void AdministrationControllerContainsNoLegacyTurnModalEntryPoints()
+        {
+            System.Type controllerType = typeof(ProjectWI.Administration.WIAdministrationUIController);
+            System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance |
+                                                   System.Reflection.BindingFlags.NonPublic |
+                                                   System.Reflection.BindingFlags.Public;
+            string[] legacyMethods =
+            {
+                "ExecuteTurnRoutine", "ShowTurnSummary", "AddPendingBattleActions",
+                "ShowCampaignResult", "AddCampaignResultContent", "ShowCurrentTutorial",
+                "AddPendingTutorial", "AddTutorialContent"
+            };
+
+            foreach (string method in legacyMethods)
+            {
+                Assert.That(controllerType.GetMethod(method, flags), Is.Null, $"레거시 턴 모달 메서드가 남아 있습니다: {method}");
+            }
+        }
+
+        // 행정 런타임 컨트롤러가 UI Toolkit 형식과 공통 동적 모달 생성 코드에 더 이상 의존하지 않는지 확인합니다.
+        [Test]
+        public void AdministrationRuntimeControllerContainsNoUIToolkitPresentationCode()
+        {
+            string[] controllerPaths =
+            {
+                "Assets/Scripts/Administration/WIAdministrationUIController.cs",
+                "Assets/Scripts/Administration/WIAdministrationUIController.World.cs",
+                "Assets/Scripts/Administration/WIAdministrationUIController.Territory.cs",
+                "Assets/Scripts/Administration/WIAdministrationUIController.Turn.cs"
+            };
+            string source = string.Empty;
+            foreach (string path in controllerPaths)
+            {
+                source += System.IO.File.ReadAllText(path);
+            }
+
+            StringAssert.DoesNotContain("UnityEngine.UIElements", source);
+            StringAssert.DoesNotContain("UIDocument", source);
+            StringAssert.DoesNotContain("VisualElement", source);
+            StringAssert.DoesNotContain("CreateModal", source);
+            StringAssert.DoesNotContain("LegacyToolkitPresentationEnabled", source);
+        }
+
+        // 등록된 완성 UGUI 프리팹이 활성 상태로 생성되어 자체 표시 초기화와 이벤트 구독을 수행하는지 확인합니다.
         [Test]
         public void ScreenBootstrapInstantiatesRegisteredPrefabs()
         {
             GameObject root = new GameObject("BootstrapTestRoot");
             GameObject first = new GameObject("FirstScreenPrefab");
             GameObject second = new GameObject("SecondScreenPrefab");
-            ProjectWI.Administration.WIAdministrationUGUIScreenBootstrap bootstrap =
-                root.AddComponent<ProjectWI.Administration.WIAdministrationUGUIScreenBootstrap>();
-            SerializedObject serialized = new SerializedObject(bootstrap);
+            GameObject firstChild = new GameObject("FirstScreenChild");
+            firstChild.transform.SetParent(first.transform);
+            ProjectWI.Administration.WIUIScreenManager screenManager =
+                root.AddComponent<ProjectWI.Administration.WIUIScreenManager>();
+            SerializedObject serialized = new SerializedObject(screenManager);
             SerializedProperty screens = serialized.FindProperty("screenPrefabs");
             screens.arraySize = 2;
             screens.GetArrayElementAtIndex(0).objectReferenceValue = first;
             screens.GetArrayElementAtIndex(1).objectReferenceValue = second;
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
-            typeof(ProjectWI.Administration.WIAdministrationUGUIScreenBootstrap)
+            typeof(ProjectWI.Administration.WIUIScreenManager)
                 .GetMethod("Awake", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                ?.Invoke(bootstrap, null);
+                ?.Invoke(screenManager, null);
 
             Assert.That(root.transform.childCount, Is.EqualTo(2));
             Assert.That(root.transform.GetChild(0).gameObject.activeSelf, Is.True);
             Assert.That(root.transform.GetChild(1).gameObject.activeSelf, Is.True);
+            Assert.That(UnityEditor.SceneVisibilityManager.instance.IsPickingDisabled(
+                root.transform.GetChild(0).gameObject, false), Is.True);
+            Assert.That(UnityEditor.SceneVisibilityManager.instance.IsPickingDisabled(
+                root.transform.GetChild(0).GetChild(0).gameObject, false), Is.False);
             Object.DestroyImmediate(first);
             Object.DestroyImmediate(second);
             Object.DestroyImmediate(root);
@@ -267,7 +370,7 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("castleIds").arraySize, Is.EqualTo(60));
         }
 
-        // 영지 프리팹이 화면 전용 컨트롤러와 고정 영웅·시설·명령 슬롯을 갖는지 확인합니다.
+        // 영지 프리팹이 시안형 하단 요약에 맞는 영웅·시설 슬롯과 고정 명령을 갖는지 확인합니다.
         [Test]
         public void TerritoryPrefabContainsFixedSlotsAndDedicatedController()
         {
@@ -280,9 +383,69 @@ namespace ProjectWI.Tests.Editor
             Assert.That(controller, Is.Not.Null);
             Assert.That(prefab.GetComponentsInChildren<Text>(true), Is.Empty);
             Assert.That(prefab.GetComponentsInChildren<EventSystem>(true), Is.Empty);
-            Assert.That(serialized.FindProperty("heroSlots").arraySize, Is.EqualTo(8));
+            Assert.That(serialized.FindProperty("heroSlots").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("facilitySlots").arraySize, Is.EqualTo(2));
             Assert.That(serialized.FindProperty("commandButtons").arraySize, Is.EqualTo(8));
+            Assert.That(serialized.FindProperty("topCommandButtons").arraySize, Is.EqualTo(3));
+            Assert.That(serialized.FindProperty("topCommandActions").arraySize, Is.EqualTo(3));
+            Assert.That(serialized.FindProperty("systemButton").objectReferenceValue, Is.Not.Null);
+        }
+
+        // 월드와 성 내정 화면의 공통 상단 HUD가 구조와 배치까지 동일한지 확인합니다.
+        [Test]
+        public void TerritoryTopHudMatchesWorldTopHud()
+        {
+            GameObject worldPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(WorldPrefabPath);
+            GameObject territoryPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(TerritoryPrefabPath);
+            Transform worldTop = worldPrefab.transform.Find("WorldContent/TopHUD");
+            Transform territoryTop = territoryPrefab.transform.Find("TerritoryContent/TopHUD");
+
+            Assert.That(worldTop, Is.Not.Null);
+            Assert.That(territoryTop, Is.Not.Null);
+            Assert.That(territoryTop.childCount, Is.EqualTo(worldTop.childCount));
+            Assert.That(territoryTop.GetComponent<RectTransform>().anchorMin,
+                Is.EqualTo(worldTop.GetComponent<RectTransform>().anchorMin));
+            Assert.That(territoryTop.GetComponent<RectTransform>().anchorMax,
+                Is.EqualTo(worldTop.GetComponent<RectTransform>().anchorMax));
+            Assert.That(territoryTop.GetComponent<RectTransform>().offsetMin,
+                Is.EqualTo(worldTop.GetComponent<RectTransform>().offsetMin));
+            Assert.That(territoryTop.GetComponent<RectTransform>().offsetMax,
+                Is.EqualTo(worldTop.GetComponent<RectTransform>().offsetMax));
+
+            for (int index = 0; index < worldTop.childCount; index += 1)
+            {
+                Transform expected = worldTop.GetChild(index);
+                Transform actual = territoryTop.GetChild(index);
+                RectTransform expectedRect = expected.GetComponent<RectTransform>();
+                RectTransform actualRect = actual.GetComponent<RectTransform>();
+
+                Assert.That(actual.name, Is.EqualTo(expected.name));
+                Assert.That(actual.gameObject.activeSelf, Is.EqualTo(expected.gameObject.activeSelf));
+                Assert.That(actualRect.anchorMin, Is.EqualTo(expectedRect.anchorMin), actual.name);
+                Assert.That(actualRect.anchorMax, Is.EqualTo(expectedRect.anchorMax), actual.name);
+                Assert.That(actualRect.offsetMin, Is.EqualTo(expectedRect.offsetMin), actual.name);
+                Assert.That(actualRect.offsetMax, Is.EqualTo(expectedRect.offsetMax), actual.name);
+
+                Image expectedImage = expected.GetComponent<Image>();
+                Image actualImage = actual.GetComponent<Image>();
+                Assert.That(actualImage == null, Is.EqualTo(expectedImage == null), actual.name);
+                if (expectedImage != null)
+                {
+                    Assert.That(actualImage.color, Is.EqualTo(expectedImage.color), actual.name);
+                    Object expectedSprite = new SerializedObject(expectedImage).FindProperty("m_Sprite").objectReferenceValue;
+                    Object actualSprite = new SerializedObject(actualImage).FindProperty("m_Sprite").objectReferenceValue;
+                    Assert.That(actualSprite, Is.EqualTo(expectedSprite), actual.name);
+                }
+
+                TMP_Text expectedText = expected.GetComponent<TMP_Text>();
+                TMP_Text actualText = actual.GetComponent<TMP_Text>();
+                Assert.That(actualText == null, Is.EqualTo(expectedText == null), actual.name);
+                if (expectedText != null)
+                {
+                    Assert.That(actualText.fontSize, Is.EqualTo(expectedText.fontSize), actual.name);
+                    Assert.That(actualText.alignment, Is.EqualTo(expectedText.alignment), actual.name);
+                }
+            }
         }
 
         // 중점 사업 프리팹이 공통 모달 프레임과 8개 사업·담당자 선택 슬롯을 갖는지 확인합니다.
@@ -630,7 +793,7 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("choiceLabels").arraySize, Is.EqualTo(8));
         }
 
-        // 턴 후속 프리팹이 결과와 튜토리얼용 고정 선택 카드를 갖는지 확인합니다.
+        // 턴 후속 프리팹이 전용 튜토리얼 내용과 두 개의 고정 선택 버튼을 갖는지 확인합니다.
         [Test]
         public void TurnFollowupPrefabContainsFixedChoiceCards()
         {
@@ -644,8 +807,66 @@ namespace ProjectWI.Tests.Editor
             Assert.That(prefab.GetComponent<ProjectWI.Administration.WIAdministrationModalUGUIController>(), Is.Not.Null);
             Assert.That(prefab.GetComponentsInChildren<Text>(true), Is.Empty);
             Assert.That(prefab.GetComponentsInChildren<EventSystem>(true), Is.Empty);
-            Assert.That(serialized.FindProperty("choiceButtons").arraySize, Is.EqualTo(8));
-            Assert.That(serialized.FindProperty("choiceLabels").arraySize, Is.EqualTo(8));
+            Assert.That(serialized.FindProperty("choiceButtons").arraySize, Is.EqualTo(2));
+            Assert.That(serialized.FindProperty("choiceLabels").arraySize, Is.EqualTo(2));
+            Assert.That(serialized.FindProperty("choiceDescriptionLabels").arraySize, Is.EqualTo(2));
+            Assert.That(serialized.FindProperty("tutorialContent").objectReferenceValue, Is.Not.Null);
+        }
+
+        // 턴 후속 정보 패널의 테두리와 모든 사용처가 9-Slice 설정을 유지하는지 확인합니다.
+        [Test]
+        public void TurnFollowupInfoPanelsUseSlicedSprite()
+        {
+            TextureImporter importer = AssetImporter.GetAtPath(TurnFollowupInfoPanelPath) as TextureImporter;
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(TurnFollowupPrefabPath);
+            Image[] images = prefab.GetComponentsInChildren<Image>(true);
+            int slicedPanelCount = 0;
+
+            Assert.That(importer, Is.Not.Null);
+            Assert.That(importer.spriteBorder, Is.EqualTo(new Vector4(48f, 48f, 48f, 48f)));
+            foreach (Image image in images)
+            {
+                if (image.sprite != null && AssetDatabase.GetAssetPath(image.sprite) == TurnFollowupInfoPanelPath)
+                {
+                    Assert.That(image.type, Is.EqualTo(Image.Type.Sliced), image.gameObject.name);
+                    slicedPanelCount += 1;
+                }
+            }
+            Assert.That(slicedPanelCount, Is.EqualTo(4));
+        }
+
+        // 성 내정 기능 모달이 구형 종이 헤더와 흰색 버튼을 다시 사용하지 않는지 확인합니다.
+        [Test]
+        public void TerritoryCommandModalsUseDarkMetalVisuals()
+        {
+            string[] prefabPaths =
+            {
+                FocusProjectPrefabPath,
+                HeroAssignmentPrefabPath,
+                CharacterActivityPrefabPath,
+                SpecialFacilityPrefabPath,
+                BasicFacilityPrefabPath,
+                DelegationPrefabPath,
+                MarchPrefabPath,
+                CastleRecordPrefabPath
+            };
+            foreach (string prefabPath in prefabPaths)
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+                Transform panel = prefab.transform.Find("ModalRoot/ModalPanel");
+                Image panelImage = panel.GetComponent<Image>();
+                Image headerImage = panel.Find("Header").GetComponent<Image>();
+                Button closeButton = panel.Find("Header/CloseButton").GetComponent<Button>();
+
+                Assert.That(AssetDatabase.GetAssetPath(panelImage.sprite), Does.EndWith("administration_modal_shell_v1.png"), prefabPath);
+                Assert.That(headerImage.enabled, Is.False, prefabPath);
+                Assert.That(AssetDatabase.GetAssetPath(closeButton.image.sprite), Does.EndWith("turn_followup_close_button_v1.png"), prefabPath);
+                foreach (Button button in prefab.GetComponentsInChildren<Button>(true))
+                {
+                    string spritePath = button.image.sprite == null ? string.Empty : AssetDatabase.GetAssetPath(button.image.sprite);
+                    Assert.That(spritePath, Does.Not.EndWith("button_normal.png"), $"{prefabPath}/{button.name}");
+                }
+            }
         }
 
         // 시스템 프리팹이 설정과 저장에 공용으로 쓰는 8개 고정 카드 슬롯을 갖는지 확인합니다.

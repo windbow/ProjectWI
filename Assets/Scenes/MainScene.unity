@@ -198,74 +198,6 @@ MonoBehaviour:
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
   m_ScrollDeltaPerTick: 6
---- !u!1 &285763714
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 285763715}
-  - component: {fileID: 285763716}
-  m_Layer: 0
-  m_Name: MainCanvas
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &285763715
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 285763714}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &285763716
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 285763714}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13cf4bc02cc47184ca3a19d8303061b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Administration.WIUIScreenManager
-  screenPrefabs:
-  - {fileID: 2536897111807893608, guid: cf83069829014c542b921300a9c52e5e, type: 3}
-  - {fileID: 5069381135453003298, guid: d3c1680cd33114a418b31b3cb94e0f13, type: 3}
-  - {fileID: 7258580092043890234, guid: b4f9430c2963095498011b5d599833fa, type: 3}
-  - {fileID: 4854675440191987987, guid: f836815dec32f7a4382f607b5fc5ab5f, type: 3}
-  - {fileID: 3827838412811946160, guid: 78e39e63151cc0b42a2bee264cf53e47, type: 3}
-  - {fileID: 8752721692419164372, guid: 94d7f055931a27c4fbd3fc200b3dbe51, type: 3}
-  - {fileID: 6397790278656861700, guid: 60cff452361f8bf4c9fc457ddbcbe18f, type: 3}
-  - {fileID: 367087498412657459, guid: e257b141eb0f4ae49ad278ebf48c3873, type: 3}
-  - {fileID: 3575324775392635511, guid: bc1942d17ef2d494988727f2ba504c90, type: 3}
-  - {fileID: 8817146683314905871, guid: 9ba71b859340b204c8524abe0c8b1a11, type: 3}
-  - {fileID: 4984011607187163216, guid: 988c710c469e48a4091b443a57e94247, type: 3}
-  - {fileID: 6421786158829884158, guid: a85332e84499397489cac53693d80fce, type: 3}
-  - {fileID: 2603308240569907791, guid: 86f78474e5070f14aa281e5ff528abf0, type: 3}
-  - {fileID: 1739513837647371131, guid: edfe5dafbb8011f478a833f657a0d59e, type: 3}
-  - {fileID: 8301435554733304868, guid: 440e81a6a94641a409534b8826810d8a, type: 3}
-  - {fileID: 6981244746132955934, guid: a59f15c05dec8cf46b1bd823fb89fb07, type: 3}
-  - {fileID: 1628580417588653878, guid: 73849326ab843024aa1c11d9bbbce96d, type: 3}
-  - {fileID: 3200749423485637618, guid: 96aabdb3185a359448d4790aec180cff, type: 3}
-  - {fileID: 9127282880425556437, guid: 4723280067bea984791703dd6302ecc9, type: 3}
-  - {fileID: 8282094373227960451, guid: 3e7c6b0dd47e74046a76c4e89a335b85, type: 3}
-  - {fileID: 3230835310726769106, guid: 5c29ff0294417af43b516a71b9ecb8c8, type: 3}
-  - {fileID: 2535890619266783291, guid: 53fcb30951ee9044b88490bf03d22b8d, type: 3}
-  - {fileID: 9068529670069307961, guid: 34eb73d974206a844b67ace4a2d7fefa, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -582,6 +514,74 @@ Transform:
   - {fileID: 7468938739445197247}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2127883683
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2127883685}
+  - component: {fileID: 2127883684}
+  m_Layer: 0
+  m_Name: UGUI Screen Bootstrap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2127883684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2127883683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13cf4bc02cc47184ca3a19d8303061b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Administration.WIUIScreenManager
+  screenPrefabs:
+  - {fileID: 2536897111807893608, guid: cf83069829014c542b921300a9c52e5e, type: 3}
+  - {fileID: 5069381135453003298, guid: d3c1680cd33114a418b31b3cb94e0f13, type: 3}
+  - {fileID: 7258580092043890234, guid: b4f9430c2963095498011b5d599833fa, type: 3}
+  - {fileID: 4854675440191987987, guid: f836815dec32f7a4382f607b5fc5ab5f, type: 3}
+  - {fileID: 3827838412811946160, guid: 78e39e63151cc0b42a2bee264cf53e47, type: 3}
+  - {fileID: 8752721692419164372, guid: 94d7f055931a27c4fbd3fc200b3dbe51, type: 3}
+  - {fileID: 6397790278656861700, guid: 60cff452361f8bf4c9fc457ddbcbe18f, type: 3}
+  - {fileID: 367087498412657459, guid: e257b141eb0f4ae49ad278ebf48c3873, type: 3}
+  - {fileID: 3575324775392635511, guid: bc1942d17ef2d494988727f2ba504c90, type: 3}
+  - {fileID: 8817146683314905871, guid: 9ba71b859340b204c8524abe0c8b1a11, type: 3}
+  - {fileID: 4984011607187163216, guid: 988c710c469e48a4091b443a57e94247, type: 3}
+  - {fileID: 6421786158829884158, guid: a85332e84499397489cac53693d80fce, type: 3}
+  - {fileID: 2603308240569907791, guid: 86f78474e5070f14aa281e5ff528abf0, type: 3}
+  - {fileID: 1739513837647371131, guid: edfe5dafbb8011f478a833f657a0d59e, type: 3}
+  - {fileID: 8301435554733304868, guid: 440e81a6a94641a409534b8826810d8a, type: 3}
+  - {fileID: 6981244746132955934, guid: a59f15c05dec8cf46b1bd823fb89fb07, type: 3}
+  - {fileID: 1628580417588653878, guid: 73849326ab843024aa1c11d9bbbce96d, type: 3}
+  - {fileID: 3200749423485637618, guid: 96aabdb3185a359448d4790aec180cff, type: 3}
+  - {fileID: 9127282880425556437, guid: 4723280067bea984791703dd6302ecc9, type: 3}
+  - {fileID: 8282094373227960451, guid: 3e7c6b0dd47e74046a76c4e89a335b85, type: 3}
+  - {fileID: 3230835310726769106, guid: 5c29ff0294417af43b516a71b9ecb8c8, type: 3}
+  - {fileID: 2535890619266783291, guid: 53fcb30951ee9044b88490bf03d22b8d, type: 3}
+  - {fileID: 9068529670069307961, guid: 34eb73d974206a844b67ace4a2d7fefa, type: 3}
+--- !u!4 &2127883685
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2127883683}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &7468938739445197246
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -653,4 +653,4 @@ SceneRoots:
   - {fileID: 171842032}
   - {fileID: 2061172984}
   - {fileID: 1634026094}
-  - {fileID: 285763715}
+  - {fileID: 2127883685}
