@@ -1,5 +1,67 @@
 # ProjectWI 프로젝트 상태
 
+- 2026-08-22: 성 내정의 `진격/출정`과 `성 상세` 화면도 공용 모달 UI 대상에 포함함. 기존 프리팹의 전투단 선택·성 이미지·상세 기록 본문 배치는 재생성하지 않고 유지하면서 `administration_modal_shell_v1` 외곽, 공용 제목 헤더, X 닫기 버튼과 평면 버튼만 적용함. 두 빌더에도 공용 처리 호출을 추가해 향후 재생성 시 구형 기본 UI로 돌아가지 않도록 했으며 공용 UI 회귀 검사 범위를 8개 화면으로 확장함.
+
+- 2026-08-22: 목표 상세 시안의 외곽을 바탕으로 무문자 냉색 금속 `administration_modal_shell_v1.png`을 제작해 중점 사업·인사 배치·인재 활동·특화 시설·기본 시설·태수 위임 6개 프리팹의 공용 셸로 적용함. 사용자가 직접 조정한 `WIAdministrationObjectiveUGUI`의 이미지·텍스트 배치는 공용화 대상에서 제외하고 기존 `objective_modal_frame_v1.png` 기반 구성으로 복원함. UGUI 이행 EditMode 42/42 및 Console Error 0건 통과.
+
+- 2026-08-22: 성 내정의 중점 사업·인사 배치·인재 활동·특화 시설·기본 시설·태수 위임 화면이 구형 `popup_header` 종이 헤더와 흰 `button_normal`을 재사용하던 문제를 공통 수정함. `WIAdministrationModalVisualUtility`를 추가해 6개 빌더가 흑청색 `bg_type_d` 본문, 얇은 냉색 금속 헤더, 평면 일반·주요 버튼, 정사각형 전용 X 닫기 버튼과 일관된 호버·비활성 색을 적용하도록 변경함. 6개 프리팹을 재생성하고 중점 사업 화면을 실제 Game View에서 확인했으며 UGUI 이행 EditMode 42/42 및 Console Error 0건 통과.
+
+- 2026-08-22: 턴 후속 공용 정보 패널 `turn_followup_info_panel_v1.png`의 외곽 잡티 4픽셀을 제거한 뒤, 위 약 84px·아래 약 126px의 과도한 투명 여백 때문에 Slice 기준선이 실제 프레임과 어긋나던 문제를 추가 수정함. 장식 바깥에 4px 투명 여백만 남겨 1955×509로 정리하고 Sprite Border를 사방 48px로 지정했으며, 설명·체크 패널 4개를 모두 `Image.Type.Sliced`로 유지함. 잡티 원본과 정리 전 1955×711 이미지는 `Assets/TrashAsset/UI/Generated`에 각각 보관함. UGUI 이행 EditMode 41/41 및 Console Error 0건 통과.
+
+- 2026-08-21: MainScene에 `WIUIScreenManager`가 `MainCanvas`와 `UGUI Screen Bootstrap` 두 개로 중복 배치되어 같은 UGUI 프리팹을 이중 생성하던 구성을 정리함. `MainCanvas`의 6개 참조를 정식 `UGUI Screen Bootstrap`의 전체 23개 참조에 병합한 뒤 중복 오브젝트를 삭제함. `WIAdministrationUGUISceneUtility`는 현재 씬의 모든 화면 관리자와 이전 루트 이름을 수집해 참조를 보존한 뒤 관리자 하나만 남기도록 보강했으며, 정리 메뉴를 두 번 실행해도 관리자 1개·프리팹 23개가 유지됨을 확인함. UGUI 이행 EditMode 40/40 및 Console Error 0건 통과.
+
+- 2026-08-21: 성 내정 화면의 상단 HUD를 월드 화면 기준으로 통일함. 높이 92px, 배경색, 하단 금속선, 진영 문장과 명칭, 날짜·금화·마나·영향력 텍스트의 앵커·폰트 크기·정렬, 자원 아이콘, 세로 구분선, 우측 월보·의회·연구·설정 아이콘과 클릭 영역을 월드 프리팹과 동일하게 구성함. 성 내정 컨트롤러에도 월보·의회·연구·설정 기능을 연결했으며 두 프리팹의 TopHUD 직계 구조·RectTransform·Image·TMP 설정을 비교하는 회귀 검사를 추가함. UGUI 이행 EditMode 40/40 및 Console Error 0건 통과.
+
+- 2026-08-21: 세로형 공통 패널 `bg_type_d.png`의 프레임 바깥 투명 여백에 남아 있던 1~4px 크기의 생성 노이즈 69픽셀을 제거함. 정상 패널 본체 307,605픽셀과 512×640 규격, 냉색 흑청 질감, 은회색 프레임은 그대로 유지했으며 기존 16px 9-Slice 설정도 보존함. 정리 전 원본은 `Assets/TrashAsset/UI/Generated/bg_type_d_noisy_original.png`에 보관함.
+
+- 2026-08-20: 성 내정 화면의 `대륙 지도` 버튼이 공용 명령 버튼의 굵은 장식 외곽선을 크게 늘려 사용해 촌스럽게 보이던 부분을 정리함. 무문자 냉색 흑청 바탕과 얇은 은회색 이중선·작은 모서리 및 중앙 장식만 사용한 전용 512×142 `territory_back_button_v1.png`를 제작하고, 좌우 12px·상하 10px 9-Slice로 적용함. 버튼 표시 높이와 글자 크기도 시안 비율에 맞게 축소했으며 공용 명령·다음 턴 버튼에는 영향을 주지 않음. UGUI 이행 EditMode 39/39 및 Console Error 0건 통과.
+
+- 2026-08-20: 성 내정 화면을 기준 시안의 성 전경 중심 구조로 전면 재배치함. 전략 화면과 같은 상단 진영·연월·자원 HUD, 좌측 성명·영지관·4종 능력치·월 수입·진행 사업, 중앙 대형 성 이미지, 우측 8개 성 내정 명령, 하단 주둔 영웅 4칸·특화 시설 2칸·이번 달 중점, 대륙 지도 및 다음 턴 버튼으로 구성함. 무문자 냉색 금속 하단 트레이 `territory_bottom_panel_v1.png`를 제작해 상하좌우 18px 9-Slice로 적용했으며 기존 성·영웅·시설 ScriptableObject와 명령 이벤트 연결을 유지함. 실제 Game View 1920×1080 시각 확인, UGUI 이행 EditMode 39/39 및 Console Error 0건 통과.
+
+- 2026-08-17: 전략 화면 우측 알림 패널 시안을 기준으로 재사용 가능한 512×640 `bg_type_d.png`를 제작함. 문구·아이콘·알림 행을 제외하고 얇은 은회색 금속 프레임과 중립적인 흑청색 질감만 유지했으며, Sprite/Single·Clamp·Bilinear·Mipmap 비활성·무압축 및 상하좌우 16px 9-Slice를 적용함. `.bg-type-d` USS 클래스를 추가하고 UGUI 전략 화면의 `CampaignSidePanel` 배경을 D Type으로 교체함. 실제 Game View에서 확대 시 모서리 보존을 확인했고 UGUI 이행 EditMode 39/39 및 Console Error 0건을 통과함.
+
+- 2026-08-17: 기존 `Builds/Windows` 테스트 빌드를 삭제하고 Unity 상단 `ProjectWI/Build/Package Windows Test Build` 원클릭 패키징 메뉴를 추가함. 활성 Build Settings 씬을 검증해 Windows x86-64 Development/LZ4 빌드를 `Builds/Windows`에 클린 생성하고, 완료된 폴더 전체를 버전·시각이 포함된 `Builds/Packages/ProjectWI-Windows-*.zip`으로 압축함. 경로가 프로젝트 밖으로 벗어나지 않도록 삭제·출력 안전 검사를 포함하며 컴파일 오류 0건과 메뉴 등록을 확인함.
+
+- 2026-08-17: 전략 화면 좌측 선택 성 패널을 기준 시안 구조로 재작성함. 작은 문장·성명·소속·등급 아이콘 헤더, 가로형 성 이미지, 실제 영지관·번영·기술·질서·방어·주둔 전투단 6행, 영웅 카드 4개, 성 관리와 보조 성 아이콘 버튼을 배치함. 존재하지 않는 인구·식량·행복도 수치는 임의 생성하지 않고 현재 ScriptableObject/런타임 성 데이터만 표시하며 보조 버튼도 성 관리 기능에 연결함. Game View 확인, UGUI EditMode 39/39, Console Error 0건 통과.
+
+- 2026-08-17: 새 하단 기준 시안에 따라 전략 명령부를 다시 구성함. 전체 청동 프레임과 하단 설정 버튼을 제거하고 군사·인사·외교·계략·연구·평정·월보 7개 평면 명령 버튼을 배치함. 좌측 이중 화살촉, 문장 슬롯, 남청색 본체를 가진 `strategy_next_turn_button_v3`를 제작해 아발론 문장·`다음 턴`·우측 화살표를 독립 요소로 배치했으며 기능은 기존 Military/Heroes/Diplomacy/Scheme/Research/Faction/MonthlyReport 및 EndTurn에 연결함. UGUI EditMode 39/39, Console Error 0건 확인.
+
+- 2026-08-17: 전략 화면 하단을 단순 비율 보정에서 시안 전용 아트 적용으로 갱신함. 참고 이미지의 얇은 은색 이중선·작은 상단 장식·절제된 모서리를 재현한 `strategy_command_button_v2`와 양끝 창날 장식·남청색 본체의 `strategy_next_turn_button_v2`를 새로 제작하고 체크무늬 생성 배경을 투명 알파로 정리함. 9-Slice Border와 표시 높이를 고정해 8개 명령·설정·다음 턴의 기존 기능은 유지했으며 Game View 비교, UGUI EditMode 39/39, Console Error 0건을 확인함.
+
+- 2026-08-17: 전략 화면 하단 명령 바를 기준 시안 비율에 맞춰 보정함. 8개 명령 버튼의 시작점·폭·간격을 조절하고 아이콘을 확대했으며 문구를 아이콘 오른쪽에 좌측 정렬함. 설정 영역을 넓히고 다음 턴 버튼과의 간격을 정리했으며 기존 전용 프레임과 실제 단축키·버튼 기능은 유지함. Game View 육안 확인, UGUI EditMode 39/39 및 컴파일 오류 0건을 확인함.
+
+- 2026-08-17: UI Toolkit 전역 지도에 존재했던 성 연결 경로를 UGUI로 복원함. `AdjacentCastleIds`를 중복 제거한 스냅샷 경로로 변환하고 단일 `MaskableGraphic` 메시에서 그림자·진영색 중심선·적대 전선 `×`·선택 경로 청백색 광택과 마름모를 렌더링함. 연결선은 성 마커 앞에서 끝나고 Raycast를 받지 않아 기존 60개 성 버튼 입력을 방해하지 않음.
+
+- 2026-08-17: 전략 화면 상·하단 공통 프레임 `bg_type_c`가 Sliced Image로 사용되지만 Sprite Border가 0이어서 모서리가 늘어나던 문제를 수정함. 1587×508 원본의 장식 범위를 기준으로 좌우 80px·상하 64px Border를 지정함.
+
+- 2026-08-17: 턴 후속 시안의 선택 설명 위 중앙 다이아 구분선이 누락되고 닫기 버튼이 공용 배경+TMP 문자로 표시되던 차이를 수정함. 얇은 금속선과 중앙 다이아를 한 Sprite로 만든 `turn_followup_choice_divider_v1.png`을 좌우 선택 영역에 각각 배치하고, 금속 사각 프레임과 X가 통째로 포함된 `turn_followup_close_button_v1.png`을 제작해 닫기 Button Image에 적용함. 기존 닫기 TMP 문자는 비활성화해 에셋 자체의 X만 표시함.
+
+- 2026-08-17: 턴 후속 전용 버튼이 작은 표시 영역에서 96/64px 9-Slice 때문에 모서리와 중앙 다이아가 안쪽으로 밀리고, 두 줄 선택 문구가 버튼 내부에 겹치던 문제를 수정함. 버튼 Sprite는 시안과 같은 약 4:1 고정 비율이므로 Sliced 대신 Simple로 표시하고 Border를 0으로 변경함. Snapshot 선택 문자열은 첫 줄 제목과 둘째 줄 설명으로 분리해 제목만 23pt로 버튼 중앙에, 설명은 16pt로 버튼 위에 배치함. Prefab Stage 육안 검사에서 양쪽 버튼 프레임과 중앙 장식이 원형대로 표시됨을 확인함.
+
+- 2026-08-17: 턴 후속 시안과 달라진 단일 단순화 나침반 V2를 철회하고 장식 역할을 다시 분리함. 상단 설명 패널에는 시안과 같은 방패형 소형 나침반 `turn_followup_header_emblem_v1.png`(210×256), 하단 체크 패널에는 저채도 대륙 지도·원형 좌표·가느다란 8방향 나침반을 결합한 `turn_followup_map_compass_v1.png`(768×680)을 제작해 각각 적용함. 두 Sprite 모두 표시 크기에 맞춰 사전 축소하고 무압축·Mipmap 비활성·Bilinear로 임포트했으며, 단순화 V2는 `Assets/TrashAsset/UI/Generated`로 이동함.
+
+- 2026-08-17: 턴 후속 화면의 공용 버튼을 시안 전용 무문자 버튼 `turn_followup_button_normal_v1.png`, `turn_followup_button_primary_v1.png`으로 교체하고 좌우·상하 96/64px 9-Slice를 적용함. 나침반 흐림은 기존 1,194×1,220 원본이 100~250px UI 영역으로 축소되면서 미세 지도선과 섬 디테일이 뭉개지는 문제로 확인함. 임포터는 이미 Max 2048·무압축·Mipmap 비활성·Bilinear로 원본을 보존하고 있었으므로, 가는 지도선을 제거하고 큰 8방향 금속 면과 단순 대륙 실루엣으로 정리한 512×486 `turn_followup_compass_v2.png`을 제작해 교체함. 기존 V1은 `Assets/TrashAsset/UI/Generated`로 이동했으며 MCP 프리팹 재생성, UGUI 이행 EditMode 39/39, Console Error 0건을 확인함.
+
+- 2026-08-17: `WIAdministrationTurnFollowupUGUI`를 의회 후보 카드 8개 재사용 화면에서 턴 후속 전용 UI로 개편함. ImageGen으로 무문자 냉색 금속 프레임, 정보 패널, 지도·나침반 장식, 완료 체크 배지 4종을 제작하고 과도한 투명 여백과 밝은 배경을 정리해 적용함. 튜토리얼 모드에서만 `다음 턴 준비` 체크 영역을 표시하며 처리 중·일반 안내·캠페인 결과는 같은 프레임의 설명 패널과 선택 버튼만 재사용함. 주요 선택은 우측 `button_primary`, 보조 선택은 좌측 `button_normal`에 연결하고 고정 버튼 배열을 실제 기능 수인 2개로 축소함. MCP로 프리팹과 MainScene 배치를 재생성했고 UGUI 이행 EditMode 39/39 통과 및 컴파일 오류 0건을 확인함.
+
+- 2026-08-16: 목표 상세 화면의 `목표 확인` 버튼, 진행도 트랙·Fill, G/M/I 보상 스트립을 참고 이미지 기반 전용 Sprite 4종으로 제작해 `WIAdministrationObjectiveUGUI`에 적용함. 생성 이미지의 투명 여백을 정리하고 Sprite/Single·무압축·Mipmap 비활성으로 임포트했으며, 진행률은 Fill Amount로 표시하고 세 보상 값은 아이콘 프레임 위 독립 TMP 라벨로 바인딩함. MCP로 프리팹과 MainScene 배치를 재생성했고 UGUI 이행 EditMode 39/39 및 Console Error 0건을 확인함.
+
+- 2026-08-16: `WIAdministrationObjectiveUGUI`를 캠페인 타이틀 양피지 재사용 화면에서 목표 상세 전용 UI로 개편함. ImageGen으로 무문자 청회색 금속 프레임 `objective_modal_frame_v1.png`을 제작해 적용하고, 현재 상황·달성 조건·진행 상황·보상 구획과 진행도 Fill, 주요 확인 버튼을 고정 UGUI로 배치함. 기존 영웅 배치 복제 프리팹에 남아 있던 후보 카드·페이지 이동 오브젝트를 제거해 19개 오브젝트로 정리했으며 Snapshot을 진행 문자열·보상 문자열·정규화 진행도로 분리함. MCP로 빌더를 실행해 프리팹과 MainScene 참조를 갱신했고 UGUI 이행 EditMode 39/39, Console Error 0건을 확인함.
+
+- 2026-08-16: 캠페인 선택 UGUI의 `VariantCard_0~2`와 `ContinueCampaignButton`이 Single Sprite 전환 후에도 구형 `button_normal_0` 서브 에셋 ID를 참조하던 문제를 수정함. 모든 일반 버튼 참조를 `button_normal` 메인 Sprite로 통일하고 난이도·시작 조건 카드는 선택 시 `button_primary`, 해제 시 `button_normal`로 실제 Sprite를 교체하도록 변경함. 이미지 Tint는 흰색으로 유지해 원본 색을 보존하며 플레이 캡처에서 선택 카드·새 캠페인 버튼은 청색 주요 이미지, 미선택 카드·이어하기 버튼은 흑청색 일반 이미지로 확인함. UGUI 이행 EditMode 39/39 및 Console Error 0건 통과.
+
+- 2026-08-16: 플레이마다 새로 생성되어 수동 Scene Picking 설정이 유지되지 않는 `~~~UGUI(Clone)` 문제를 자동화함. `WIUIScreenManager`가 각 화면을 인스턴스화한 직후 Editor 전용 `SceneVisibilityManager.DisablePicking(screen, false)`를 호출해 전체 화면 루트만 선택되지 않게 하고 자식 패널·버튼의 피킹은 유지함. Player 빌드에는 포함되지 않으며 회귀 검사에서 Clone 루트 피킹 차단과 자식 피킹 허용을 함께 확인함.
+
+- 2026-08-16: `MainCanvas` 아래 23개 UGUI 프리팹의 컨트롤러 루트는 이벤트 구독을 위해 활성 상태로 유지하면서, 숨겨진 화면의 전체 화면 Canvas가 Scene 선택과 입력을 가로막지 않도록 표시 상태를 분리함. 공통 모달 `Show/Hide`와 월드·영지 `Refresh`가 루트 `Canvas` 및 `GraphicRaycaster`를 내부 표시 상태와 함께 전환함. 캠페인 시작 전 플레이 검증에서 캠페인 선택 Canvas 1개만 활성, 나머지 22개 Canvas 비활성, 전용 EditMode 검사 2/2 및 Console Error 0건을 확인함.
+
+- 2026-08-16: 공통 주요 버튼 `Assets/Resources/UI/Generated/button_primary.png`의 Unity Sprite 9-Slice를 버튼 타입 가이드 기준인 좌우 28px·상하 24px로 적용함. 메인 TextureImporter border와 `button_primary_0` Sprite 메타데이터 border가 모두 동일하게 저장됐음을 확인함.
+
+- 2026-08-15: 플레이 시 `MainCanvas` 아래 캠페인 선택 UI와 각 UGUI 화면이 나타나지 않던 원인을 수정함. `WIUIScreenManager`가 등록된 23개 완성 프리팹을 생성한 직후 루트 전체를 비활성화해 `OnEnable` 이벤트 구독까지 차단하고 있었음. 프리팹 루트는 활성 상태로 유지하고 각 화면 내부의 `contentRoot`·`modalRoot`가 캠페인 및 모달 상태에 따라 표시를 관리하도록 초기화 방식을 바로잡았으며 회귀 테스트 기대값도 활성 상태 기준으로 변경함. 전용 EditMode 검사 1/1 통과, 플레이 시 `WICampaignTitleUGUI(Clone)`과 `Backdrop`·`CampaignPanel`의 활성 계층 및 Console Error 0건을 확인함.
+
+- 2026-08-15: R&D 잔여물 정리 후 Unity 게임 검증을 수행함. 전체 EditMode 281개 중 272개 통과·9개 실패로, 아레스 현재 Sprite 경로 및 정리 대상 관련 검사는 통과함. 실패는 숨은 사각 그리드 전환 후 과거 충돌·공격·카메라 기대값이 남은 전투 검사 7개와 현재 조명 강도·전투 HUD 클래스에 맞지 않는 UI 검사 2개임. PlayMode 진입 시 `MainScene`의 `WIAdministrationUIController`와 Canvas 23개가 활성 생성됐고 게임 코드 오류는 0건이었음. 등록된 실질 PlayMode 테스트 케이스는 0개라 자동 플레이 동선 검증 범위는 제한됨.
+
+- 2026-08-15: R&D 잔여물 정리를 추가 진행함. 미참조 복구 씬과 비어 있는 전장 실험 폴더, CharacterScaleArena V2~V5의 생성 스크립트·리포트를 삭제함. QA 스크린샷, 아레스·중세 검사 미사용 후보, 생성 파이프라인 원본, 미사용 UI 이미지, 구형 외곽선 셰이더·재질은 아트와 작업 기록을 보존하도록 `Assets/TrashAsset`으로 이동함. 현재 전투 Sprite 경로에 맞게 UGUI 마이그레이션 테스트 기대값과 전투 데이터 문서를 갱신함. 프로젝트 내부 `.tools/sprite-gen-venv`는 사용자 확인 대상으로 이번 정리에서 제외함.
+
 - 2026-08-15: Unity 상단 `ProjectWI`·`WI` 메뉴를 실제 `MenuItem` 선언과 호출 관계 기준으로 전수 점검함. 현재 ScriptableObject에 결과가 확정됐거나 최신 값을 덮어쓸 위험이 있는 데이터·이미지 일회성 시더 10개 파일과 중복 Verification 메뉴를 제거함. Character Data Viewer가 직접 호출하는 500명 결정론적 로스터 시더, UGUI Prefab Build, 화면 QA, 전투·캠페인 테스트 랩과 성능 벤치마크는 유지함. `UnityToolMenuManual.md`를 남은 각 메뉴의 실행 모드, 처리 단계, 변경 대상, 출력, 위험과 권장 용도가 드러나도록 전면 개정함.
 
 - 2026-08-15: 전투 아트 반복 작업에서 남은 미사용 코드를 정리함. 과거 V1~V5 및 요새 청크 실험 전장만 생성하던 `WIBattleGroundTextureBaker`, 구형 단일 배경을 다시 연결하던 `WIBattleVisualAssetSeeder`, 전체 인물에게 아레스 Sprite를 일괄 배정·해제하던 테스트 메뉴를 제거함. 현재 설정에서 참조되지 않는 전장 프리팹 10개를 삭제하고, 전용 구버전·실험 이미지 61개는 GUID와 상대 폴더 구조를 유지해 `Assets/TrashAsset/Art/Battle`로 이동함. 현재 V6 프리팹·청크·마스터·ImageGen 원본과 공용 환경물은 유지함.
@@ -459,3 +521,7 @@
 - 2026-08-15: 최초 전투 시안의 회화적 밀도와 캐릭터 축척을 함께 검증하기 위한 완성형 청크 전장 V5를 적용함. 성벽·성문·야영지·망루·방책과 접지 그림자를 하나의 3840×2160 중립 대낮 배경에 함께 제작하고 1920×1080 네 청크로 기계 분할해 재조립 픽셀 완전 일치를 확인함. 다크 판타지의 검은 비네팅·압축된 암부와 GPT 이미지 특유의 노란/금색 조명을 배제하고 회갈색 흙, 절제된 올리브 잔디, 중립 회색 석재를 사용함. `WIBattleCharacterScaleArenaV5.prefab`의 기존 독립 환경물은 중복을 막기 위해 비활성화하고 현재 `WI_BattleConfig.arenaPrefab`에 연결함.
 - 2026-08-15: 60명 전투의 캐릭터 밀도 재검증을 위해 아레스 전투 Sprite의 Transform Scale 1은 유지하고 PPU를 600에서 1178로 변경하여 원본 1178px 높이가 약 1월드 유닛으로 표시되도록 조정함. 공용 비주얼 재설정 메뉴도 1178 PPU 기준으로 동기화함. 동시에 V5의 캐릭터보다 큰 양각형 지면 무늬를 제거하고 넓은 회갈색 흙 색면·희미한 올리브 변화·드문 소형 자갈 중심으로 다시 그린 `Battle_CompleteArena_CharacterScale_V6_4K`을 제작함. 1920×1080 네 청크의 재조립 픽셀 완전 일치를 확인하고 `WIBattleCharacterScaleArenaV6.prefab` 및 현재 `WI_BattleConfig.arenaPrefab`에 연결함.
 - 2026-08-15: 기존 아레스 원화와 비슷한 약 7등신 비율을 유지한 단일 전장용 후보 `Ares_Battle_Unit_V1.png`을 제작함. 흰 장발·검은 판금 갑옷·절제된 금장·짙은 남보라 망토·장검의 정체성을 유지하고 작은 화면에서 읽히도록 세부 장식과 명암 덩어리를 정리함. 녹색 크로마 원본을 투명화한 뒤 256×384 셀에 비율 유지 배치했으며 실제 캐릭터 알파 높이는 328px, 투명 모서리 검사를 통과함. Unity Sprite/Single, 328 PPU, Bilinear, Mipmap 비활성, 무압축, Max 512로 설정했으며 현재 데이터에는 연결하지 않은 검토 후보임. 정식 component-row 추출은 Windows에서 `fcntl` 잠금을 지원하지 않아 중단하고 단일 이미지 cutout 경로만 사용함.
+- 2026-08-16: 캠페인 선택 UGUI 버튼의 9-Slice 설정을 정리함. `button_normal`의 실제 Single Sprite Border를 좌우·상하 28px로 복구하고, `WICampaignTitleUGUI.prefab`에서 `button_normal`·`button_primary`를 사용하는 Image 8개를 모두 Sliced로 변경함. 전체 행정 프리팹에서 두 Sprite를 Simple로 사용하는 잔여 항목은 0개이며 Unity 재임포트와 콘솔 컴파일 오류 없음 확인. 관련 EditMode 67개 중 65개 통과, 기존 전투 HUD·조명 기대값 불일치 2개는 본 변경과 무관하게 실패함.
+- 2026-08-17: 전략 화면을 시안의 상단 자원 HUD·좌측 선택 성·중앙 지도·우측 목표/알림·하단 명령부 구조에 맞춰 재배치함. 중앙 지도 영역과 성 노드를 확대하고 좌우 패널 폭, 다음 턴 강조, 아발론 문장 장식을 조정했으며 기존 60성 선택 및 행정 명령 데이터 연결은 유지함.
+- 2026-08-17: 전략 화면과 시안의 아트 차이를 줄이기 위해 전용 측면 패널·명령 버튼·다음 턴 버튼·영웅 초상 카드 에셋을 추가 적용함. 선택 성의 실제 주둔 영웅 최대 4명에 대해 초상·이름·경험 기반 표시 레벨을 연결하고 선택 지도 마커를 확대함. 런타임 UI 생성 없이 월드 UGUI 프리팹에 고정 카드 슬롯을 구성함.
+- 2026-08-17: 전략 화면 상단 HUD를 기준 시안에 맞춰 재구성함. 중앙 진영 방침 문구를 제거하고 아발론 문장·진영명, 연월, 금화·마나·영향력과 월 수입, 우측 월간 보고·의회·연구·설정 아이콘을 한 줄로 재배치했으며 얇은 세로 구분선과 하단 금속선을 적용함. 설정 톱니 전용 투명 에셋을 제작하고 네 아이콘의 실제 버튼 기능을 연결했으며 UGUI EditMode 39/39 및 Unity 콘솔 오류 0건을 확인함.

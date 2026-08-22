@@ -126,6 +126,7 @@ namespace ProjectWI.EditorTools
             Set(serialized, "managerBackButton", managerBack);
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
+            WIAdministrationModalVisualUtility.Apply(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             Object.DestroyImmediate(root);
             GameObject existing = GameObject.Find("WIAdministrationFocusProjectUGUI");

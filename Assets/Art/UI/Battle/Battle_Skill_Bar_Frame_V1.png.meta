@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e90fa918d55e1c44daf9b94ad88f74d7
+guid: 52faa8eb18e0f9d468428a9413e2b0fc
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8183771611362791540
-    second: Character_MedievalSwordsman_Test_V1_0
+      213: -4382588465638485867
+    second: Battle_Skill_Bar_Frame_V1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Character_MedievalSwordsman_Test_V1_0
+      name: Battle_Skill_Bar_Frame_V1_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1024
-        height: 1536
+        x: 3
+        y: 5
+        width: 475
+        height: 127
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c8f6bc534176d6e80800000000000000
-      internalID: -8183771611362791540
+      spriteID: 590d4eca20bed23c0800000000000000
+      internalID: -4382588465638485867
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Character_MedievalSwordsman_Test_V1_0: -8183771611362791540
+      Battle_Skill_Bar_Frame_V1_0: -4382588465638485867
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

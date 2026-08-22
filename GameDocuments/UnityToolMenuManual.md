@@ -1,6 +1,6 @@
 # ProjectWI Unity 도구 메뉴 설명서
 
-**기준일:** 2026-08-15  
+**기준일:** 2026-08-17  
 **조사 기준:** `Assets/Editor`의 실제 `MenuItem` 선언, 호출 코드, 생성 에셋과 현재 프로젝트 연결 상태
 
 ## 1. 메뉴 구성과 안전 등급
@@ -40,6 +40,12 @@ Unity 상단의 프로젝트 전용 메뉴는 두 루트로 나뉩니다.
 | `WI/Battle/Configure Ares Battle Sprite Defaults` | 현재 Ares Sprite의 Import 설정이 확정됐으며 재실행 메뉴가 필요하지 않습니다. | Texture Importer와 `BattleSceneAssetSettingsGuide.md`를 기준으로 관리합니다. |
 
 ## 3. ProjectWI 메뉴
+
+### 3.0 ProjectWI/Build
+
+| 메뉴 | 등급 | 기능 | 출력 및 주의사항 |
+|---|---|---|---|
+| `ProjectWI/Build/Package Windows Test Build` | 파일 생성 | Build Settings의 활성 씬으로 Windows x86-64 Development 빌드를 생성하고 전체 폴더를 ZIP으로 압축합니다. | 기존 `Builds/Windows`를 먼저 삭제합니다. 빌드는 `Builds/Windows/ProjectWI.exe`, ZIP은 `Builds/Packages/ProjectWI-Windows-v버전-날짜시간.zip`에 생성됩니다. |
 
 ### 3.1 ProjectWI/Data
 
@@ -171,9 +177,9 @@ Unity 상단의 프로젝트 전용 메뉴는 두 루트로 나뉩니다.
 
 ### `WI/UI/Configure UGUI Scene Visibility`
 
-- 실제 동작: 현재 Scene에서 `UGUI Screen Bootstrap`을 찾거나 만들고 `WIUIScreenManager`를 보장합니다.
-- 수집 범위: 기존 `screenPrefabs`, Scene 자식의 원본 Prefab, `Assets/Prefabs/Administration` 아래 이름이 `UGUI.prefab`으로 끝나는 모든 Prefab입니다.
-- 정리: 중복과 null을 제거해 `screenPrefabs`를 다시 기록한 후 Bootstrap 아래에 펼쳐진 모든 화면 자식을 삭제합니다.
+- 실제 동작: 현재 Scene에서 정식 루트 `UGUI Screen Bootstrap`을 찾거나 만들고 `WIUIScreenManager`를 보장합니다. 정식 루트가 없으면 이전 이름인 `UGUI Screens (Prefab Instances)` 또는 `MainCanvas`의 관리자를 재사용해 이름을 정규화합니다.
+- 수집 범위: 현재 Scene에 있는 모든 `WIUIScreenManager`의 `screenPrefabs`, 각 관리자 자식의 원본 Prefab, `Assets/Prefabs/Administration` 아래 이름이 `UGUI.prefab`으로 끝나는 모든 Prefab입니다.
+- 정리: 모든 참조에서 중복과 null을 제거해 정식 관리자의 `screenPrefabs`를 다시 기록한 후, Bootstrap 아래에 펼쳐진 화면 자식과 다른 `WIUIScreenManager` 루트를 삭제합니다. 따라서 메뉴를 반복 실행해도 화면 관리자는 하나만 유지됩니다.
 - 저장: 현재 열린 Scene을 Dirty 처리하고 즉시 저장합니다.
 - 실행 위치: `MainScene`에서만 사용하는 것이 안전합니다.
 - 위험: 이름과 달리 단순 표시 전환이 아니라 Scene 계층을 변경하고 저장합니다.

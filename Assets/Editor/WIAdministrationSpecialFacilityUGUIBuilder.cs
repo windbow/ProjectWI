@@ -58,6 +58,7 @@ namespace ProjectWI.EditorTools
             TextArray(serialized.FindProperty("optionLabels"), labels);
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
+            WIAdministrationModalVisualUtility.Apply(root);
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             PrefabUtility.UnloadPrefabContents(root);
             GameObject existing = GameObject.Find("WIAdministrationSpecialFacilityUGUI");

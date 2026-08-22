@@ -104,6 +104,8 @@ namespace ProjectWI.EditorTools
             serialized.FindProperty("scrollRect").objectReferenceValue = scroll;
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
+            WIAdministrationModalVisualUtility.Apply(root);
+
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             PrefabUtility.UnloadPrefabContents(root);
             GameObject existing = GameObject.Find("WIAdministrationCastleRecordUGUI");

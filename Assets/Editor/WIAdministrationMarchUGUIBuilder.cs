@@ -62,6 +62,8 @@ namespace ProjectWI.EditorTools
             Set(serialized, "pageLabel", panel.Find("PageLabel").GetComponent<TMP_Text>());
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
+            WIAdministrationModalVisualUtility.Apply(root);
+
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             PrefabUtility.UnloadPrefabContents(root);
             GameObject existing = GameObject.Find("WIAdministrationMarchUGUI");

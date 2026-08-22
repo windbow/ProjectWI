@@ -715,6 +715,16 @@
     background-color:rgba(0,0,0,0);
     border-width:0;
 }
+.bg-type-d {
+    background-image:url("project://database/Assets/Resources/UI/Generated/bg_type_d.png");
+    -unity-background-scale-mode:stretch-to-fill;
+    -unity-slice-left:16;
+    -unity-slice-right:16;
+    -unity-slice-top:16;
+    -unity-slice-bottom:16;
+    background-color:rgba(0,0,0,0);
+    border-width:0;
+}
 .compact-hud,
 .map-heading,
 .faction-legend,

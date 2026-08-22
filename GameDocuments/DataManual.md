@@ -1,6 +1,46 @@
 # ProjectWI 데이터 편집 매뉴얼
 
+> R&D 중간 이미지와 생성 원본은 활성 데이터 폴더에서 분리해 `Assets/TrashAsset`에 보관하며, 현재 ScriptableObject가 참조하는 에셋만 활성 경로에 유지합니다.
+
 현재 기획 기준은 `GameDesign.md`이며 전략 게임 데이터는 ScriptableObject에서 편집합니다. 방치형 던전 데이터는 사용하지 않습니다.
+
+## 성 내정 공용 모달 셸
+
+- `Assets/Resources/UI/Generated/administration_modal_shell_v1.png`은 성 내정 기능 모달 8종이 함께 쓰는 무문자 외곽 셸입니다.
+- 셸에는 외곽 금속 프레임, 빈 제목 띠, 어두운 본문 배경만 둡니다. 화면별 문구·목록·버튼·장식은 각 프리팹의 자식 요소로 유지합니다.
+- `WIAdministrationObjectiveUGUI`는 사용자가 직접 조정한 이미지·텍스트 배치를 보존하기 위해 이 공용 셸 적용 대상에서 제외합니다.
+- 공용 외곽 변경은 `WIAdministrationModalVisualUtility`에서 수행합니다. 중점 사업·인사 배치·인재 활동·특화 시설·기본 시설·태수 위임·진격/출정·성 상세 빌더가 이를 호출합니다.
+
+## Windows 테스트 패키징
+
+- Unity 상단 메뉴 `ProjectWI > Build > Package Windows Test Build`를 실행합니다.
+- 실행할 때마다 기존 `Builds/Windows`를 지우고 현재 Build Settings의 활성 씬으로 Windows x86-64 Development 빌드를 새로 만듭니다.
+- 실행 파일은 `Builds/Windows/ProjectWI.exe`이며, 전달용 ZIP은 `Builds/Packages/ProjectWI-Windows-v버전-날짜시간.zip`에 생성됩니다.
+- ZIP에는 실행 파일뿐 아니라 `ProjectWI_Data`, `UnityPlayer.dll`, Mono 런타임 등 실행에 필요한 Windows 빌드 폴더 전체가 포함됩니다.
+- 빌드 실패 시 ZIP을 만들지 않으며 Console에 `[WI_PACKAGE_FAIL]`을 기록합니다. 성공 시 `[WI_PACKAGE_SUCCESS]` 로그와 완료 창을 표시하고 ZIP 위치를 엽니다.
+- 자동 검증이 필요하면 새 빌드 후 `ProjectWI.exe -batchmode -nographics -wi-smoke-test -logFile SmokeTest.log`를 실행합니다.
+
+## 턴 후속 UI 에셋 편집
+
+- 턴 처리·캠페인 결과·튜토리얼·일반 안내는 `Assets/Prefabs/Administration/WIAdministrationTurnFollowupUGUI.prefab`을 공용으로 사용합니다.
+- 전용 이미지는 `Assets/Resources/UI/Generated/turn_followup_*_v1.png`이며, 프레임·정보 패널·지도 나침반·완료 체크 배지로 분리되어 있습니다.
+- 이미지에는 문구를 굽지 않습니다. 제목·설명·선택 문구는 `WIAdministrationTurnFollowupSnapshot`에서 TMP 라벨로 전달합니다.
+- 튜토리얼의 기능 선택 순서는 0번 안내 확인, 1번 전체 건너뛰기입니다. 화면에서는 주요 행동인 0번을 오른쪽 청색 버튼, 보조 행동인 1번을 왼쪽 흑청색 버튼에 표시합니다.
+- `TutorialContent`는 튜토리얼 모드에서만 활성화합니다. 캠페인 결과와 일반 안내에 튜토리얼 체크 문구를 재사용하지 않습니다.
+- 턴 후속 선택 버튼은 전용 `turn_followup_button_normal_v1.png`, `turn_followup_button_primary_v1.png`을 원본 약 4:1 비율의 `Image.Type.Simple`로 사용합니다. 중앙 다이아와 모서리 장식이 있는 이미지이므로 9-Slice를 적용하지 않습니다.
+- 설명 패널·튜토리얼 체크 패널·체크 행은 `turn_followup_info_panel_v1.png`을 사용합니다. 해당 Sprite는 장식 바깥 투명 여백을 4px만 둔 1955×509 이미지이며 사방 48px Border와 `Image.Type.Sliced`를 유지해야 합니다. 빌더 재실행 시에도 같은 설정이 적용됩니다.
+- 선택 문자열의 첫 줄은 버튼 제목, 줄바꿈 뒤 둘째 줄은 버튼 위 설명으로 표시됩니다. 제목과 설명을 다시 한 TMP 안에 합치지 않습니다.
+- 선택 설명 위 장식은 `turn_followup_choice_divider_v1.png`을 좌우에 각각 사용합니다. 중앙 다이아를 별도 오브젝트로 다시 만들지 않습니다.
+- 닫기 버튼은 X까지 포함된 `turn_followup_close_button_v1.png` 단일 Sprite입니다. 닫기 TMP 문자는 비활성 상태를 유지합니다.
+- 상단 설명 아이콘은 방패형 `turn_followup_header_emblem_v1.png`을 사용하고, 하단 튜토리얼 장식은 지도형 `turn_followup_map_compass_v1.png`을 사용합니다. 서로 역할과 표시 크기가 다르므로 한 이미지로 통합하지 않습니다.
+- 두 장식은 각각 210×256과 768×680, 무압축, Mipmap 비활성, Bilinear가 기준입니다. 원본 크기를 무작정 키우지 말고 실제 표시 크기에 맞춘 사전 축소본을 유지합니다.
+
+## 캠페인 목표 UI 에셋 편집
+
+- 목표 상세 프레임과 전용 요소는 `Assets/Resources/UI/Generated/objective_*_v1.png`에 있습니다.
+- `objective_confirm_button_v1.png`은 문구가 없는 버튼 배경이며 `목표 확인` 문구는 프리팹의 TMP에서 관리합니다.
+- 진행도는 `objective_progress_track_v1.png` 위에 `objective_progress_fill_v1.png`을 Filled Image로 겹칩니다. 목표 수치를 바꿀 때 이미지를 다시 만들지 않고 `ProgressNormalized` 계산을 유지합니다.
+- `objective_reward_strip_v1.png`에는 G/M/I 아이콘과 빈 프레임만 포함됩니다. 실제 보상 값은 목표 ScriptableObject의 `RewardGold`, `RewardMana`, `RewardInfluence`에서 각각 표시됩니다.
 
 전투씬 에셋의 설정값과 제작·검증 절차는 `GameDocuments/BattleSceneAssetSettingsGuide.md`를 우선 기준으로 사용합니다. 아래 과거 하이브리드 청크 항목은 비교·복구용 기록이며 현재 전장 기준이 아닙니다.
 
@@ -37,9 +77,16 @@
 
 ## UI 배경 에셋
 
+- 목표 상세 모달은 `Assets/Resources/UI/Generated/objective_modal_frame_v1.png`을 전용 배경으로 사용합니다. 이미지에는 문구·수치·버튼이 포함되지 않으며 `WIAdministrationObjectiveUGUI.prefab`의 TMP와 Image가 제목, 현재 상황, 달성 조건, 진행도, 보상을 표시합니다. 재생성은 `WI/UI/Build Objective UGUI` 메뉴를 사용합니다.
+
+- 캠페인 난이도·시작 조건 카드는 미선택 시 `button_normal`, 선택 시 `button_primary` Sprite를 사용합니다. 원본 이미지 색을 유지하기 위해 Image Tint로 선택색을 만들지 않습니다. `ContinueCampaignButton`은 `button_normal`, `NewCampaignButton`은 `button_primary`를 사용합니다.
+
+- 공통 주요 버튼 `Assets/Resources/UI/Generated/button_primary.png`은 512×128 Sprite이며 9-Slice border는 좌우 28px·상하 24px입니다. 버튼 크기를 변경할 때 `Simple` 스트레치 대신 `Sliced`를 사용해 외곽 장식 두께를 유지합니다.
+
 - Background A Type: `Assets/Resources/UI/Generated/bg_type_a.png`
 - Background B Type: `Assets/Resources/UI/Generated/bg_type_b.png`
 - Background C Type: `Assets/Resources/UI/Generated/bg_type_c.png`
+- Background D Type: `Assets/Resources/UI/Generated/bg_type_d.png`
 - 원본 가운데 패널만 1587×508로 크롭하고 모서리 바깥 영역을 투명 처리한 RGBA Sprite입니다.
 - UI Toolkit에서 크기를 변경할 때 좌·우·상·하 3px 9-Slice를 유지합니다.
 - 모서리는 2px만 사선으로 잘라 거의 직사각형이며 외곽에는 단일 2px 금속 테두리만 사용합니다.
@@ -300,7 +347,7 @@ UI 후속 작업은 `GameDocuments/UIHandoffReport.md`와 `GameDocuments/UIConce
 
 전체 UI 제목·본문·입력 문구는 `Assets/Fonts/NotoSerifKR-VariableFont_wght.ttf`를 기본으로 사용합니다. 자원 수치, 성 수치, 지도 명패, 작은 슬롯 문구와 모든 버튼은 작은 크기에서도 획이 선명한 `Assets/Fonts/NotoSansKR-VariableFont_wght.ttf`를 사용하며 버튼 텍스트 외곽선은 적용하지 않습니다. 두 글꼴은 SIL Open Font License이며 각각의 라이선스 원문을 같은 폴더의 `OFL-NotoSerifKR.txt`, `OFL-NotoSansKR.txt`에 보관합니다.
 
-시안형 명령 아이콘은 `icon_flat_*.png`, 상단 날짜·자원 아이콘은 `hud_flat_*.png`, 버튼 타입은 `button_flat_normal.png`, `button_flat_primary.png`, `button_flat_danger.png`입니다. A/B 버튼은 동일한 768×128 규격과 형상을 사용하며 B는 푸른 색조만 다릅니다. 두 버튼은 2px 투명 모서리와 단일 2px 테두리로 구성하고 USS에서 상하좌우 3의 9-Slice를 사용합니다. 전역 지도 좌측 성 요약 패널과 오른쪽의 독립된 목표·알림 패널을 포함한 공통 패널 배경은 `bg_type_a.png`와 상하좌우 3의 9-Slice를 사용합니다. 조금 더 강조가 필요한 패널에는 원본 대비 약 1/2 두께의 `bg_type_b.png`를 `.bg-type-b` 클래스로 지정하며 상하좌우 16의 9-Slice를 사용합니다. 청동 테두리·대각 모서리와 어두운 중앙 면만 사용하는 `bg_type_c.png`는 `.bg-type-c` 클래스로 지정하며 좌우 72·상하 40의 9-Slice를 사용합니다. 원본과 가공 소스는 `Tools/UIAssetSources`에서 다시 가공할 수 있습니다.
+시안형 명령 아이콘은 `icon_flat_*.png`, 상단 날짜·자원 아이콘은 `hud_flat_*.png`, 버튼 타입은 `button_flat_normal.png`, `button_flat_primary.png`, `button_flat_danger.png`입니다. A/B 버튼은 동일한 768×128 규격과 형상을 사용하며 B는 푸른 색조만 다릅니다. 두 버튼은 2px 투명 모서리와 단일 2px 테두리로 구성하고 USS에서 상하좌우 3의 9-Slice를 사용합니다. 전역 지도 좌측 성 요약 패널과 오른쪽의 독립된 목표·알림 패널을 포함한 공통 패널 배경은 `bg_type_a.png`와 상하좌우 3의 9-Slice를 사용합니다. 조금 더 강조가 필요한 패널에는 원본 대비 약 1/2 두께의 `bg_type_b.png`를 `.bg-type-b` 클래스로 지정하며 상하좌우 16의 9-Slice를 사용합니다. 청동 테두리·대각 모서리와 어두운 중앙 면만 사용하는 `bg_type_c.png`는 `.bg-type-c` 클래스로 지정하며 좌우 72·상하 40의 9-Slice를 사용합니다. 세로형 알림 패널에는 얇은 은회색 금속 프레임과 흑청색 질감 면으로 구성된 512×640 `bg_type_d.png`를 `.bg-type-d` 클래스로 지정하며 상하좌우 16px 9-Slice를 사용합니다. D Type에는 제목·아이콘·행 구분선이 합성되어 있지 않아 알림 외의 세로형 정보 패널에도 재사용할 수 있습니다. 프레임 바깥은 완전 투명하며 고립 알파 픽셀은 허용하지 않습니다. 정리 전 원본은 `Assets/TrashAsset/UI/Generated/bg_type_d_noisy_original.png`에 보관합니다.
 
 공통 모달 헤더는 사용자가 선택한 은색 금속 프레임 이미지를 바탕으로 테두리를 기존 약 1/4 두께로 얇게 재작성한 `popup_header.png`를 사용합니다. 에셋과 Unity Sprite 표시 영역은 1024×297이며, 공통 모달에서 최소 80px 높이와 좌우 20·상하 10의 9-Slice로 표시합니다. 가공 전 선택 원본은 `Tools/UIAssetSources/popup_header_selected_source.png`, 얇은 프레임 생성 원본은 `Tools/UIAssetSources/popup_header_thin_imagegen_source.png`에 보존합니다.
 
@@ -343,11 +390,17 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - **데이터 저장 & Undo/Redo**: 유니티 `SerializedObject` 연동으로 수정 내용의 Undo/Redo 지원, '새 캐릭터 추가' 및 '데이터베이스 저장' 버튼 제공
 # UGUI 월드 화면 이행
 
+- 플레이 중 각 화면 프리팹 루트는 이벤트 구독을 위해 활성 상태를 유지합니다. 숨겨진 화면은 `Canvas.enabled=false`, `GraphicRaycaster.enabled=false`로 전환되므로 Scene 선택과 게임 입력을 가로막지 않으며, 내부 `contentRoot` 또는 `modalRoot`가 표시될 때만 Canvas도 함께 활성화됩니다.
+- 플레이 때 생성된 `~~~UGUI(Clone)` 루트는 에디터 코드가 자동으로 Scene Picking을 차단합니다. 이 설정은 루트에만 적용되고 자식은 포함하지 않으므로 수동 `Alt + Picking` 조작 없이도 실제 자식 UI를 Scene View에서 선택할 수 있습니다.
 - `WIAdministrationWorldUGUIController`는 데이터를 직접 생성하거나 변경하지 않고 `WIAdministrationWorldSnapshot`을 표시합니다.
 - 월드 화면의 군사·영웅·외교·첩보·연구·통치·의회·월간 보고·다음 턴 버튼은 이행용 `WIAdministrationUIController.UGUIBridge`를 통해 기존 게임 기능을 호출합니다.
 - 실제 게임 화면은 완성 UGUI 프리팹을 사용합니다. 이전 UI Toolkit UXML은 참고 자료로 남아 있으나 런타임 `UIDocument`에는 연결되지 않습니다.
 - 월드 지도 성 노드는 런타임 생성하지 않으며 프리팹에 60개가 고정 배치됩니다. 위치는 `WICastleDefinition.NormalizedMapPosition`, 표시 이름과 초기 진영은 행정 데이터베이스를 기준으로 생성하고 런타임 소유 진영은 스냅샷으로 갱신합니다.
-- 영지 UGUI는 `WIAdministrationTerritorySnapshot`을 통해 선택 성 정보를 읽습니다. 영웅 슬롯 8개, 특화 시설 슬롯 2개와 명령 버튼 8개는 프리팹에 고정 배치되며 성 규모·정보 공개 상태에 따라 표시 또는 비활성화됩니다.
+- 영지 UGUI는 `WIAdministrationTerritorySnapshot`을 통해 선택 성 정보를 읽습니다. 화면은 전략 HUD와 동일한 상단 진영·연월·자원 표시, 좌측 성 현황, 중앙 대형 성 전경, 우측 명령, 하단 요약 트레이로 구성됩니다. 하단에는 주둔 영웅 앞쪽 4명, 특화 시설 최대 2개와 이번 달 중점을 표시하고, 명령 버튼 8개는 프리팹에 고정 배치됩니다. 성 규모·정보 공개·관리 가능 상태에 따라 슬롯과 버튼이 표시 또는 비활성화됩니다.
+- 영지 UGUI의 `TopHUD`는 월드 UGUI의 `TopHUD`를 기준으로 동일하게 유지합니다. 1920×1080 기준 높이는 92px이며 배경·하단 금속선·진영 문장·날짜 및 세 자원·자원 아이콘·세로 구분선·우측 월보/의회/연구/설정 아이콘과 투명 클릭 영역의 구조, 앵커, 오프셋, 폰트 크기와 정렬을 일치시킵니다. 월보·의회·연구·설정 버튼도 두 화면에서 같은 전역 UGUI 기능을 실행합니다.
+- 성 내정의 중점 사업·인사 배치·인재 활동·특화 시설·기본 시설·태수 위임 모달은 공통 냉색 금속 스타일을 사용합니다. 본문은 `bg_type_d`, 헤더와 일반 버튼은 `button_flat_normal`, 주요 행동은 `button_flat_primary`, 닫기는 X가 포함된 `turn_followup_close_button_v1`을 사용합니다. 각 빌더는 `WIAdministrationModalVisualUtility`를 호출하므로 재생성해도 밝은 종이 헤더나 흰 버튼으로 돌아가지 않습니다.
+- 성 내정 하단 공통 트레이는 `Assets/Resources/UI/Generated/territory_bottom_panel_v1.png`입니다. 문구·아이콘·카드가 합성되지 않은 512×171 투명 PNG이며 냉색 흑청 질감, 얇은 은회색·저채도 청동 프레임을 사용합니다. Unity에서는 Sprite/Single, 무압축, Mipmap 비활성, Clamp, Bilinear와 상하좌우 18px 9-Slice를 사용합니다.
+- 성 내정의 `대륙 지도` 이동 버튼은 공용 명령 버튼을 확대하지 않고 `Assets/Resources/UI/Generated/territory_back_button_v1.png`를 사용합니다. 512×142 무문자 투명 PNG의 얇은 은회색 이중선과 작은 모서리·중앙 장식으로 구성되며, Unity에서는 좌우 12px·상하 10px 9-Slice를 사용합니다.
 - 영웅 배치·인재 활동·기본 시설·영웅 목록은 각 UGUI 프리팹과 전용 브리지만 사용하며 레거시 UI Toolkit 인물·시설 모달은 호출하지 않습니다.
 - 중점 사업 UGUI는 8종 사업의 기본/집중 투자 선택 후 대기 영웅을 담당자로 선택하는 2단계 고정 화면입니다. 사업 비용·예상 성과·특기·전문 분야·진영 방침 계산은 기존 `WIAdministrationTurnSystem`을 사용합니다.
 - 영웅 배치 UGUI는 영입되었고 다른 성에 배치되지 않았으며 임무·전투단에 참여하지 않는 인물을 후보로 표시합니다. 한 페이지에 8개의 고정 카드를 사용하며 이전/다음 버튼으로 전체 후보를 탐색합니다.
@@ -361,7 +414,7 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 월간 보고 UGUI는 하단 월간 보고 버튼과 오른쪽 전투 알림에서 열립니다. 지난달 자원·위임·AI 판단·뉴스를 스크롤로 확인하고, 오른쪽 행동 목록에서 선택 사건을 처리하거나 미결 전투를 시작합니다.
 - 군사 UGUI는 하단 군사 버튼에서 열리며 미결 플레이어 전투와 플레이어 전투단의 인원·숙련·보급·상태를 최대 8개 고정 카드로 표시합니다. 같은 프리팹에서 전투 시작, 편성 성·대장·역할·단원 선택, 단원 제외, 합동 훈련, 해산, 인접 성 이동·원정을 단계별로 처리합니다.
 - 영웅 UGUI는 하단 영웅 버튼에서 열리며 영입 영웅과 발견 인재를 페이지 가능한 8개 카드로 표시합니다. 영웅 카드를 선택하면 공훈·명성·충성·특기를 확인하고 승격 대기 인물의 영웅 승격 또는 조건을 충족한 작위 수여를 처리할 수 있습니다.
-- `MainScene`에는 개별 UGUI 화면 인스턴스를 저장하지 않습니다. `WIUIScreenManager`가 `Assets/Prefabs/Administration`의 완성 프리팹 참조를 보관하고 플레이 시작 때 화면을 비활성 상태로 생성합니다. Scene에서 확인할 화면의 루트만 수동으로 활성화하면 다른 화면과 겹치지 않게 편집할 수 있습니다.
+- `MainScene`에는 개별 UGUI 화면 인스턴스를 저장하지 않습니다. 단일 `UGUI Screen Bootstrap` 오브젝트의 `WIUIScreenManager`가 `Assets/Prefabs/Administration`의 완성 프리팹 참조를 보관하고 플레이 시작 때 화면을 생성합니다. 별도의 `MainCanvas` 화면 관리자는 사용하지 않습니다. Scene에서 확인할 화면의 루트만 수동으로 활성화하면 다른 화면과 겹치지 않게 편집할 수 있습니다.
 - 외교 UGUI는 하단 외교 버튼에서 열리며 존속 중인 다른 진영과 전쟁·중립·우호·불가침·동맹 상태를 표시합니다. 대상 진영을 선택하면 현재 관계에 맞춰 포로 처리, 관계 개선, 협정, 원조, 공동 공격 또는 선전포고 명령을 실행합니다.
 - 첩보 UGUI는 하단 첩보 버튼에서 열리며 진행 중 임무와 조사·방첩·유언비어·인재 이간을 표시합니다. 첩보 종류, 대기 담당 인물, 대상 성을 차례로 선택하며 인재 이간은 조사로 정보가 공개된 성의 주둔 인물까지 선택합니다.
 - 연구 UGUI는 하단 연구 버튼에서 열리며 완료 연구, 진행 중 연구와 미완료 연구를 함께 표시합니다. 마나·최고 기술·선행 연구·진행 중 연구 조건을 충족한 연구를 선택한 뒤 플레이어 진영의 대기 인물을 지력 순으로 비교해 담당자로 지정합니다.
@@ -377,7 +430,7 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 캠페인 저장 상태에 미결 플레이어 전투가 있으면 MainScene 초기화 직후 월간 보고 UGUI가 자동으로 열립니다. 화면별 `OnEnable` 구독보다 먼저 요청이 소실되지 않도록 한 프레임 뒤에 표시합니다.
 - 캠페인 난이도와 시작 조건 카드는 `WICampaignTitleUGUI.prefab`에 고정 배치되어 있으며 `WICampaignTitleUGUIController`만 선택 상태와 버튼 입력을 관리합니다. 행정 UI Toolkit UXML에는 더 이상 런타임 카드가 생성되지 않습니다.
 - 실제 플레이 입력은 UGUI 프리팹의 버튼만 사용합니다. 행정 초기화는 UI Toolkit 전역 버튼을 바인딩하거나 UXML 성 노드를 다시 구성하지 않으며, UGUI 지도는 `WIAdministrationWorldUGUI.prefab`에 저장된 60개 고정 버튼을 사용합니다.
-- MainScene의 화면 관리자에는 화면 자식이 없으며 `WIUIScreenManager.screenPrefabs`에 23개 완성 프리팹 에셋만 연결됩니다. 플레이 시 해당 프리팹을 비활성 자식으로 생성합니다. 빌더는 새 프리팹을 자동 등록하며 수동 복구는 `WI/UI/Configure UGUI Scene Visibility` 메뉴를 사용합니다.
+- MainScene에는 화면 관리자 `UGUI Screen Bootstrap` 하나만 존재합니다. 화면 자식 없이 `WIUIScreenManager.screenPrefabs`에 23개 완성 프리팹 에셋만 연결되며 플레이 시 해당 프리팹을 자식으로 생성합니다. 빌더는 새 프리팹을 자동 등록하고, 수동 복구 메뉴는 이전 이름이나 중복 관리자의 참조를 병합한 뒤 중복 루트를 삭제합니다.
 - `WIAdministrationUI.prefab`은 이름을 유지하지만 더 이상 UI 화면이나 `UIDocument`를 포함하지 않습니다. 캠페인 상태와 기능별 UGUI 스냅샷·명령을 연결하는 런타임 브리지 프리팹입니다.
 - 군사 목록·전투단 편성·상세·이동/원정은 `WIAdministrationMilitaryUGUIController`와 `WIAdministrationUIController.UGUIMilitaryBridge`만 사용합니다. 이전 UI Toolkit 군사 모달 진입 메서드는 삭제됐습니다.
 - `WIAdministrationUIController.Characters.cs`에는 UGUI 카드 표시용 `GetGradeDisplayName`, `GetTraitDisplayText`만 남습니다. 인물 선택과 시설 명령은 각 UGUI 컨트롤러가 고정 프리팹 카드를 갱신해 처리합니다.
@@ -414,3 +467,14 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 현재 검증 데이터의 전체 캐릭터 500명은 `Ares_Battle_1WU_A_OutlineBake_V1.png`를 공용 `battleSprite`로 사용합니다. 과거 일괄 배정·해제 테스트 메뉴는 데이터 훼손 위험을 줄이기 위해 제거했습니다.
 - 30대30 밀도 검증은 Unity 메뉴 `ProjectWI/Verification/Start 30v30 Battle Density Test`로 실행합니다. 캠페인 저장과 분리된 테스트 세션에 양측 영웅 1명·커먼급 29명을 자동 편성하고 MainScene에서 BattleScene으로 진입합니다.
 - 확대 검증용 실험 지면은 `Assets/Art/Battle/Backgrounds/GroundExperiment_V2/Battle_Ground_NeutralDay_V2_4K.png`입니다. 4096×4096 단일 대형 지면 후보이며 무압축·Mipmap 비활성 설정을 사용합니다. 반복 배치 시 이음선이 있으므로 Tile/Repeat 용도로 사용하지 않으며 현재 전투 설정에는 연결하지 않습니다.
+- 공통 UGUI 버튼 배경 `button_normal`은 좌우·상하 28px, `button_primary`는 좌우 28px·상하 24px Border를 사용합니다. 크기가 변하는 버튼의 `Image Type`은 반드시 `Sliced`로 유지하며 현재 캠페인 선택 프리팹을 포함한 모든 연결 사용처가 이 규칙을 따릅니다.
+- 전략 월드 UGUI는 1920×1080 기준으로 상단 HUD 92px, 하단 명령부 112px를 사용합니다. 상단은 진영 문장·진영명, 연월, 금화·마나·영향력과 월 수입, 월간 보고·의회·연구·설정 버튼 순서입니다. 본문은 좌측 선택 성 22%, 중앙 지도 59%, 우측 목표·알림 19%로 나누며 지도 Sprite와 60개 고정 성 노드는 기존 `WIAdministrationWorldSnapshot` 데이터를 사용합니다.
+- `strategy_top_settings_v1`은 전략 상단 설정 버튼 전용 투명 톱니 Sprite입니다. 나머지 세 상단 기능은 `icon_flat_report`, `icon_flat_faction`, `icon_flat_research`를 재사용하며 각 아이콘 위의 투명 Button이 기존 기능을 호출합니다.
+- 전략 하단 명령 바는 좌측 1.8%부터 군사·인사·외교·계략·연구·평정·월보 7개 버튼을 배치합니다. 버튼은 화면 폭 9.8%, 간격 10.5%이며 아이콘과 명조 계열 문구를 분리해 표시합니다. 다음 턴은 화면 78~98.2%에 독립 배치하고 하단 설정 버튼은 사용하지 않습니다.
+- 전략 좌측 선택 성 패널은 상단 문장·성명·소속, 가로형 성 이미지, 영지관·번영·기술·질서·방어·주둔 전투단 6행, 영웅 카드 4개, 성 관리 버튼 순서로 구성합니다. 현재 데이터 모델에 없는 인구·식량·행복도는 표시를 위해 임의 계산하지 않습니다.
+- 하단 일반 명령은 `strategy_command_button_v2`를 좌우 34px·상하 24px Border의 Sliced Image로 사용합니다. 다음 턴은 비대칭 `strategy_next_turn_button_v3`를 좌 88px·우 42px·상하 24px Border로 사용하며 아발론 문장, 문구, 우측 화살표는 별도 자식 요소입니다.
+- `strategy_avalon_crest_v1`은 전략 화면의 상단 진영 표식과 좌측 선택 성 표식에 공용으로 사용하는 투명 Sprite입니다. 이미지에 문구나 수치는 포함하지 않습니다.
+- 전략 화면 전용 `strategy_side_panel_v1`, `strategy_command_button_v1`, `strategy_next_turn_button_v1`, `strategy_hero_card_v1`은 문구가 없는 투명 PNG입니다. TMP 텍스트와 실제 영웅 초상은 프리팹 자식 요소로 별도 배치합니다.
+- 선택 성 영웅 카드는 `WICastleRuntimeState.HeroIds`의 앞쪽 최대 4명을 표시합니다. 이름과 초상은 `WIHeroDefinition`, 표시 레벨은 `WICharacterRuntimeState.Experience`를 100 경험치당 1단계로 환산해 사용합니다.
+- `bg_type_c`는 전략 화면 상단 HUD의 공통 프레임 Sprite입니다. 하단 명령부는 새 시안에 따라 단색 흑청색 배경과 얇은 상하 구분선을 사용합니다.
+- 전략 지도 연결선은 `WIAdministrationMapConnectionGraphic` 하나가 `WIAdministrationWorldSnapshot.MapConnections`를 메시로 그립니다. 평상시에는 저명도 진영색, 적대 경계는 적색과 `×`, 선택 성의 인접 경로는 청백색 이중 광택과 마름모 표식으로 표시하며 포인터 입력은 받지 않습니다.

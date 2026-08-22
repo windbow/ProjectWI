@@ -106,6 +106,7 @@ namespace ProjectWI.EditorTools
             Set(serialized, "pageLabel", page);
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
+            WIAdministrationModalVisualUtility.Apply(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             Object.DestroyImmediate(root);
             GameObject existing = GameObject.Find("WIAdministrationHeroAssignmentUGUI");

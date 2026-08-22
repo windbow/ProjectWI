@@ -139,7 +139,7 @@
 
 - 현재 A·B·C 모두 일반 `WI_BattleCharacter_Unlit.mat`을 사용하며 외곽선은 Sprite에 직접 베이크합니다.
 - 베이크 외곽선은 바깥 실루엣에만 `#10141A` 색으로 84%→50%→20% 알파를 사용합니다.
-- `ProjectWI/Battle/Sprite Unlit Outline`, `WI_BattleCharacter_UnlitOutline.mat`, `WI_BattleCharacter_UnlitOutlineStrong.mat`은 비교·복구용으로 보존하지만 현재 런타임 설정에서는 사용하지 않습니다.
+- 구형 `ProjectWI/Battle/Sprite Unlit Outline` 셰이더와 비교 재질 두 종은 현재 런타임에서 사용하지 않으며 `Assets/TrashAsset/Art/Battle/OutlineExperiment`에 복구용으로 보관합니다.
 - 셰이더 방식은 머리카락·갑옷 틈의 알파 노이즈까지 경계로 검출해 확대 시 울퉁불퉁해졌으므로 현재 기준에서 제외합니다.
 
 ### 3.5.1 공용 접지 그림자

@@ -19,6 +19,14 @@ namespace ProjectWI.EditorTools
         [MenuItem("WI/UI/Build Administration World UGUI")]
         public static void Build()
         {
+            ConfigureStrategyButtonAsset("Assets/Resources/UI/Generated/bg_type_d.png",
+                new Vector4(16f, 16f, 16f, 16f));
+            ConfigureStrategyButtonAsset("Assets/Resources/UI/Generated/strategy_command_button_v2.png",
+                new Vector4(34f, 24f, 34f, 24f));
+            ConfigureStrategyButtonAsset("Assets/Resources/UI/Generated/strategy_next_turn_button_v2.png",
+                new Vector4(92f, 24f, 92f, 24f));
+            ConfigureStrategyButtonAsset("Assets/Resources/UI/Generated/strategy_next_turn_button_v3.png",
+                new Vector4(88f, 24f, 42f, 24f));
             CreatePersistentDynamicFont("Assets/Fonts/NotoSansCJKkr-Regular.otf",
                 "Assets/Fonts/TMP/NotoSansCJKkr-Dynamic.asset");
             CreatePersistentDynamicFont("Assets/Fonts/NotoSerifCJKkr-Regular.otf",
@@ -40,49 +48,143 @@ namespace ProjectWI.EditorTools
 
             GameObject content = CreatePanel(root.transform, "WorldContent", null, new Color32(8, 15, 20, 255),
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-            GameObject top = CreatePanel(content.transform, "TopHUD", LoadSprite("bg_type_c"), Color.white,
-                new Vector2(0f, 1f), Vector2.one, new Vector2(0f, -82f), Vector2.zero);
-            TMP_Text faction = CreateText(top.transform, "Faction", "아발론 왕국", 25f, TextAlignmentOptions.MidlineLeft,
-                new Vector2(0f, 0f), new Vector2(0.23f, 1f), new Vector2(26f, 0f), new Vector2(-8f, 0f), true);
-            TMP_Text date = CreateText(top.transform, "Date", "1000년 01월 · 제 1턴", 20f, TextAlignmentOptions.Center,
-                new Vector2(0.23f, 0f), new Vector2(0.45f, 1f), Vector2.zero, Vector2.zero, false);
-            TMP_Text turnDescription = CreateText(top.transform, "TurnDescription", "명령을 검토하십시오.", 17f,
-                TextAlignmentOptions.Center, new Vector2(0.45f, 0f), new Vector2(0.68f, 1f), Vector2.zero, Vector2.zero, false);
-            TMP_Text gold = CreateText(top.transform, "Gold", "금화", 17f, TextAlignmentOptions.Center,
-                new Vector2(0.68f, 0f), new Vector2(0.79f, 1f), Vector2.zero, Vector2.zero, false);
-            TMP_Text mana = CreateText(top.transform, "Mana", "마나", 17f, TextAlignmentOptions.Center,
-                new Vector2(0.79f, 0f), new Vector2(0.89f, 1f), Vector2.zero, Vector2.zero, false);
-            TMP_Text influence = CreateText(top.transform, "Influence", "영향력", 17f, TextAlignmentOptions.Center,
-                new Vector2(0.89f, 0f), Vector2.one, Vector2.zero, Vector2.zero, false);
+            GameObject top = CreatePanel(content.transform, "TopHUD", null, new Color32(6, 13, 18, 255),
+                new Vector2(0f, 1f), Vector2.one, new Vector2(0f, -92f), Vector2.zero);
+            CreateImage(top.transform, "BottomMetalLine", null, new Color32(91, 91, 85, 255),
+                new Vector2(0f, 0f), new Vector2(1f, 0f), Vector2.zero, new Vector2(0f, 2f), Image.Type.Simple);
+            Image factionCrest = CreateImage(top.transform, "FactionCrest", LoadSprite("strategy_avalon_crest_v1"), Color.white,
+                new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(24f, 8f), new Vector2(88f, -8f), Image.Type.Simple);
+            factionCrest.preserveAspect = true;
+            TMP_Text faction = CreateText(top.transform, "Faction", "아발론 왕국", 28f, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0f, 0f), new Vector2(0.18f, 1f), new Vector2(98f, 0f), new Vector2(-8f, 0f), true);
+            TMP_Text date = CreateText(top.transform, "Date", "1년 03월", 22f, TextAlignmentOptions.Center,
+                new Vector2(0.19f, 0f), new Vector2(0.31f, 1f), new Vector2(18f, 0f), Vector2.zero, false);
+            TMP_Text turnDescription = CreateText(top.transform, "TurnDescription", string.Empty, 1f,
+                TextAlignmentOptions.Center, Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero, false);
+            turnDescription.gameObject.SetActive(false);
+            TMP_Text gold = CreateText(top.transform, "Gold", "금화 1,240 (+320/월)", 19f, TextAlignmentOptions.Center,
+                new Vector2(0.32f, 0f), new Vector2(0.47f, 1f), new Vector2(18f, 0f), Vector2.zero, false);
+            TMP_Text mana = CreateText(top.transform, "Mana", "마나 360 (+90/월)", 19f, TextAlignmentOptions.Center,
+                new Vector2(0.47f, 0f), new Vector2(0.61f, 1f), new Vector2(18f, 0f), Vector2.zero, false);
+            TMP_Text influence = CreateText(top.transform, "Influence", "영향력 125 (+15/월)", 19f, TextAlignmentOptions.Center,
+                new Vector2(0.61f, 0f), new Vector2(0.76f, 1f), new Vector2(18f, 0f), Vector2.zero, false);
+            CreateHudIcon(top.transform, "DateIcon", "hud_flat_date", 0.205f);
+            CreateHudIcon(top.transform, "GoldIcon", "hud_flat_gold", 0.335f);
+            CreateHudIcon(top.transform, "ManaIcon", "hud_flat_mana", 0.485f);
+            CreateHudIcon(top.transform, "InfluenceIcon", "hud_flat_influence", 0.625f);
+            CreateTopSeparator(top.transform, "FactionSeparator", 0.185f);
+            CreateTopSeparator(top.transform, "DateSeparator", 0.315f);
+            CreateTopSeparator(top.transform, "GoldSeparator", 0.47f);
+            CreateTopSeparator(top.transform, "ManaSeparator", 0.61f);
+            CreateTopSeparator(top.transform, "InfluenceSeparator", 0.76f);
+
+            string[] topIconNames = {
+                "icon_flat_report", "icon_flat_faction", "icon_flat_research", "strategy_top_settings_v1"
+            };
+            for (int index = 0; index < topIconNames.Length; index += 1)
+            {
+                float topIconCenter = 0.845625f + index * 0.04125f;
+                Image topIcon = CreateImage(top.transform, $"TopIcon{index + 1}", LoadSprite(topIconNames[index]),
+                    new Color32(205, 209, 210, 255), new Vector2(topIconCenter, 0.5f), new Vector2(topIconCenter, 0.5f),
+                    new Vector2(-22f, -22f), new Vector2(22f, 22f), Image.Type.Simple);
+                topIcon.preserveAspect = true;
+            }
+            List<Button> topCommands = new List<Button>();
+            WIAdministrationShortcutAction[] topActions = {
+                WIAdministrationShortcutAction.MonthlyReport, WIAdministrationShortcutAction.Council,
+                WIAdministrationShortcutAction.Research
+            };
+            for (int index = 0; index < topActions.Length; index += 1)
+            {
+                float minimum = 0.825f + index * 0.04125f;
+                Button topCommand = CreateButton(top.transform, $"TopCommand{index + 1}", string.Empty, null,
+                    new Vector2(minimum, 0.08f), new Vector2(minimum + 0.04125f, 0.92f), Vector2.zero, Vector2.zero,
+                    out TMP_Text topCommandLabel);
+                Object.DestroyImmediate(topCommandLabel.gameObject);
+                topCommand.image.color = Color.clear;
+                topCommands.Add(topCommand);
+            }
+            Button topSystemButton = CreateButton(top.transform, "TopSystemButton", string.Empty, null,
+                new Vector2(0.94875f, 0.08f), new Vector2(0.99f, 0.92f), Vector2.zero, Vector2.zero,
+                out TMP_Text topSystemLabel);
+            Object.DestroyImmediate(topSystemLabel.gameObject);
+            topSystemButton.image.color = Color.clear;
 
             GameObject body = CreatePanel(content.transform, "WorldBody", null, Color.clear,
-                new Vector2(0f, 0f), Vector2.one, new Vector2(0f, 104f), new Vector2(0f, -88f));
-            GameObject left = CreatePanel(body.transform, "CastleSummaryPanel", LoadSprite("bg_type_a"), Color.white,
-                Vector2.zero, new Vector2(0.18f, 1f), new Vector2(12f, 12f), new Vector2(-6f, -12f));
-            CreateText(left.transform, "Kicker", "아발론 영지", 15f, TextAlignmentOptions.MidlineLeft,
-                new Vector2(0f, 0.92f), Vector2.one, new Vector2(22f, 0f), new Vector2(-18f, 0f), false);
-            TMP_Text castleName = CreateText(left.transform, "CastleName", "별빛 수도", 28f, TextAlignmentOptions.MidlineLeft,
-                new Vector2(0f, 0.83f), new Vector2(1f, 0.93f), new Vector2(22f, 0f), new Vector2(-18f, 0f), true);
+                new Vector2(0f, 0f), Vector2.one, new Vector2(0f, 112f), new Vector2(0f, -90f));
+            GameObject left = CreatePanel(body.transform, "CastleSummaryPanel", LoadSprite("right_panel_frame"), Color.white,
+                Vector2.zero, new Vector2(0.22f, 1f), new Vector2(14f, 12f), new Vector2(-6f, -12f));
+            Image castleCrest = CreateImage(left.transform, "CastleCrest", LoadSprite("strategy_avalon_crest_v1"), Color.white,
+                new Vector2(0.04f, 0.855f), new Vector2(0.23f, 0.985f), Vector2.zero, Vector2.zero, Image.Type.Simple);
+            castleCrest.preserveAspect = true;
+            TMP_Text castleName = CreateText(left.transform, "CastleName", "별빛 수도", 27f, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0.23f, 0.915f), new Vector2(0.88f, 0.985f), Vector2.zero, Vector2.zero, true);
+            TMP_Text castleOwner = CreateText(left.transform, "CastleOwner", "수도 · 아발론 왕국", 15f,
+                TextAlignmentOptions.MidlineLeft, new Vector2(0.23f, 0.855f), new Vector2(0.88f, 0.925f),
+                Vector2.zero, Vector2.zero, false);
+            Image castleRankIcon = CreateImage(left.transform, "CastleRankIcon", LoadSprite("icon_flat_faction"),
+                new Color32(210, 205, 185, 255), new Vector2(0.88f, 0.90f), new Vector2(0.97f, 0.98f),
+                Vector2.zero, Vector2.zero, Image.Type.Simple);
+            castleRankIcon.preserveAspect = true;
             Image castleImage = CreateImage(left.transform, "CastleImage", null, Color.white,
-                new Vector2(0f, 0.51f), new Vector2(1f, 0.83f), new Vector2(22f, 8f), new Vector2(-22f, -8f), Image.Type.Simple);
+                new Vector2(0.04f, 0.62f), new Vector2(0.96f, 0.84f), Vector2.zero, Vector2.zero, Image.Type.Simple);
             castleImage.preserveAspect = true;
-            TMP_Text castleOwner = CreateText(left.transform, "CastleOwner", "수도 · 아발론 왕국", 16f,
-                TextAlignmentOptions.MidlineLeft, new Vector2(0f, 0.44f), new Vector2(1f, 0.52f),
-                new Vector2(22f, 0f), new Vector2(-18f, 0f), false);
-            TMP_Text castleStats = CreateText(left.transform, "CastleStats", "번영 45 · 기술 40\n질서 50 · 방어 40", 18f,
-                TextAlignmentOptions.TopLeft, new Vector2(0f, 0.29f), new Vector2(1f, 0.44f),
-                new Vector2(22f, 0f), new Vector2(-18f, 0f), false);
-            TMP_Text castleHeroes = CreateText(left.transform, "CastleHeroes", "주둔 영웅 4명", 16f,
-                TextAlignmentOptions.TopLeft, new Vector2(0f, 0.19f), new Vector2(1f, 0.29f),
-                new Vector2(22f, 0f), new Vector2(-18f, 0f), false);
-            Button castleManage = CreateButton(left.transform, "CastleManageButton", "수도 관리", LoadSprite("button_primary"),
-                new Vector2(0f, 0.05f), new Vector2(1f, 0.14f), new Vector2(22f, 0f), new Vector2(-22f, 0f), out _);
+            List<TMP_Text> castleDetailRows = new List<TMP_Text>();
+            for (int index = 0; index < 6; index += 1)
+            {
+                float maximum = 0.61f - index * 0.05f;
+                TMP_Text detailRow = CreateText(left.transform, $"CastleDetailRow{index + 1}", string.Empty, 16f,
+                    TextAlignmentOptions.MidlineLeft, new Vector2(0.05f, maximum - 0.05f),
+                    new Vector2(0.95f, maximum), Vector2.zero, Vector2.zero, false);
+                detailRow.textWrappingMode = TextWrappingModes.NoWrap;
+                castleDetailRows.Add(detailRow);
+                CreateImage(left.transform, $"CastleDetailLine{index + 1}", null, new Color32(44, 53, 58, 190),
+                    new Vector2(0.05f, maximum - 0.05f), new Vector2(0.95f, maximum - 0.05f),
+                    Vector2.zero, new Vector2(0f, 1f), Image.Type.Simple);
+            }
+            CreateText(left.transform, "HeroHeading", "영웅", 17f, TextAlignmentOptions.MidlineLeft,
+                new Vector2(0.05f, 0.265f), new Vector2(0.95f, 0.31f), Vector2.zero, Vector2.zero, true);
+            List<Image> heroPortraits = new List<Image>();
+            List<TMP_Text> heroLabels = new List<TMP_Text>();
+            for (int index = 0; index < 4; index += 1)
+            {
+                float minimum = 0.045f + index * 0.238f;
+                GameObject card = CreatePanel(left.transform, $"HeroCard{index + 1}", LoadSprite("strategy_hero_card_v1"), Color.white,
+                    new Vector2(minimum, 0.085f), new Vector2(minimum + 0.215f, 0.265f), Vector2.zero, Vector2.zero);
+                Image portrait = CreateImage(card.transform, "Portrait", null, Color.white,
+                    new Vector2(0.08f, 0.27f), new Vector2(0.92f, 0.93f), Vector2.zero, Vector2.zero, Image.Type.Simple);
+                portrait.preserveAspect = true;
+                portrait.transform.SetAsFirstSibling();
+                TMP_Text heroLabel = CreateText(card.transform, "HeroLabel", string.Empty, 12f, TextAlignmentOptions.Bottom,
+                    new Vector2(0.05f, 0.01f), new Vector2(0.95f, 0.28f), Vector2.zero, Vector2.zero, false);
+                heroLabel.fontStyle = FontStyles.Bold;
+                heroPortraits.Add(portrait);
+                heroLabels.Add(heroLabel);
+            }
+            Button castleManage = CreateButton(left.transform, "CastleManageButton", "성 관리", LoadSprite("button_primary"),
+                new Vector2(0.04f, 0.015f), new Vector2(0.80f, 0.075f), Vector2.zero, Vector2.zero, out _);
+            Button castleRecords = CreateButton(left.transform, "CastleRecordButton", string.Empty, LoadSprite("button_normal"),
+                new Vector2(0.83f, 0.015f), new Vector2(0.96f, 0.075f), Vector2.zero, Vector2.zero,
+                out TMP_Text castleRecordsLabel);
+            Object.DestroyImmediate(castleRecordsLabel.gameObject);
+            Image castleRecordsIcon = CreateImage(castleRecords.transform, "Icon", LoadSprite("icon_flat_council"),
+                new Color32(210, 205, 185, 255), new Vector2(0.18f, 0.12f), new Vector2(0.82f, 0.88f),
+                Vector2.zero, Vector2.zero, Image.Type.Simple);
+            castleRecordsIcon.preserveAspect = true;
 
             GameObject center = CreatePanel(body.transform, "MapPanel", null, new Color32(13, 23, 27, 255),
-                new Vector2(0.18f, 0f), new Vector2(0.82f, 1f), new Vector2(5f, 12f), new Vector2(-5f, -12f));
+                new Vector2(0.22f, 0f), new Vector2(0.81f, 1f), new Vector2(4f, 12f), new Vector2(-4f, -12f));
             Image mapImage = CreateImage(center.transform, "MapImage", null, Color.white, Vector2.zero, Vector2.one,
-                new Vector2(8f, 8f), new Vector2(-8f, -8f), Image.Type.Simple);
-            mapImage.preserveAspect = true;
+                Vector2.zero, Vector2.zero, Image.Type.Simple);
+            mapImage.preserveAspect = false;
+            GameObject connectionLayer = new GameObject("MapConnections", typeof(RectTransform), typeof(CanvasRenderer),
+                typeof(WIAdministrationMapConnectionGraphic));
+            connectionLayer.transform.SetParent(center.transform, false);
+            SetRect(connectionLayer.GetComponent<RectTransform>(), Vector2.zero, Vector2.one,
+                new Vector2(8f, 8f), new Vector2(-8f, -8f));
+            WIAdministrationMapConnectionGraphic connectionGraphic =
+                connectionLayer.GetComponent<WIAdministrationMapConnectionGraphic>();
+            connectionGraphic.raycastTarget = false;
             GameObject mapNodes = CreatePanel(center.transform, "MapNodes", null, Color.clear, Vector2.zero, Vector2.one,
                 new Vector2(8f, 8f), new Vector2(-8f, -8f));
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(
@@ -95,12 +197,12 @@ namespace ProjectWI.EditorTools
             {
                 Vector2 position = new Vector2(castle.NormalizedMapPosition.x, 1f - castle.NormalizedMapPosition.y);
                 Button castleButton = CreateButton(mapNodes.transform, "Castle-" + castle.Id, string.Empty, null,
-                    position, position, new Vector2(-44f, -30f), new Vector2(44f, 30f), out TMP_Text unusedLabel);
+                    position, position, new Vector2(-48f, -34f), new Vector2(48f, 34f), out TMP_Text unusedLabel);
                 Object.DestroyImmediate(unusedLabel.gameObject);
                 castleButton.image.color = Color.clear;
                 Image marker = CreateImage(castleButton.transform, "Marker", LoadSprite("map_castle_" + castle.FactionId),
                     Color.white, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                    new Vector2(-17f, -9f), new Vector2(17f, 25f), Image.Type.Simple);
+                    new Vector2(-20f, -10f), new Vector2(20f, 30f), Image.Type.Simple);
                 marker.preserveAspect = true;
                 TMP_Text castleLabel = CreateText(castleButton.transform, "CastleName",
                     castle.DisplayName.Get(database.UseEnglish), 12f, TextAlignmentOptions.Center,
@@ -113,10 +215,10 @@ namespace ProjectWI.EditorTools
                 castleIds.Add(castle.Id);
             }
             CreateText(center.transform, "MapTitle", "천하 전략도", 28f, TextAlignmentOptions.Top,
-                new Vector2(0f, 0.88f), Vector2.one, Vector2.zero, new Vector2(0f, -12f), true);
+                new Vector2(0f, 0.90f), Vector2.one, new Vector2(26f, 0f), new Vector2(-26f, -14f), true);
 
-            GameObject right = CreatePanel(body.transform, "CampaignSidePanel", LoadSprite("bg_type_a"), Color.white,
-                new Vector2(0.82f, 0f), Vector2.one, new Vector2(6f, 12f), new Vector2(-12f, -12f));
+            GameObject right = CreatePanel(body.transform, "CampaignSidePanel", LoadSprite("bg_type_d"), Color.white,
+                new Vector2(0.81f, 0f), Vector2.one, new Vector2(6f, 12f), new Vector2(-14f, -12f));
             CreateText(right.transform, "MonthKicker", "이번 달", 16f, TextAlignmentOptions.Center,
                 new Vector2(0f, 0.92f), Vector2.one, new Vector2(18f, 0f), new Vector2(-18f, 0f), true);
             CreateText(right.transform, "ObjectiveHeading", "주요 목표", 19f, TextAlignmentOptions.MidlineLeft,
@@ -140,26 +242,52 @@ namespace ProjectWI.EditorTools
                 TextAlignmentOptions.TopLeft, new Vector2(0f, 0.05f), new Vector2(1f, 0.29f),
                 new Vector2(22f, 8f), new Vector2(-18f, -8f), false);
 
-            GameObject bottom = CreatePanel(content.transform, "CommandBar", LoadSprite("bg_type_c"), Color.white,
-                Vector2.zero, new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 104f));
-            string[] names = { "Military", "Heroes", "Diplomacy", "Scheme", "Research", "Faction", "Council", "Report" };
-            string[] labels = { "군사 M", "영웅 H", "외교 D", "첩보 S", "연구 R", "통치 G", "의회 C", "월간 보고 L" };
+            GameObject bottom = CreatePanel(content.transform, "CommandBar", null, new Color32(5, 12, 16, 255),
+                Vector2.zero, new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 112f));
+            CreateImage(bottom.transform, "CommandTopLine", null, new Color32(39, 50, 55, 255),
+                new Vector2(0f, 1f), Vector2.one, Vector2.zero, new Vector2(0f, 2f), Image.Type.Simple);
+            CreateImage(bottom.transform, "CommandBottomLine", null, new Color32(48, 48, 45, 255),
+                Vector2.zero, new Vector2(1f, 0f), Vector2.zero, new Vector2(0f, 4f), Image.Type.Simple);
+            string[] names = { "Military", "Heroes", "Diplomacy", "Scheme", "Research", "Faction", "Report" };
+            string[] labels = { "군사", "인사", "외교", "계략", "연구", "평정", "월보" };
             string[] icons = { "icon_flat_military", "icon_flat_heroes", "icon_flat_diplomacy", "icon_flat_scheme",
-                "icon_flat_research", "icon_flat_faction", "icon_flat_council", "icon_flat_report" };
-            List<Button> commands = new List<Button>();
+                "icon_flat_research", "icon_flat_faction", "icon_flat_report" };
+            List<Button> commands = new List<Button>(topCommands);
             for (int index = 0; index < names.Length; index += 1)
             {
-                float min = 0.012f + index * 0.087f;
-                Button command = CreateButton(bottom.transform, names[index] + "Button", labels[index], LoadSprite("button_flat_normal"),
-                    new Vector2(min, 0.16f), new Vector2(min + 0.081f, 0.84f), Vector2.zero, Vector2.zero, out _);
-                CreateImage(command.transform, "Icon", LoadSprite(icons[index]), Color.white,
-                    new Vector2(0f, 0.12f), new Vector2(0.30f, 0.88f), new Vector2(8f, 0f), Vector2.zero, Image.Type.Simple).preserveAspect = true;
+                float min = 0.018f + index * 0.105f;
+                Button command = CreateButton(bottom.transform, names[index] + "Button", labels[index], LoadSprite("strategy_command_button_v2"),
+                    new Vector2(min, 0.11f), new Vector2(min + 0.098f, 0.89f), Vector2.zero, Vector2.zero,
+                    out TMP_Text commandLabel);
+                commandLabel.fontSize = 21f;
+                commandLabel.font = serifFont;
+                commandLabel.color = new Color32(214, 210, 196, 255);
+                commandLabel.alignment = TextAlignmentOptions.MidlineLeft;
+                commandLabel.rectTransform.offsetMin = new Vector2(70f, 4f);
+                commandLabel.rectTransform.offsetMax = new Vector2(-8f, -4f);
+                CreateImage(command.transform, "Icon", LoadSprite(icons[index]), new Color32(204, 201, 187, 255),
+                    new Vector2(0f, 0.08f), new Vector2(0.36f, 0.92f), new Vector2(12f, 0f), Vector2.zero,
+                    Image.Type.Simple).preserveAspect = true;
                 commands.Add(command);
             }
-            Button endTurn = CreateButton(bottom.transform, "EndTurnButton", "다음 턴 T", LoadSprite("button_type_h"),
-                new Vector2(0.76f, 0.10f), new Vector2(0.985f, 0.90f), Vector2.zero, Vector2.zero, out TMP_Text endTurnLabel);
-            Button systemButton = CreateButton(bottom.transform, "SystemButton", "설정", LoadSprite("button_flat_normal"),
-                new Vector2(0.715f, 0.16f), new Vector2(0.755f, 0.84f), Vector2.zero, Vector2.zero, out _);
+            Button endTurn = CreateButton(bottom.transform, "EndTurnButton", "다음 턴", LoadSprite("strategy_next_turn_button_v3"),
+                new Vector2(0.78f, 0.02f), new Vector2(0.982f, 0.98f), Vector2.zero, Vector2.zero, out TMP_Text endTurnLabel);
+            ColorBlock endTurnColors = endTurn.colors;
+            endTurnColors.normalColor = Color.white;
+            endTurnColors.highlightedColor = Color.white;
+            endTurnColors.selectedColor = Color.white;
+            endTurn.colors = endTurnColors;
+            endTurnLabel.fontSize = 29f;
+            endTurnLabel.font = serifFont;
+            endTurnLabel.rectTransform.offsetMin = new Vector2(112f, 4f);
+            endTurnLabel.rectTransform.offsetMax = new Vector2(-46f, -4f);
+            Image endTurnCrest = CreateImage(endTurn.transform, "Crest", LoadSprite("strategy_avalon_crest_v1"), Color.white,
+                new Vector2(0f, 0.08f), new Vector2(0.32f, 0.92f), new Vector2(42f, 0f), new Vector2(-2f, 0f),
+                Image.Type.Simple);
+            endTurnCrest.preserveAspect = true;
+            TMP_Text endTurnArrow = CreateText(endTurn.transform, "Arrow", "›", 38f, TextAlignmentOptions.Center,
+                new Vector2(0.89f, 0f), new Vector2(0.98f, 1f), Vector2.zero, Vector2.zero, true);
+            endTurnArrow.color = new Color32(178, 184, 184, 255);
 
             WIAdministrationWorldUGUIController controller = root.GetComponent<WIAdministrationWorldUGUIController>();
             SerializedObject serialized = new SerializedObject(controller);
@@ -172,8 +300,9 @@ namespace ProjectWI.EditorTools
             SetObject(serialized, "influenceLabel", influence);
             SetObject(serialized, "castleNameLabel", castleName);
             SetObject(serialized, "castleOwnerLabel", castleOwner);
-            SetObject(serialized, "castleStatsLabel", castleStats);
-            SetObject(serialized, "castleHeroesLabel", castleHeroes);
+            SetTextArray(serialized.FindProperty("castleDetailRows"), castleDetailRows);
+            SetImageArray(serialized.FindProperty("castleHeroPortraits"), heroPortraits);
+            SetTextArray(serialized.FindProperty("castleHeroLabels"), heroLabels);
             SetObject(serialized, "mapImage", mapImage);
             SetObject(serialized, "castleImage", castleImage);
             SetObject(serialized, "objectiveTitleLabel", objectiveTitle);
@@ -183,16 +312,19 @@ namespace ProjectWI.EditorTools
             SetObject(serialized, "battleAlertButton", battleAlert);
             SetObject(serialized, "monthlyNewsLabel", monthlyNews);
             SetObject(serialized, "castleManageButton", castleManage);
+            SetObject(serialized, "castleRecordButton", castleRecords);
             SetObject(serialized, "objectiveButton", objective);
             SetObject(serialized, "endTurnButton", endTurn);
             SetObject(serialized, "endTurnLabel", endTurnLabel);
-            SetObject(serialized, "systemButton", systemButton);
+            SetObject(serialized, "systemButton", topSystemButton);
             SetArray(serialized.FindProperty("commandButtons"), commands);
             WIAdministrationShortcutAction[] actions = {
+                WIAdministrationShortcutAction.MonthlyReport, WIAdministrationShortcutAction.Council,
+                WIAdministrationShortcutAction.Research,
                 WIAdministrationShortcutAction.Military, WIAdministrationShortcutAction.Heroes,
                 WIAdministrationShortcutAction.Diplomacy, WIAdministrationShortcutAction.Scheme,
                 WIAdministrationShortcutAction.Research, WIAdministrationShortcutAction.Faction,
-                WIAdministrationShortcutAction.Council, WIAdministrationShortcutAction.MonthlyReport
+                WIAdministrationShortcutAction.MonthlyReport
             };
             SerializedProperty actionProperty = serialized.FindProperty("commandActions");
             actionProperty.arraySize = actions.Length;
@@ -208,6 +340,7 @@ namespace ProjectWI.EditorTools
             SetImageArray(mapSerialized.FindProperty("castleMarkers"), castleMarkers);
             SetTextArray(mapSerialized.FindProperty("castleLabels"), castleLabels);
             SetStringArray(mapSerialized.FindProperty("castleIds"), castleIds);
+            SetObject(mapSerialized, "connectionGraphic", connectionGraphic);
             SetObject(mapSerialized, "avalonMarker", LoadSprite("map_castle_avalon"));
             SetObject(mapSerialized, "valdorMarker", LoadSprite("map_castle_valdor"));
             SetObject(mapSerialized, "ironheartMarker", LoadSprite("map_castle_ironheart"));
@@ -287,6 +420,23 @@ namespace ProjectWI.EditorTools
             return image;
         }
 
+        // 상단 자원 정보 앞에 작은 고정 아이콘을 배치합니다.
+        private static void CreateHudIcon(Transform parent, string name, string spriteName, float horizontalAnchor)
+        {
+            Image icon = CreateImage(parent, name, LoadSprite(spriteName), Color.white,
+                new Vector2(horizontalAnchor, 0.5f), new Vector2(horizontalAnchor, 0.5f),
+                new Vector2(-18f, -18f), new Vector2(18f, 18f), Image.Type.Simple);
+            icon.preserveAspect = true;
+        }
+
+        // 상단 정보 구획 사이에 시안의 얇은 세로 금속선을 배치합니다.
+        private static void CreateTopSeparator(Transform parent, string name, float horizontalAnchor)
+        {
+            CreateImage(parent, name, null, new Color32(42, 50, 54, 210),
+                new Vector2(horizontalAnchor, 0.20f), new Vector2(horizontalAnchor, 0.80f),
+                new Vector2(-1f, 0f), new Vector2(1f, 0f), Image.Type.Simple);
+        }
+
         // RectTransform의 앵커와 여백을 일괄 적용합니다.
         private static void SetRect(RectTransform rect, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin, Vector2 offsetMax)
         {
@@ -346,6 +496,25 @@ namespace ProjectWI.EditorTools
         private static Sprite LoadSprite(string name)
         {
             return AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Resources/UI/Generated/{name}.png");
+        }
+
+        // 생성된 전략 버튼을 Sprite와 9-Slice용 Border로 고정해 축소 상태의 모서리 장식을 보존합니다.
+        private static void ConfigureStrategyButtonAsset(string assetPath, Vector4 border)
+        {
+            TextureImporter importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
+            if (importer == null)
+            {
+                return;
+            }
+
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.alphaIsTransparency = true;
+            importer.mipmapEnabled = false;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.maxTextureSize = 1024;
+            importer.spriteBorder = border;
+            importer.SaveAndReimport();
         }
 
         // TMP 아틀라스와 머티리얼을 폰트 자산의 영구 서브에셋으로 저장합니다.

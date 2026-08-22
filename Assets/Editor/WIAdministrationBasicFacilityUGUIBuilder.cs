@@ -100,6 +100,7 @@ namespace ProjectWI.EditorTools
             TextArray(serialized.FindProperty("cardLabels"), labels);
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
+            WIAdministrationModalVisualUtility.Apply(root);
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             PrefabUtility.UnloadPrefabContents(root);
             GameObject existing = GameObject.Find("WIAdministrationBasicFacilityUGUI");
