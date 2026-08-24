@@ -80,7 +80,7 @@ namespace ProjectWI.Administration
         // QA에서 표준 캠페인 상태의 월드 UGUI를 표시합니다.
         public void OpenGlobalPreviewForQA()
         {
-            BeginCampaignForQA(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
+            BeginCampaignForQA(WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
             ShowGlobalView();
             RefreshAll();
         }
@@ -88,7 +88,7 @@ namespace ProjectWI.Administration
         // QA에서 아발론 소유 성을 선택하고 영지 UGUI를 표시합니다.
         public void OpenCastlePreviewForQA()
         {
-            BeginCampaignForQA(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
+            BeginCampaignForQA(WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
             SelectCastle("castle_00");
             RefreshAll();
         }

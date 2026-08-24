@@ -190,7 +190,7 @@ namespace ProjectWI.Administration
             WICastleDefinition origin = database.GetCastle(army.CurrentCastleId);
             snapshot.Title = "이동 / 원정 목표";
             snapshot.Summary = origin.DisplayName.Get(database.UseEnglish) + "에서 출발합니다.";
-            foreach (string targetId in origin.AdjacentCastleIds)
+            foreach (string targetId in state.GetCastle(army.CurrentCastleId).AdjacentCastleIds)
             {
                 WICastleRuntimeState target = state.GetCastle(targetId);
                 bool friendly = target.FactionId == army.FactionId;

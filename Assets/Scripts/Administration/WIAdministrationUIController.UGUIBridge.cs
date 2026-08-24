@@ -83,12 +83,13 @@ namespace ProjectWI.Administration
             if (castle != null)
             {
                 WIHeroDefinition governor = database.GetHero(castle.GovernorHeroId);
-                snapshot.CastleDetailRows.Add($"영지관                         {governor?.DisplayName.Get(database.UseEnglish) ?? "미배치"}");
-                snapshot.CastleDetailRows.Add($"번영                                      {castle.Prosperity}");
-                snapshot.CastleDetailRows.Add($"기술                                      {castle.Technology}");
-                snapshot.CastleDetailRows.Add($"질서                                      {castle.Stability}");
-                snapshot.CastleDetailRows.Add($"방어                                {castle.Defense}/100");
-                snapshot.CastleDetailRows.Add($"주둔 전투단                            {armyCount}개");
+                snapshot.CastleDetailTitles.AddRange(new[] { "영지관", "번영", "기술", "질서", "방어", "주둔 전투단" });
+                snapshot.CastleDetailValues.Add(governor?.DisplayName.Get(database.UseEnglish) ?? "미배치");
+                snapshot.CastleDetailValues.Add(castle.Prosperity.ToString());
+                snapshot.CastleDetailValues.Add(castle.Technology.ToString());
+                snapshot.CastleDetailValues.Add(castle.Stability.ToString());
+                snapshot.CastleDetailValues.Add($"{castle.Defense}/100");
+                snapshot.CastleDetailValues.Add($"{armyCount}개");
                 foreach (string heroId in castle.HeroIds.Take(4))
                 {
                     WIHeroDefinition hero = database.GetHero(heroId);
@@ -110,6 +111,9 @@ namespace ProjectWI.Administration
                     CastleId = definition.Id,
                     DisplayName = definition.DisplayName.Get(database.UseEnglish),
                     FactionId = castleState?.FactionId ?? definition.FactionId,
+                    Position = castleState == null
+                        ? new UnityEngine.Vector2(definition.NormalizedMapPosition.x, 1f - definition.NormalizedMapPosition.y)
+                        : new UnityEngine.Vector2(castleState.NormalizedMapPosition.x, 1f - castleState.NormalizedMapPosition.y),
                     Selected = selectedCastle != null && selectedCastle.CastleId == definition.Id,
                     Tooltip = $"{owner?.DisplayName.Get(database.UseEnglish) ?? castleState?.FactionId}\n{definition.DisplayName.Get(database.UseEnglish)}"
                 });
@@ -118,7 +122,7 @@ namespace ProjectWI.Administration
             foreach (WICastleDefinition definition in database.Castles)
             {
                 WICastleRuntimeState originState = state.GetCastle(definition.Id);
-                foreach (string adjacentId in definition.AdjacentCastleIds)
+                foreach (string adjacentId in originState.AdjacentCastleIds)
                 {
                     string connectionId = string.CompareOrdinal(definition.Id, adjacentId) < 0
                         ? $"{definition.Id}|{adjacentId}"
@@ -149,10 +153,10 @@ namespace ProjectWI.Administration
                                 (byte)(ownerColor.b * 170f), 92);
                     snapshot.MapConnections.Add(new WIAdministrationMapConnectionSnapshot
                     {
-                        Start = new UnityEngine.Vector2(definition.NormalizedMapPosition.x,
-                            1f - definition.NormalizedMapPosition.y),
-                        End = new UnityEngine.Vector2(adjacent.NormalizedMapPosition.x,
-                            1f - adjacent.NormalizedMapPosition.y),
+                        Start = new UnityEngine.Vector2(originState.NormalizedMapPosition.x,
+                            1f - originState.NormalizedMapPosition.y),
+                        End = new UnityEngine.Vector2(adjacentState.NormalizedMapPosition.x,
+                            1f - adjacentState.NormalizedMapPosition.y),
                         Color = routeColor,
                         Frontline = frontline,
                         Selected = selectedRoute
@@ -870,7 +874,7 @@ namespace ProjectWI.Administration
             snapshot = new WIAdministrationMarchSnapshot();
             error = string.Empty;
             WIArmyState army = state.Armies.Find(item => item.ArmyId == armyId);
-            WICastleDefinition origin = army == null ? null : database.GetCastle(army.CurrentCastleId);
+            WICastleRuntimeState origin = army == null ? null : state.GetCastle(army.CurrentCastleId);
             if (army == null || origin == null || army.IsOperational == false)
             {
                 error = "현재 이동 또는 원정할 수 없는 전투단입니다.";
@@ -1245,13 +1249,12 @@ namespace ProjectWI.Administration
             error = string.Empty;
             WICharacterRuntimeState actor = state.GetCharacter(actorHeroId);
             WICastleRuntimeState originState = state.Castles.FirstOrDefault(castle => castle.HeroIds.Contains(actorHeroId));
-            WICastleDefinition origin = originState == null ? null : database.GetCastle(originState.CastleId);
-            if (actor == null || originState == null || origin == null || state.IsCharacterBusy(actorHeroId))
+            if (actor == null || originState == null || state.IsCharacterBusy(actorHeroId))
             {
                 error = "이동할 인물을 다시 선택하십시오.";
                 return false;
             }
-            foreach (string targetId in origin.AdjacentCastleIds)
+            foreach (string targetId in originState.AdjacentCastleIds)
             {
                 WICastleRuntimeState target = state.GetCastle(targetId);
                 WICastleDefinition targetDefinition = database.GetCastle(targetId);

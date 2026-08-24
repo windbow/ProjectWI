@@ -31,7 +31,7 @@ namespace ProjectWI.Systems
             DontDestroyOnLoad(gameObject);
             if (database != null && State == null)
             {
-                State = WIAdministrationState.Create(database);
+                State = WIAdministrationState.Create(database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
             }
         }
 
@@ -53,7 +53,7 @@ namespace ProjectWI.Systems
             }
             if (State == null && database != null)
             {
-                State = WIAdministrationState.Create(database);
+                State = WIAdministrationState.Create(database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
             }
             return State;
         }
@@ -125,7 +125,8 @@ namespace ProjectWI.Systems
         // 테스트나 새 캠페인 시작 시 보존 중인 상태를 새 상태로 교체합니다.
         public void ResetCampaign()
         {
-            State = database == null ? null : WIAdministrationState.Create(database);
+            State = database == null ? null : WIAdministrationState.Create(
+                database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
             PendingBattleSessionId = string.Empty;
             HasCampaignStarted = false;
             IsTestBattle = false;
@@ -133,7 +134,7 @@ namespace ProjectWI.Systems
 
         // 선택한 난이도로 새 캠페인 상태를 만들고 진행 중 상태로 전환합니다.
         public WIAdministrationState StartNewCampaign(WICampaignDifficulty difficulty,
-            WICampaignVariant variant = WICampaignVariant.Classic)
+            WICampaignVariant variant = WICampaignVariant.AresMain)
         {
             State = database == null ? null : WIAdministrationState.Create(database, difficulty, variant);
             PendingBattleSessionId = string.Empty;
@@ -156,6 +157,7 @@ namespace ProjectWI.Systems
                 return false;
             }
             State = loaded;
+            State.EnsureRuntimeCastleMap(database);
             foreach (WICharacterRuntimeState character in State.Characters)
             {
                 WIHeroDefinition definition = database.GetHero(character.HeroId);

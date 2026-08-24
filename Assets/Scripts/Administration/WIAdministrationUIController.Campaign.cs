@@ -6,7 +6,7 @@ namespace ProjectWI.Administration
     {
         // 지정 난이도로 새 캠페인을 시작해 시작 화면을 닫습니다.
         public void BeginCampaign(WICampaignDifficulty difficulty,
-            WICampaignVariant variant = WICampaignVariant.Classic)
+            WICampaignVariant variant = WICampaignVariant.AresMain)
         {
             WICampaignRuntimeService service = WICampaignRuntimeService.Instance;
             state = service == null
@@ -18,7 +18,7 @@ namespace ProjectWI.Administration
 
         // 화면별 QA에서는 캠페인 후속 목표를 열지 않고 검증용 상태만 시작합니다.
         public void BeginCampaignForQA(WICampaignDifficulty difficulty,
-            WICampaignVariant variant = WICampaignVariant.Classic)
+            WICampaignVariant variant = WICampaignVariant.AresMain)
         {
             WICampaignRuntimeService service = WICampaignRuntimeService.Instance;
             state = service == null
@@ -60,6 +60,5 @@ namespace ProjectWI.Administration
             RefreshAll();
             SelectInitialCastle();
         }
-
     }
 }

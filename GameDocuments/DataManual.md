@@ -9,7 +9,7 @@
 - `Assets/Resources/UI/Generated/administration_modal_shell_v1.png`은 성 내정 기능 모달 8종이 함께 쓰는 무문자 외곽 셸입니다.
 - 셸에는 외곽 금속 프레임, 빈 제목 띠, 어두운 본문 배경만 둡니다. 화면별 문구·목록·버튼·장식은 각 프리팹의 자식 요소로 유지합니다.
 - `WIAdministrationObjectiveUGUI`는 사용자가 직접 조정한 이미지·텍스트 배치를 보존하기 위해 이 공용 셸 적용 대상에서 제외합니다.
-- 공용 외곽 변경은 `WIAdministrationModalVisualUtility`에서 수행합니다. 중점 사업·인사 배치·인재 활동·특화 시설·기본 시설·태수 위임·진격/출정·성 상세 빌더가 이를 호출합니다.
+- 공용 외곽과 버튼 디자인은 각 완성 프리팹에 직접 저장합니다. 프리팹을 코드로 열어 공용 디자인을 다시 적용하고 저장하는 Editor 유틸리티는 사용하지 않습니다.
 
 ## Windows 테스트 패키징
 
@@ -77,7 +77,7 @@
 
 ## UI 배경 에셋
 
-- 목표 상세 모달은 `Assets/Resources/UI/Generated/objective_modal_frame_v1.png`을 전용 배경으로 사용합니다. 이미지에는 문구·수치·버튼이 포함되지 않으며 `WIAdministrationObjectiveUGUI.prefab`의 TMP와 Image가 제목, 현재 상황, 달성 조건, 진행도, 보상을 표시합니다. 재생성은 `WI/UI/Build Objective UGUI` 메뉴를 사용합니다.
+- 목표 상세 모달은 `Assets/Resources/UI/Generated/objective_modal_frame_v1.png`을 전용 배경으로 사용합니다. 이미지에는 문구·수치·버튼이 포함되지 않으며 `WIAdministrationObjectiveUGUI.prefab`의 TMP와 Image가 제목, 현재 상황, 달성 조건, 진행도, 보상을 표시합니다. 디자인 변경은 해당 프리팹을 Prefab Mode에서 직접 편집합니다.
 
 - 캠페인 난이도·시작 조건 카드는 미선택 시 `button_normal`, 선택 시 `button_primary` Sprite를 사용합니다. 원본 이미지 색을 유지하기 위해 Image Tint로 선택색을 만들지 않습니다. `ContinueCampaignButton`은 `button_normal`, `NewCampaignButton`은 `button_primary`를 사용합니다.
 
@@ -87,6 +87,7 @@
 - Background B Type: `Assets/Resources/UI/Generated/bg_type_b.png`
 - Background C Type: `Assets/Resources/UI/Generated/bg_type_c.png`
 - Background D Type: `Assets/Resources/UI/Generated/bg_type_d.png`
+- Background G Type: `Assets/Resources/UI/Generated/bg_type_g.png` — 567×292 가로형 무문자 정보 패널입니다. Unity에서는 Sprite/Single, Mipmap 비활성, Bilinear, Clamp, 기본 플랫폼 무압축과 사방 10px 9-Slice를 사용합니다. UI Image에 적용할 때 Type을 `Sliced`로 지정하면 패널 크기가 달라져도 얇은 외곽 프레임을 보존할 수 있습니다.
 - 원본 가운데 패널만 1587×508로 크롭하고 모서리 바깥 영역을 투명 처리한 RGBA Sprite입니다.
 - UI Toolkit에서 크기를 변경할 때 좌·우·상·하 3px 9-Slice를 유지합니다.
 - 모서리는 2px만 사선으로 잘라 거의 직사각형이며 외곽에는 단일 2px 금속 테두리만 사용합니다.
@@ -141,7 +142,7 @@
 
 AI 성향은 부국, 개발, 수비, 공세와 모략입니다. 전선 판단에는 **실제로 전쟁 중인 진영의 인접 성 수**, 접근 중인 적 전투단, 성 방어와 질서를 사용합니다. 중립·우호·불가침·동맹 진영의 접경은 적대 위협으로 계산하지 않습니다.
 
-`AI War Pressure Interval Months`는 장기 평화 상태를 다시 평가하는 주기이며, `AI Minimum Active War Fronts`는 유지할 최소 활성 전선 수입니다. 평가 시점에 활성 전선이 부족하면 접경 규모와 양측 AI 공세 성향을 점수화해 인접 AI 진영 사이에 신규 전쟁을 생성합니다. 기본값은 12개월과 2개 전선입니다.
+`AI War Pressure Interval Months`는 장기 평화 상태를 다시 평가하는 주기이며, `AI Minimum Active War Fronts`는 유지할 최소 활성 전선 수입니다. 평가 시점에 활성 전선이 부족하면 접경 규모와 양측 AI 공세 성향을 점수화해 인접 AI 진영 사이에 신규 전쟁을 생성합니다. 기본값은 18개월과 2개 전선입니다. 일괄적인 초반 공격 금지는 동시 침공 구조를 깨고 균형형·공세형 플레이어의 조기 멸망을 유발해 채택하지 않았습니다.
 
 `Difficulty Definitions`에는 여유·표준·도전 난이도의 표시 문구와 `AI Candidate Window`를 저장합니다. 난이도는 플레이어·AI 자원이나 성공률에 보너스를 주지 않습니다. 여유는 상위 3개, 표준은 상위 2개, 도전은 최상위 1개 담당 후보 중에서 AI가 선택하며 선택한 난이도는 캠페인 저장 상태에 포함됩니다.
 
@@ -275,7 +276,9 @@ AI 진영은 장기 캠페인에서 영지관과 전투단 대장이 같은 한 
 
 친선 및 휴전 교섭은 금화 100과 영향력 15, 불가침은 영향력 25, 동맹은 영향력 40, 선전포고는 영향력 10을 사용합니다. 동맹 원조는 금화 200을 실제 진영 경제 사이에서 이동시키고 6개월의 재요청 대기 시간을 가집니다. 다른 진영의 성으로 원정하려면 두 진영이 전쟁 상태여야 합니다.
 
-포로 몸값은 데이터베이스의 `Prisoner Ransom Gold`를 사용하며 현재 150G입니다. 원소속 진영이 지불한 금화는 포획 진영으로 실제 이전되고 포로는 즉시 원소속 성으로 귀환합니다. 양측이 서로 포로를 보유하면 금화 없이 한 명씩 맞교환할 수 있습니다. 공동 공격은 동맹 양측이 모두 교전 중인 제3진영의 성만 대상으로 하며 `Joint Attack Influence Cost` 20과 `Joint Attack Duration Months` 3을 사용합니다. 약속의 대상과 남은 기간은 외교 관계 상태에 저장되고 매월 감소합니다.
+포로 몸값은 포로 발생 직후 생성되는 교환 요청을 사용합니다. 기본 금화 요구액은 데이터베이스의 `Prisoner Ransom Gold`(현재 150G)이며, 전투 판정에 따라 같은 가치 기준의 마나를 요구할 수도 있습니다. 원소속 진영이 요구 자원을 지불하면 포획 진영으로 실제 이전되고 포로는 즉시 원소속 성으로 귀환합니다. 양측이 서로 포로를 보유하면 자원 없이 한 명씩 맞교환할 수 있습니다. 공동 공격은 동맹 양측이 모두 교전 중인 제3진영의 성만 대상으로 하며 `Joint Attack Influence Cost` 20과 `Joint Attack Duration Months` 3을 사용합니다. 약속의 대상과 남은 기간은 외교 관계 상태에 저장되고 매월 감소합니다.
+
+전투 운명 확률은 난이도 정의의 `Battle Death Chance`, `Battle Capture Chance`, `Battle Defection Chance`에서 편집합니다. 남은 확률은 후퇴입니다. 여유 난이도는 세 값이 모두 0이라 항상 후퇴하고, 인물의 `Battle Traits`에 지정하는 생존가(`Survivor`)는 사망 가중치를 1/4로, 탈출가(`Elusive`)는 포로 가중치를 1/4로 줄이며 불굴(`Unyielding`)은 적 합류를 금지합니다.
 
 ## 17. 자원 고갈과 월 수입
 
@@ -393,12 +396,13 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 플레이 중 각 화면 프리팹 루트는 이벤트 구독을 위해 활성 상태를 유지합니다. 숨겨진 화면은 `Canvas.enabled=false`, `GraphicRaycaster.enabled=false`로 전환되므로 Scene 선택과 게임 입력을 가로막지 않으며, 내부 `contentRoot` 또는 `modalRoot`가 표시될 때만 Canvas도 함께 활성화됩니다.
 - 플레이 때 생성된 `~~~UGUI(Clone)` 루트는 에디터 코드가 자동으로 Scene Picking을 차단합니다. 이 설정은 루트에만 적용되고 자식은 포함하지 않으므로 수동 `Alt + Picking` 조작 없이도 실제 자식 UI를 Scene View에서 선택할 수 있습니다.
 - `WIAdministrationWorldUGUIController`는 데이터를 직접 생성하거나 변경하지 않고 `WIAdministrationWorldSnapshot`을 표시합니다.
+- 선택 성 상세의 `CastleDetailRow1~6`은 왼쪽 제목 전용 TMP이며, `CastleDetailValue1~6`은 오른쪽 값 전용 TMP입니다. 제목과 값 사이를 공백 문자로 맞추지 않으며 `CastleDetailTitles`, `CastleDetailValues` 배열의 같은 인덱스를 한 행으로 표시합니다.
 - 월드 화면의 군사·영웅·외교·첩보·연구·통치·의회·월간 보고·다음 턴 버튼은 이행용 `WIAdministrationUIController.UGUIBridge`를 통해 기존 게임 기능을 호출합니다.
 - 실제 게임 화면은 완성 UGUI 프리팹을 사용합니다. 이전 UI Toolkit UXML은 참고 자료로 남아 있으나 런타임 `UIDocument`에는 연결되지 않습니다.
 - 월드 지도 성 노드는 런타임 생성하지 않으며 프리팹에 60개가 고정 배치됩니다. 위치는 `WICastleDefinition.NormalizedMapPosition`, 표시 이름과 초기 진영은 행정 데이터베이스를 기준으로 생성하고 런타임 소유 진영은 스냅샷으로 갱신합니다.
 - 영지 UGUI는 `WIAdministrationTerritorySnapshot`을 통해 선택 성 정보를 읽습니다. 화면은 전략 HUD와 동일한 상단 진영·연월·자원 표시, 좌측 성 현황, 중앙 대형 성 전경, 우측 명령, 하단 요약 트레이로 구성됩니다. 하단에는 주둔 영웅 앞쪽 4명, 특화 시설 최대 2개와 이번 달 중점을 표시하고, 명령 버튼 8개는 프리팹에 고정 배치됩니다. 성 규모·정보 공개·관리 가능 상태에 따라 슬롯과 버튼이 표시 또는 비활성화됩니다.
 - 영지 UGUI의 `TopHUD`는 월드 UGUI의 `TopHUD`를 기준으로 동일하게 유지합니다. 1920×1080 기준 높이는 92px이며 배경·하단 금속선·진영 문장·날짜 및 세 자원·자원 아이콘·세로 구분선·우측 월보/의회/연구/설정 아이콘과 투명 클릭 영역의 구조, 앵커, 오프셋, 폰트 크기와 정렬을 일치시킵니다. 월보·의회·연구·설정 버튼도 두 화면에서 같은 전역 UGUI 기능을 실행합니다.
-- 성 내정의 중점 사업·인사 배치·인재 활동·특화 시설·기본 시설·태수 위임 모달은 공통 냉색 금속 스타일을 사용합니다. 본문은 `bg_type_d`, 헤더와 일반 버튼은 `button_flat_normal`, 주요 행동은 `button_flat_primary`, 닫기는 X가 포함된 `turn_followup_close_button_v1`을 사용합니다. 각 빌더는 `WIAdministrationModalVisualUtility`를 호출하므로 재생성해도 밝은 종이 헤더나 흰 버튼으로 돌아가지 않습니다.
+- 성 내정의 중점 사업·인사 배치·인재 활동·특화 시설·기본 시설·태수 위임 모달은 공통 냉색 금속 스타일을 사용합니다. 본문은 `bg_type_d`, 헤더와 일반 버튼은 `button_flat_normal`, 주요 행동은 `button_flat_primary`, 닫기는 X가 포함된 `turn_followup_close_button_v1`을 사용합니다. 고정 디자인은 각 프리팹에 저장하며 런타임 코드에서 위치나 Sprite를 교체하지 않습니다.
 - 성 내정 하단 공통 트레이는 `Assets/Resources/UI/Generated/territory_bottom_panel_v1.png`입니다. 문구·아이콘·카드가 합성되지 않은 512×171 투명 PNG이며 냉색 흑청 질감, 얇은 은회색·저채도 청동 프레임을 사용합니다. Unity에서는 Sprite/Single, 무압축, Mipmap 비활성, Clamp, Bilinear와 상하좌우 18px 9-Slice를 사용합니다.
 - 성 내정의 `대륙 지도` 이동 버튼은 공용 명령 버튼을 확대하지 않고 `Assets/Resources/UI/Generated/territory_back_button_v1.png`를 사용합니다. 512×142 무문자 투명 PNG의 얇은 은회색 이중선과 작은 모서리·중앙 장식으로 구성되며, Unity에서는 좌우 12px·상하 10px 9-Slice를 사용합니다.
 - 영웅 배치·인재 활동·기본 시설·영웅 목록은 각 UGUI 프리팹과 전용 브리지만 사용하며 레거시 UI Toolkit 인물·시설 모달은 호출하지 않습니다.
@@ -478,3 +482,27 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 선택 성 영웅 카드는 `WICastleRuntimeState.HeroIds`의 앞쪽 최대 4명을 표시합니다. 이름과 초상은 `WIHeroDefinition`, 표시 레벨은 `WICharacterRuntimeState.Experience`를 100 경험치당 1단계로 환산해 사용합니다.
 - `bg_type_c`는 전략 화면 상단 HUD의 공통 프레임 Sprite입니다. 하단 명령부는 새 시안에 따라 단색 흑청색 배경과 얇은 상하 구분선을 사용합니다.
 - 전략 지도 연결선은 `WIAdministrationMapConnectionGraphic` 하나가 `WIAdministrationWorldSnapshot.MapConnections`를 메시로 그립니다. 평상시에는 저명도 진영색, 적대 경계는 적색과 `×`, 선택 성의 인접 경로는 청백색 이중 광택과 마름모 표식으로 표시하며 포인터 입력은 받지 않습니다.
+
+# 일반 인물 사망·재야·자동 영입
+
+- 태생 영웅 등급 인물은 사망 또는 처형되면 영구 퇴장합니다.
+- 일반 출신 인물은 영웅으로 승격했더라도 사망 6개월 후 일반 재야 인재로 복귀합니다. 이때 승격 상태·승격 성취·작위를 잃으며, 복귀 성은 살아남은 세력의 성 중 재현 가능한 방식으로 선택됩니다.
+- 복귀 전에 성·전투단·포로·전향·영입 상태를 검사하므로 같은 인물이 고용된 상태로 중복 등장하지 않습니다.
+- `ProjectWI/Tools/Campaign Auto Test Lab`은 실제 탐색·영입 활동을 수행하며 CSV와 Markdown에 `일반 재야 복귀`, `인재 발견`, `신규 영입` 지표를 출력합니다.
+- 도구 결과 행의 `인물(영/일)`은 플레이어 세력의 최종 전체 고용 인원과 그중 영웅/일반 수이며, `영입(발/영/복)`은 실행 중 발견/신규 영입/재야 복귀 수입니다.
+
+# 시나리오 성 배치 데이터
+
+- `WICampaignVariantDefinition.castlePlacements`: 시나리오 전용 성 소유권, 정규화 지도 좌표, 인접 성 목록을 편집합니다.
+- `playerStartingCastleId`: 기존 플레이어 시작 영웅을 모을 시나리오 시작 성 ID입니다.
+- `valdorAttackIntervalMonths`: 해당 시나리오에서 발도르가 공격 출정을 검토하는 월 간격입니다.
+- 아레스 메인은 프로스트혼 단독 시작, 프로스트혼-카르디아-룬포지/브론즈게이트 진출 연결, 발도르 24개월 공격 주기를 사용하며 프리 시나리오는 기본 마스터 배치를 사용합니다.
+- `overrideInitialStats`: 시나리오 전용 첫 관문처럼 시작 성 수치를 별도로 지정할 때 사용합니다. 현재 카르디아만 방어 10·질서 20을 사용합니다.
+- `recruitableHeroIds`: 성에 귀속된 인재 탐색 풀입니다. 해당 성에 있는 인물이 탐색할 때 귀속 인재를 먼저 발견합니다.
+- 월드 UI는 `WIAdministrationWorldUGUI.prefab` 하나만 사용합니다. 성 소유 세력·좌표·연결은 프리팹이 아니라 선택한 시나리오의 `castlePlacements` 데이터와 성 마스터 데이터에서 결정합니다.
+- Unity Inspector에서 `WI_AdministrationDatabase`의 `Campaign Variants`를 펼쳐 대상 시나리오의 `Castle Placements` 항목을 편집합니다. `Castle Id`는 성 식별자, `Faction Id`는 초기 소유 세력, `Override Map Position`과 `Normalized Map Position`은 위치, `Override Connections`와 `Adjacent Castle Ids`는 연결을 뜻합니다.
+- 편집 경로는 Project 창의 `Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset` → Inspector의 `Campaign Variants` → `Ares Main` → `Castle Placements`입니다.
+- 성 위치는 `Override Map Position`을 체크하고 `Normalized Map Position`을 수정합니다. X는 0이 왼쪽·1이 오른쪽이며, Y는 0이 아래·1이 위입니다.
+- 성 연결은 두 성 모두 `Override Connections`를 체크하고 서로의 `Castle Id`를 `Adjacent Castle Ids`에 추가합니다. 한쪽만 입력하면 표시나 이동 판정이 비대칭이 될 수 있습니다.
+- 초기 소유권은 해당 배치 행의 `Faction Id`를 `avalon`, `valdor`, `ironheart`, `sylvanroad`, `necropolis` 중 하나로 입력합니다.
+- 프리 시나리오까지 공통으로 바꾸려면 위 시나리오 덮어쓰기가 아니라 같은 에셋의 기본 `Castles` 목록에서 성을 찾아 위치·연결·세력을 수정합니다.

@@ -28,6 +28,13 @@ namespace ProjectWI.Administration
         public WICampaignResult CampaignResult;
         public int RemainingPlayerBattles;
         public int RemainingDecisions;
+        public int CommonCharactersReturned;
+        public int CharactersDiscovered;
+        public int CharactersRecruited;
+        public int FinalEmployedCharacters;
+        public int FinalHeroCharacters;
+        public int FinalCommonCharacters;
+        public int FinalWanderingCharacters;
         public List<int> BattleIntervals = new List<int>();
         public List<int> PlayerBattlePowerMargins = new List<int>();
         public List<int> EarlyDecisionCountsByMonth = new List<int>();
@@ -63,6 +70,9 @@ namespace ProjectWI.Administration
 
             Dictionary<string, string> initialOwners = state.Castles.ToDictionary(
                 castle => castle.CastleId, castle => castle.FactionId);
+            int initialReturnCount = state.Characters.Sum(character => character.CommonReturnCount);
+            int initialDiscoveredCount = state.Characters.Count(character => character.Discovered);
+            int initialRecruitedCount = state.Characters.Count(character => character.Recruited);
             int lastBattleMonth = 0;
             if (stopWhenCampaignEnds && state.CampaignResult != WICampaignResult.Ongoing)
             {
@@ -77,6 +87,7 @@ namespace ProjectWI.Administration
                 ResolvePendingDecisions(database, state, policy, metrics, state.LastMonthlyReport);
                 ResolvePendingBattles(database, state, metrics, month, ref lastBattleMonth);
                 ConfigureAdministration(state, policy);
+                PrepareRecruitmentAction(database, state, policy);
                 PrepareMilitaryAction(database, state, policy, metrics);
                 WITurnSummary summary = WIAdministrationTurnSystem.ExecuteTurn(database, state);
                 ResolvePendingDecisions(database, state, policy, metrics, summary);
@@ -100,7 +111,72 @@ namespace ProjectWI.Administration
             metrics.RemainingPlayerBattles = state.BattleSessions.Count(session =>
                 session.PlayerInvolved && session.Status != WIBattleSessionStatus.Resolved);
             metrics.RemainingDecisions = CountPendingDecisions(state);
+            metrics.CommonCharactersReturned = state.Characters.Sum(character => character.CommonReturnCount) - initialReturnCount;
+            metrics.CharactersDiscovered = Mathf.Max(0,
+                state.Characters.Count(character => character.Discovered) - initialDiscoveredCount);
+            metrics.CharactersRecruited = Mathf.Max(0,
+                state.Characters.Count(character => character.Recruited) - initialRecruitedCount);
+            HashSet<string> playerCharacterIds = new HashSet<string>(state.Castles
+                .Where(castle => castle.FactionId == state.PlayerFactionId)
+                .SelectMany(castle => castle.HeroIds));
+            foreach (string heroId in state.Armies.Where(army => army.FactionId == state.PlayerFactionId)
+                         .SelectMany(army => army.Members).Select(member => member.HeroId))
+            {
+                playerCharacterIds.Add(heroId);
+            }
+            metrics.FinalEmployedCharacters = playerCharacterIds.Count(heroId =>
+                state.GetCharacter(heroId)?.IsDead == false);
+            metrics.FinalHeroCharacters = playerCharacterIds.Count(heroId =>
+            {
+                WICharacterRuntimeState character = state.GetCharacter(heroId);
+                return character != null && character.IsDead == false &&
+                       (character.BaseGrade == WICharacterGrade.Hero || character.PromotedToHero);
+            });
+            metrics.FinalCommonCharacters = Mathf.Max(0,
+                metrics.FinalEmployedCharacters - metrics.FinalHeroCharacters);
+            metrics.FinalWanderingCharacters = state.Characters.Count(character =>
+                character.IsDead == false && character.Recruited == false && character.Captured == false &&
+                string.IsNullOrEmpty(character.JoinedEnemyFactionId));
             return metrics;
+        }
+
+        // 실제 인물 활동 규칙을 사용해 재야 탐색 또는 발견한 인재 영입을 매월 한 건 준비합니다.
+        private static void PrepareRecruitmentAction(
+            WIAdministrationDatabaseSO database,
+            WIAdministrationState state,
+            WIAutoPlayerPolicy policy)
+        {
+            WICharacterRuntimeState actor = state.Characters
+                .Where(character => character.Recruited && character.IsDead == false && character.Captured == false &&
+                                    character.Activity == WICharacterActivityType.None &&
+                                    state.IsCharacterBusy(character.HeroId) == false)
+                .Where(character => state.Castles.Any(castle =>
+                    castle.FactionId == state.PlayerFactionId && castle.HeroIds.Contains(character.HeroId)))
+                .OrderBy(character => character.Fatigue)
+                .ThenByDescending(character => database.GetHero(character.HeroId)?.Charisma ?? 0)
+                .FirstOrDefault();
+            if (actor == null || actor.Fatigue > 70)
+            {
+                return;
+            }
+
+            WICharacterRuntimeState candidate = state.Characters
+                .Where(character => character.Discovered && character.Recruited == false &&
+                                    character.IsDead == false && character.Captured == false &&
+                                    string.IsNullOrEmpty(character.JoinedEnemyFactionId))
+                .OrderByDescending(character => character.RecruitmentProgress)
+                .ThenBy(character => database.GetHero(character.HeroId)?.RequiredReputation ?? 0)
+                .FirstOrDefault(character => actor.Reputation >=
+                    (database.GetHero(character.HeroId)?.RequiredReputation ?? int.MaxValue));
+            if (candidate != null)
+            {
+                actor.Activity = WICharacterActivityType.Recruit;
+                actor.ActivityTargetHeroId = candidate.HeroId;
+                return;
+            }
+
+            actor.Activity = WICharacterActivityType.Search;
+            actor.ActivityTargetHeroId = string.Empty;
         }
 
         // 정책에 맞춰 플레이어 성의 위임 방침과 진영 방침을 지정합니다.
@@ -183,7 +259,7 @@ namespace ProjectWI.Administration
             foreach (WIArmyState army in state.Armies.Where(item =>
                          item.FactionId == state.PlayerFactionId && item.IsOperational).ToList())
             {
-                WICastleDefinition origin = database.GetCastle(army.CurrentCastleId);
+                WICastleRuntimeState origin = state.GetCastle(army.CurrentCastleId);
                 string targetId = origin?.AdjacentCastleIds
                     .Where(id =>
                     {

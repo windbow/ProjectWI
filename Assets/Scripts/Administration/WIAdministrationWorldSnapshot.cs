@@ -17,7 +17,10 @@ namespace ProjectWI.Administration
         public string CastleOwner;
         public string CastleStats;
         public string CastleHeroes;
-        public List<string> CastleDetailRows = new List<string>();
+        // 성 상세 행의 왼쪽 제목 목록입니다.
+        public List<string> CastleDetailTitles = new List<string>();
+        // 성 상세 행의 오른쪽 값 목록입니다.
+        public List<string> CastleDetailValues = new List<string>();
         public Sprite MapImage;
         public Sprite CastleImage;
         public string ObjectiveTitle;
@@ -45,6 +48,7 @@ namespace ProjectWI.Administration
         public string CastleId;
         public string DisplayName;
         public string FactionId;
+        public Vector2 Position;
         public bool Selected;
         public string Tooltip;
     }

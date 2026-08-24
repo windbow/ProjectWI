@@ -91,7 +91,7 @@ namespace ProjectWI.Editor
         {
             WIAdministrationUIController controller = FindController();
             if (controller == null) return;
-            controller.BeginCampaign(WICampaignDifficulty.Standard, WICampaignVariant.Classic);
+            controller.BeginCampaign(WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
             WICampaignTitleUGUIController title = UnityEngine.Object.FindFirstObjectByType<WICampaignTitleUGUIController>(FindObjectsInactive.Include);
             if (title != null) title.gameObject.SetActive(false);
         }

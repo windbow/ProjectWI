@@ -116,6 +116,13 @@ namespace ProjectWI.Administration
         Instructor
     }
 
+    public enum WIBattleTraitType
+    {
+        Survivor,
+        Elusive,
+        Unyielding
+    }
+
     public enum WICharacterActivityType
     {
         None,
@@ -275,9 +282,39 @@ namespace ProjectWI.Administration
 
     public enum WICampaignVariant
     {
-        Classic,
-        BorderGarrison,
-        DividedCourt
+        AresMain,
+        Free,
+        Reserved
+    }
+
+    [Serializable]
+    public class WICampaignCastlePlacement
+    {
+        [SerializeField] private string castleId;
+        [SerializeField] private string factionId;
+        [SerializeField] private bool overrideMapPosition;
+        [SerializeField] private Vector2 normalizedMapPosition;
+        [SerializeField] private bool overrideConnections;
+        [SerializeField] private List<string> adjacentCastleIds = new List<string>();
+        [SerializeField] private bool overrideInitialStats;
+        [SerializeField, Range(0, 100)] private int initialProsperity;
+        [SerializeField, Range(0, 100)] private int initialTechnology;
+        [SerializeField, Range(0, 100)] private int initialStability;
+        [SerializeField, Range(0, 100)] private int initialDefense;
+        [SerializeField] private List<string> recruitableHeroIds = new List<string>();
+
+        public string CastleId => castleId;
+        public string FactionId => factionId;
+        public bool OverrideMapPosition => overrideMapPosition;
+        public Vector2 NormalizedMapPosition => normalizedMapPosition;
+        public bool OverrideConnections => overrideConnections;
+        public IReadOnlyList<string> AdjacentCastleIds => adjacentCastleIds;
+        public bool OverrideInitialStats => overrideInitialStats;
+        public int InitialProsperity => initialProsperity;
+        public int InitialTechnology => initialTechnology;
+        public int InitialStability => initialStability;
+        public int InitialDefense => initialDefense;
+        public IReadOnlyList<string> RecruitableHeroIds => recruitableHeroIds;
     }
 
     [Serializable]
@@ -290,6 +327,9 @@ namespace ProjectWI.Administration
         [SerializeField] private string relationshipFirstHeroId;
         [SerializeField] private string relationshipSecondHeroId;
         [SerializeField] private WIRelationshipLevel relationshipLevel = WIRelationshipLevel.Normal;
+        [SerializeField] private string playerStartingCastleId;
+        [SerializeField, Min(1)] private int valdorAttackIntervalMonths = 3;
+        [SerializeField] private List<WICampaignCastlePlacement> castlePlacements = new List<WICampaignCastlePlacement>();
 
         public WICampaignVariant Variant => variant;
         public WILocalizedString DisplayName => displayName;
@@ -298,6 +338,9 @@ namespace ProjectWI.Administration
         public string RelationshipFirstHeroId => relationshipFirstHeroId;
         public string RelationshipSecondHeroId => relationshipSecondHeroId;
         public WIRelationshipLevel RelationshipLevel => relationshipLevel;
+        public string PlayerStartingCastleId => playerStartingCastleId;
+        public int ValdorAttackIntervalMonths => Mathf.Max(1, valdorAttackIntervalMonths);
+        public IReadOnlyList<WICampaignCastlePlacement> CastlePlacements => castlePlacements;
     }
 
     [Serializable]
@@ -470,11 +513,17 @@ namespace ProjectWI.Administration
         [SerializeField] private WILocalizedString displayName;
         [SerializeField] private WILocalizedString description;
         [SerializeField, Range(1, 3)] private int aiCandidateWindow = 2;
+        [SerializeField, Range(0, 100)] private int battleDeathChance = 15;
+        [SerializeField, Range(0, 100)] private int battleCaptureChance = 35;
+        [SerializeField, Range(0, 100)] private int battleDefectionChance = 10;
 
         public WICampaignDifficulty Difficulty => difficulty;
         public WILocalizedString DisplayName => displayName;
         public WILocalizedString Description => description;
         public int AICandidateWindow => aiCandidateWindow;
+        public int BattleDeathChance => difficulty == WICampaignDifficulty.Relaxed ? 0 : battleDeathChance;
+        public int BattleCaptureChance => battleCaptureChance;
+        public int BattleDefectionChance => battleDefectionChance;
     }
 
     [Serializable]
@@ -596,6 +645,7 @@ namespace ProjectWI.Administration
         [SerializeField] private WIHeroClass heroClass;
         [SerializeField] private WICharacterGrade grade = WICharacterGrade.Hero;
         [SerializeField] private List<WITraitType> traits = new List<WITraitType>();
+        [SerializeField] private List<WIBattleTraitType> battleTraits = new List<WIBattleTraitType>();
         [SerializeField] private Sprite portrait;
         [SerializeField] private Sprite battleSprite;
         [SerializeField] private int leadership = 50;
@@ -615,6 +665,9 @@ namespace ProjectWI.Administration
         public WIHeroClass HeroClass => heroClass;
         public WICharacterGrade Grade => grade;
         public IReadOnlyList<WITraitType> Traits => traits;
+        public IReadOnlyList<WIBattleTraitType> BattleTraits => battleTraits != null
+            ? (IReadOnlyList<WIBattleTraitType>)battleTraits
+            : Array.Empty<WIBattleTraitType>();
         public Sprite Portrait => portrait;
         public Sprite BattleSprite => battleSprite;
         public int Leadership => leadership;

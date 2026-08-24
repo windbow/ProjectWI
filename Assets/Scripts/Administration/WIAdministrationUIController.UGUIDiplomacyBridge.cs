@@ -89,11 +89,17 @@ namespace ProjectWI.Administration
             var theirPrisoners = state.Characters.Where(item => item.Captured && item.CapturedFromFactionId == factionId && item.CaptorFactionId == state.PlayerFactionId).ToList();
             foreach (WICharacterRuntimeState prisoner in ourPrisoners)
             {
+                WIResourceType ransomType = prisoner.RansomRequested ? prisoner.RansomResourceType : WIResourceType.Gold;
+                int ransomAmount = prisoner.RansomRequested ? prisoner.RansomAmount : database.PrisonerRansomGold;
+                int availableAmount = ransomType == WIResourceType.ManaCrystal ? player.ManaCrystal :
+                    ransomType == WIResourceType.Influence ? player.Influence : player.Gold;
+                string resourceName = ransomType == WIResourceType.ManaCrystal ? "마나" :
+                    ransomType == WIResourceType.Influence ? "영향력" : "금화";
                 snapshot.Cards.Add(new WIAdministrationDiplomacyCardSnapshot
                 {
                     Action = "ransom", Id = prisoner.HeroId,
                     Title = "포로 몸값 · " + (database.GetHero(prisoner.HeroId)?.DisplayName.Get(database.UseEnglish) ?? prisoner.HeroId),
-                    Description = $"금화 {database.PrisonerRansomGold}", Interactable = player.Gold >= database.PrisonerRansomGold
+                    Description = $"{resourceName} {ransomAmount}", Interactable = availableAmount >= ransomAmount
                 });
             }
             if (ourPrisoners.Count > 0 && theirPrisoners.Count > 0)

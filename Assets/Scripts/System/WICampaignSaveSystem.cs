@@ -209,6 +209,7 @@ namespace ProjectWI.Systems
             {
                 if (castle == null) continue;
                 castle.HeroIds = castle.HeroIds ?? new System.Collections.Generic.List<string>();
+                castle.AdjacentCastleIds = castle.AdjacentCastleIds ?? new System.Collections.Generic.List<string>();
                 castle.SpecialFacilityIds = castle.SpecialFacilityIds ?? new System.Collections.Generic.List<string>();
                 castle.HeroLegacies = castle.HeroLegacies ?? new System.Collections.Generic.List<WIHeroLegacyState>();
                 castle.CommemoratedHeroLegacies = castle.CommemoratedHeroLegacies ?? new System.Collections.Generic.List<WIHeroLegacyState>();

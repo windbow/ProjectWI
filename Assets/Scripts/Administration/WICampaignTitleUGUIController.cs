@@ -28,7 +28,7 @@ namespace ProjectWI.Administration
         // 선택된 카드에 사용하는 주요 버튼 배경입니다.
         private Sprite selectedCardSprite;
         private WICampaignDifficulty selectedDifficulty = WICampaignDifficulty.Standard;
-        private WICampaignVariant selectedVariant = WICampaignVariant.Classic;
+        private WICampaignVariant selectedVariant = WICampaignVariant.AresMain;
 
         // 외부 QA 시작이나 저장 불러오기처럼 다른 경로에서 캠페인이 시작되어도 타이틀을 닫습니다.
         private void OnEnable()
@@ -76,7 +76,7 @@ namespace ProjectWI.Administration
             WICampaignRuntimeService service = WICampaignRuntimeService.Instance;
             continueCampaignButton.interactable = service != null && service.HasSave(0);
             SelectDifficulty(WICampaignDifficulty.Standard);
-            SelectVariant(WICampaignVariant.Classic);
+            SelectVariant(WICampaignVariant.AresMain);
 
             if (service != null && service.HasCampaignStarted)
             {

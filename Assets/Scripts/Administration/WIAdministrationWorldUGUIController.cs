@@ -18,6 +18,8 @@ namespace ProjectWI.Administration
         [SerializeField] private TMP_Text castleNameLabel;
         [SerializeField] private TMP_Text castleOwnerLabel;
         [SerializeField] private TMP_Text[] castleDetailRows;
+        // 성 상세 행의 오른쪽 값을 표시하는 텍스트 목록입니다.
+        [SerializeField] private TMP_Text[] castleDetailValueRows;
         [SerializeField] private Image[] castleHeroPortraits;
         [SerializeField] private TMP_Text[] castleHeroLabels;
         [SerializeField] private Image mapImage;
@@ -146,8 +148,14 @@ namespace ProjectWI.Administration
             castleOwnerLabel.text = snapshot.CastleOwner;
             for (int index = 0; index < castleDetailRows.Length; index += 1)
             {
-                castleDetailRows[index].text = index < snapshot.CastleDetailRows.Count
-                    ? snapshot.CastleDetailRows[index]
+                castleDetailRows[index].text = index < snapshot.CastleDetailTitles.Count
+                    ? snapshot.CastleDetailTitles[index]
+                    : string.Empty;
+            }
+            for (int index = 0; index < castleDetailValueRows.Length; index += 1)
+            {
+                castleDetailValueRows[index].text = index < snapshot.CastleDetailValues.Count
+                    ? snapshot.CastleDetailValues[index]
                     : string.Empty;
             }
             RefreshCastleHeroCards(snapshot);

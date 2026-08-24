@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 31cf9d46dded4b24daeac4e69e106798
+guid: cac1ddc3b9472b54cafc656fa31f00cb
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2271798418598955
-    second: strategy_command_button_v2_0
+      213: 4855567617447303432
+    second: bg_type_g_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -52,7 +52,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 34, y: 24, z: 34, w: 24}
+  spriteBorder: {x: 10, y: 10, z: 10, w: 10}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -72,7 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 1024
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: strategy_command_button_v2_0
+      name: bg_type_g_0
       rect:
         serializedVersion: 2
-        x: 7
-        y: 7
-        width: 453
-        height: 117
+        x: 0
+        y: 0
+        width: 567
+        height: 292
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5d31246bfcde7fff0800000000000000
-      internalID: -2271798418598955
+      spriteID: 80916dca501726340800000000000000
+      internalID: 4855567617447303432
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      strategy_command_button_v2_0: -2271798418598955
+      bg_type_g_0: 4855567617447303432
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

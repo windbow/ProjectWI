@@ -55,11 +55,14 @@ namespace ProjectWI.Administration
         // 영입 영웅과 발견 인재를 전체 목록 카드로 변환합니다.
         private void BuildHeroListCards(WIAdministrationHeroesSnapshot snapshot)
         {
-            int recruitedCount = state.Characters.Count(item => item.Recruited && item.IsDead == false);
-            int discoveredCount = state.Characters.Count(item => item.Discovered && item.Recruited == false);
+            int recruitedCount = state.Characters.Count(item => item.Recruited && item.IsDead == false &&
+                string.IsNullOrEmpty(item.JoinedEnemyFactionId));
+            int discoveredCount = state.Characters.Count(item => item.Discovered && item.Recruited == false &&
+                item.IsDead == false && string.IsNullOrEmpty(item.JoinedEnemyFactionId));
             snapshot.Title = database.GetText("UI_ALL_HEROES");
             snapshot.Summary = $"영입 영웅 {recruitedCount}명 · 발견 인재 {discoveredCount}명 · 영웅을 선택하면 승격과 작위를 관리합니다.";
-            foreach (WICharacterRuntimeState character in state.Characters.Where(item => item.Recruited))
+            foreach (WICharacterRuntimeState character in state.Characters.Where(item => item.Recruited &&
+                         item.IsDead == false && string.IsNullOrEmpty(item.JoinedEnemyFactionId)))
             {
                 WIHeroDefinition hero = database.GetHero(character.HeroId);
                 WICharacterGrade grade = character.PromotedToHero ? WICharacterGrade.Hero : character.BaseGrade;
@@ -74,7 +77,8 @@ namespace ProjectWI.Administration
                     Portrait = hero.Portrait
                 });
             }
-            foreach (WICharacterRuntimeState character in state.Characters.Where(item => item.Discovered && item.Recruited == false))
+            foreach (WICharacterRuntimeState character in state.Characters.Where(item => item.Discovered &&
+                         item.Recruited == false && item.IsDead == false && string.IsNullOrEmpty(item.JoinedEnemyFactionId)))
             {
                 WIHeroDefinition hero = database.GetHero(character.HeroId);
                 snapshot.Cards.Add(new WIAdministrationHeroCardSnapshot
@@ -93,7 +97,8 @@ namespace ProjectWI.Administration
             WIHeroDefinition hero = database.GetHero(heroId);
             if (character == null || hero == null) return;
             snapshot.Title = "영웅 관리 · " + hero.DisplayName.Get(database.UseEnglish);
-            snapshot.Summary = $"공훈 {character.Merit} · 명성 {character.Reputation} · 충성 {character.LoyaltyState}\n특기 · {GetTraitDisplayText(hero)}";
+            snapshot.Summary = $"공훈 {character.Merit} · 명성 {character.Reputation} · 충성 {character.LoyaltyState}\n" +
+                $"내정 특기 · {GetTraitDisplayText(hero)}\n전투 특성 · {GetBattleTraitDisplayText(hero)}";
             if (state.PendingHeroPromotionIds.Contains(heroId))
             {
                 snapshot.Cards.Add(new WIAdministrationHeroCardSnapshot

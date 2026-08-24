@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ProjectWI.Administration
@@ -47,6 +48,8 @@ namespace ProjectWI.Administration
         public int Stability;
         public int Defense;
         public WICastleSize CastleSize;
+        public Vector2 NormalizedMapPosition;
+        public List<string> AdjacentCastleIds = new List<string>();
         public WICastleProjectState ActiveProject;
         public bool DelegatedToGovernor;
         public WIGovernorPolicy GovernorPolicy = WIGovernorPolicy.Balanced;
@@ -309,7 +312,14 @@ namespace ProjectWI.Administration
         public string CaptorFactionId;
         public string CapturedFromFactionId;
         public int CapturedMonthsRemaining;
+        public bool RansomRequested;
+        public WIResourceType RansomResourceType = WIResourceType.Gold;
+        public int RansomAmount;
         public bool IsDead;
+        public int CommonReturnMonthsRemaining;
+        public int CommonReturnCount;
+        public string JoinedEnemyFactionId;
+        public string RecruitmentCastleId;
         public int RecruitmentProgress;
         public WILoyaltyState LoyaltyState = WILoyaltyState.Stable;
         public string TitleId;
@@ -346,7 +356,7 @@ namespace ProjectWI.Administration
     public class WIAdministrationState
     {
         public WICampaignDifficulty Difficulty = WICampaignDifficulty.Standard;
-        public WICampaignVariant CampaignVariant = WICampaignVariant.Classic;
+        public WICampaignVariant CampaignVariant = WICampaignVariant.Free;
         public int Year;
         public int Month;
         public int Turn;
@@ -412,7 +422,7 @@ namespace ProjectWI.Administration
         // 마스터 데이터에서 새 캠페인의 런타임 상태를 생성합니다.
         public static WIAdministrationState Create(WIAdministrationDatabaseSO database,
             WICampaignDifficulty difficulty = WICampaignDifficulty.Standard,
-            WICampaignVariant variant = WICampaignVariant.Classic)
+            WICampaignVariant variant = WICampaignVariant.Free)
         {
             WIAdministrationState state = new WIAdministrationState
             {
@@ -451,7 +461,9 @@ namespace ProjectWI.Administration
                     Technology = castle.InitialTechnology,
                     Stability = castle.InitialStability,
                     Defense = castle.InitialDefense,
-                    CastleSize = castle.CastleSize
+                    CastleSize = castle.CastleSize,
+                    NormalizedMapPosition = castle.NormalizedMapPosition,
+                    AdjacentCastleIds = castle.AdjacentCastleIds.ToList()
                 });
             }
 
@@ -499,8 +511,12 @@ namespace ProjectWI.Administration
             WICampaignVariantDefinition variantDefinition = database.GetCampaignVariant(variant);
             if (variantDefinition != null)
             {
+                ApplyCampaignCastlePlacements(state, variantDefinition);
                 WICastleRuntimeState additionalCastle = state.GetCastle(variantDefinition.AdditionalPlayerCastleId);
-                if (additionalCastle != null) additionalCastle.FactionId = state.PlayerFactionId;
+                if (additionalCastle != null)
+                {
+                    additionalCastle.FactionId = state.PlayerFactionId;
+                }
                 if (string.IsNullOrEmpty(variantDefinition.RelationshipFirstHeroId) == false &&
                     string.IsNullOrEmpty(variantDefinition.RelationshipSecondHeroId) == false)
                 {
@@ -510,6 +526,144 @@ namespace ProjectWI.Administration
             }
 
             return state;
+        }
+
+        // 이전 저장 파일에 없는 시나리오별 지도 좌표와 연결 정보를 마스터 데이터에서 복구합니다.
+        public void EnsureRuntimeCastleMap(WIAdministrationDatabaseSO database)
+        {
+            WICampaignVariantDefinition variantDefinition = database.GetCampaignVariant(CampaignVariant);
+            foreach (WICastleRuntimeState castle in Castles)
+            {
+                WICastleDefinition definition = database.GetCastle(castle.CastleId);
+                if (definition == null)
+                {
+                    continue;
+                }
+
+                if (castle.AdjacentCastleIds == null || castle.AdjacentCastleIds.Count == 0)
+                {
+                    castle.AdjacentCastleIds = definition.AdjacentCastleIds.ToList();
+                }
+                if (castle.NormalizedMapPosition == Vector2.zero)
+                {
+                    castle.NormalizedMapPosition = definition.NormalizedMapPosition;
+                }
+
+                WICampaignCastlePlacement placement = variantDefinition?.CastlePlacements
+                    .FirstOrDefault(item => item.CastleId == castle.CastleId);
+                if (placement == null)
+                {
+                    continue;
+                }
+                if (placement.OverrideMapPosition)
+                {
+                    castle.NormalizedMapPosition = placement.NormalizedMapPosition;
+                }
+                if (placement.OverrideConnections)
+                {
+                    castle.AdjacentCastleIds = placement.AdjacentCastleIds.Distinct().ToList();
+                }
+                foreach (string heroId in placement.RecruitableHeroIds)
+                {
+                    WICharacterRuntimeState candidate = GetCharacter(heroId);
+                    if (candidate != null && candidate.Recruited == false &&
+                        string.IsNullOrEmpty(candidate.RecruitmentCastleId))
+                    {
+                        candidate.RecruitmentCastleId = castle.CastleId;
+                    }
+                }
+            }
+        }
+
+        // 시나리오 전용 성 소유권·좌표·연결을 런타임 상태에 적용하고 시작 인물을 재배치합니다.
+        private static void ApplyCampaignCastlePlacements(
+            WIAdministrationState state,
+            WICampaignVariantDefinition variantDefinition)
+        {
+            Dictionary<string, string> originalOwners = state.Castles.ToDictionary(
+                castle => castle.CastleId, castle => castle.FactionId);
+            foreach (WICampaignCastlePlacement placement in variantDefinition.CastlePlacements)
+            {
+                WICastleRuntimeState castle = state.GetCastle(placement.CastleId);
+                if (castle == null)
+                {
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(placement.FactionId) == false)
+                {
+                    castle.FactionId = placement.FactionId;
+                }
+                if (placement.OverrideMapPosition)
+                {
+                    castle.NormalizedMapPosition = placement.NormalizedMapPosition;
+                }
+                if (placement.OverrideConnections)
+                {
+                    castle.AdjacentCastleIds = placement.AdjacentCastleIds.Distinct().ToList();
+                }
+                if (placement.OverrideInitialStats)
+                {
+                    castle.Prosperity = placement.InitialProsperity;
+                    castle.Technology = placement.InitialTechnology;
+                    castle.Stability = placement.InitialStability;
+                    castle.Defense = placement.InitialDefense;
+                }
+                foreach (string heroId in placement.RecruitableHeroIds)
+                {
+                    WICharacterRuntimeState candidate = state.GetCharacter(heroId);
+                    if (candidate != null && candidate.Recruited == false)
+                    {
+                        candidate.RecruitmentCastleId = castle.CastleId;
+                    }
+                }
+            }
+
+            WICastleRuntimeState playerStart = state.GetCastle(variantDefinition.PlayerStartingCastleId);
+            if (playerStart == null)
+            {
+                return;
+            }
+
+            List<string> playerHeroIds = state.Castles
+                .Where(castle => originalOwners.TryGetValue(castle.CastleId, out string owner) &&
+                                 owner == state.PlayerFactionId)
+                .SelectMany(castle => castle.HeroIds)
+                .Distinct()
+                .ToList();
+            foreach (WICastleRuntimeState castle in state.Castles)
+            {
+                string originalOwner = originalOwners[castle.CastleId];
+                if (castle.FactionId != originalOwner && castle.HeroIds.Count > 0)
+                {
+                    WICastleRuntimeState fallback = state.Castles.FirstOrDefault(item =>
+                        item.CastleId != castle.CastleId && item.FactionId == originalOwner);
+                    if (fallback != null)
+                    {
+                        foreach (string heroId in castle.HeroIds.Where(id => playerHeroIds.Contains(id) == false).ToList())
+                        {
+                            if (fallback.HeroIds.Contains(heroId) == false)
+                            {
+                                fallback.HeroIds.Add(heroId);
+                            }
+                            castle.HeroIds.Remove(heroId);
+                        }
+                    }
+                }
+                foreach (string heroId in playerHeroIds)
+                {
+                    castle.HeroIds.Remove(heroId);
+                }
+            }
+
+            foreach (string heroId in playerHeroIds)
+            {
+                if (playerStart.HeroIds.Contains(heroId) == false)
+                {
+                    playerStart.HeroIds.Add(heroId);
+                }
+            }
+            playerStart.GovernorHeroId = playerHeroIds.FirstOrDefault();
         }
 
         // AI 성향에 대응하는 기본 진영 방침을 반환합니다.

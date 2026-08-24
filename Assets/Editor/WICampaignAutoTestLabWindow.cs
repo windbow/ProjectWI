@@ -33,7 +33,7 @@ namespace ProjectWI.Editor
         public static void OpenWindow()
         {
             WICampaignAutoTestLabWindow window = GetWindow<WICampaignAutoTestLabWindow>("Campaign Auto Test Lab");
-            window.minSize = new Vector2(980f, 620f);
+            window.minSize = new Vector2(1180f, 620f);
         }
 
         // UXML에 고정 배치된 에디터 도구 요소를 찾아 데이터와 동작을 연결합니다.
@@ -111,7 +111,10 @@ namespace ProjectWI.Editor
 
                 RefreshResultRows();
                 int completed = results.Count(item => item.Metrics.CampaignResult != WICampaignResult.Ongoing);
-                SetStatus($"실행 완료 · {results.Count}개 조합 · 결말 도달 {completed}개 · 최대 {maximumMonths}개월", false);
+                int returned = results.Sum(item => item.Metrics.CommonCharactersReturned);
+                int recruited = results.Sum(item => item.Metrics.CharactersRecruited);
+                SetStatus($"실행 완료 · {results.Count}개 조합 · 결말 {completed}개 · " +
+                          $"재야 복귀 {returned}명 · 신규 영입 {recruited}명 · 최대 {maximumMonths}개월", false);
             }
             catch (Exception exception)
             {
@@ -170,6 +173,10 @@ namespace ProjectWI.Editor
                 SetRowText(index, "marches", metrics.MarchesStarted.ToString());
                 SetRowText(index, "changes", metrics.OwnershipChanges.ToString());
                 SetRowText(index, "decisions", metrics.DecisionsResolved.ToString());
+                SetRowText(index, "characters",
+                    $"{metrics.FinalEmployedCharacters} ({metrics.FinalHeroCharacters}/{metrics.FinalCommonCharacters})");
+                SetRowText(index, "recruitment",
+                    $"{metrics.CharactersDiscovered}/{metrics.CharactersRecruited}/{metrics.CommonCharactersReturned}");
                 row.EnableInClassList("result-victory", metrics.CampaignResult == WICampaignResult.Victory);
                 row.EnableInClassList("result-defeat", metrics.CampaignResult == WICampaignResult.Defeat);
             }
@@ -219,7 +226,7 @@ namespace ProjectWI.Editor
         internal static string BuildCsv(IReadOnlyList<WICampaignAutoTestResult> source)
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine("난이도,정책,진행 개월,결과,최종 성,전투,승리,패배,출정,소유권 변화,선택 해결");
+            builder.AppendLine("난이도,정책,진행 개월,결과,최종 성,전투,승리,패배,출정,소유권 변화,선택 해결,최종 고용 인물,최종 영웅,최종 일반,현재 재야,일반 재야 복귀,인재 발견,신규 영입");
             foreach (WICampaignAutoTestResult result in source)
             {
                 WIAutoCampaignMetrics metrics = result.Metrics;
@@ -228,7 +235,11 @@ namespace ProjectWI.Editor
                     GetDifficultyLabel(result.Difficulty), GetPolicyLabel(result.Policy), metrics.MonthsSimulated.ToString(),
                     GetCampaignResultLabel(metrics.CampaignResult), metrics.FinalPlayerCastleCount.ToString(),
                     metrics.BattlesResolved.ToString(), metrics.PlayerVictories.ToString(), metrics.PlayerDefeats.ToString(),
-                    metrics.MarchesStarted.ToString(), metrics.OwnershipChanges.ToString(), metrics.DecisionsResolved.ToString()
+                    metrics.MarchesStarted.ToString(), metrics.OwnershipChanges.ToString(), metrics.DecisionsResolved.ToString(),
+                    metrics.FinalEmployedCharacters.ToString(), metrics.FinalHeroCharacters.ToString(),
+                    metrics.FinalCommonCharacters.ToString(), metrics.FinalWanderingCharacters.ToString(),
+                    metrics.CommonCharactersReturned.ToString(), metrics.CharactersDiscovered.ToString(),
+                    metrics.CharactersRecruited.ToString()
                 }));
             }
             return builder.ToString();
@@ -242,15 +253,19 @@ namespace ProjectWI.Editor
             builder.AppendLine();
             builder.AppendLine($"생성 시각: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
             builder.AppendLine();
-            builder.AppendLine("| 난이도 | 정책 | 개월 | 결과 | 최종 성 | 승/패 | 출정 | 소유권 변화 | 선택 해결 |");
-            builder.AppendLine("|---|---|---:|---|---:|---:|---:|---:|---:|");
+            builder.AppendLine("| 난이도 | 정책 | 개월 | 결과 | 최종 성 | 승/패 | 출정 | 소유권 변화 | 선택 해결 | 최종 인물(영웅/일반) | 현재 재야 | 재야 복귀 | 발견 | 영입 |");
+            builder.AppendLine("|---|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|");
             foreach (WICampaignAutoTestResult result in source)
             {
                 WIAutoCampaignMetrics metrics = result.Metrics;
                 builder.AppendLine($"| {GetDifficultyLabel(result.Difficulty)} | {GetPolicyLabel(result.Policy)} | " +
                                    $"{metrics.MonthsSimulated} | {GetCampaignResultLabel(metrics.CampaignResult)} | " +
                                    $"{metrics.FinalPlayerCastleCount} | {metrics.PlayerVictories}/{metrics.PlayerDefeats} | " +
-                                   $"{metrics.MarchesStarted} | {metrics.OwnershipChanges} | {metrics.DecisionsResolved} |");
+                                   $"{metrics.MarchesStarted} | {metrics.OwnershipChanges} | {metrics.DecisionsResolved} | " +
+                                   $"{metrics.FinalEmployedCharacters} ({metrics.FinalHeroCharacters}/{metrics.FinalCommonCharacters}) | " +
+                                   $"{metrics.FinalWanderingCharacters} | " +
+                                   $"{metrics.CommonCharactersReturned} | {metrics.CharactersDiscovered} | " +
+                                   $"{metrics.CharactersRecruited} |");
             }
             return builder.ToString();
         }

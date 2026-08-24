@@ -76,6 +76,8 @@ namespace ProjectWI.Administration
             for (int index = 0; index < count; index += 1)
             {
                 WIAdministrationMapNodeSnapshot node = snapshot.MapNodes[index];
+                castleButtons[index].image.rectTransform.anchorMin = node.Position;
+                castleButtons[index].image.rectTransform.anchorMax = node.Position;
                 castleLabels[index].text = node.DisplayName;
                 castleMarkers[index].sprite = ResolveMarker(node.FactionId);
                 castleMarkers[index].color = node.Selected ? selectedColor : normalColor;

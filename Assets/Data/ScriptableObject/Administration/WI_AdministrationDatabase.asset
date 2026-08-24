@@ -1986,6 +1986,7 @@ MonoBehaviour:
     heroClass: 0
     grade: 0
     traits: 0500000003000000
+    battleTraits: 02000000
     portrait: {fileID: 21300000, guid: b033f36c488f64744af930888190c131, type: 3}
     battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 55
@@ -2010,6 +2011,7 @@ MonoBehaviour:
     heroClass: 6
     grade: 0
     traits: 04000000
+    battleTraits: 01000000
     portrait: {fileID: 21300000, guid: b022ccf8ec4770a40bbf8857b9c28070, type: 3}
     battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 58
@@ -2034,6 +2036,7 @@ MonoBehaviour:
     heroClass: 8
     grade: 0
     traits: 0000000006000000
+    battleTraits: 00000000
     portrait: {fileID: 21300000, guid: 1c6d8f245555daf458be4280333acfd1, type: 3}
     battleSprite: {fileID: 21300000, guid: 0a79f4b5874ffd64d9d359eb07fa1e94, type: 3}
     leadership: 76
@@ -14415,6 +14418,9 @@ MonoBehaviour:
         \uB450 \uD6C4\uBCF4 \uC548\uC5D0\uC11C \uC0C1\uD669\uC5D0 \uB9DE\uB294 \uACB0\uC815\uC744
         \uB0B4\uB9BD\uB2C8\uB2E4."
     aiCandidateWindow: 2
+    battleDeathChance: 15
+    battleCaptureChance: 35
+    battleDefectionChance: 10
   - difficulty: 1
     displayName:
       uid: DIFFICULTY_RELAXED
@@ -14429,6 +14435,9 @@ MonoBehaviour:
         \uC0C1\uC704 \uC138 \uD6C4\uBCF4\uB97C \uD3ED\uB113\uAC8C \uAC80\uD1A0\uD574
         \uCD5C\uC801 \uC120\uD0DD \uBE48\uB3C4\uAC00 \uB0AE\uC2B5\uB2C8\uB2E4."
     aiCandidateWindow: 3
+    battleDeathChance: 0
+    battleCaptureChance: 0
+    battleDefectionChance: 0
   - difficulty: 2
     displayName:
       uid: DIFFICULTY_HARD
@@ -14443,6 +14452,9 @@ MonoBehaviour:
         AI\uAC00 \uC228\uC740 \uBCF4\uB108\uC2A4 \uC5C6\uC774 \uD56D\uC0C1 \uCD5C\uC0C1\uC704
         \uD6C4\uBCF4\uB97C \uC120\uD0DD\uD569\uB2C8\uB2E4."
     aiCandidateWindow: 1
+    battleDeathChance: 25
+    battleCaptureChance: 40
+    battleDefectionChance: 15
   tutorialDefinitions:
   - id: tutorial_global
     month: 1
@@ -15227,46 +15239,250 @@ MonoBehaviour:
   campaignVariants:
   - variant: 0
     displayName:
-      uid: VARIANT_CLASSIC_NAME
-      korean: "\uC815\uD1B5 \uC7AC\uAC74"
-      english: Classic Restoration
+      uid: VARIANT_ARES_MAIN_NAME
+      korean: "\uC544\uB808\uC2A4 \uBA54\uC778"
+      english: Ares Main
     description:
-      uid: VARIANT_CLASSIC_DESC
-      korean: "\uC544\uBC1C\uB860 \uC131 \uD55C \uACF3\uACFC \uC544\uB808\uC2A4\xB7\uC54C\uB374\uC758
-        \uC2E0\uB8B0\uB85C \uC2DC\uC791\uD569\uB2C8\uB2E4."
-      english: Begin with Avalon Castle and the trust of Ares and Alden.
-    additionalPlayerCastleId: 
-    relationshipFirstHeroId: 
-    relationshipSecondHeroId: 
+      uid: VARIANT_ARES_MAIN_DESC
+      korean: "\uCD5C\uBD81\uB2E8 \uD504\uB85C\uC2A4\uD2B8\uD63C\uC5D0\uC11C \uC544\uB808\uC2A4\uC640 \uC2DC\uC791\uD558\uC5EC \uBC1C\uB3C4\uB974 \uAD70\uC0AC\uC81C\uAD6D\uC744 \uBB34\uB108\uB728\uB9BD\uB2C8\uB2E4."
+      english: Begin with Ares at the isolated northern Frosthorn and defeat the Valdor Military Empire.
+    additionalPlayerCastleId:
+    relationshipFirstHeroId:
+    relationshipSecondHeroId:
     relationshipLevel: 1
+    playerStartingCastleId: castle_28
+    valdorAttackIntervalMonths: 24
+    castlePlacements:
+    - castleId: castle_00
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_01
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_04
+      factionId: valdor
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.54, y: 0.11}
+      overrideConnections: 1
+      adjacentCastleIds: [castle_28, castle_33, castle_34]
+      overrideInitialStats: 1
+      initialProsperity: 30
+      initialTechnology: 20
+      initialStability: 20
+      initialDefense: 10
+      recruitableHeroIds: [common_016, common_017, common_018, common_019]
+    - castleId: castle_05
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 1
+      adjacentCastleIds: [castle_06, castle_14]
+    - castleId: castle_13
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 1
+      adjacentCastleIds: [castle_12, castle_14, castle_23]
+    - castleId: castle_28
+      factionId: avalon
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.54, y: 0.18}
+      overrideConnections: 1
+      adjacentCastleIds: [castle_04]
+      overrideInitialStats: 0
+      initialProsperity: 0
+      initialTechnology: 0
+      initialStability: 0
+      initialDefense: 0
+      recruitableHeroIds: [common_012, common_013, common_014, common_015]
+    - castleId: castle_26
+      factionId: ironheart
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.72, y: 0.36}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_27
+      factionId: ironheart
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.63, y: 0.32}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_29
+      factionId: valdor
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.45, y: 0.28}
+      overrideConnections: 1
+      adjacentCastleIds: [castle_03, castle_31, castle_32, castle_33]
+    - castleId: castle_30
+      factionId: valdor
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.25, y: 0.42}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_31
+      factionId: valdor
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.32, y: 0.35}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_32
+      factionId: valdor
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.4, y: 0.32}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_33
+      factionId: valdor
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.49, y: 0.24}
+      overrideConnections: 1
+      adjacentCastleIds: [castle_04, castle_29, castle_32]
+    - castleId: castle_34
+      factionId: ironheart
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.59, y: 0.24}
+      overrideConnections: 1
+      adjacentCastleIds: [castle_04, castle_27, castle_35]
+    - castleId: castle_35
+      factionId: ironheart
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.68, y: 0.29}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_36
+      factionId: valdor
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.77, y: 0.33}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_37
+      factionId: valdor
+      overrideMapPosition: 1
+      normalizedMapPosition: {x: 0.83, y: 0.39}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_42
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_43
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_44
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_45
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_46
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_47
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_48
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_49
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_54
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_55
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_56
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_57
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_58
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
+    - castleId: castle_59
+      factionId: valdor
+      overrideMapPosition: 0
+      normalizedMapPosition: {x: 0, y: 0}
+      overrideConnections: 0
+      adjacentCastleIds: []
   - variant: 1
     displayName:
-      uid: VARIANT_BORDER_NAME
-      korean: "\uAD6D\uACBD \uC218\uBE44\uB300"
-      english: Border Garrison
+      uid: VARIANT_FREE_NAME
+      korean: "\uD504\uB9AC \uC2DC\uB098\uB9AC\uC624"
+      english: Free Scenario
     description:
-      uid: VARIANT_BORDER_DESC
-      korean: "\uBD89\uC740 \uAD00\uBB38\uC744 \uC120\uC810\uD574 \uC544\uBC1C\uB860
-        \uC601\uD1A0 2\uC131\uC73C\uB85C \uC2DC\uC791\uD569\uB2C8\uB2E4."
-      english: Begin with the Red Gate secured and two Avalon castles.
-    additionalPlayerCastleId: castle_01
-    relationshipFirstHeroId: 
-    relationshipSecondHeroId: 
+      uid: VARIANT_FREE_DESC
+      korean: "\uAC01 \uC138\uB825\uC774 \uAE30\uBCF8 \uC131 \uBC30\uCE58\uC5D0\uC11C \uC2DC\uC791\uD558\uB294 \uC804\uB7B5 \uC911\uC2EC \uC2DC\uB098\uB9AC\uC624\uC785\uB2C8\uB2E4."
+      english: A strategy-focused scenario using the standard balanced castle layout.
+    additionalPlayerCastleId:
+    relationshipFirstHeroId:
+    relationshipSecondHeroId:
     relationshipLevel: 1
+    playerStartingCastleId: castle_00
+    valdorAttackIntervalMonths: 3
+    castlePlacements: []
   - variant: 2
     displayName:
-      uid: VARIANT_COURT_NAME
-      korean: "\uBD84\uC5F4\uB41C \uAD81\uC815"
-      english: Divided Court
+      uid: VARIANT_RESERVED_NAME
+      korean: "\uCD94\uD6C4 \uCD94\uAC00"
+      english: Coming Later
     description:
-      uid: VARIANT_COURT_DESC
-      korean: "\uC544\uB808\uC2A4\uC640 \uC54C\uB374\uC758 \uAD00\uACC4\uAC00 \uAC08\uB4F1\uC73C\uB85C
-        \uBC14\uB010 \uCC44 \uC218\uB3C4 \uC7AC\uAC74\uC744 \uC2DC\uC791\uD569\uB2C8\uB2E4."
-      english: Restore the capital while Ares and Alden begin in conflict.
-    additionalPlayerCastleId: 
-    relationshipFirstHeroId: ares
-    relationshipSecondHeroId: common_alden
-    relationshipLevel: 0
+      uid: VARIANT_RESERVED_DESC
+      korean: "\uCD94\uD6C4 \uCD94\uAC00\uD560 \uC2DC\uB098\uB9AC\uC624 \uC608\uC57D \uC2AC\uB86F\uC785\uB2C8\uB2E4."
+      english: Reserved for a future scenario.
+    additionalPlayerCastleId:
+    relationshipFirstHeroId:
+    relationshipSecondHeroId:
+    relationshipLevel: 1
+    playerStartingCastleId: castle_00
+    valdorAttackIntervalMonths: 3
+    castlePlacements: []
   heroLegacyDefinitions:
   - id: legacy_prosperity
     projectType: 0
@@ -15706,7 +15922,7 @@ MonoBehaviour:
   promotionRequiredMerit: 80
   promotionRequiredReputation: 30
   promotionInfluenceCost: 30
-  aiWarPressureIntervalMonths: 12
+  aiWarPressureIntervalMonths: 18
   aiMinimumActiveWarFronts: 2
   castleDefensePowerPercent: 300
   castleStabilityPowerPercent: 50

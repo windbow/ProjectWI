@@ -39,6 +39,8 @@ namespace ProjectWI.Tests.Editor
             {
                 Assert.IsNotNull(root.Q<VisualElement>($"result-row-{index}"));
                 Assert.IsNotNull(root.Q<Label>($"result-{index}-result"));
+                Assert.IsNotNull(root.Q<Label>($"result-{index}-characters"));
+                Assert.IsNotNull(root.Q<Label>($"result-{index}-recruitment"));
             }
         }
 
@@ -58,7 +60,14 @@ namespace ProjectWI.Tests.Editor
                         CampaignResult = WICampaignResult.Victory,
                         FinalPlayerCastleCount = 60,
                         PlayerVictories = 8,
-                        PlayerDefeats = 2
+                        PlayerDefeats = 2,
+                        CommonCharactersReturned = 3,
+                        CharactersDiscovered = 4,
+                        CharactersRecruited = 2,
+                        FinalEmployedCharacters = 12,
+                        FinalHeroCharacters = 5,
+                        FinalCommonCharacters = 7,
+                        FinalWanderingCharacters = 30
                     }
                 }
             };
@@ -68,6 +77,23 @@ namespace ProjectWI.Tests.Editor
 
             StringAssert.Contains("표준,균형형,24,승리,60", csv);
             StringAssert.Contains("| 표준 | 균형형 | 24 | 승리 | 60 | 8/2 |", markdown);
+            StringAssert.Contains("일반 재야 복귀,인재 발견,신규 영입", csv);
+            StringAssert.Contains("| 12 (5/7) | 30 | 3 | 4 | 2 |", markdown);
+        }
+
+        // 자동 플레이어가 실제 탐색·영입 활동을 사용해 재야 인재 순환을 진행하는지 검증합니다.
+        [Test]
+        public void AutoPlayer_SearchesAndRecruitsWanderingCharacters()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(
+                database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+
+            WIAutoCampaignMetrics metrics = WICampaignAutoPlayer.Run(
+                database, state, WIAutoPlayerPolicy.Balanced, 24, false);
+
+            Assert.Greater(metrics.CharactersDiscovered, 0);
+            Assert.Greater(metrics.CharactersRecruited, 0);
         }
     }
 }

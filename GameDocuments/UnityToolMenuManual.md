@@ -146,34 +146,7 @@ Unity 상단의 프로젝트 전용 메뉴는 두 루트로 나뉩니다.
 
 ## 4. WI/UI 메뉴
 
-모든 `Build ... UGUI` 메뉴는 런타임 UI를 동적으로 만드는 기능이 아닙니다. 에디터에서 실제 Prefab을 생성·갱신하고 `WIUIScreenManager`에 등록합니다. 기존 Prefab을 직접 수정한 내용은 재생성 과정에서 덮어쓸 수 있습니다.
-
-| 메뉴 | 생성·갱신 대상 | 주요 구성 | 실행 영향 |
-|---|---|---|---|
-| `WI/UI/Build Administration World UGUI` | 전역 화면 Prefab | 자원 HUD, 성 요약, 60개 성 지도, 목표·알림, 하단 명령 | 대형 Prefab 재저장 및 화면 관리자 등록 |
-| `WI/UI/Build Administration Territory UGUI` | 영지 상세 Prefab | 성 현황, 영지관, 4대 수치, 영웅·시설 슬롯, 영지 명령 | 대형 Prefab 재저장 및 화면 관리자 등록 |
-| `WI/UI/Build Focus Project UGUI` | 중점 사업 Prefab | 사업 카드, 담당자 선택, 비용·예상 결과 | 해당 Prefab 재저장 |
-| `WI/UI/Build Hero Assignment UGUI` | 영웅 배치 Prefab | 후보 카드, 페이지 이동, 배치·해제 | 해당 Prefab 재저장 |
-| `WI/UI/Build Character Activity UGUI` | 인재 활동 Prefab | 인물, 활동, 대상의 단계별 선택 | 해당 Prefab 재저장 |
-| `WI/UI/Build Special Facility UGUI` | 특화 시설 Prefab | 8개 시설 후보와 조건·효과 | 해당 Prefab 재저장 |
-| `WI/UI/Build Basic Facility UGUI` | 기본 시설 Prefab | 기본 시설, 선술집 의뢰, 담당자 선택 | 해당 Prefab 재저장 |
-| `WI/UI/Build Delegation UGUI` | 위임 설정 Prefab | 영지관, 운영 방침, 예산, 위임 토글 | 해당 Prefab 재저장 |
-| `WI/UI/Build March UGUI` | 원정 Prefab | 전투단, 대장, 이동·공격 목표 | 해당 Prefab 재저장 |
-| `WI/UI/Build Castle Record UGUI` | 성 기록 Prefab | 성 이미지와 읽기 전용 기록 ScrollView | 해당 Prefab 재저장 |
-| `WI/UI/Build Objective UGUI` | 캠페인 목표 Prefab | 상황, 조건, 진행도와 보상 | 해당 Prefab 재저장 |
-| `WI/UI/Build Monthly Report UGUI` | 월간 보고 Prefab | 보고 ScrollView, 사건·전투 행동 슬롯 | 해당 Prefab 재저장 |
-| `WI/UI/Build Military UGUI` | 군사 Prefab | 미결 전투, 전투단 편성·상세·이동 | 해당 Prefab 재저장 |
-| `WI/UI/Build Heroes UGUI` | 영웅 관리 Prefab | 목록, 상세, 승격과 작위 | 해당 Prefab 재저장 |
-| `WI/UI/Build Diplomacy UGUI` | 외교 Prefab | 대상 진영과 외교 행동 카드 | 해당 Prefab 재저장 |
-| `WI/UI/Build Scheme UGUI` | 첩보 Prefab | 첩보 종류, 담당자와 대상 선택 | 해당 Prefab 재저장 |
-| `WI/UI/Build Research UGUI` | 연구 Prefab | 연구 목록, 조건과 담당자 | 해당 Prefab 재저장 |
-| `WI/UI/Build Faction UGUI` | 진영 정세 Prefab | 진영별 영토·관계·상태 카드 | 해당 Prefab 재저장 |
-| `WI/UI/Build Council UGUI` | 의회 Prefab | 6개 월간 진영 방침 | 해당 Prefab 재저장 |
-| `WI/UI/Build Event Choice UGUI` | 선택 사건 Prefab | 일반 사건 선택과 영웅의 흔적 교체 | 해당 Prefab 재저장 |
-| `WI/UI/Build Turn Followup UGUI` | 턴 후속 Prefab | 턴 처리, 튜토리얼, 결과와 공통 안내 | 해당 Prefab 재저장 |
-| `WI/UI/Build System UGUI` | 시스템 Prefab | 설정과 저장·불러오기 2페이지 | 해당 Prefab 재저장 |
-
-각 Build 메뉴는 생성한 Prefab을 `WIAdministrationUGUISceneUtility.InstantiateUnderSceneRoot`에 전달합니다. 이 함수는 Scene에 화면 인스턴스를 펼치지 않고 `UGUI Screen Bootstrap`의 `WIUIScreenManager.screenPrefabs` 목록에 Prefab 참조를 등록합니다.
+일회성 UI Toolkit→UGUI 이행에 사용한 `Build ... UGUI` 메뉴와 Builder 클래스는 제거했습니다. 완성된 UGUI 디자인은 `Assets/Prefabs/Administration`의 프리팹을 Prefab Mode에서 직접 편집합니다. 런타임 컨트롤러는 데이터 기반 문구·수치·초상·성 이미지·진영 마커만 갱신하며 고정 위치·앵커·Sprite를 재생성하지 않습니다.
 
 ### `WI/UI/Configure UGUI Scene Visibility`
 
@@ -243,12 +216,12 @@ Preview 상태는 플레이 모드를 종료하면 사라지는 것이 원칙입
 
 ### UGUI 화면 수정
 
-1. 현재 Prefab 변경분을 확인합니다.
-2. 해당 `WI/UI/Build ... UGUI` 메뉴를 실행합니다.
-3. MainScene에서 화면 관리자 구성이 의심될 때만 `Configure UGUI Scene Visibility`를 실행합니다.
-4. 플레이 모드에 진입하고 기준 Game View 해상도를 선택합니다.
-5. 대응하는 Preview 메뉴로 화면을 엽니다.
-6. Console 오류와 Prefab Diff를 확인합니다.
+1. 플레이 모드를 종료합니다.
+2. Project 창에서 대상 UGUI 프리팹을 열어 Prefab Mode인지 확인합니다.
+3. 위치·앵커·Sprite 등 고정 디자인을 프리팹에서 직접 수정하고 저장합니다.
+4. MainScene에서 화면 관리자 구성이 의심될 때만 `Configure UGUI Scene Visibility`를 실행합니다.
+5. 플레이 모드에 진입하고 기준 Game View 해상도를 선택합니다.
+6. 대응하는 Preview 메뉴로 화면을 열어 Console 오류와 Prefab Diff를 확인합니다.
 7. 필요할 때만 Current Game View 캡처를 저장합니다.
 
 ### 전투 수정

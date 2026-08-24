@@ -24,5 +24,27 @@ namespace ProjectWI.Administration
             }
             return names.Count == 0 ? "없음" : string.Join(", ", names);
         }
+
+        // 인물의 전투 운명 특성을 효과 설명과 함께 UI 문자열로 조합합니다.
+        private static string GetBattleTraitDisplayText(WIHeroDefinition hero)
+        {
+            List<string> names = new List<string>();
+            foreach (WIBattleTraitType trait in hero.BattleTraits)
+            {
+                if (trait == WIBattleTraitType.Survivor)
+                {
+                    names.Add("생존가 · 사망 확률 감소");
+                }
+                else if (trait == WIBattleTraitType.Elusive)
+                {
+                    names.Add("탈출가 · 포로 확률 감소");
+                }
+                else if (trait == WIBattleTraitType.Unyielding)
+                {
+                    names.Add("불굴 · 적 진영 합류 불가");
+                }
+            }
+            return names.Count == 0 ? "없음" : string.Join(", ", names);
+        }
     }
 }

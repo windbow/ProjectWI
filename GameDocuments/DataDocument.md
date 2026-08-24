@@ -1,8 +1,24 @@
 # ProjectWI 씬 및 에셋 구조
 
+## 일반 인물 사망과 재야 복귀
+
+- 태생 영웅 등급 인물은 사망·처형 시 `IsDead` 상태로 영구 퇴장합니다.
+- 일반 출신 인물은 영웅 승격 여부와 무관하게 사망 후 `CommonReturnMonthsRemaining` 6개월을 거쳐 살아남은 세력의 성 하나에 일반 재야 인재로 다시 배치됩니다.
+- 승격 일반 인물은 재야 복귀 대기 진입 시 `PromotedToHero`, 승격 성취와 작위를 초기화합니다.
+- 복귀할 때 `Recruited`, `Discovered`, 영입 진척을 초기화하고 `RecruitmentCastleId`로 새 출현 지역을 기록합니다.
+- 성·전투단·포로·전향·영입 상태 중 하나라도 남아 있으면 중복 출현하지 않습니다.
+- `CommonReturnCount`는 시뮬레이션에서 일반 인물 재순환 횟수를 집계합니다.
+
+## 월드 지도 프리팹과 시나리오 배치
+
+- 월드 지도 UI 자산은 `WIAdministrationWorldUGUI.prefab` 하나입니다.
+- `WICampaignVariantDefinition.castlePlacements`가 선택 시나리오의 성 소유 세력·정규화 좌표·인접 성을 덮어씁니다.
+- 런타임의 `WICastleRuntimeState`에 확정된 배치를 저장하고, `WIAdministrationWorldSnapshot.MapNodes`와 `MapConnections`를 통해 공용 프리팹에 표시합니다.
+- 프리 시나리오처럼 덮어쓰기가 없는 항목은 `WICastleDefinition`의 기본 소유 세력·좌표·연결을 유지합니다.
+- 아레스 메인의 현재 북부 진출로는 `castle_28 ↔ castle_04`, `castle_04 ↔ castle_33`, `castle_04 ↔ castle_34`입니다. 연결은 양쪽 성의 `AdjacentCastleIds`에 서로를 기록합니다.
+
 ## 성 내정 공용 모달 셸
 
-- `Assets/Editor/WIAdministrationModalVisualUtility.cs`: 공용 셸, 제목 배치, X 닫기 버튼 및 공통 버튼 상태를 성 내정 모달에 적용하는 Editor 전용 조립 유틸리티입니다.
 - `Assets/Resources/UI/Generated/administration_modal_shell_v1.png`: 얇은 은회색 외곽, 중앙 상·하단 장식, 빈 헤더와 흑청색 본문으로 구성된 공용 Simple Sprite입니다.
 - 공용 셸 사용 프리팹은 `WIAdministrationFocusProjectUGUI`, `WIAdministrationHeroAssignmentUGUI`, `WIAdministrationCharacterActivityUGUI`, `WIAdministrationSpecialFacilityUGUI`, `WIAdministrationBasicFacilityUGUI`, `WIAdministrationDelegationUGUI`, `WIAdministrationMarchUGUI`, `WIAdministrationCastleRecordUGUI`입니다.
 - `WIAdministrationObjectiveUGUI`는 화면별 수동 배치를 보존하기 위해 공용 셸에서 제외하며 `objective_modal_frame_v1.png`을 유지합니다.
@@ -159,8 +175,8 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 ## 2-2. 성 내정 기능 모달 공통 아트
 
 - `WIAdministrationFocusProjectUGUI`, `WIAdministrationHeroAssignmentUGUI`, `WIAdministrationCharacterActivityUGUI`, `WIAdministrationSpecialFacilityUGUI`, `WIAdministrationBasicFacilityUGUI`, `WIAdministrationDelegationUGUI`는 동일한 냉색 금속 모달 규칙을 사용합니다.
-- `WIAdministrationModalVisualUtility`가 `bg_type_d` 본문 패널, `button_flat_normal` 헤더·일반 버튼, `button_flat_primary` 주요 버튼, `turn_followup_close_button_v1` 닫기 버튼과 버튼 상태 색을 적용합니다.
-- 각 화면의 빌더가 저장 직전에 공통 스타일을 다시 적용하므로 기반 프리팹을 복제하거나 메뉴에서 재생성해도 구형 종이 헤더와 흰 버튼이 다시 저장되지 않습니다.
+- 성 내정 모달의 `bg_type_d` 본문 패널, `button_flat_normal` 헤더·일반 버튼, `button_flat_primary` 주요 버튼, `turn_followup_close_button_v1` 닫기 버튼과 상태 색은 각 완성 프리팹에 직접 저장합니다.
+- 공통 모달 스타일은 각 완성 프리팹에 직접 저장합니다. 고정 헤더·버튼·프레임 디자인은 런타임 데이터 갱신 대상이 아닙니다.
 
 ## 3. 프리팹
 
@@ -217,6 +233,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
   - 연구 시작·완료·진영 효과, 작위, 영웅 승격, 영지관 임명과 개별 인물 이동 계산
   - 실제 전쟁 접경 위협도와 ScriptableObject 설정 기반 AI 전선 활성화
 - `WICampaignAutoPlayer.cs`: 성장형·균형형·공세형 캠페인 자동 진행과 재미 검증 지표 수집
+- `AdministrationBalancePlan.md`: 영웅 개인 전투력과 아이템을 제외한 내정·전쟁 밸런스 목표, 측정 지표와 단계별 조정 계획
 - `WICampaignAutoTestLabWindow.cs`: 단일 조합 또는 정책 3종 × 난이도 3종 캠페인 완주와 결과 내보내기 에디터 도구
 - `WICampaignAutoTestLab.uxml`, `WICampaignAutoTestLab.uss`: 자동 테스트 랩의 고정 입력·결과 9행 레이아웃과 스타일
 - `WIFunValidationAutomationTests.cs`: 세 정책 24·60·120개월, AI 전선, 전투 목표와 첫 12개월 사건 밀도 회귀 검증
@@ -237,6 +254,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - `Assets/Resources/UI/Generated/bg_type_b.png`: 초기 검은 금속 패널의 테두리를 원본 대비 약 1/2로 줄인 1587×508 강조 패널 배경. `.bg-type-b` 클래스와 상하좌우 16px 9-Slice를 사용함
 - `Assets/Resources/UI/Generated/bg_type_c.png`: 외곽 석재 프레임 없이 청동 테두리, 대각 모서리와 어두운 중앙 면만 가진 1587×508 강조 패널 배경. `.bg-type-c` 클래스와 좌우 72·상하 40px 9-Slice를 사용함
 - `Assets/Resources/UI/Generated/bg_type_d.png`: 전략 화면 알림 영역용 512×640 세로형 공통 패널 배경. 얇은 은회색 금속 프레임과 중립적인 흑청색 질감 면으로 구성하며 문구·아이콘·행 장식은 포함하지 않음. 프레임과 연결되지 않은 생성 노이즈 69픽셀을 제거했으며 `.bg-type-d` 클래스와 상하좌우 16px 9-Slice를 사용함. 정리 전 원본은 `Assets/TrashAsset/UI/Generated/bg_type_d_noisy_original.png`에 보관함
+- `Assets/Resources/UI/Generated/bg_type_g.png`: 567×292 가로형 공통 정보 패널 배경. 중립적인 냉색 흑청 내부 면과 얇은 저채도 회갈색 금속 프레임으로 구성하며 문구·아이콘·구분선은 포함하지 않음. Sprite/Single과 상하좌우 10px 9-Slice를 사용함
 - `Assets/Resources/UI/Generated/popup_header.png`: 은색 금속 테두리를 기존 약 1/4 두께로 줄인 1024×297 공통 모달 헤더. Unity Sprite 영역도 전체 1024×297로 설정하며 좌우 20·상하 10 슬라이스를 사용함
 - `Tools/UIAssetSources/popup_header_selected_source.png`: 검은 바깥 여백을 제거한 1774×515 선택 원본
 - `GameDocuments/ButtonTypeGuide.md`: 현행 버튼 이미지의 A~H Type 공식 별칭, 사용처와 업무 지시 기준
@@ -295,7 +313,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - 월간 보고 화면은 `LastMonthlyReport`, 미결 선택 사건 컬렉션과 `BattleSessions`를 `WIAdministrationMonthlyReportSnapshot`으로 변환합니다. 사건 선택은 기존 모달을 유지하고 전투는 `WICampaignRuntimeService.StartBattle`에 연결합니다.
 - 군사 화면은 `BattleSessions`, 플레이어 소유 `WIArmyState`, 성 인접 경로와 대기 영웅을 단계별 `WIAdministrationMilitarySnapshot`으로 변환합니다. 편성·단원 관리·훈련·해산·원정은 기존 `WIAdministrationTurnSystem`을 호출하며 UI 전용 군사 데이터는 복제하지 않습니다.
 - 영웅 전역 화면은 `WICharacterRuntimeState`와 `WIHeroDefinition`, `WITitleDefinition`을 `WIAdministrationHeroesSnapshot` 카드로 변환합니다. 승격과 작위 수여는 기존 `PromoteCommonCharacter`, `AwardTitle`을 호출하며 영웅·작위 데이터를 중복 생성하지 않습니다.
-- MainScene의 `UGUI Screen Bootstrap`에 있는 유일한 `WIUIScreenManager` 컴포넌트는 UGUI 프리팹 에셋 참조만 보관합니다. 각 화면은 `Assets/Prefabs/Administration`의 독립 프리팹이며 `WIAdministrationUGUISceneUtility`가 빌더 재생성 시 참조 목록을 갱신합니다. 같은 컴포넌트를 가진 이전 이름 또는 중복 루트가 발견되면 참조를 이 관리자에 병합하고 중복 루트를 제거합니다.
+- MainScene의 `UGUI Screen Bootstrap`에 있는 유일한 `WIUIScreenManager` 컴포넌트는 UGUI 프리팹 에셋 참조만 보관합니다. 각 화면은 `Assets/Prefabs/Administration`의 독립 프리팹이며, 같은 컴포넌트를 가진 이전 이름 또는 중복 루트가 발견되면 `WIAdministrationUGUISceneUtility`가 참조를 정식 관리자에 병합하고 중복 루트를 제거합니다.
 - `Assets/Prefabs/Administration/WIAdministrationUI.prefab`의 루트 컴포넌트는 `Transform`과 `WIAdministrationUIController`뿐입니다. `UIDocument` 없이 캠페인 상태 초기화와 UGUI 이벤트·스냅샷 브리지를 제공합니다.
 - 군사 UGUI 상태 변경은 `ExecuteUGUIMilitaryAction`이 기존 `WIAdministrationTurnSystem` API를 호출합니다. 레거시 군사 partial에는 UI 생성 코드 없이 `GetArmyMarchFailureMessage`와 `GetUnitRoleDisplayName` 헬퍼만 남습니다.
 - 외교 화면은 `WIDiplomaticRelationState`, 진영 런타임 자원, 포로 상태와 공동 공격 후보를 `WIAdministrationDiplomacySnapshot`으로 변환합니다. 모든 외교 명령은 기존 `WIAdministrationTurnSystem`의 확정 명령 API를 호출하며 관계 데이터를 복제하지 않습니다.
@@ -323,14 +341,27 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - `Battle_Ground_NeutralDay_V2_4K`: `GroundExperiment_V2`에 보존된 4096×4096 실험용 중립 지면 Sprite입니다. 확대 상태의 지면 세부 검증을 위한 단일 화면 후보이며 현재 `WI_BattleConfig`와 전장 Prefab에서는 참조하지 않습니다. 반복 경계가 검증되지 않았으므로 타일 데이터로 취급하지 않습니다.
 - `button_normal`: 공통 일반 UGUI 버튼 Sprite입니다. Single Sprite Border는 `{left: 28, bottom: 28, right: 28, top: 28}`이며 연결 Image는 Sliced를 사용합니다.
 - `button_primary`: 공통 주요 UGUI 버튼 Sprite입니다. Border는 `{left: 28, bottom: 24, right: 28, top: 24}`이며 연결 Image는 Sliced를 사용합니다.
-- `WIAdministrationWorldUGUI.prefab`: 전략 화면의 고정 UGUI 프리팹입니다. `WIAdministrationWorldUGUIBuilder`가 시안 기반 5영역 레이아웃과 60개 성 버튼을 편집기 시점에 생성하며 런타임에는 새 UI를 동적으로 만들지 않습니다.
+- `WIAdministrationWorldUGUI.prefab`: 전략 화면의 시안 기반 5영역 레이아웃과 60개 성 버튼을 저장한 고정 UGUI 프리팹입니다. 디자인은 Prefab Mode에서 직접 편집하며 런타임에는 새 UI를 동적으로 만들지 않습니다.
 - `strategy_avalon_crest_v1`: `Assets/Resources/UI/Generated`에 저장된 아발론 문장 Sprite입니다. 상단 진영 및 선택 성 패널에서 재사용하며 투명 배경, 중립 청회색 금속 색조를 사용합니다.
 - `WIAdministrationWorldSnapshot.CastleHeroCards`: 선택 성의 주둔 영웅 중 최대 네 명의 표시 이름, 경험 기반 레벨 문자열, 초상 Sprite를 전달하는 읽기 전용 목록입니다.
 - `WIAdministrationWorldSnapshot.MapConnections`: 인접 성 두 곳의 정규화 좌표, 표시색, 적대 전선 여부와 선택 경로 여부를 전달합니다. `WIAdministrationMapConnectionGraphic`이 이 목록을 하나의 UGUI 메시로 렌더링합니다.
-- `WIAdministrationWorldSnapshot.CastleDetailRows`: 좌측 선택 성 패널의 영지관, 번영, 기술, 질서, 방어, 주둔 전투단 문자열을 순서대로 전달하는 읽기 전용 목록입니다. 원본 값은 `WICastleRuntimeState`와 현재 성에 위치한 `WIArmyState`에서 가져옵니다.
+- `WIAdministrationWorldSnapshot.CastleDetailTitles`, `CastleDetailValues`: 좌측 선택 성 패널의 영지관, 번영, 기술, 질서, 방어, 주둔 전투단 제목과 값을 같은 인덱스의 두 읽기 전용 목록으로 전달합니다. `CastleDetailRow1~6`은 제목을 왼쪽 정렬하고 `CastleDetailValue1~6`은 값을 오른쪽 정렬하며, 원본 값은 `WICastleRuntimeState`와 현재 성에 위치한 `WIArmyState`에서 가져옵니다.
 - `strategy_side_panel_v1`: 좌우 전략 정보 패널 공용 프레임입니다. 하단 일반 명령은 `strategy_command_button_v2`, 턴 진행은 `strategy_next_turn_button_v3`, 좌측 영웅 초상 슬롯은 `strategy_hero_card_v1`을 사용합니다.
 - `strategy_top_settings_v1`: 전략 상단 우측 설정 메뉴의 512px 투명 톱니 Sprite입니다. `WIAdministrationWorldUGUI.prefab/WorldContent/TopHUD/TopIcon4`에서 표시하고 같은 영역의 `TopSystemButton`이 `OpenUGUISystem`을 호출합니다.
 - `WIAdministrationWorldUGUI.prefab/WorldContent/CommandBar`: 112px 높이의 전략 하단 명령 영역입니다. 군사·인사·외교·계략·연구·평정·월보 7개 버튼과 `strategy_next_turn_button_v3` 기반 다음 턴 버튼으로 구성되며 설정은 상단 톱니 버튼에서 엽니다.
 - `strategy_command_button_v2`: 시안 기반의 무문자 흑청색 일반 명령 프레임입니다. 512px 후처리 원본과 `{left:34,bottom:24,right:34,top:24}` Border를 사용합니다.
 - `strategy_next_turn_button_v2`: 시안 기반의 무문자 남청색 다음 턴 프레임입니다. 양끝 금속 창날 장식을 보존하도록 `{left:92,bottom:24,right:92,top:24}` Border를 사용합니다.
 - `strategy_next_turn_button_v3`: 새 하단 기준 시안의 비대칭 다음 턴 프레임입니다. 좌측 이중 화살촉과 우측 절삭 모서리를 가지며 `{left:88,bottom:24,right:42,top:24}` Border를 사용합니다.
+# 전투 인물 운명 데이터
+
+- `WICampaignDifficultyDefinition`: 난이도별 사망·포로·적 합류 확률을 보유하며 나머지는 후퇴 확률로 사용합니다.
+- `WIHeroDefinition.BattleTraits`: `Survivor`, `Elusive`, `Unyielding`으로 전투 운명 가중치를 보정합니다. 내정 사업 특기 목록과 분리되어 기존 성과 보너스에 영향을 주지 않습니다.
+- `WICharacterRuntimeState`: 포로 교환 요청 자원·수량과 적 합류 진영을 저장하여 세이브 데이터에서 유지합니다.
+
+# 시나리오 런타임 지도
+
+- `WICastleRuntimeState.NormalizedMapPosition`, `AdjacentCastleIds`: 선택한 시나리오가 적용된 실제 지도 좌표와 연결 정보입니다.
+- 이동, 출정, AI 목표 선택, 퇴각, 지도 노드와 연결선은 마스터 성 정의가 아니라 런타임 지도 정보를 사용합니다.
+- 구버전 저장 파일에 런타임 지도 필드가 없으면 불러올 때 마스터 배치와 선택 시나리오의 좌표·연결 재정의를 복구합니다.
+- `WICharacterRuntimeState.RecruitmentCastleId`: 아직 영입되지 않은 인재가 어느 성의 탐색 풀에 속하는지 저장합니다.
+- 영입 성공 시 후보 인물은 영입 담당자가 머무는 성의 `HeroIds`에 추가되어 실제 배치 가능한 인력이 됩니다.

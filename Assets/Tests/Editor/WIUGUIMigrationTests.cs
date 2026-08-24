@@ -354,6 +354,34 @@ namespace ProjectWI.Tests.Editor
             Assert.That(prefab.GetComponentsInChildren<EventSystem>(true), Is.Empty);
         }
 
+        // 성 상세 6개 행이 왼쪽 제목과 오른쪽 값 텍스트로 분리되어 직렬화되었는지 확인합니다.
+        [Test]
+        public void WorldCastleDetailRowsSeparateTitlesAndValues()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(WorldPrefabPath);
+            ProjectWI.Administration.WIAdministrationWorldUGUIController controller =
+                prefab.GetComponent<ProjectWI.Administration.WIAdministrationWorldUGUIController>();
+            SerializedObject serialized = new SerializedObject(controller);
+            SerializedProperty valueRows = serialized.FindProperty("castleDetailValueRows");
+            Transform panel = prefab.transform.Find("WorldContent/WorldBody/CastleSummaryPanel");
+
+            Assert.That(panel, Is.Not.Null);
+            Assert.That(valueRows.arraySize, Is.EqualTo(6));
+            for (int index = 0; index < 6; index += 1)
+            {
+                TMP_Text title = panel.Find($"CastleDetailRow{index + 1}")?.GetComponent<TMP_Text>();
+                TMP_Text value = panel.Find($"CastleDetailValue{index + 1}")?.GetComponent<TMP_Text>();
+
+                Assert.That(title, Is.Not.Null);
+                Assert.That(value, Is.Not.Null);
+                Assert.That(title.alignment, Is.EqualTo(TextAlignmentOptions.MidlineLeft));
+                Assert.That(value.alignment, Is.EqualTo(TextAlignmentOptions.MidlineRight));
+                Assert.That(title.rectTransform.anchorMax.x, Is.EqualTo(0.48f).Within(0.0001f));
+                Assert.That(value.rectTransform.anchorMin.x, Is.EqualTo(0.48f).Within(0.0001f));
+                Assert.That(valueRows.GetArrayElementAtIndex(index).objectReferenceValue, Is.EqualTo(value));
+            }
+        }
+
         // 월드 지도 프리팹에 60개 성 노드와 직렬화된 데이터 연결이 고정 배치되었는지 확인합니다.
         [Test]
         public void WorldMapPrefabContainsSixtyBoundCastleNodes()
@@ -368,6 +396,17 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("castleMarkers").arraySize, Is.EqualTo(60));
             Assert.That(serialized.FindProperty("castleLabels").arraySize, Is.EqualTo(60));
             Assert.That(serialized.FindProperty("castleIds").arraySize, Is.EqualTo(60));
+        }
+
+        // 시나리오별 중복 월드 프리팹 없이 공용 월드 프리팹 하나만 유지하는지 확인합니다.
+        [Test]
+        public void WorldMapUsesSingleSharedPrefab()
+        {
+            const string freeWorldPrefabPath =
+                "Assets/Prefabs/Administration/WIAdministrationWorldUGUI_Free.prefab";
+
+            Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>(WorldPrefabPath), Is.Not.Null);
+            Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>(freeWorldPrefabPath), Is.Null);
         }
 
         // 영지 프리팹이 시안형 하단 요약에 맞는 영웅·시설 슬롯과 고정 명령을 갖는지 확인합니다.
