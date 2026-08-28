@@ -6,10 +6,9 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public class WICampaignTitleUGUIController : MonoBehaviour
+    public class WICampaignTitleUGUIController : WIAdministrationUGUIPanelController
     {
         [SerializeField] private WIAdministrationDatabaseSO database;
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private Button[] difficultyButtons;
         [SerializeField] private TMP_Text[] difficultyLabels;
         [SerializeField] private Button[] variantButtons;
@@ -51,10 +50,7 @@ namespace ProjectWI.Administration
         // 고정 배치된 UGUI 카드에 데이터와 클릭 동작을 연결합니다.
         private void Awake()
         {
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
 
             if (database == null || administrationController == null)
             {
@@ -78,7 +74,9 @@ namespace ProjectWI.Administration
             SelectDifficulty(WICampaignDifficulty.Standard);
             SelectVariant(WICampaignVariant.AresMain);
 
-            if (service != null && service.HasCampaignStarted)
+            bool campaignStarted = service != null && service.HasCampaignStarted;
+            administrationController.SetUGUICampaignTitleVisibility(campaignStarted == false);
+            if (campaignStarted)
             {
                 gameObject.SetActive(false);
             }
@@ -154,6 +152,7 @@ namespace ProjectWI.Administration
         private void StartNewCampaign()
         {
             administrationController.BeginCampaign(selectedDifficulty, selectedVariant);
+            administrationController.SetUGUICampaignTitleVisibility(false);
             gameObject.SetActive(false);
         }
 
@@ -164,6 +163,7 @@ namespace ProjectWI.Administration
             WICampaignRuntimeService service = WICampaignRuntimeService.Instance;
             if (service != null && service.HasCampaignStarted)
             {
+                administrationController.SetUGUICampaignTitleVisibility(false);
                 gameObject.SetActive(false);
             }
         }
@@ -174,6 +174,7 @@ namespace ProjectWI.Administration
             WICampaignRuntimeService service = WICampaignRuntimeService.Instance;
             if (service != null && service.HasCampaignStarted)
             {
+                administrationController.SetUGUICampaignTitleVisibility(false);
                 gameObject.SetActive(false);
             }
         }
@@ -181,6 +182,12 @@ namespace ProjectWI.Administration
         // 캠페인 결과에서 시작 화면으로 돌아올 때 타이틀 프리팹을 다시 표시합니다.
         public void ShowCampaignStart()
         {
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.SetUGUICampaignTitleVisibility(true);
+            }
+
             gameObject.SetActive(true);
         }
     }

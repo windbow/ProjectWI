@@ -15,5 +15,11 @@
 .result-header { background-color: rgb(47, 55, 65); border-top-width: 1px; border-left-width: 1px; border-right-width: 1px; border-top-color: rgb(80, 91, 104); border-left-color: rgb(80, 91, 104); border-right-color: rgb(80, 91, 104); -unity-font-style: bold; }
 .result-victory { background-color: rgba(43, 104, 69, 0.35); }
 .result-defeat { background-color: rgba(123, 52, 52, 0.35); }
-.col-difficulty { width: 80px; }.col-policy { width: 80px; }.col-number { width: 64px; }.col-result { width: 80px; }.col-battles { width: 105px; }.col-characters { width: 115px; }.col-recruitment { width: 125px; }
+.col-difficulty { width: 80px; }.col-policy { width: 80px; }.col-number { width: 64px; }.col-result { width: 80px; }.col-battles { width: 105px; }.col-characters { width: 115px; }.col-recruitment { width: 145px; }.col-detail { width: 62px; }
+.detail-button { min-height: 24px; margin-left: 4px; }
+.detail-panel { display: none; margin-top: 10px; padding: 12px; background-color: rgb(39, 45, 53); border-left-width: 1px; border-right-width: 1px; border-top-width: 1px; border-bottom-width: 1px; border-left-color: rgb(76, 86, 98); border-right-color: rgb(76, 86, 98); border-top-color: rgb(76, 86, 98); border-bottom-color: rgb(76, 86, 98); }
+.detail-title-row { flex-direction: row; align-items: center; }
+.detail-title { flex-grow: 1; font-size: 15px; -unity-font-style: bold; color: rgb(235, 239, 244); }
+.detail-close-button { width: 64px; min-height: 24px; }
+.detail-body { margin-top: 8px; white-space: normal; color: rgb(194, 204, 216); }
 .footnote { margin-top: 10px; color: rgb(142, 151, 162); font-size: 11px; }

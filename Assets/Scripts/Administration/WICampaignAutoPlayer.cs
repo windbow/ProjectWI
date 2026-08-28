@@ -31,6 +31,9 @@ namespace ProjectWI.Administration
         public int CommonCharactersReturned;
         public int CharactersDiscovered;
         public int CharactersRecruited;
+        public int CharacterDeaths;
+        public int PermanentHeroDeaths;
+        public int CommonCharacterDeaths;
         public int FinalEmployedCharacters;
         public int FinalHeroCharacters;
         public int FinalCommonCharacters;
@@ -72,7 +75,10 @@ namespace ProjectWI.Administration
                 castle => castle.CastleId, castle => castle.FactionId);
             int initialReturnCount = state.Characters.Sum(character => character.CommonReturnCount);
             int initialDiscoveredCount = state.Characters.Count(character => character.Discovered);
-            int initialRecruitedCount = state.Characters.Count(character => character.Recruited);
+            int initialRecruitmentSuccessCount = state.PlayerRecruitmentSuccessCount;
+            int initialDeathCount = state.Characters.Sum(character => character.DeathCount);
+            int initialPermanentHeroDeaths = state.Characters.Count(character =>
+                character.IsDead && character.BaseGrade == WICharacterGrade.Hero);
             int lastBattleMonth = 0;
             if (stopWhenCampaignEnds && state.CampaignResult != WICampaignResult.Ongoing)
             {
@@ -87,8 +93,8 @@ namespace ProjectWI.Administration
                 ResolvePendingDecisions(database, state, policy, metrics, state.LastMonthlyReport);
                 ResolvePendingBattles(database, state, metrics, month, ref lastBattleMonth);
                 ConfigureAdministration(state, policy);
-                PrepareRecruitmentAction(database, state, policy);
                 PrepareMilitaryAction(database, state, policy, metrics);
+                PrepareRecruitmentAction(database, state, policy);
                 WITurnSummary summary = WIAdministrationTurnSystem.ExecuteTurn(database, state);
                 ResolvePendingDecisions(database, state, policy, metrics, summary);
                 ResolvePendingBattles(database, state, metrics, month, ref lastBattleMonth);
@@ -115,7 +121,13 @@ namespace ProjectWI.Administration
             metrics.CharactersDiscovered = Mathf.Max(0,
                 state.Characters.Count(character => character.Discovered) - initialDiscoveredCount);
             metrics.CharactersRecruited = Mathf.Max(0,
-                state.Characters.Count(character => character.Recruited) - initialRecruitedCount);
+                state.PlayerRecruitmentSuccessCount - initialRecruitmentSuccessCount);
+            metrics.CharacterDeaths = Mathf.Max(0,
+                state.Characters.Sum(character => character.DeathCount) - initialDeathCount);
+            metrics.PermanentHeroDeaths = Mathf.Max(0, state.Characters.Count(character =>
+                character.IsDead && character.BaseGrade == WICharacterGrade.Hero) - initialPermanentHeroDeaths);
+            metrics.CommonCharacterDeaths = Mathf.Max(0,
+                metrics.CharacterDeaths - metrics.PermanentHeroDeaths);
             HashSet<string> playerCharacterIds = new HashSet<string>(state.Castles
                 .Where(castle => castle.FactionId == state.PlayerFactionId)
                 .SelectMany(castle => castle.HeroIds));
@@ -149,6 +161,7 @@ namespace ProjectWI.Administration
             WICharacterRuntimeState actor = state.Characters
                 .Where(character => character.Recruited && character.IsDead == false && character.Captured == false &&
                                     character.Activity == WICharacterActivityType.None &&
+                                    WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId) &&
                                     state.IsCharacterBusy(character.HeroId) == false)
                 .Where(character => state.Castles.Any(castle =>
                     castle.FactionId == state.PlayerFactionId && castle.HeroIds.Contains(character.HeroId)))
@@ -247,10 +260,16 @@ namespace ProjectWI.Administration
                 FillArmy(database, state, baseCastle, army, policy);
             }
 
-            // 공세형도 첫 두 달은 편성과 적 이동을 확인한 뒤 원정해 첫 턴 상호 침공으로 전멸하지 않게 합니다.
-            bool allowMarch = policy == WIAutoPlayerPolicy.Aggressive
-                ? state.Turn >= 3
-                : state.Turn % 3 == 0;
+            PositionAndConsolidateArmies(database, state);
+            PrepareBlockedArmyTraining(database, state, policy);
+
+            // 첫 관문은 1년 안에 공략하고 이후에는 정책별 준비 주기로 연속 점령 속도를 제한합니다.
+            bool firstExpansion = state.Castles.Count(castle =>
+                castle.FactionId == state.PlayerFactionId) <= 1;
+            int marchInterval = firstExpansion
+                ? 3
+                : (policy == WIAutoPlayerPolicy.Aggressive ? 9 : 12);
+            bool allowMarch = state.Turn >= 3 && state.Turn % marchInterval == 0;
             if (allowMarch == false)
             {
                 return;
@@ -280,6 +299,146 @@ namespace ProjectWI.Administration
                     metrics.MarchesStarted += 1;
                 }
             }
+        }
+
+        // 전선의 예상 전력을 넘지 못한 전투단이 단순 대기하지 않고 합동훈련을 준비하게 합니다.
+        private static void PrepareBlockedArmyTraining(
+            WIAdministrationDatabaseSO database,
+            WIAdministrationState state,
+            WIAutoPlayerPolicy policy)
+        {
+            foreach (WIArmyState army in state.Armies.Where(item =>
+                         item.FactionId == state.PlayerFactionId && item.IsOperational))
+            {
+                WICastleRuntimeState origin = state.GetCastle(army.CurrentCastleId);
+                if (origin == null)
+                {
+                    continue;
+                }
+                List<WICastleRuntimeState> enemies = origin.AdjacentCastleIds
+                    .Select(state.GetCastle)
+                    .Where(target => target != null && target.FactionId != state.PlayerFactionId &&
+                                     WIAdministrationTurnSystem.AreFactionsAtWar(
+                                         state, state.PlayerFactionId, target.FactionId))
+                    .ToList();
+                if (enemies.Count > 0 && enemies.Any(target =>
+                        CanAutoAttack(database, state, army, target, policy)) == false)
+                {
+                    WIAdministrationTurnSystem.ScheduleJointTraining(army);
+                }
+            }
+        }
+
+        // 후방 전투단을 가장 가까운 전선으로 이동시키고 같은 성의 전투단을 권장 인원까지 통합합니다.
+        private static void PositionAndConsolidateArmies(
+            WIAdministrationDatabaseSO database,
+            WIAdministrationState state)
+        {
+            List<WIArmyState> playerArmies = state.Armies.Where(army =>
+                army.FactionId == state.PlayerFactionId && army.IsOperational).ToList();
+            foreach (IGrouping<string, WIArmyState> group in playerArmies.GroupBy(army => army.CurrentCastleId))
+            {
+                WIArmyState primary = group.OrderByDescending(army => army.Members.Count).FirstOrDefault();
+                if (primary == null)
+                {
+                    continue;
+                }
+
+                int maximum = WIAdministrationTurnSystem.GetRecommendedArmySize(database, primary);
+                foreach (WIArmyState support in group.Where(army => army != primary).ToList())
+                {
+                    foreach (WIArmyMemberState member in support.Members.ToList())
+                    {
+                        if (primary.Members.Count >= maximum)
+                        {
+                            break;
+                        }
+                        support.Members.Remove(member);
+                        if (WIAdministrationTurnSystem.AddArmyMember(
+                                database, state, primary, member.HeroId, member.Role) == false)
+                        {
+                            support.Members.Add(member);
+                        }
+                    }
+                    if (support.Members.Count == 0)
+                    {
+                        state.Armies.Remove(support);
+                    }
+                }
+            }
+
+            List<WICastleRuntimeState> frontlines = state.Castles.Where(castle =>
+                castle.FactionId == state.PlayerFactionId && castle.AdjacentCastleIds.Any(id =>
+                {
+                    WICastleRuntimeState adjacent = state.GetCastle(id);
+                    return adjacent != null && adjacent.FactionId != state.PlayerFactionId &&
+                           WIAdministrationTurnSystem.AreFactionsAtWar(
+                               state, state.PlayerFactionId, adjacent.FactionId);
+                })).ToList();
+            foreach (WIArmyState army in state.Armies.Where(item =>
+                         item.FactionId == state.PlayerFactionId && item.IsOperational).ToList())
+            {
+                WICastleRuntimeState origin = state.GetCastle(army.CurrentCastleId);
+                if (origin == null || frontlines.Contains(origin))
+                {
+                    continue;
+                }
+                string step = FindFriendlyStep(state, origin.CastleId, frontlines.Select(item => item.CastleId));
+                if (string.IsNullOrEmpty(step) == false &&
+                    WIAdministrationTurnSystem.BeginArmyMarch(database, state, army, step))
+                {
+                    army.Mission = WIArmyMission.Reinforce;
+                }
+            }
+        }
+
+        // 아군 성만 통과해 가장 가까운 목적지 집합으로 가는 첫 이동 성을 반환합니다.
+        private static string FindFriendlyStep(
+            WIAdministrationState state,
+            string originId,
+            IEnumerable<string> destinationIds)
+        {
+            HashSet<string> destinations = new HashSet<string>(destinationIds);
+            Queue<string> queue = new Queue<string>();
+            Dictionary<string, string> previous = new Dictionary<string, string>();
+            queue.Enqueue(originId);
+            previous[originId] = string.Empty;
+            string destination = string.Empty;
+            while (queue.Count > 0)
+            {
+                string current = queue.Dequeue();
+                if (current != originId && destinations.Contains(current))
+                {
+                    destination = current;
+                    break;
+                }
+                WICastleRuntimeState castle = state.GetCastle(current);
+                if (castle == null)
+                {
+                    continue;
+                }
+                foreach (string adjacentId in castle.AdjacentCastleIds)
+                {
+                    if (previous.ContainsKey(adjacentId) ||
+                        state.GetCastle(adjacentId)?.FactionId != state.PlayerFactionId)
+                    {
+                        continue;
+                    }
+                    previous[adjacentId] = current;
+                    queue.Enqueue(adjacentId);
+                }
+            }
+
+            if (string.IsNullOrEmpty(destination))
+            {
+                return string.Empty;
+            }
+            string step = destination;
+            while (previous[step] != originId && string.IsNullOrEmpty(previous[step]) == false)
+            {
+                step = previous[step];
+            }
+            return step;
         }
 
         // 자동 플레이가 피로 누적 또는 현격한 열세에서 반복 원정하지 않도록 공격 가능성을 판정합니다.
@@ -331,7 +490,8 @@ namespace ProjectWI.Administration
             int roleIndex = 0;
             foreach (string heroId in castle.HeroIds
                          .Where(id => state.IsCharacterBusy(id) == false)
-                         .OrderByDescending(id => database.GetHero(id)?.Might ?? 0)
+                         .OrderBy(id => WIAdministrationTurnSystem.IsAdministrationCapable(state, id) ? 1 : 0)
+                         .ThenByDescending(id => database.GetHero(id)?.Might ?? 0)
                          .ToList())
             {
                 if (army.Members.Count >= targetSize)

@@ -4,11 +4,9 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationBasicFacilityUGUIController : MonoBehaviour
+    public sealed class WIAdministrationBasicFacilityUGUIController : WIAdministrationUGUIPanelController
     {
         private enum PageMode { Facility, Quest, Hero }
-
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -26,7 +24,7 @@ namespace ProjectWI.Administration
         // 선술집 버튼과 고정 선택 카드를 기본 시설 흐름에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             tavernButton.onClick.AddListener(OpenQuests);
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
@@ -38,14 +36,20 @@ namespace ProjectWI.Administration
         // 기본 시설 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUIBasicFacilityRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUIBasicFacilityRequested += Open;
+            }
         }
 
         // 기본 시설 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUIBasicFacilityRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUIBasicFacilityRequested -= Open;
+            }
         }
 
         // 성관·시장·훈련소·선술집의 기본 역할 안내를 표시합니다.
@@ -66,7 +70,8 @@ namespace ProjectWI.Administration
             modal.SetTitle("선술집 월간 의뢰");
             facilityRoot.SetActive(false);
             cardRoot.SetActive(true);
-            if (administrationController.TryGetUGUITavernQuests(out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUITavernQuests(out snapshot, out string error)
+                == false)
             {
                 ShowError(error);
                 return;
@@ -84,7 +89,10 @@ namespace ProjectWI.Administration
             {
                 bool visible = index < count;
                 cardButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 if (pageMode == PageMode.Quest)
                 {
                     WIAdministrationTavernQuestSnapshot quest = snapshot.Quests[index];
@@ -112,9 +120,13 @@ namespace ProjectWI.Administration
         {
             if (pageMode == PageMode.Quest)
             {
-                if (index >= snapshot.Quests.Count) return;
+                if (index >= snapshot.Quests.Count)
+                {
+                    return;
+                }
                 selectedQuestId = snapshot.Quests[index].QuestId;
-                if (administrationController.TryGetUGUIQuestHeroes(selectedQuestId, out snapshot, out string error) == false)
+                if (administrationController.TryGetUGUIQuestHeroes(selectedQuestId, out snapshot, out string error)
+                    == false)
                 {
                     ShowError(error);
                     return;
@@ -125,7 +137,10 @@ namespace ProjectWI.Administration
                 RefreshCards();
                 return;
             }
-            if (pageMode != PageMode.Hero || index >= snapshot.Heroes.Count) return;
+            if (pageMode != PageMode.Hero || index >= snapshot.Heroes.Count)
+            {
+                return;
+            }
             if (administrationController.AssignUGUITavernQuest(selectedQuestId, snapshot.Heroes[index].HeroId, out string assignError))
             {
                 modal.Hide();

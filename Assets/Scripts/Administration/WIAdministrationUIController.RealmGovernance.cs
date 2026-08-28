@@ -8,6 +8,12 @@ namespace ProjectWI.Administration
             WIProjectInvestment investment,
             WIHeroDefinition manager)
         {
+            if (WIAdministrationTurnSystem.IsAdministrationCapable(state, manager.Id) == false)
+            {
+                ShowMessage("영웅 등급의 인물만 내정 사업을 담당할 수 있습니다.");
+                return;
+            }
+
             if (projectType == WICastleProjectType.Expansion && CanStartExpansion(selectedCastle) == false)
             {
                 ShowMessage("확장에는 성 규모에 맞는 번영과 기술이 필요하며 대형 성은 더 확장할 수 없습니다.");

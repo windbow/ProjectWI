@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationSpecialFacilityUGUIController : MonoBehaviour
+    public sealed class WIAdministrationSpecialFacilityUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -19,7 +18,7 @@ namespace ProjectWI.Administration
         // 고정된 시설 카드 버튼을 선택 기능에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < optionButtons.Length; index += 1)
             {
                 int captured = index;
@@ -30,21 +29,28 @@ namespace ProjectWI.Administration
         // 특화 시설 선택 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUISpecialFacilityRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUISpecialFacilityRequested += Open;
+            }
         }
 
         // 특화 시설 선택 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUISpecialFacilityRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUISpecialFacilityRequested -= Open;
+            }
         }
 
         // 현재 성에서 선택 가능한 특화 시설을 표시합니다.
         private void Open()
         {
             modal.Show("특화 시설 선택");
-            if (administrationController.TryGetUGUISpecialFacilitySnapshot(out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUISpecialFacilitySnapshot(out snapshot, out string error)
+                == false)
             {
                 statusLabel.text = string.Empty;
                 messageLabel.gameObject.SetActive(true);
@@ -58,7 +64,10 @@ namespace ProjectWI.Administration
             {
                 bool visible = index < snapshot.Options.Count;
                 optionButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationSpecialFacilityOptionSnapshot option = snapshot.Options[index];
                 optionIcons[index].sprite = option.Icon;
                 optionIcons[index].enabled = option.Icon != null;
@@ -69,7 +78,10 @@ namespace ProjectWI.Administration
         // 선택한 시설을 기존 성 상태에 추가하고 모달을 닫습니다.
         private void Select(int index)
         {
-            if (snapshot == null || index >= snapshot.Options.Count) return;
+            if (snapshot == null || index >= snapshot.Options.Count)
+            {
+                return;
+            }
             if (administrationController.SelectUGUISpecialFacility(snapshot.Options[index].FacilityId, out string error))
             {
                 modal.Hide();

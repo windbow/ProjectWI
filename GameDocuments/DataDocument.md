@@ -1,5 +1,38 @@
 # ProjectWI 씬 및 에셋 구조
 
+## 월드맵 성 이미지
+
+- `WICastleDefinition.mapMarkerImage`: 월드맵 노드 전용 Sprite입니다.
+- `WICastleDefinition.castleImage`: 기존 성 상세·영지 화면 전경 Sprite입니다.
+- 기본 데이터는 산악형, 해안형, 설원형 성 마커를 60개 성에 각각 20개씩 분산 배정합니다.
+
+- `WIAdministrationTurnSystem.PlanAIActions`는 위협 성을 우선하고, 없으면 전쟁 중인 적과 인접한 접경 성을 집결지로 사용합니다. `CanAIFactionAttack`은 해당 집결지의 작전 가능 동일 진영 전투단 전력을 합산해 데이터베이스의 공격 허용 비율과 비교합니다.
+- 전투 물리 회귀 테스트는 `CreateBattleConfigWithHiddenGrid(false)`로 원본 `WI_BattleConfig.asset`의 복제본을 만들고 연속 좌표 모드만 격리해 검증합니다. 실제 게임의 기본 숨은 격자 설정은 유지됩니다.
+- `WIAdministrationAITurnTests`의 전투 결과 픽스처는 `PrepareValdorAttackOnAvalon`에서 발도르 전투단과 2개월 원정을 명시적으로 구성합니다. AI 공격 대상 선택 검증과 전투 세션·결과 검증은 서로 독립된 테스트 계약입니다.
+
+## 전투 캐릭터 표시 프리팹
+
+- `WIBattleCharacter.prefab`은 접지 그림자, 집중·선택 마커, 체력 배경·전경, 인물 라벨을 고정 자식으로 보유합니다.
+- `WIBattleCharacterView`는 해당 자식을 찾아 Sprite, 색상, 체력 비율과 표시 여부만 갱신하며 런타임에 UI 오브젝트나 컴포넌트를 생성하지 않습니다.
+- 표시 요소 이름은 `GroundShadow`, `FocusTargetMarker`, `SelectionMarker`, `HealthBackground/HealthFill`, `CharacterLabel`로 유지합니다.
+
+## UGUI 브리지 코드 구조
+
+- `WIUILayoutFormattingTests`는 현재 UGUI 모달·턴 후속 에셋, 전투 씬의 실제 전역광 강도와 전투 전용 버튼 클래스, 현행 전략 용어를 검증합니다. 삭제된 `popup_header.png` 경로는 USS와 테스트 계약에서 제거했습니다.
+- 월드 성 상세 패널은 제목 `CastleDetailRow1~6`과 값 `CastleDetailValue1~6`을 분리해 프리팹에 고정 보유하며, `WIAdministrationWorldUGUIController`의 두 TMP 배열이 같은 인덱스로 갱신합니다.
+- `turn_followup_info_panel_v1.png`은 1955×509, 사방 48px Border의 Sliced Sprite이며 턴 후속 설명 패널·체크리스트 패널·두 체크 행이 공용으로 사용합니다.
+- `WIAdministrationTopHUDUGUI.prefab`: 월드 기준의 92px 상단 HUD를 저장한 공용 중첩 프리팹이며 월드·영지 화면이 동일 자산을 사용합니다.
+- `WIAdministrationTopHUDUGUIController.cs`: 공용 HUD의 진영·날짜·자원 TMP 갱신과 월보·의회·연구·설정 버튼 연결을 담당합니다.
+- 기능 화면 컨트롤러의 제어문은 모두 명시적 중괄호 블록을 사용합니다. 이벤트 연결, 조기 반환과 카드 반복 처리도 같은 형식을 유지합니다.
+- `WIAdministrationUGUIPanelController.cs`: 24개 기능 화면 컨트롤러의 공통 기반 클래스입니다. 프리팹의 기존 `administrationController` 직렬화 이름을 유지하고 참조 누락 시 씬 탐색을 한 곳에서 처리합니다.
+- `WIAdministrationUIController.UGUIBridge.cs`: 월드·영지 스냅샷, 화면 표시 상태와 화면 전환 이벤트를 담당합니다.
+- `WIAdministrationUIController.UGUICastleCommandBridge.cs`: 중점 사업, 영웅 배치와 인물 활동을 담당합니다.
+- `WIAdministrationUIController.UGUIFacilityBridge.cs`: 특화 시설, 선술집과 영지관 위임을 담당합니다.
+- `WIAdministrationUIController.UGUIMarchBridge.cs`: 전투단 선택·편성·이동·원정을 담당합니다.
+- `WIAdministrationUIController.UGUIReportBridge.cs`: 성 기록, 목표, 월간 보고, 단축 명령과 QA 진입을 담당합니다.
+- `WIAdministrationUIController.UGUIMilitaryTransferBridge.cs`: 군사 현황과 인물 이동을 담당합니다.
+- 모든 파일은 같은 partial 컨트롤러의 기존 공개 API와 이벤트를 유지하며 프리팹은 이 코드 분리로 변경되지 않습니다.
+
 ## 일반 인물 사망과 재야 복귀
 
 - 태생 영웅 등급 인물은 사망·처형 시 `IsDead` 상태로 영구 퇴장합니다.
@@ -15,6 +48,9 @@
 - `WICampaignVariantDefinition.castlePlacements`가 선택 시나리오의 성 소유 세력·정규화 좌표·인접 성을 덮어씁니다.
 - 런타임의 `WICastleRuntimeState`에 확정된 배치를 저장하고, `WIAdministrationWorldSnapshot.MapNodes`와 `MapConnections`를 통해 공용 프리팹에 표시합니다.
 - 프리 시나리오처럼 덮어쓰기가 없는 항목은 `WICastleDefinition`의 기본 소유 세력·좌표·연결을 유지합니다.
+- 아레스 메인의 `aiPreservationFactionId=valdor`, `valdorAIPreservationCastleCount=36`은 제3세력 AI의 발도르 침식만 제한하는 시나리오 데이터입니다. 아발론의 정복 진행과 발도르 자체 경제·방어 수치에는 보너스를 주지 않습니다.
+- `WIAdministrationTurnSystem.Pipeline.cs`는 월간 처리를 준비, 성별 처리, 후속 시스템, 턴 완료의 네 단계로 조율합니다. 개별 경제·인물·군사·AI 계산은 `WIAdministrationTurnSystem`의 도메인 함수가 담당합니다.
+- `WIAdministrationDatabaseSO`의 `AggressiveAIAttackPowerPercent=90`, `StandardAIAttackPowerPercent=105`는 AI 성향별 원정 최소 전력 비율입니다.
 - 아레스 메인의 현재 북부 진출로는 `castle_28 ↔ castle_04`, `castle_04 ↔ castle_33`, `castle_04 ↔ castle_34`입니다. 연결은 양쪽 성의 `AdjacentCastleIds`에 서로를 기록합니다.
 
 ## 성 내정 공용 모달 셸
@@ -112,6 +148,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - `WIAdministrationModalUGUIController`는 활성 인스턴스를 정적 집합으로 관리해 전역 단축키 차단 여부와 Escape로 닫을 최상위 Canvas를 제공합니다. 닫힌 모달은 컨트롤러 루트와 이벤트 구독은 유지하되 루트 `Canvas`와 `GraphicRaycaster`를 비활성화하며, `Show`와 `Hide`가 표시·입력 상태를 함께 전환합니다. 실제 명령 키 판정은 `WIAdministrationWorldUGUIController`가 Input System으로 처리합니다.
 - `WIAdministrationUIController` 초기화 시 미결 전투가 발견되면 `OpenPendingBattleReportUGUIAfterInitialization` 코루틴이 한 프레임 대기한 뒤 `UGUIMonthlyReportRequested`를 발생시킵니다.
 - 캠페인 시작 데이터는 UGUI 타이틀 컨트롤러가 `WIAdministrationDatabaseSO.DifficultyDefinitions`와 `CampaignVariants`를 읽어 프리팹의 고정 카드 배열에 표시합니다. 선택 결과만 `BeginCampaign`으로 전달되며 행정 컨트롤러는 카드 오브젝트를 생성하지 않습니다.
+- `WIAdministrationUIController.UGUIBridge`는 캠페인 타이틀 표시 상태를 월드·영지 스냅샷의 공통 가시성 조건으로 사용합니다. 최초 값은 표시 상태이며 새 캠페인 또는 이어하기 성공 시 해제되고, `ShowCampaignStart()`로 타이틀에 복귀하면 다시 활성화됩니다.
 - UGUI 지도 노드의 식별자·버튼·마커 배열은 `WIAdministrationWorldUGUI.prefab`에 직렬화됩니다. 소유 진영, 선택 상태와 정보 공개 문구는 `TryGetUGUIMapSnapshot`을 통해 갱신하며 기존 UI Toolkit `BuildMap()`은 실제 UGUI 초기화·캠페인 재구성·설정·불러오기 경로에서 호출하지 않습니다.
 - `WIUIScreenManager`에는 캠페인 타이틀, 월드, 영지와 기능 모달을 합친 23개 프리팹 에셋 참조가 직렬화됩니다. 씬 자식은 저장하지 않고 `Awake()`에서 완성 프리팹을 생성합니다.
 
@@ -138,6 +175,8 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - `WIAdministrationUIController.World.cs`는 선택 성 전환, QA용 기본 월드/성 상태 진입과 UGUI 표시 문자열 헬퍼만 보유합니다. 60개 지도 노드와 월드 HUD는 `WIAdministrationWorldUGUI.prefab`과 `WIAdministrationMapUGUIController`가 담당합니다.
 - 비전투 런타임 스크립트에는 `UnityEngine.UIElements`, `UIDocument`, `VisualTreeAsset`, `PanelSettings` 의존성이 남아 있지 않습니다. 레거시 `WIAdministrationWorldView.uxml`의 지도 연결선 자리도 일반 `VisualElement`이며 전용 `WIMapConnectionLayer` 형식은 삭제됐습니다.
 - `WIUIScreenManager`는 등록된 완성 UGUI 프리팹 인스턴스의 루트를 활성 상태로 생성해 컨트롤러의 이벤트 구독을 유지합니다. 캠페인 타이틀만 최초 Canvas가 활성화되고, 월드·영지·공통 모달 Canvas 및 GraphicRaycaster는 실제 표시 조건이 될 때만 활성화됩니다.
+- 월드 프리팹의 `commandButtons`와 `commandActions`는 하단 전역 명령 7개를 일대일로 보관합니다. 상단 월보·의회·연구·설정 입력은 공용 `WIAdministrationTopHUDUGUIController`가 소유하며 월드 명령 배열에 포함하지 않습니다.
+- `WIAdministrationEndTurnUGUIController`는 공용 다음 턴 프리팹의 클릭 이벤트, 활성 상태와 표시 문구를 담당합니다. 월드·영지 컨트롤러는 각각의 스냅샷에서 `CanEndTurn`과 `EndTurnText`를 전달하며 미결 플레이어 전투가 있으면 두 화면에서 동일하게 버튼을 비활성화합니다.
 - Unity Editor 플레이 모드에서는 `WIUIScreenManager`가 매번 새로 생성되는 23개 화면 Clone의 루트만 `SceneVisibilityManager.DisablePicking(screen, false)`로 피킹 차단합니다. 자식 UI는 피킹 가능하므로 Scene View에서 실제 패널·버튼을 직접 선택할 수 있으며 Player 빌드에는 이 처리가 포함되지 않습니다.
 - `WIHeroDefinition.battleSprite`는 인물별 선택 전투 전신 Sprite입니다. 현재 밀도 테스트에서는 `Assets/Art/Characters/Ares/Ares_Battle_1WU_A_OutlineBake_V1.png`가 공용 연결되며 `WIBattleCharacterView`는 값이 있으면 흰색 원본 Sprite를, 없으면 기존 진영색 플레이스홀더를 표시합니다. 아레스 UI 초상화는 고해상도 원본에서 얼굴 중심으로 추출한 `Ares_Portrait_Face_V1.png`를 사용합니다.
 - `WIBattleCameraController.FrameCombatants`는 전체 참가자의 초기 좌표 범위와 2~60명 밀도를 함께 계산해 직교 카메라 시작 크기를 결정합니다. `WI_BattleConfig.cameraMaximumZoom`은 12이며 60명 전투는 최대 줌아웃을 사용합니다.
@@ -365,3 +404,23 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - 구버전 저장 파일에 런타임 지도 필드가 없으면 불러올 때 마스터 배치와 선택 시나리오의 좌표·연결 재정의를 복구합니다.
 - `WICharacterRuntimeState.RecruitmentCastleId`: 아직 영입되지 않은 인재가 어느 성의 탐색 풀에 속하는지 저장합니다.
 - 영입 성공 시 후보 인물은 영입 담당자가 머무는 성의 `HeroIds`에 추가되어 실제 배치 가능한 인력이 됩니다.
+# 시나리오 인물 데이터
+
+- `WICampaignVariantDefinition.nonPlayerRecruitmentEnabled`: 해당 시나리오에서 비플레이어 세력의 재야 인재 고용 허용 여부입니다.
+- `WICampaignVariantDefinition.characterPlacements`: 런타임 생성이 아닌 ScriptableObject 저장형 시작 인물 배치 목록입니다.
+- 현재 캐릭터 마스터는 태생 영웅 100명과 일반 400명, 총 500명이며 시나리오별 시작 배치는 250명입니다.
+- 아레스 메인 `castle_28`에는 태생 영웅 4명과 일반 병사 10명, 총 14명이 배치됩니다.
+- 내정 가능 판정은 태생 영웅 또는 승격 영웅입니다. 일반 등급은 모든 개인 활동과 내정 담당에서 제외되며 전투단 편성·군사 행동·전투단 합동훈련과 대기 회복만 적용됩니다.
+# Campaign Auto Test Lab 상세 데이터
+
+- 결과 행의 `상세` 버튼과 `detail-panel`은 `WICampaignAutoTestLab.uxml`에 9개 행분이 고정 배치되어 있습니다.
+- `BuildDetailText`는 최종 영토, 전투, 인물 등급 구성, 실제 신규 영입 성공, 재야 복귀, 사망과 미해결 상태를 설명하고 장기 정체 조건을 진단합니다.
+# 인재 영입 진척 데이터
+
+- `WIAdministrationDatabaseSO.RecruitmentBaseProgress`: 월간 영입 설득 기본 진척입니다. ScriptableObject 저장값은 35입니다.
+- 후보별 월간 설득 진척 공식은 `RecruitmentBaseProgress + recruiter.Charisma / 4`이며 최대 100으로 제한됩니다.
+
+# 인물 휴식 데이터
+
+- `WIAdministrationDatabaseSO.CharacterRestFatigueRecovery`: 영웅 개인 휴식 1개월의 피로 회복량입니다. ScriptableObject 저장값은 50입니다.
+- 개인 휴식은 부상 기간을 1개월 줄이며, 일반 등급의 개인 활동 제한과 전투단 대기 회복 15에는 영향을 주지 않습니다.

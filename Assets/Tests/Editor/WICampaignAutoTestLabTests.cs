@@ -41,7 +41,35 @@ namespace ProjectWI.Tests.Editor
                 Assert.IsNotNull(root.Q<Label>($"result-{index}-result"));
                 Assert.IsNotNull(root.Q<Label>($"result-{index}-characters"));
                 Assert.IsNotNull(root.Q<Label>($"result-{index}-recruitment"));
+                Assert.IsNotNull(root.Q<Button>($"result-{index}-detail"));
             }
+            Assert.IsNotNull(root.Q<VisualElement>("detail-panel"));
+            Assert.IsNotNull(root.Q<Label>("detail-body"));
+        }
+
+        // 상세 설명에 지표의 풀어쓴 의미와 장기 정체 진단이 포함되는지 검증합니다.
+        [Test]
+        public void CampaignAutoTestLab_DetailExplainsMetricsAndWarnings()
+        {
+            WICampaignAutoTestResult result = new WICampaignAutoTestResult
+            {
+                Difficulty = WICampaignDifficulty.Standard,
+                Policy = WIAutoPlayerPolicy.Balanced,
+                Metrics = new WIAutoCampaignMetrics
+                {
+                    MonthsSimulated = 240,
+                    CampaignResult = WICampaignResult.Ongoing,
+                    FinalPlayerCastleCount = 3,
+                    FinalEmployedCharacters = 14,
+                    FinalHeroCharacters = 4,
+                    FinalCommonCharacters = 10
+                }
+            };
+
+            string detail = WICampaignAutoTestLabWindow.BuildDetailText(result);
+            StringAssert.Contains("실제 신규 영입 성공 0명", detail);
+            StringAssert.Contains("원정이 없어", detail);
+            StringAssert.Contains("240개월에도 캠페인이 끝나지 않아", detail);
         }
 
         // CSV와 Markdown 내보내기 문자열에 주요 캠페인 지표가 포함되는지 검증합니다.
@@ -77,13 +105,13 @@ namespace ProjectWI.Tests.Editor
 
             StringAssert.Contains("표준,균형형,24,승리,60", csv);
             StringAssert.Contains("| 표준 | 균형형 | 24 | 승리 | 60 | 8/2 |", markdown);
-            StringAssert.Contains("일반 재야 복귀,인재 발견,신규 영입", csv);
+            StringAssert.Contains("일반 재야 복귀,인재 발견,신규 영입 성공", csv);
             StringAssert.Contains("| 12 (5/7) | 30 | 3 | 4 | 2 |", markdown);
         }
 
-        // 자동 플레이어가 실제 탐색·영입 활동을 사용해 재야 인재 순환을 진행하는지 검증합니다.
+        // 자동 플레이 지표가 전 세계 고용 순증이 아니라 플레이어의 실제 영입 성공만 보고하는지 검증합니다.
         [Test]
-        public void AutoPlayer_SearchesAndRecruitsWanderingCharacters()
+        public void AutoPlayer_ReportsOnlyPlayerRecruitmentSuccesses()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(
@@ -92,8 +120,7 @@ namespace ProjectWI.Tests.Editor
             WIAutoCampaignMetrics metrics = WICampaignAutoPlayer.Run(
                 database, state, WIAutoPlayerPolicy.Balanced, 24, false);
 
-            Assert.Greater(metrics.CharactersDiscovered, 0);
-            Assert.Greater(metrics.CharactersRecruited, 0);
+            Assert.AreEqual(state.PlayerRecruitmentSuccessCount, metrics.CharactersRecruited);
         }
     }
 }

@@ -5,9 +5,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationSchemeUGUIController : MonoBehaviour
+    public sealed class WIAdministrationSchemeUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -27,7 +26,7 @@ namespace ProjectWI.Administration
         // 첩보 단계 카드와 페이지·이전 버튼을 실제 첩보 기능에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
                 int captured = index;
@@ -41,14 +40,20 @@ namespace ProjectWI.Administration
         // 첩보 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUISchemeRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUISchemeRequested += Open;
+            }
         }
 
         // 첩보 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUISchemeRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUISchemeRequested -= Open;
+            }
         }
 
         // 첩보 종류 목록을 첫 페이지부터 엽니다.
@@ -82,7 +87,10 @@ namespace ProjectWI.Administration
                 int sourceIndex = page * cardButtons.Length + index;
                 bool visible = sourceIndex < snapshot.Cards.Count;
                 cardButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationSchemeCardSnapshot card = snapshot.Cards[sourceIndex];
                 cardLabels[index].text = card.Title + "\n" + card.Description;
                 cardPortraits[index].sprite = card.Portrait;
@@ -102,14 +110,30 @@ namespace ProjectWI.Administration
         private void SelectCard(int index)
         {
             int sourceIndex = page * cardButtons.Length + index;
-            if (snapshot == null || sourceIndex >= snapshot.Cards.Count) return;
+            if (snapshot == null || sourceIndex >= snapshot.Cards.Count)
+            {
+                return;
+            }
             WIAdministrationSchemeCardSnapshot card = snapshot.Cards[sourceIndex];
-            if (card.Action == "scheme") { Push(new SchemeViewState("agents", card.Id, string.Empty, string.Empty)); return; }
-            if (card.Action == "agent") { Push(new SchemeViewState("castles", view.SchemeId, card.Id, string.Empty)); return; }
-            if (card.Action == "castle-heroes") { Push(new SchemeViewState("heroes", view.SchemeId, view.AgentId, card.Id)); return; }
+            if (card.Action == "scheme")
+            {
+                Push(new SchemeViewState("agents", card.Id, string.Empty, string.Empty));
+                return;
+            }
+            if (card.Action == "agent")
+            {
+                Push(new SchemeViewState("castles", view.SchemeId, card.Id, string.Empty));
+                return;
+            }
+            if (card.Action == "castle-heroes")
+            {
+                Push(new SchemeViewState("heroes", view.SchemeId, view.AgentId, card.Id));
+                return;
+            }
             string targetHeroId = card.Action == "execute-hero" ? card.Id : string.Empty;
             string targetCastleId = card.Action == "execute-hero" ? view.CastleId : card.Id;
-            if (administrationController.ScheduleUGUIScheme(view.SchemeId, view.AgentId, targetCastleId, targetHeroId, out string error) == false)
+            if (administrationController.ScheduleUGUIScheme(view.SchemeId, view.AgentId, targetCastleId, targetHeroId, out string error)
+                == false)
             {
                 messageLabel.gameObject.SetActive(true);
                 messageLabel.text = error;

@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationHeroesUGUIController : MonoBehaviour
+    public sealed class WIAdministrationHeroesUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -26,7 +25,7 @@ namespace ProjectWI.Administration
         // 고정 영웅 카드와 페이지·이전 버튼을 영웅 기능에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
                 int captured = index;
@@ -40,14 +39,20 @@ namespace ProjectWI.Administration
         // 영웅 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUIHeroesRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUIHeroesRequested += Open;
+            }
         }
 
         // 영웅 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUIHeroesRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUIHeroesRequested -= Open;
+            }
         }
 
         // 영입 영웅 전체 목록을 첫 페이지부터 엽니다.
@@ -63,7 +68,8 @@ namespace ProjectWI.Administration
         // 현재 단계의 데이터를 읽어 8개 고정 카드에 표시합니다.
         private void Refresh()
         {
-            if (administrationController.TryGetUGUIHeroesPanel(mode, heroId, out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUIHeroesPanel(mode, heroId, out snapshot, out string error)
+                == false)
             {
                 messageLabel.gameObject.SetActive(true);
                 messageLabel.text = error;
@@ -80,7 +86,10 @@ namespace ProjectWI.Administration
                 int sourceIndex = page * cardButtons.Length + index;
                 bool visible = sourceIndex < snapshot.Cards.Count;
                 cardButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationHeroCardSnapshot card = snapshot.Cards[sourceIndex];
                 cardLabels[index].text = card.Title + "\n" + card.Description;
                 cardPortraits[index].sprite = card.Portrait;
@@ -100,7 +109,10 @@ namespace ProjectWI.Administration
         private void SelectCard(int index)
         {
             int sourceIndex = page * cardButtons.Length + index;
-            if (snapshot == null || sourceIndex >= snapshot.Cards.Count) return;
+            if (snapshot == null || sourceIndex >= snapshot.Cards.Count)
+            {
+                return;
+            }
             WIAdministrationHeroCardSnapshot card = snapshot.Cards[sourceIndex];
             if (card.Action == "hero")
             {
@@ -110,7 +122,8 @@ namespace ProjectWI.Administration
                 Refresh();
                 return;
             }
-            if (administrationController.ExecuteUGUIHeroAction(card.Action, heroId, card.Id, out string error) == false)
+            if (administrationController.ExecuteUGUIHeroAction(card.Action, heroId, card.Id, out string error)
+                == false)
             {
                 messageLabel.gameObject.SetActive(true);
                 messageLabel.text = error;

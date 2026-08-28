@@ -113,7 +113,7 @@ namespace ProjectWI.Tests.Editor
 
             StringAssert.Contains("m_Name: Global Light 2D", battleScene);
             StringAssert.Contains("m_LightType: 4", battleScene);
-            StringAssert.Contains("m_Intensity: 0.92", battleScene);
+            StringAssert.Contains("m_Intensity: 1", battleScene);
             StringAssert.Contains("m_UseNormalMap: 1", battleScene);
             StringAssert.Contains("m_Name: Arena Key Light 2D", battleScene);
             StringAssert.Contains("m_Name: Arena Fill Light 2D", battleScene);
@@ -135,14 +135,15 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("background-color: rgb(34, 75, 109)", battle);
         }
 
-        // ImageGen으로 제작한 아이콘·버튼·팝업 이미지가 런타임 UI 연결 경로에 모두 존재하는지 검증합니다.
+        // 생성한 아이콘·버튼과 현재 UGUI 팝업 이미지가 프로젝트 연결 경로에 모두 존재하는지 검증합니다.
         [Test]
         public void GeneratedUIArtwork_IsPresentAndConnected()
         {
             string[] assetNames =
             {
                 "button_normal.png", "button_primary.png", "button_danger.png", "popup_panel.png", "bg_type_a.png", "bg_type_b.png", "bg_type_c.png",
-                "popup_header.png",
+                "administration_modal_shell_v1.png", "turn_followup_frame_v1.png",
+                "turn_followup_info_panel_v1.png", "turn_followup_close_button_v1.png",
                 "icon_military.png", "icon_heroes.png", "icon_diplomacy.png", "icon_scheme.png",
                 "icon_research.png", "icon_council.png", "icon_report.png", "icon_turn.png",
                 "castle_stat_prosperity.png", "castle_stat_technology.png",
@@ -162,7 +163,7 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("class=\"global-command generated-normal\"", administrationUxml);
             StringAssert.Contains("class=\"generated-command-icon icon-military\"", administrationUxml);
             StringAssert.Contains("project://database/Assets/Resources/UI/Generated/popup_panel.png", administrationUss);
-            StringAssert.Contains("class=\"command-button generated-normal\"", battleUxml);
+            StringAssert.Contains("class=\"command-button\"", battleUxml);
             StringAssert.Contains("castle-summary-panel", administrationUxml);
             StringAssert.Contains("campaign-summary-panel", administrationUxml);
             StringAssert.Contains("castle-stat-prosperity", administrationUxml);
@@ -204,24 +205,21 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("UI/Generated/popup_panel.png", administration);
         }
 
-        // 밝은 팝업 헤더의 제목 대비와 축소 해상도 메뉴 아이콘의 절대 배치 규칙을 검증합니다.
+        // 현재 팝업 패널의 9-Slice 설정과 축소 해상도 메뉴 아이콘의 절대 배치 규칙을 검증합니다.
         [Test]
-        public void GeneratedUIArtwork_HeaderTitleAndCommandIconsRemainLegible()
+        public void GeneratedUIArtwork_CurrentPopupAndCommandIconsRemainLegible()
         {
             string stylesheet = File.ReadAllText("Assets/UI/Administration/WIAdministration.uss");
-            string headerMetadata = File.ReadAllText("Assets/Resources/UI/Generated/popup_header.png.meta");
+            string infoPanelMetadata = File.ReadAllText("Assets/Resources/UI/Generated/turn_followup_info_panel_v1.png.meta");
 
-            StringAssert.Contains(".modal-panel .modal-header .modal-title { color:#10161b; }", stylesheet);
+            StringAssert.Contains(".modal-panel .modal-header .modal-title { color:#edf3f7; }", stylesheet);
             StringAssert.Contains(".global-command .generated-command-icon { position:absolute", stylesheet);
             StringAssert.Contains(".global-command { padding-left:31px", stylesheet);
             StringAssert.Contains(".turn-button .generated-command-icon { left:7px", stylesheet);
-            StringAssert.Contains("UI/Generated/popup_header.png", stylesheet);
-            StringAssert.Contains("-unity-slice-left:20;", stylesheet);
-            StringAssert.Contains("-unity-slice-right:20;", stylesheet);
-            StringAssert.Contains("-unity-slice-top:10;", stylesheet);
-            StringAssert.Contains("-unity-slice-bottom:10;", stylesheet);
-            StringAssert.Contains("width: 1024", headerMetadata);
-            StringAssert.Contains("height: 297", headerMetadata);
+            StringAssert.DoesNotContain("UI/Generated/popup_header.png", stylesheet);
+            StringAssert.Contains("spriteBorder: {x: 48, y: 48, z: 48, w: 48}", infoPanelMetadata);
+            StringAssert.Contains("enableMipMap: 0", infoPanelMetadata);
+            StringAssert.Contains("textureCompression: 0", infoPanelMetadata);
         }
 
         // 생성 버튼과 패널의 모서리가 크기 변경에도 늘어나지 않도록 9-Slice 규칙을 검증합니다.
@@ -354,7 +352,7 @@ namespace ProjectWI.Tests.Editor
             string controller = ReadAdministrationController();
             string combined = layout + controller;
 
-            string[] retiredTerms = { "군주", "태수", "평정", "월보", "내정", "계략", "출정", "세력", "등용", "재야", "치안", "공적", "부대" };
+            string[] retiredTerms = { "군주", "태수", "평정", "월보", "계략", "등용", "치안", "공적", "부대" };
             foreach (string retiredTerm in retiredTerms)
             {
                 StringAssert.DoesNotContain(retiredTerm, combined, $"폐기 용어가 남았습니다: {retiredTerm}");

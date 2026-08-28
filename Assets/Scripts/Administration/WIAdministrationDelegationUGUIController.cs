@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationDelegationUGUIController : MonoBehaviour
+    public sealed class WIAdministrationDelegationUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -25,7 +24,7 @@ namespace ProjectWI.Administration
         // 고정 영지관·방침·예산 버튼을 위임 설정 기능에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < governorButtons.Length; index += 1)
             {
                 int captured = index;
@@ -45,14 +44,20 @@ namespace ProjectWI.Administration
         // 영지관 위임 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUIDelegationRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUIDelegationRequested += Open;
+            }
         }
 
         // 영지관 위임 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUIDelegationRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUIDelegationRequested -= Open;
+            }
         }
 
         // 현재 성의 위임 설정을 열고 최신 상태를 표시합니다.
@@ -65,7 +70,8 @@ namespace ProjectWI.Administration
         // 기존 캠페인 상태를 다시 읽어 모든 고정 컨트롤에 반영합니다.
         private void Refresh()
         {
-            if (administrationController.TryGetUGUIDelegationSnapshot(out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUIDelegationSnapshot(out snapshot, out string error)
+                == false)
             {
                 messageLabel.gameObject.SetActive(true);
                 messageLabel.text = error;
@@ -77,7 +83,10 @@ namespace ProjectWI.Administration
             {
                 bool visible = index < snapshot.Candidates.Count;
                 governorButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationGovernorCandidateSnapshot candidate = snapshot.Candidates[index];
                 governorPortraits[index].sprite = candidate.Portrait;
                 governorPortraits[index].enabled = candidate.Portrait != null;
@@ -101,7 +110,10 @@ namespace ProjectWI.Administration
         // 선택한 주둔 인물을 영지관으로 임명합니다.
         private void AssignGovernor(int index)
         {
-            if (index >= snapshot.Candidates.Count) return;
+            if (index >= snapshot.Candidates.Count)
+            {
+                return;
+            }
             Apply(administrationController.AssignUGUIGovernor(snapshot.Candidates[index].HeroId, out string error), error);
         }
 
@@ -120,7 +132,11 @@ namespace ProjectWI.Administration
         // 설정 변경 결과를 표시하고 성공하면 전체 화면을 갱신합니다.
         private void Apply(bool succeeded, string error)
         {
-            if (succeeded) { Refresh(); return; }
+            if (succeeded)
+            {
+                Refresh();
+                return;
+            }
             messageLabel.gameObject.SetActive(true);
             messageLabel.text = error;
         }

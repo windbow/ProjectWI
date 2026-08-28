@@ -4,10 +4,9 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationMonthlyReportUGUIController : MonoBehaviour
+    public sealed class WIAdministrationMonthlyReportUGUIController : WIAdministrationUGUIPanelController
     {
         private const int PageSize = 6;
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text bodyLabel;
         [SerializeField] private ScrollRect scrollRect;
@@ -23,7 +22,7 @@ namespace ProjectWI.Administration
         // 고정 행동 버튼과 페이지 이동을 월간 보고 기능에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < actionButtons.Length; index += 1)
             {
                 int captured = index;
@@ -37,14 +36,20 @@ namespace ProjectWI.Administration
         // 월간 보고 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUIMonthlyReportRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUIMonthlyReportRequested += Open;
+            }
         }
 
         // 월간 보고 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUIMonthlyReportRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUIMonthlyReportRequested -= Open;
+            }
         }
 
         // 월간 보고 프리팹이 제거될 때 공통 모달 종료 구독을 해제합니다.
@@ -56,7 +61,10 @@ namespace ProjectWI.Administration
         // 지난달 보고 본문과 처리할 사건·전투 행동을 표시합니다.
         private void Open()
         {
-            if (administrationController.TryGetUGUIMonthlyReportSnapshot(out snapshot) == false) return;
+            if (administrationController.TryGetUGUIMonthlyReportSnapshot(out snapshot) == false)
+            {
+                return;
+            }
             modal.Show("지난달 월간 보고");
             closingForAction = false;
             bodyLabel.text = snapshot.Body;
@@ -75,7 +83,10 @@ namespace ProjectWI.Administration
                 int actionIndex = pageIndex * PageSize + index;
                 bool visible = actionIndex < snapshot.Actions.Count;
                 actionButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationReportActionSnapshot action = snapshot.Actions[actionIndex];
                 actionButtons[index].GetComponentInChildren<TMP_Text>().text = action.Caption;
                 actionButtons[index].GetComponent<Image>().color = action.Danger
@@ -90,7 +101,10 @@ namespace ProjectWI.Administration
         private void Execute(int buttonIndex)
         {
             int actionIndex = pageIndex * PageSize + buttonIndex;
-            if (actionIndex >= snapshot.Actions.Count) return;
+            if (actionIndex >= snapshot.Actions.Count)
+            {
+                return;
+            }
             closingForAction = true;
             modal.Hide();
             administrationController.ExecuteUGUIReportAction(snapshot.Actions[actionIndex].Type, snapshot.Actions[actionIndex].Id);

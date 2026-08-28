@@ -5,9 +5,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationMilitaryUGUIController : MonoBehaviour
+    public sealed class WIAdministrationMilitaryUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -22,7 +21,7 @@ namespace ProjectWI.Administration
         // 고정 전투단 카드와 편성 버튼을 군사 기능에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < itemButtons.Length; index += 1)
             {
                 int captured = index;
@@ -34,14 +33,20 @@ namespace ProjectWI.Administration
         // 군사 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUIMilitaryRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUIMilitaryRequested += Open;
+            }
         }
 
         // 군사 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUIMilitaryRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUIMilitaryRequested -= Open;
+            }
         }
 
         // 현재 전투 세션과 플레이어 전투단 목록을 엽니다.
@@ -56,7 +61,8 @@ namespace ProjectWI.Administration
         // 캠페인 상태를 다시 읽어 고정 카드에 반영합니다.
         private void Refresh()
         {
-            if (administrationController.TryGetUGUIMilitaryPanel(view.Mode, view.Context, view.Role, out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUIMilitaryPanel(view.Mode, view.Context, view.Role, out snapshot, out string error)
+                == false)
             {
                 messageLabel.gameObject.SetActive(true);
                 messageLabel.text = error;
@@ -70,7 +76,10 @@ namespace ProjectWI.Administration
             {
                 bool visible = index < snapshot.Items.Count;
                 itemButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationMilitaryItemSnapshot item = snapshot.Items[index];
                 itemLabels[index].text = item.Title + "\n" + item.Description;
                 itemButtons[index].interactable = item.Interactable;
@@ -81,7 +90,10 @@ namespace ProjectWI.Administration
         // 선택한 카드의 단계 이동 또는 군사 상태 변경을 처리합니다.
         private void OpenItem(int index)
         {
-            if (snapshot == null || index >= snapshot.Items.Count) return;
+            if (snapshot == null || index >= snapshot.Items.Count)
+            {
+                return;
+            }
             WIAdministrationMilitaryItemSnapshot item = snapshot.Items[index];
             switch (item.Kind)
             {
@@ -111,7 +123,10 @@ namespace ProjectWI.Administration
             }
             else if (item.Kind == "add-member")
             {
-                while (history.Count > 0 && history.Peek().Mode != "army") history.Pop();
+                while (history.Count > 0 && history.Peek().Mode != "army")
+                {
+                    history.Pop();
+                }
                 view = history.Count > 0 ? history.Pop() : new MilitaryViewState("army", view.Context, 0);
             }
             Refresh();

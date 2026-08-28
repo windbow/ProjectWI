@@ -12,6 +12,8 @@ namespace ProjectWI.Tests.Editor
         private const string CampaignTitlePrefabPath = "Assets/Prefabs/Administration/WICampaignTitleUGUI.prefab";
         private const string WorldPrefabPath = "Assets/Prefabs/Administration/WIAdministrationWorldUGUI.prefab";
         private const string TerritoryPrefabPath = "Assets/Prefabs/Administration/WIAdministrationTerritoryUGUI.prefab";
+        private const string TopHudPrefabPath = "Assets/Prefabs/Administration/WIAdministrationTopHUDUGUI.prefab";
+        private const string EndTurnPrefabPath = "Assets/Prefabs/Administration/WIAdministrationEndTurnUGUI.prefab";
         private const string FocusProjectPrefabPath = "Assets/Prefabs/Administration/WIAdministrationFocusProjectUGUI.prefab";
         private const string HeroAssignmentPrefabPath = "Assets/Prefabs/Administration/WIAdministrationHeroAssignmentUGUI.prefab";
         private const string CharacterActivityPrefabPath = "Assets/Prefabs/Administration/WIAdministrationCharacterActivityUGUI.prefab";
@@ -100,6 +102,68 @@ namespace ProjectWI.Tests.Editor
 
             Assert.That(prefab, Is.Not.Null);
             Assert.That(prefab.GetComponentsInChildren<EventSystem>(true), Is.Empty);
+        }
+
+        // 캠페인 시작 화면이 열려 있는 동안 월드와 영지 UGUI가 함께 숨겨지는지 확인합니다.
+        [Test]
+        public void CampaignTitleVisibilityGatesWorldScreens()
+        {
+            const string bridgePath = "Assets/Scripts/Administration/WIAdministrationUIController.UGUIBridge.cs";
+            const string titleControllerPath = "Assets/Scripts/Administration/WICampaignTitleUGUIController.cs";
+            string bridgeSource = System.IO.File.ReadAllText(bridgePath);
+            string titleControllerSource = System.IO.File.ReadAllText(titleControllerPath);
+
+            StringAssert.Contains("private bool uguiCampaignTitleVisible = true;", bridgeSource);
+            Assert.That(
+                bridgeSource.Split("uguiCampaignTitleVisible == false").Length - 1,
+                Is.GreaterThanOrEqualTo(2),
+                "월드와 영지 화면 모두 캠페인 타이틀 표시 상태를 확인해야 합니다.");
+            StringAssert.Contains("SetUGUICampaignTitleVisibility(campaignStarted == false)", titleControllerSource);
+            StringAssert.Contains("SetUGUICampaignTitleVisibility(true)", titleControllerSource);
+        }
+
+        // 월드 프리팹의 하단 명령 버튼 배열에 제거된 상단 HUD 버튼의 빈 참조가 남지 않았는지 확인합니다.
+        [Test]
+        public void WorldCommandButtonsContainNoMissingReferences()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(WorldPrefabPath);
+            ProjectWI.Administration.WIAdministrationWorldUGUIController controller =
+                prefab.GetComponent<ProjectWI.Administration.WIAdministrationWorldUGUIController>();
+            SerializedObject serializedController = new SerializedObject(controller);
+            SerializedProperty buttons = serializedController.FindProperty("commandButtons");
+            SerializedProperty actions = serializedController.FindProperty("commandActions");
+
+            Assert.That(buttons.arraySize, Is.EqualTo(7));
+            Assert.That(actions.arraySize, Is.EqualTo(buttons.arraySize));
+            for (int index = 0; index < buttons.arraySize; index += 1)
+            {
+                Assert.That(buttons.GetArrayElementAtIndex(index).objectReferenceValue, Is.Not.Null, $"명령 버튼 {index}번 참조가 비어 있습니다.");
+            }
+        }
+
+        // 월드와 영지 화면이 동일한 공용 다음 턴 중첩 프리팹을 사용하는지 확인합니다.
+        [Test]
+        public void WorldAndTerritoryUseSharedEndTurnPrefab()
+        {
+            GameObject sharedPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(EndTurnPrefabPath);
+            GameObject worldPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(WorldPrefabPath);
+            GameObject territoryPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(TerritoryPrefabPath);
+
+            Assert.That(sharedPrefab, Is.Not.Null);
+            AssertSharedEndTurnSource(worldPrefab);
+            AssertSharedEndTurnSource(territoryPrefab);
+        }
+
+        // 화면 컨트롤러의 공용 다음 턴 참조가 지정 프리팹에서 온 것인지 확인합니다.
+        private static void AssertSharedEndTurnSource(GameObject screenPrefab)
+        {
+            ProjectWI.Administration.WIAdministrationEndTurnUGUIController endTurn =
+                screenPrefab.GetComponentInChildren<ProjectWI.Administration.WIAdministrationEndTurnUGUIController>(true);
+            Assert.That(endTurn, Is.Not.Null, $"{screenPrefab.name}에 공용 다음 턴 버튼이 없습니다.");
+
+            Object source = PrefabUtility.GetCorrespondingObjectFromSource(endTurn.gameObject);
+            Assert.That(source, Is.Not.Null, $"{screenPrefab.name}의 다음 턴 버튼이 중첩 프리팹이 아닙니다.");
+            Assert.That(AssetDatabase.GetAssetPath(source), Is.EqualTo(EndTurnPrefabPath));
         }
 
         // 행정 슈퍼 컨트롤러가 숨은 UI Toolkit 캠페인 카드를 더 이상 동적으로 만들지 않는지 확인합니다.
@@ -425,22 +489,39 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("heroSlots").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("facilitySlots").arraySize, Is.EqualTo(2));
             Assert.That(serialized.FindProperty("commandButtons").arraySize, Is.EqualTo(8));
-            Assert.That(serialized.FindProperty("topCommandButtons").arraySize, Is.EqualTo(3));
-            Assert.That(serialized.FindProperty("topCommandActions").arraySize, Is.EqualTo(3));
-            Assert.That(serialized.FindProperty("systemButton").objectReferenceValue, Is.Not.Null);
+            Assert.That(serialized.FindProperty("topHUD").objectReferenceValue, Is.Not.Null);
         }
 
-        // 월드와 성 내정 화면의 공통 상단 HUD가 구조와 배치까지 동일한지 확인합니다.
+        // 월드와 성 내정 화면이 동일한 공용 상단 HUD 프리팹을 중첩 사용하는지 확인합니다.
         [Test]
         public void TerritoryTopHudMatchesWorldTopHud()
         {
             GameObject worldPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(WorldPrefabPath);
             GameObject territoryPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(TerritoryPrefabPath);
+            GameObject topHudPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(TopHudPrefabPath);
             Transform worldTop = worldPrefab.transform.Find("WorldContent/TopHUD");
             Transform territoryTop = territoryPrefab.transform.Find("TerritoryContent/TopHUD");
+            ProjectWI.Administration.WIAdministrationTopHUDUGUIController topHudController =
+                topHudPrefab.GetComponent<ProjectWI.Administration.WIAdministrationTopHUDUGUIController>();
+            SerializedObject topHudSerialized = new SerializedObject(topHudController);
 
+            Assert.That(topHudPrefab, Is.Not.Null);
+            Assert.That(topHudController, Is.Not.Null);
+            Assert.That(topHudSerialized.FindProperty("factionLabel").objectReferenceValue, Is.Not.Null);
+            Assert.That(topHudSerialized.FindProperty("dateLabel").objectReferenceValue, Is.Not.Null);
+            Assert.That(topHudSerialized.FindProperty("goldLabel").objectReferenceValue, Is.Not.Null);
+            Assert.That(topHudSerialized.FindProperty("manaLabel").objectReferenceValue, Is.Not.Null);
+            Assert.That(topHudSerialized.FindProperty("influenceLabel").objectReferenceValue, Is.Not.Null);
+            Assert.That(topHudSerialized.FindProperty("monthlyReportButton").objectReferenceValue, Is.Not.Null);
+            Assert.That(topHudSerialized.FindProperty("councilButton").objectReferenceValue, Is.Not.Null);
+            Assert.That(topHudSerialized.FindProperty("researchButton").objectReferenceValue, Is.Not.Null);
+            Assert.That(topHudSerialized.FindProperty("systemButton").objectReferenceValue, Is.Not.Null);
             Assert.That(worldTop, Is.Not.Null);
             Assert.That(territoryTop, Is.Not.Null);
+            Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(worldTop.gameObject),
+                Is.EqualTo(AssetDatabase.LoadAssetAtPath<GameObject>(TopHudPrefabPath)));
+            Assert.That(PrefabUtility.GetCorrespondingObjectFromSource(territoryTop.gameObject),
+                Is.EqualTo(AssetDatabase.LoadAssetAtPath<GameObject>(TopHudPrefabPath)));
             Assert.That(territoryTop.childCount, Is.EqualTo(worldTop.childCount));
             Assert.That(territoryTop.GetComponent<RectTransform>().anchorMin,
                 Is.EqualTo(worldTop.GetComponent<RectTransform>().anchorMin));

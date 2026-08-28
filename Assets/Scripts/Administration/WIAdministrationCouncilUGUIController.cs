@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationCouncilUGUIController : MonoBehaviour
+    public sealed class WIAdministrationCouncilUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -16,7 +15,7 @@ namespace ProjectWI.Administration
         // 고정 방침 카드에 각 배열 위치의 선택 처리를 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
                 int capturedIndex = index;
@@ -27,14 +26,20 @@ namespace ProjectWI.Administration
         // 의회 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUICouncilRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUICouncilRequested += Open;
+            }
         }
 
         // 의회 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUICouncilRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUICouncilRequested -= Open;
+            }
         }
 
         // 현재 월간 방침과 선택 가능한 방침을 표시합니다.
@@ -47,7 +52,8 @@ namespace ProjectWI.Administration
         // 최신 진영 방침 스냅샷으로 고정 카드를 갱신합니다.
         private void Refresh()
         {
-            if (administrationController.TryGetUGUICouncilSnapshot(out WIAdministrationCouncilSnapshot snapshot) == false)
+            if (administrationController.TryGetUGUICouncilSnapshot(out WIAdministrationCouncilSnapshot snapshot)
+                == false)
             {
                 messageLabel.gameObject.SetActive(true);
                 messageLabel.text = "진영 방침 정보를 불러올 수 없습니다.";
@@ -61,7 +67,10 @@ namespace ProjectWI.Administration
             {
                 bool visible = index < snapshot.Cards.Count;
                 cardButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationCouncilCardSnapshot card = snapshot.Cards[index];
                 cardLabels[index].text = (card.Selected ? "● " : string.Empty) + card.Title + "\n" + card.Description;
                 cardButtons[index].interactable = card.Selected == false;
@@ -71,8 +80,14 @@ namespace ProjectWI.Administration
         // 선택한 카드의 월간 진영 방침을 기존 캠페인 상태에 반영합니다.
         private void SelectPolicy(int index)
         {
-            if (administrationController.TryGetUGUICouncilSnapshot(out WIAdministrationCouncilSnapshot snapshot) == false || index >= snapshot.Cards.Count) return;
-            if (administrationController.SetUGUICouncilPolicy(snapshot.Cards[index].Policy) == false) return;
+            if (administrationController.TryGetUGUICouncilSnapshot(out WIAdministrationCouncilSnapshot snapshot) == false || index >= snapshot.Cards.Count)
+            {
+                return;
+            }
+            if (administrationController.SetUGUICouncilPolicy(snapshot.Cards[index].Policy) == false)
+            {
+                return;
+            }
             modal.Hide();
         }
     }

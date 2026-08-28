@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationFocusProjectUGUIController : MonoBehaviour
+    public sealed class WIAdministrationFocusProjectUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private GameObject projectPage;
         [SerializeField] private GameObject managerPage;
@@ -29,10 +28,7 @@ namespace ProjectWI.Administration
         // 고정 사업·담당자 버튼을 기존 캠페인 기능과 연결합니다.
         private void Awake()
         {
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
 
             for (int index = 0; index < basicButtons.Length; index += 1)
             {
@@ -51,10 +47,7 @@ namespace ProjectWI.Administration
         // UGUI 중점 사업 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
             if (administrationController != null)
             {
                 administrationController.UGUIFocusProjectRequested += Open;
@@ -73,7 +66,8 @@ namespace ProjectWI.Administration
         // 현재 선택 성의 사업 목록과 비용을 첫 페이지에 표시합니다.
         private void Open()
         {
-            if (administrationController.TryGetUGUIFocusProjectSnapshot(out currentSnapshot, out string error) == false)
+            if (administrationController.TryGetUGUIFocusProjectSnapshot(out currentSnapshot, out string error)
+                == false)
             {
                 modal.Show("중점 사업");
                 projectPage.SetActive(false);

@@ -4,11 +4,9 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationHeroAssignmentUGUIController : MonoBehaviour
+    public sealed class WIAdministrationHeroAssignmentUGUIController : WIAdministrationUGUIPanelController
     {
         private const int PageSize = 8;
-
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text slotStatusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -25,10 +23,7 @@ namespace ProjectWI.Administration
         // 고정 후보 카드와 페이지 버튼을 영웅 배치 기능에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
             for (int index = 0; index < candidateButtons.Length; index += 1)
             {
                 int captured = index;
@@ -41,10 +36,7 @@ namespace ProjectWI.Administration
         // UGUI 영웅 배치 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
             if (administrationController != null)
             {
                 administrationController.UGUIHeroAssignmentRequested += Open;
@@ -65,7 +57,8 @@ namespace ProjectWI.Administration
         {
             modal.Show("영웅 배치");
             pageIndex = 0;
-            if (administrationController.TryGetUGUIHeroAssignmentSnapshot(out currentSnapshot, out string error) == false)
+            if (administrationController.TryGetUGUIHeroAssignmentSnapshot(out currentSnapshot, out string error)
+                == false)
             {
                 slotStatusLabel.text = string.Empty;
                 messageLabel.gameObject.SetActive(true);

@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationSystemUGUIController : MonoBehaviour
+    public sealed class WIAdministrationSystemUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -21,7 +20,7 @@ namespace ProjectWI.Administration
         // 고정 시스템 카드와 페이지 이동 버튼에 선택 처리를 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             previousButton.onClick.AddListener(() => ChangePage(-1));
             nextButton.onClick.AddListener(() => ChangePage(1));
             for (int index = 0; index < cardButtons.Length; index += 1)
@@ -34,14 +33,20 @@ namespace ProjectWI.Administration
         // 시스템 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUISystemRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUISystemRequested += Open;
+            }
         }
 
         // 시스템 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUISystemRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUISystemRequested -= Open;
+            }
         }
 
         // 시스템 설정 화면을 첫 페이지부터 표시합니다.
@@ -62,7 +67,8 @@ namespace ProjectWI.Administration
         // 현재 페이지의 고정 카드 문구와 사용 가능 상태를 갱신합니다.
         private void Refresh()
         {
-            if (administrationController.TryGetUGUISystemSnapshot(out WIAdministrationSystemSnapshot snapshot) == false)
+            if (administrationController.TryGetUGUISystemSnapshot(out WIAdministrationSystemSnapshot snapshot)
+                == false)
             {
                 messageLabel.gameObject.SetActive(true);
                 messageLabel.text = "시스템 정보를 불러올 수 없습니다.";
@@ -103,10 +109,22 @@ namespace ProjectWI.Administration
         // 저장 페이지에서 비어 있는 불러오기 카드만 비활성화합니다.
         private bool IsSaveCardEnabled(WIAdministrationSystemSnapshot snapshot, int index)
         {
-            if (index == 1) return snapshot.HasSave1;
-            if (index == 3) return snapshot.HasSave2;
-            if (index == 5) return snapshot.HasSave3;
-            if (index == 6) return snapshot.HasAutoSave;
+            if (index == 1)
+            {
+                return snapshot.HasSave1;
+            }
+            if (index == 3)
+            {
+                return snapshot.HasSave2;
+            }
+            if (index == 5)
+            {
+                return snapshot.HasSave3;
+            }
+            if (index == 6)
+            {
+                return snapshot.HasAutoSave;
+            }
             return true;
         }
 
@@ -122,7 +140,10 @@ namespace ProjectWI.Administration
                     return;
                 }
                 modal.Hide();
-                if (index == 6) administrationController.ApplyUGUISystemSettings();
+                if (index == 6)
+                {
+                    administrationController.ApplyUGUISystemSettings();
+                }
                 else administrationController.ResetUGUISystemSettings();
                 return;
             }
@@ -135,7 +156,10 @@ namespace ProjectWI.Administration
             }
             int slot = index == 6 ? 0 : index / 2 + 1;
             modal.Hide();
-            if (index < 6 && index % 2 == 0) administrationController.SaveUGUICampaignSlot(slot);
+            if (index < 6 && index % 2 == 0)
+            {
+                administrationController.SaveUGUICampaignSlot(slot);
+            }
             else administrationController.LoadUGUICampaignSlot(slot);
         }
     }

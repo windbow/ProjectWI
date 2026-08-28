@@ -329,6 +329,10 @@ namespace ProjectWI.Administration
         [SerializeField] private WIRelationshipLevel relationshipLevel = WIRelationshipLevel.Normal;
         [SerializeField] private string playerStartingCastleId;
         [SerializeField, Min(1)] private int valdorAttackIntervalMonths = 3;
+        [SerializeField] private string aiPreservationFactionId = "valdor";
+        [SerializeField, Min(0)] private int valdorAIPreservationCastleCount;
+        [SerializeField] private bool nonPlayerRecruitmentEnabled;
+        [SerializeField] private List<WICampaignCharacterPlacement> characterPlacements = new List<WICampaignCharacterPlacement>();
         [SerializeField] private List<WICampaignCastlePlacement> castlePlacements = new List<WICampaignCastlePlacement>();
 
         public WICampaignVariant Variant => variant;
@@ -340,7 +344,23 @@ namespace ProjectWI.Administration
         public WIRelationshipLevel RelationshipLevel => relationshipLevel;
         public string PlayerStartingCastleId => playerStartingCastleId;
         public int ValdorAttackIntervalMonths => Mathf.Max(1, valdorAttackIntervalMonths);
+        public string AIPreservationFactionId => aiPreservationFactionId;
+        public int ValdorAIPreservationCastleCount => Mathf.Max(0, valdorAIPreservationCastleCount);
+        public bool NonPlayerRecruitmentEnabled => nonPlayerRecruitmentEnabled;
+        public IReadOnlyList<WICampaignCharacterPlacement> CharacterPlacements => characterPlacements;
         public IReadOnlyList<WICampaignCastlePlacement> CastlePlacements => castlePlacements;
+    }
+
+    [Serializable]
+    public class WICampaignCharacterPlacement
+    {
+        [SerializeField] private string castleId;
+        [SerializeField] private string heroId;
+        [SerializeField] private bool governor;
+
+        public string CastleId => castleId;
+        public string HeroId => heroId;
+        public bool Governor => governor;
     }
 
     [Serializable]
@@ -715,6 +735,7 @@ namespace ProjectWI.Administration
         [SerializeField, Range(0, 100)] private int initialStability = 40;
         [SerializeField, Range(0, 100)] private int initialDefense = 25;
         [SerializeField] private Sprite castleImage;
+        [SerializeField] private Sprite mapMarkerImage;
 
         public string Id => id;
         public WILocalizedString DisplayName => displayName;
@@ -732,6 +753,7 @@ namespace ProjectWI.Administration
         public int InitialStability => initialStability;
         public int InitialDefense => initialDefense;
         public Sprite CastleImage => castleImage;
+        public Sprite MapMarkerImage => mapMarkerImage;
     }
 
     [Serializable]
@@ -946,9 +968,17 @@ namespace ProjectWI.Administration
         [SerializeField] private int promotionRequiredReputation = 30;
         [SerializeField] private int promotionInfluenceCost = 30;
 
+        [Header("인재 영입 균형")]
+        [SerializeField, Min(1)] private int recruitmentBaseProgress = 35;
+
+        [Header("인물 휴식 균형")]
+        [SerializeField, Min(1)] private int characterRestFatigueRecovery = 50;
+
         [Header("AI 전선 활성화")]
         [SerializeField, Min(1)] private int aiWarPressureIntervalMonths = 12;
         [SerializeField, Min(1)] private int aiMinimumActiveWarFronts = 2;
+        [SerializeField, Min(1)] private int aggressiveAIAttackPowerPercent = 90;
+        [SerializeField, Min(1)] private int standardAIAttackPowerPercent = 105;
 
         [Header("전략 전투 전력 균형")]
         [SerializeField, Min(0)] private int castleDefensePowerPercent = 300;
@@ -1047,6 +1077,10 @@ namespace ProjectWI.Administration
         public int PromotionRequiredMerit => promotionRequiredMerit;
         public int PromotionRequiredReputation => promotionRequiredReputation;
         public int PromotionInfluenceCost => promotionInfluenceCost;
+        public int RecruitmentBaseProgress => Mathf.Max(1, recruitmentBaseProgress);
+        public int CharacterRestFatigueRecovery => Mathf.Max(1, characterRestFatigueRecovery);
+        public int AggressiveAIAttackPowerPercent => Mathf.Max(1, aggressiveAIAttackPowerPercent);
+        public int StandardAIAttackPowerPercent => Mathf.Max(1, standardAIAttackPowerPercent);
 
         // 문자열 UID로 현지화된 표시 문구를 찾습니다.
         public string GetText(string uid)

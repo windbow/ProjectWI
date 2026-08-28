@@ -4,12 +4,10 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationMarchUGUIController : MonoBehaviour
+    public sealed class WIAdministrationMarchUGUIController : WIAdministrationUGUIPanelController
     {
         private const int PageSize = 8;
         private enum PageMode { Army, Commander, Target }
-
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -29,7 +27,7 @@ namespace ProjectWI.Administration
         // 고정 카드와 새 전투단·페이지 버튼을 원정 단계에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
                 int captured = index;
@@ -43,14 +41,20 @@ namespace ProjectWI.Administration
         // 원정 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUIMarchRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUIMarchRequested += Open;
+            }
         }
 
         // 원정 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUIMarchRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUIMarchRequested -= Open;
+            }
         }
 
         // 현재 성의 출정 가능한 전투단을 표시합니다.
@@ -59,7 +63,8 @@ namespace ProjectWI.Administration
             modal.Show("원정 전투단 선택");
             pageMode = PageMode.Army;
             pageIndex = 0;
-            if (administrationController.TryGetUGUIMarchArmies(out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUIMarchArmies(out snapshot, out string error)
+                == false)
             {
                 snapshot = new WIAdministrationMarchSnapshot();
                 messageLabel.gameObject.SetActive(true);
@@ -78,7 +83,8 @@ namespace ProjectWI.Administration
             pageIndex = 0;
             modal.SetTitle("새 전투단 · 대장 선택");
             createArmyButton.gameObject.SetActive(false);
-            if (administrationController.TryGetUGUIMarchCommanders(out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUIMarchCommanders(out snapshot, out string error)
+                == false)
             {
                 ShowError(error);
                 return;
@@ -96,7 +102,8 @@ namespace ProjectWI.Administration
             pageIndex = 0;
             modal.SetTitle("이동 / 원정 목표");
             createArmyButton.gameObject.SetActive(false);
-            if (administrationController.TryGetUGUIMarchTargets(armyId, out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUIMarchTargets(armyId, out snapshot, out string error)
+                == false)
             {
                 ShowError(error);
                 return;
@@ -117,7 +124,10 @@ namespace ProjectWI.Administration
                 int optionIndex = pageIndex * PageSize + index;
                 bool visible = optionIndex < count;
                 cardButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationMarchOptionSnapshot option = snapshot.Options[optionIndex];
                 cardImages[index].sprite = option.Image;
                 cardImages[index].enabled = option.Image != null;
@@ -133,12 +143,20 @@ namespace ProjectWI.Administration
         private void SelectCard(int cardIndex)
         {
             int optionIndex = pageIndex * PageSize + cardIndex;
-            if (snapshot == null || optionIndex >= snapshot.Options.Count) return;
+            if (snapshot == null || optionIndex >= snapshot.Options.Count)
+            {
+                return;
+            }
             WIAdministrationMarchOptionSnapshot option = snapshot.Options[optionIndex];
-            if (pageMode == PageMode.Army) { OpenTargets(option.Id); return; }
+            if (pageMode == PageMode.Army)
+            {
+                OpenTargets(option.Id);
+                return;
+            }
             if (pageMode == PageMode.Commander)
             {
-                if (administrationController.CreateUGUIMarchArmy(option.Id, out string armyId, out string error) == false)
+                if (administrationController.CreateUGUIMarchArmy(option.Id, out string armyId, out string error)
+                    == false)
                 {
                     ShowError(error);
                     return;

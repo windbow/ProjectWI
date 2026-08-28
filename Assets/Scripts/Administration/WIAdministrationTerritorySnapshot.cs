@@ -8,6 +8,8 @@ namespace ProjectWI.Administration
         public bool Visible;
         public bool Manageable;
         public bool CanChooseSpecialFacility;
+        public bool CanEndTurn;
+        public string EndTurnText;
         public string FactionName;
         public string Date;
         public string Gold;

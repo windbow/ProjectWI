@@ -4,13 +4,11 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationCharacterActivityUGUIController : MonoBehaviour
+    public sealed class WIAdministrationCharacterActivityUGUIController : WIAdministrationUGUIPanelController
     {
         private const int PageSize = 8;
 
         private enum PageMode { Actor, Activity, Target, Transfer }
-
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text contextLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -33,7 +31,7 @@ namespace ProjectWI.Administration
         // 고정 카드와 활동 버튼을 인재 활동 단계에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
                 int captured = index;
@@ -57,14 +55,20 @@ namespace ProjectWI.Administration
         // 인재 활동 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUICharacterActivityRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUICharacterActivityRequested += Open;
+            }
         }
 
         // 인재 활동 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUICharacterActivityRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUICharacterActivityRequested -= Open;
+            }
         }
 
         // 현재 성에서 활동 가능한 인물 선택 화면을 엽니다.
@@ -73,7 +77,8 @@ namespace ProjectWI.Administration
             modal.Show("인재 활동 · 인물 선택");
             pageMode = PageMode.Actor;
             pageIndex = 0;
-            if (administrationController.TryGetUGUICharacterActivityActors(out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUICharacterActivityActors(out snapshot, out string error)
+                == false)
             {
                 ShowError(error);
                 return;
@@ -96,7 +101,10 @@ namespace ProjectWI.Administration
                 int candidateIndex = pageIndex * PageSize + index;
                 bool visible = candidateIndex < count;
                 cardButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationCharacterActivityCandidateSnapshot candidate = snapshot.Candidates[candidateIndex];
                 cardPortraits[index].sprite = candidate.Portrait;
                 cardPortraits[index].enabled = candidate.Portrait != null;
@@ -112,7 +120,10 @@ namespace ProjectWI.Administration
         private void SelectCard(int cardIndex)
         {
             int candidateIndex = pageIndex * PageSize + cardIndex;
-            if (snapshot == null || candidateIndex >= snapshot.Candidates.Count) return;
+            if (snapshot == null || candidateIndex >= snapshot.Candidates.Count)
+            {
+                return;
+            }
             WIAdministrationCharacterActivityCandidateSnapshot candidate = snapshot.Candidates[candidateIndex];
             if (pageMode == PageMode.Actor)
             {
@@ -165,7 +176,8 @@ namespace ProjectWI.Administration
         {
             pageMode = PageMode.Transfer;
             pageIndex = 0;
-            if (administrationController.TryGetUGUICharacterTransferTargets(selectedHeroId, out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUICharacterTransferTargets(selectedHeroId, out snapshot, out string error)
+                == false)
             {
                 ShowError(error);
                 return;
@@ -179,7 +191,8 @@ namespace ProjectWI.Administration
         // 선택 인물의 한 달 이동을 기존 이동 시스템으로 시작합니다.
         private void StartTransfer(string targetCastleId)
         {
-            if (administrationController.StartUGUICharacterTransfer(selectedHeroId, targetCastleId, out string message) == false)
+            if (administrationController.StartUGUICharacterTransfer(selectedHeroId, targetCastleId, out string message)
+                == false)
             {
                 ShowError(message);
                 return;

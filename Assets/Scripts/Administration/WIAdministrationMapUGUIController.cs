@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationMapUGUIController : MonoBehaviour
+    public sealed class WIAdministrationMapUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private Button[] castleButtons;
         [SerializeField] private Image[] castleMarkers;
         [SerializeField] private TMP_Text[] castleLabels;
@@ -23,10 +22,7 @@ namespace ProjectWI.Administration
         // 고정 배치된 60개 성 노드에 기존 성 선택 기능을 연결합니다.
         private void Awake()
         {
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
 
             int count = Mathf.Min(castleButtons.Length, castleIds.Length);
             for (int index = 0; index < count; index += 1)
@@ -39,10 +35,7 @@ namespace ProjectWI.Administration
         // 월드 상태 변경을 구독하고 지도 노드를 갱신합니다.
         private void OnEnable()
         {
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
 
             if (administrationController != null)
             {
@@ -63,7 +56,8 @@ namespace ProjectWI.Administration
         // 캠페인 스냅샷의 성 이름·진영·선택 상태를 각 지도 노드에 반영합니다.
         private void Refresh()
         {
-            if (administrationController.TryGetUGUIWorldSnapshot(out WIAdministrationWorldSnapshot snapshot) == false)
+            if (administrationController.TryGetUGUIWorldSnapshot(out WIAdministrationWorldSnapshot snapshot)
+                == false)
             {
                 return;
             }
@@ -79,7 +73,9 @@ namespace ProjectWI.Administration
                 castleButtons[index].image.rectTransform.anchorMin = node.Position;
                 castleButtons[index].image.rectTransform.anchorMax = node.Position;
                 castleLabels[index].text = node.DisplayName;
-                castleMarkers[index].sprite = ResolveMarker(node.FactionId);
+                castleMarkers[index].sprite = node.CastleImage != null
+                    ? node.CastleImage
+                    : ResolveMarker(node.FactionId);
                 castleMarkers[index].color = node.Selected ? selectedColor : normalColor;
                 castleMarkers[index].rectTransform.localScale = node.Selected
                     ? new Vector3(1.65f, 1.65f, 1f)

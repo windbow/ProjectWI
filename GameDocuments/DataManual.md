@@ -1,8 +1,33 @@
 # ProjectWI 데이터 편집 매뉴얼
 
+- 성 마스터 데이터의 `castleImage`는 성 상세 전경에 사용하며, `mapMarkerImage`는 월드맵 노드의 성 외형에만 사용합니다. 두 슬롯을 분리하여 월드맵 마커 교체가 영지·기록 화면의 전경을 바꾸지 않도록 합니다.
+
 > R&D 중간 이미지와 생성 원본은 활성 데이터 폴더에서 분리해 `Assets/TrashAsset`에 보관하며, 현재 ScriptableObject가 참조하는 에셋만 활성 경로에 유지합니다.
 
 현재 기획 기준은 `GameDesign.md`이며 전략 게임 데이터는 ScriptableObject에서 편집합니다. 방치형 던전 데이터는 사용하지 않습니다.
+
+- AI는 양수 위협 점수의 성이 없어도 전쟁 중인 적과 맞닿은 접경 성으로 집결합니다. 공격 전력 비율은 개별 전투단이 아니라 같은 접경 성에 있는 작전 가능 아군 전투단의 합산 전력과 목표 성 방어력을 비교합니다.
+- 전투 설정의 `Use Hidden Grid`가 활성화된 상태에서는 인물 위치가 격자 셀 중심으로 보정됩니다. 연속 좌표 물리 자체를 검증할 때는 원본 에셋을 수정하지 말고 복제 설정에서만 이 값을 끕니다.
+- 전투 결과 단위 테스트는 AI가 공격 대상을 선택할 것이라고 가정하지 않고, 테스트 픽스처에서 공격 전투단과 이동 일정을 직접 구성합니다. AI 공격 성향·전력 임계값을 변경해도 전략 승패와 실시간 전투 결과 검증이 함께 흔들리지 않도록 유지합니다.
+
+## 전투 캐릭터 표시 요소 편집
+
+- `Assets/Prefabs/Battle/WIBattleCharacter.prefab`에서 접지 그림자, 선택·집중 마커, 체력 바와 인물 라벨을 편집합니다.
+- 런타임 코드에서 새로운 표시 오브젝트를 생성하지 않습니다. 표시 요소가 필요하면 프리팹에 고정 자식으로 추가하고 `WIBattleCharacterView`에서 참조와 상태만 갱신합니다.
+- 기존 자식 이름은 코드 탐색 경로이므로 이름을 변경할 때 `WIBattleCharacterView`도 함께 수정해야 합니다.
+
+## UGUI 기능 코드 편집 위치
+
+- UI 레이아웃 회귀 검사는 삭제된 `popup_header.png` 대신 현재 모달 셸과 `turn_followup_info_panel_v1.png`의 48px 9-Slice 설정을 기준으로 유지합니다. `내정`, `출정`, `세력`, `재야`는 현재 전략 기획 용어이므로 폐기 용어로 취급하지 않습니다.
+- 월드 성 상세 정보는 `WIAdministrationWorldUGUI.prefab/WorldContent/WorldBody/CastleSummaryPanel`의 `CastleDetailRow1~6` 제목과 `CastleDetailValue1~6` 값 TMP를 사용합니다. 제목은 좌측, 값은 우측 정렬이며 두 직렬화 배열의 순서를 함께 유지합니다.
+- 월드와 영지 화면의 상단 HUD 디자인은 `Assets/Prefabs/Administration/WIAdministrationTopHUDUGUI.prefab`에서 한 번만 편집합니다. 두 화면 프리팹의 `TopHUD`는 이 공용 프리팹의 중첩 인스턴스이므로 자식 UI를 분리하거나 화면별 복제본으로 되돌리지 않습니다.
+- 진영·날짜·금화·마나·영향력 표시와 월보·의회·연구·설정 버튼 동작은 `WIAdministrationTopHUDUGUIController`가 담당합니다. 월드·영지 컨트롤러에는 같은 필드나 버튼 연결을 중복 추가하지 않습니다.
+- UGUI 컨트롤러의 `if`, `for`, `while`은 짧은 조기 반환이나 이벤트 구독이라도 반드시 다음 줄에 중괄호를 사용합니다. 여러 동작을 한 줄 블록에 합치지 않습니다.
+- 각 화면의 UGUI 컨트롤러는 `WIAdministrationUGUIPanelController`를 상속합니다. 행정 화면 관리자 참조는 기반 클래스의 `administrationController` 필드와 `ResolveAdministrationController()`를 사용하며, 화면별 컨트롤러에 같은 직렬화 필드나 씬 탐색 코드를 다시 추가하지 않습니다.
+- 월드·영지 화면 전환은 `WIAdministrationUIController.UGUIBridge.cs`에서 편집합니다.
+- 중점 사업·영웅 배치·인물 활동은 `UGUICastleCommandBridge`, 특화 시설·선술집·위임은 `UGUIFacilityBridge`에서 편집합니다.
+- 원정은 `UGUIMarchBridge`, 성 기록·목표·월간 보고·QA는 `UGUIReportBridge`, 군사 현황·인물 이동은 `UGUIMilitaryTransferBridge`에서 편집합니다.
+- 공개 이벤트 이름과 프리팹 컨트롤러 호출은 유지해야 하며, 화면 기능을 다시 하나의 거대한 브리지 파일에 합치지 않습니다.
 
 ## 성 내정 공용 모달 셸
 
@@ -74,6 +99,7 @@
 - 카드 개수는 난이도 3개와 시작 조건 3개로 고정되어 있으며 표시 문구는 `WI_AdministrationDatabase.asset`의 정의에서 갱신됩니다.
 - 버튼 이미지는 현재 고정 크기에서 원본 비율을 사용하는 `Image Type = Simple`입니다.
 - 입력은 MainScene의 기존 `EventSystem`과 `InputSystemUIInputModule`을 공유합니다. 프리팹 안에 EventSystem을 추가하지 않습니다.
+- 캠페인 타이틀이 표시되는 동안 월드와 영지 UGUI는 함께 숨겨집니다. 결과 화면 등에서 타이틀을 다시 열 때는 `ShowCampaignStart()`를 사용해 배경 화면 차단 상태도 함께 복원합니다.
 
 ## UI 배경 에셋
 
@@ -473,6 +499,8 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 확대 검증용 실험 지면은 `Assets/Art/Battle/Backgrounds/GroundExperiment_V2/Battle_Ground_NeutralDay_V2_4K.png`입니다. 4096×4096 단일 대형 지면 후보이며 무압축·Mipmap 비활성 설정을 사용합니다. 반복 배치 시 이음선이 있으므로 Tile/Repeat 용도로 사용하지 않으며 현재 전투 설정에는 연결하지 않습니다.
 - 공통 UGUI 버튼 배경 `button_normal`은 좌우·상하 28px, `button_primary`는 좌우 28px·상하 24px Border를 사용합니다. 크기가 변하는 버튼의 `Image Type`은 반드시 `Sliced`로 유지하며 현재 캠페인 선택 프리팹을 포함한 모든 연결 사용처가 이 규칙을 따릅니다.
 - 전략 월드 UGUI는 1920×1080 기준으로 상단 HUD 92px, 하단 명령부 112px를 사용합니다. 상단은 진영 문장·진영명, 연월, 금화·마나·영향력과 월 수입, 월간 보고·의회·연구·설정 버튼 순서입니다. 본문은 좌측 선택 성 22%, 중앙 지도 59%, 우측 목표·알림 19%로 나누며 지도 Sprite와 60개 고정 성 노드는 기존 `WIAdministrationWorldSnapshot` 데이터를 사용합니다.
+- `WIAdministrationWorldUGUIController.commandButtons`에는 하단 명령부의 군사·인사·외교·계략·연구·평정·월보 7개 버튼만 순서대로 연결합니다. 공용 상단 HUD 버튼은 `WIAdministrationTopHUDUGUIController`가 별도로 관리하므로 이 배열에 빈 항목으로 남기지 않습니다.
+- 월드와 성 내정 화면의 다음 턴 버튼은 `Assets/Prefabs/Administration/WIAdministrationEndTurnUGUI.prefab`을 공통으로 사용합니다. 외형·자식 장식·글꼴·크기는 공용 프리팹에서만 수정하며 두 화면 프리팹에서 중첩 인스턴스를 풀거나 개별 복제하지 않습니다.
 - `strategy_top_settings_v1`은 전략 상단 설정 버튼 전용 투명 톱니 Sprite입니다. 나머지 세 상단 기능은 `icon_flat_report`, `icon_flat_faction`, `icon_flat_research`를 재사용하며 각 아이콘 위의 투명 Button이 기존 기능을 호출합니다.
 - 전략 하단 명령 바는 좌측 1.8%부터 군사·인사·외교·계략·연구·평정·월보 7개 버튼을 배치합니다. 버튼은 화면 폭 9.8%, 간격 10.5%이며 아이콘과 명조 계열 문구를 분리해 표시합니다. 다음 턴은 화면 78~98.2%에 독립 배치하고 하단 설정 버튼은 사용하지 않습니다.
 - 전략 좌측 선택 성 패널은 상단 문장·성명·소속, 가로형 성 이미지, 영지관·번영·기술·질서·방어·주둔 전투단 6행, 영웅 카드 4개, 성 관리 버튼 순서로 구성합니다. 현재 데이터 모델에 없는 인구·식량·행복도는 표시를 위해 임의 계산하지 않습니다.
@@ -496,6 +524,9 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - `WICampaignVariantDefinition.castlePlacements`: 시나리오 전용 성 소유권, 정규화 지도 좌표, 인접 성 목록을 편집합니다.
 - `playerStartingCastleId`: 기존 플레이어 시작 영웅을 모을 시나리오 시작 성 ID입니다.
 - `valdorAttackIntervalMonths`: 해당 시나리오에서 발도르가 공격 출정을 검토하는 월 간격입니다.
+- `aiPreservationFactionId`: 다른 AI의 침식으로부터 보존할 진영 ID입니다. 아레스 메인은 `valdor`를 사용하고 프리·예약 시나리오는 비워 둡니다.
+- `valdorAIPreservationCastleCount`: 보존 대상 진영에 허용하는 최소 잔존 성 수입니다. `0`이면 제한하지 않으며 아레스 메인은 `36`을 사용합니다. 필드 이름은 기존 데이터 호환을 위해 유지하지만 실제 대상 진영은 `aiPreservationFactionId`에서 결정합니다. 플레이어의 공격에는 적용되지 않습니다.
+- 전략 데이터베이스의 `Aggressive AI Attack Power Percent`와 `Standard AI Attack Power Percent`는 AI가 원정을 시작할 최소 예상 전력 비율입니다. 현재 공세 성향은 방어 전력의 90%, 나머지 성향은 105%를 요구합니다.
 - 아레스 메인은 프로스트혼 단독 시작, 프로스트혼-카르디아-룬포지/브론즈게이트 진출 연결, 발도르 24개월 공격 주기를 사용하며 프리 시나리오는 기본 마스터 배치를 사용합니다.
 - `overrideInitialStats`: 시나리오 전용 첫 관문처럼 시작 성 수치를 별도로 지정할 때 사용합니다. 현재 카르디아만 방어 10·질서 20을 사용합니다.
 - `recruitableHeroIds`: 성에 귀속된 인재 탐색 풀입니다. 해당 성에 있는 인물이 탐색할 때 귀속 인재를 먼저 발견합니다.
@@ -506,3 +537,23 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 성 연결은 두 성 모두 `Override Connections`를 체크하고 서로의 `Castle Id`를 `Adjacent Castle Ids`에 추가합니다. 한쪽만 입력하면 표시나 이동 판정이 비대칭이 될 수 있습니다.
 - 초기 소유권은 해당 배치 행의 `Faction Id`를 `avalon`, `valdor`, `ironheart`, `sylvanroad`, `necropolis` 중 하나로 입력합니다.
 - 프리 시나리오까지 공통으로 바꾸려면 위 시나리오 덮어쓰기가 아니라 같은 에셋의 기본 `Castles` 목록에서 성을 찾아 위치·연결·세력을 수정합니다.
+# 시나리오 인물 배치와 AI 영입
+
+- `WI_AdministrationDatabase`의 `campaignVariants > characterPlacements`에서 시나리오별 시작 인물의 `castleId`, `heroId`, `governor`를 편집합니다.
+- `nonPlayerRecruitmentEnabled`가 꺼진 아레스 메인에서는 플레이어 외 세력이 영입하지 않습니다. 켜진 프리 시나리오에서는 비플레이어 세력도 미고용 재야 인재를 고용합니다.
+- `ProjectWI/Data/Build Scenario Character Placements` 메뉴는 현재 500명 중 250명을 각 시나리오 데이터에 다시 저장합니다. 아레스 메인의 프로스트혼은 영웅 4명과 일반 병사 10명, 총 14명으로 고정되고 카르디아는 추가 자동 배치에서 제외됩니다.
+- 일반 등급은 영지관·성 사업·연구·탐색·교류·영입·개인 훈련·개인 휴식을 수행할 수 없습니다. 전투단 편성과 전투단 단위 합동훈련·대기 회복은 가능하며 영웅 승격 뒤에는 내정도 가능합니다.
+# Campaign Auto Test Lab 상세 보기
+
+- `ProjectWI/Tools/Campaign Auto Test Lab`에서 실행 후 각 결과 행 오른쪽의 `상세` 버튼을 누르면 해당 독립 실행의 지표 설명과 자동 진단이 표시됩니다.
+- 인재 열은 `발견 / 실제 신규 영입 성공 / 일반 재야 복귀 / 총 사망` 순서입니다. 열 제목에 마우스를 올려도 같은 설명을 확인할 수 있습니다.
+- 상세 진단은 원정 없음, 실제 영입 없음, 패배 우세, 240개월 미종료를 경고합니다.
+# 인재 영입 속도
+
+- `WI_AdministrationDatabase`의 `recruitmentBaseProgress`가 월간 기본 설득 진척도입니다. 현재 값은 `35`입니다.
+- 실제 월간 진척은 `recruitmentBaseProgress + 담당 영웅 매력/4`이며, 기본 설정에서는 보통 2~3개월 뒤 영입 요구 사건에 도달합니다.
+
+# 인물 휴식 회복량
+
+- `WI_AdministrationDatabase`의 `characterRestFatigueRecovery`가 영웅 개인 휴식 1개월의 피로 회복량입니다. 현재 값은 `50`입니다.
+- 휴식은 부상 기간도 1개월 줄입니다. 일반 등급은 개인 휴식을 수행하지 않고, 전투단 대기 중 피로 회복 15는 이 값과 별도로 적용됩니다.

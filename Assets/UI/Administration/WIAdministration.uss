@@ -280,8 +280,8 @@
 .battle-alert-button { min-height:62px; margin-top:10px; padding:10px; color:#ffffff; border-width:0; white-space:normal; }
 .side-panel-news { flex-grow:1; margin-top:10px; padding:10px; background-color:rgba(5,10,15,.72); color:#aeb9c0; white-space:normal; line-height:19px; }
 .modal-panel.generated-panel-background { background-color:#0c141b; }
-.modal-panel .modal-header { background-image:url("project://database/Assets/Resources/UI/Generated/popup_header.png"); -unity-background-scale-mode:stretch-to-fill; background-color:rgba(255,255,255,0); padding-left:24px; padding-right:18px; }
-.modal-panel .modal-header .modal-title { color:#10161b; }
+.modal-panel .modal-header { background-color:rgba(18,29,39,0.96); padding-left:24px; padding-right:18px; }
+.modal-panel .modal-header .modal-title { color:#edf3f7; }
 .modal-panel Button { background-image:url("project://database/Assets/Resources/UI/Generated/button_normal.png"); -unity-background-scale-mode:stretch-to-fill; background-color:rgba(0,0,0,0); border-width:0; }
 .modal-panel Button.danger,.modal-panel Button.retreat { background-image:url("project://database/Assets/Resources/UI/Generated/button_danger.png"); }
 .modal-close { background-image:url("project://database/Assets/Resources/UI/Generated/button_normal.png"); }

@@ -48,6 +48,8 @@ namespace ProjectWI.Administration
         public string CastleId;
         public string DisplayName;
         public string FactionId;
+        // 성 마스터 데이터에서 지정한 월드맵 성 이미지를 전달합니다.
+        public Sprite CastleImage;
         public Vector2 Position;
         public bool Selected;
         public string Tooltip;

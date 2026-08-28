@@ -96,7 +96,8 @@ namespace ProjectWI.Administration
             snapshot.Summary = $"마나 {research.ManaCost} · 기술 {research.RequiredTechnology} · 기본 {research.DurationMonths}개월\n지력이 높은 대기 인물을 선택하십시오.";
             foreach (WICharacterRuntimeState character in state.Characters)
             {
-                if (character.Recruited == false || state.IsCharacterBusy(character.HeroId)) continue;
+                if (character.Recruited == false || state.IsCharacterBusy(character.HeroId) ||
+                    WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId) == false) continue;
                 bool inPlayerFaction = state.Castles.Exists(castle => castle.FactionId == state.PlayerFactionId && castle.HeroIds.Contains(character.HeroId));
                 if (inPlayerFaction == false) continue;
                 WIHeroDefinition hero = database.GetHero(character.HeroId);

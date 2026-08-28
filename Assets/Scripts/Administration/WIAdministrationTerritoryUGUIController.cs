@@ -4,20 +4,12 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationTerritoryUGUIController : MonoBehaviour
+    public sealed class WIAdministrationTerritoryUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private GameObject contentRoot;
         [SerializeField] private Button backButton;
-        [SerializeField] private Button nextTurnButton;
-        [SerializeField] private TMP_Text factionLabel;
-        [SerializeField] private TMP_Text dateLabel;
-        [SerializeField] private TMP_Text goldLabel;
-        [SerializeField] private TMP_Text manaLabel;
-        [SerializeField] private TMP_Text influenceLabel;
-        [SerializeField] private Button[] topCommandButtons;
-        [SerializeField] private WIAdministrationShortcutAction[] topCommandActions;
-        [SerializeField] private Button systemButton;
+        [SerializeField] private WIAdministrationEndTurnUGUIController endTurn;
+        [SerializeField] private WIAdministrationTopHUDUGUIController topHUD;
         [SerializeField] private TMP_Text castleTitle;
         [SerializeField] private TMP_Text castleInfo;
         [SerializeField] private Image castleBackground;
@@ -46,10 +38,7 @@ namespace ProjectWI.Administration
         {
             rootCanvas = GetComponent<Canvas>();
             rootRaycaster = GetComponent<GraphicRaycaster>();
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
             if (administrationController == null)
             {
                 enabled = false;
@@ -57,16 +46,8 @@ namespace ProjectWI.Administration
             }
 
             backButton.onClick.AddListener(administrationController.ReturnToUGUIWorld);
-            nextTurnButton.onClick.AddListener(() =>
-                administrationController.ExecuteUGUIShortcut(WIAdministrationShortcutAction.EndTurn));
-            systemButton.onClick.AddListener(administrationController.OpenUGUISystem);
-            int topCommandCount = Mathf.Min(topCommandButtons.Length, topCommandActions.Length);
-            for (int index = 0; index < topCommandCount; index += 1)
-            {
-                WIAdministrationShortcutAction action = topCommandActions[index];
-                topCommandButtons[index].onClick.AddListener(() =>
-                    administrationController.ExecuteUGUIShortcut(action));
-            }
+            endTurn.Initialize(administrationController);
+            topHUD.Initialize(administrationController);
 
             int count = Mathf.Min(commandButtons.Length, commandActions.Length);
             for (int index = 0; index < count; index += 1)
@@ -80,10 +61,7 @@ namespace ProjectWI.Administration
         // 월드 상태 알림을 구독하고 영지 화면을 갱신합니다.
         private void OnEnable()
         {
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
             if (administrationController != null)
             {
                 administrationController.UGUIWorldChanged += Refresh;
@@ -103,7 +81,8 @@ namespace ProjectWI.Administration
         // 선택 성의 스냅샷을 영지 UGUI 요소에 반영합니다.
         private void Refresh()
         {
-            if (administrationController.TryGetUGUITerritorySnapshot(out WIAdministrationTerritorySnapshot snapshot) == false)
+            if (administrationController.TryGetUGUITerritorySnapshot(out WIAdministrationTerritorySnapshot snapshot)
+                == false)
             {
                 contentRoot.SetActive(false);
                 SetCanvasVisible(false);
@@ -117,11 +96,9 @@ namespace ProjectWI.Administration
                 return;
             }
 
-            factionLabel.text = snapshot.FactionName;
-            dateLabel.text = snapshot.Date;
-            goldLabel.text = snapshot.Gold;
-            manaLabel.text = snapshot.Mana;
-            influenceLabel.text = snapshot.Influence;
+            topHUD.Apply(snapshot.FactionName, snapshot.Date, string.Empty,
+                snapshot.Gold, snapshot.Mana, snapshot.Influence);
+            endTurn.Apply(snapshot.CanEndTurn, snapshot.EndTurnText);
             castleTitle.text = snapshot.CastleTitle;
             castleInfo.text = snapshot.CastleInfo;
             ApplySprite(castleBackground, snapshot.CastleImage);

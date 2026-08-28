@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationResearchUGUIController : MonoBehaviour
+    public sealed class WIAdministrationResearchUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -26,7 +25,7 @@ namespace ProjectWI.Administration
         // 연구·담당자 카드와 페이지·이전 버튼을 실제 연구 기능에 연결합니다.
         private void Awake()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
+            ResolveAdministrationController();
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
                 int captured = index;
@@ -40,14 +39,20 @@ namespace ProjectWI.Administration
         // 연구 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
-            if (administrationController == null) administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            if (administrationController != null) administrationController.UGUIResearchRequested += Open;
+            ResolveAdministrationController();
+            if (administrationController != null)
+            {
+                administrationController.UGUIResearchRequested += Open;
+            }
         }
 
         // 연구 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
-            if (administrationController != null) administrationController.UGUIResearchRequested -= Open;
+            if (administrationController != null)
+            {
+                administrationController.UGUIResearchRequested -= Open;
+            }
         }
 
         // 전체 연구 목록을 첫 페이지부터 엽니다.
@@ -63,7 +68,8 @@ namespace ProjectWI.Administration
         // 현재 연구 단계의 스냅샷을 8개 고정 카드에 표시합니다.
         private void Refresh()
         {
-            if (administrationController.TryGetUGUIResearchPanel(mode, researchId, out snapshot, out string error) == false)
+            if (administrationController.TryGetUGUIResearchPanel(mode, researchId, out snapshot, out string error)
+                == false)
             {
                 messageLabel.gameObject.SetActive(true);
                 messageLabel.text = error;
@@ -80,7 +86,10 @@ namespace ProjectWI.Administration
                 int sourceIndex = page * cardButtons.Length + index;
                 bool visible = sourceIndex < snapshot.Cards.Count;
                 cardButtons[index].gameObject.SetActive(visible);
-                if (visible == false) continue;
+                if (visible == false)
+                {
+                    continue;
+                }
                 WIAdministrationResearchCardSnapshot card = snapshot.Cards[sourceIndex];
                 cardLabels[index].text = card.Title + "\n" + card.Description;
                 cardPortraits[index].sprite = card.Portrait;
@@ -100,7 +109,10 @@ namespace ProjectWI.Administration
         private void SelectCard(int index)
         {
             int sourceIndex = page * cardButtons.Length + index;
-            if (snapshot == null || sourceIndex >= snapshot.Cards.Count) return;
+            if (snapshot == null || sourceIndex >= snapshot.Cards.Count)
+            {
+                return;
+            }
             WIAdministrationResearchCardSnapshot card = snapshot.Cards[sourceIndex];
             if (card.Action == "research")
             {
@@ -110,7 +122,8 @@ namespace ProjectWI.Administration
                 Refresh();
                 return;
             }
-            if (administrationController.BeginUGUIResearch(researchId, card.Id, out string error) == false)
+            if (administrationController.BeginUGUIResearch(researchId, card.Id, out string error)
+                == false)
             {
                 messageLabel.gameObject.SetActive(true);
                 messageLabel.text = error;

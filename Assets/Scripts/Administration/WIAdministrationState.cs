@@ -316,6 +316,7 @@ namespace ProjectWI.Administration
         public WIResourceType RansomResourceType = WIResourceType.Gold;
         public int RansomAmount;
         public bool IsDead;
+        public int DeathCount;
         public int CommonReturnMonthsRemaining;
         public int CommonReturnCount;
         public string JoinedEnemyFactionId;
@@ -375,6 +376,7 @@ namespace ProjectWI.Administration
         public List<string> CompletedRegionalEventIds = new List<string>();
         public List<WIPendingOccupationEvent> PendingOccupationEvents = new List<WIPendingOccupationEvent>();
         public List<WIPendingRecruitmentEvent> PendingRecruitmentEvents = new List<WIPendingRecruitmentEvent>();
+        public int PlayerRecruitmentSuccessCount;
         public List<WIArmyState> Armies = new List<WIArmyState>();
         public int NextArmyNumber = 1;
         public List<WIBattleSessionState> BattleSessions = new List<WIBattleSessionState>();
@@ -494,7 +496,8 @@ namespace ProjectWI.Administration
                 castle.HeroIds.Add(placement.HeroId);
                 character.Discovered = true;
                 character.Recruited = true;
-                if (placement.Governor == true)
+                if (placement.Governor == true &&
+                    (character.BaseGrade == WICharacterGrade.Hero || character.PromotedToHero))
                 {
                     castle.GovernorHeroId = placement.HeroId;
                 }
@@ -512,6 +515,7 @@ namespace ProjectWI.Administration
             if (variantDefinition != null)
             {
                 ApplyCampaignCastlePlacements(state, variantDefinition);
+                ApplyCampaignCharacterPlacements(state, variantDefinition);
                 WICastleRuntimeState additionalCastle = state.GetCastle(variantDefinition.AdditionalPlayerCastleId);
                 if (additionalCastle != null)
                 {
@@ -526,6 +530,47 @@ namespace ProjectWI.Administration
             }
 
             return state;
+        }
+
+        // 시나리오에 저장된 시작 인물 배치를 성과 인물 고용 상태에 적용합니다.
+        private static void ApplyCampaignCharacterPlacements(
+            WIAdministrationState state,
+            WICampaignVariantDefinition variantDefinition)
+        {
+            if (variantDefinition.CharacterPlacements == null ||
+                variantDefinition.CharacterPlacements.Count == 0)
+            {
+                return;
+            }
+
+            foreach (WICastleRuntimeState castle in state.Castles)
+            {
+                castle.HeroIds.Clear();
+                castle.GovernorHeroId = string.Empty;
+            }
+            foreach (WICharacterRuntimeState character in state.Characters)
+            {
+                character.Recruited = false;
+                character.Discovered = false;
+            }
+
+            foreach (WICampaignCharacterPlacement placement in variantDefinition.CharacterPlacements)
+            {
+                WICastleRuntimeState castle = state.GetCastle(placement.CastleId);
+                WICharacterRuntimeState character = state.GetCharacter(placement.HeroId);
+                if (castle == null || character == null || castle.HeroIds.Contains(placement.HeroId))
+                {
+                    continue;
+                }
+                castle.HeroIds.Add(placement.HeroId);
+                character.Recruited = true;
+                character.Discovered = true;
+                if (placement.Governor && string.IsNullOrEmpty(castle.GovernorHeroId) &&
+                    (character.BaseGrade == WICharacterGrade.Hero || character.PromotedToHero))
+                {
+                    castle.GovernorHeroId = placement.HeroId;
+                }
+            }
         }
 
         // 이전 저장 파일에 없는 시나리오별 지도 좌표와 연결 정보를 마스터 데이터에서 복구합니다.

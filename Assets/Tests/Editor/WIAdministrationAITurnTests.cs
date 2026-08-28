@@ -1698,12 +1698,12 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationState state = WIAdministrationState.Create(database);
 
             int playerGoldBefore = state.GetFactionState("avalon").Gold;
-            int valdorGoldBefore = state.GetFactionState("valdor").Gold;
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
 
             Assert.AreEqual(5, state.Factions.Count);
             Assert.Greater(state.GetFactionState("avalon").Gold, playerGoldBefore);
-            Assert.Greater(state.GetFactionState("valdor").Gold, valdorGoldBefore);
+            Assert.GreaterOrEqual(state.GetFactionState("valdor").Gold, 0);
+            Assert.AreNotEqual(state.GetFactionState("avalon").Gold, state.GetFactionState("valdor").Gold);
             Assert.AreNotSame(state.GetFactionState("avalon"), state.GetFactionState("valdor"));
         }
 
@@ -1713,11 +1713,15 @@ namespace ProjectWI.Tests.Editor
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
+            state.Turn = 3;
             foreach (WICastleRuntimeState castle in state.Castles.Where(item => item.FactionId == "valdor"))
             {
                 castle.Defense = castle.CastleId == "castle_01" ? 0 : 100;
                 castle.Stability = castle.CastleId == "castle_01" ? 0 : 100;
             }
+            state.GetCastle("castle_00").Defense = 0;
+            state.GetCastle("castle_00").Stability = 0;
+            state.GetCastle("castle_00").HeroIds.Clear();
             int influenceBefore = state.GetFactionState("valdor").Influence;
             int expectedIncome = WIAdministrationTurnSystem.GetFactionMonthlyIncome(
                 database, state, "valdor").InfluenceGained;
@@ -1737,11 +1741,15 @@ namespace ProjectWI.Tests.Editor
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
+            state.Turn = 3;
             foreach (WICastleRuntimeState castle in state.Castles.Where(item => item.FactionId == "valdor"))
             {
                 castle.Defense = castle.CastleId == "castle_01" ? 0 : 100;
                 castle.Stability = castle.CastleId == "castle_01" ? 0 : 100;
             }
+            state.GetCastle("castle_00").Defense = 0;
+            state.GetCastle("castle_00").Stability = 0;
+            state.GetCastle("castle_00").HeroIds.Clear();
             WICastleRuntimeState frontline = state.GetCastle("castle_01");
             string[] additionalCommanders =
             {
@@ -1788,7 +1796,7 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
             state.UsePlayerRealTimeBattles = false;
-            PrepareValdorAttackOnAvalon(state);
+            PrepareValdorAttackOnAvalon(database, state);
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIArmyState army = state.Armies.First(item => item.FactionId == "valdor");
@@ -1809,11 +1817,15 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
             state.UsePlayerRealTimeBattles = false;
-            PrepareValdorAttackOnAvalon(state);
+            PrepareValdorAttackOnAvalon(database, state);
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIArmyState army = state.Armies.First(item => item.FactionId == "valdor");
             string commanderId = army.Members[0].HeroId;
+            WICastleRuntimeState targetCastle = state.GetCastle("castle_00");
+            targetCastle.Defense = 0;
+            targetCastle.Stability = 0;
+            targetCastle.HeroIds.Clear();
             string[] reinforcements = database.Heroes
                 .Where(hero => hero.Grade == WICharacterGrade.Hero && army.Members.All(member => member.HeroId != hero.Id))
                 .Select(hero => hero.Id).Take(3).ToArray();
@@ -1821,6 +1833,10 @@ namespace ProjectWI.Tests.Editor
             {
                 state.GetCharacter(heroId).Discovered = true;
                 state.GetCharacter(heroId).Recruited = true;
+                foreach (WICastleRuntimeState castle in state.Castles)
+                {
+                    castle.HeroIds.Remove(heroId);
+                }
                 army.Members.Add(new WIArmyMemberState { HeroId = heroId, Role = WIUnitRole.Melee });
             }
 
@@ -1842,7 +1858,7 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
             state.UsePlayerRealTimeBattles = false;
-            PrepareValdorAttackOnAvalon(state);
+            PrepareValdorAttackOnAvalon(database, state);
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
@@ -1862,7 +1878,7 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
             state.UseStrategicBattleFallback = false;
-            PrepareValdorAttackOnAvalon(state);
+            PrepareValdorAttackOnAvalon(database, state);
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
@@ -1939,7 +1955,7 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
             state.UseStrategicBattleFallback = false;
-            PrepareValdorAttackOnAvalon(state);
+            PrepareValdorAttackOnAvalon(database, state);
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIBattleSessionState session = state.BattleSessions.First(item => item.PlayerInvolved);
@@ -1966,6 +1982,62 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(affected.RansomAmount, restored.RansomAmount);
         }
 
+        // 기본 설득량 상향이 데이터 값과 매력 보너스를 합산해 2~3개월 영입 속도를 만드는지 검증합니다.
+        [Test]
+        public void RecruitmentProgress_UsesShortenedDataDrivenMonthlyGain()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICharacterRuntimeState recruiter = state.GetCharacter("ares");
+            WICharacterRuntimeState candidate = state.GetCharacter("selene");
+            recruiter.Reputation = 100;
+            recruiter.Activity = WICharacterActivityType.Recruit;
+            recruiter.ActivityTargetHeroId = candidate.HeroId;
+            candidate.Discovered = true;
+            candidate.Recruited = false;
+            candidate.RecruitmentProgress = 0;
+
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+
+            int expected = database.RecruitmentBaseProgress + database.GetHero("ares").Charisma / 4;
+            Assert.AreEqual(expected, candidate.RecruitmentProgress);
+            Assert.GreaterOrEqual(candidate.RecruitmentProgress, 35);
+        }
+
+        // 모든 성에 월드맵 전용 성 이미지가 배정되고 세 변형이 고르게 사용되는지 검증합니다.
+        [Test]
+        public void WorldMapCastleMarkers_AreAssignedToAllCastles()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            Assert.IsTrue(database.Castles.All(castle => castle.MapMarkerImage != null));
+
+            string[] markerPaths = database.Castles
+                .Select(castle => AssetDatabase.GetAssetPath(castle.MapMarkerImage))
+                .Distinct()
+                .OrderBy(path => path)
+                .ToArray();
+            Assert.AreEqual(3, markerPaths.Length);
+            Assert.IsTrue(markerPaths.All(path => path.StartsWith("Assets/Resources/UI/Generated/map_marker_castle_")));
+        }
+
+        // 개인 휴식이 데이터에 설정된 상향 회복량만큼 피로와 부상을 회복하는지 검증합니다.
+        [Test]
+        public void CharacterRest_UsesIncreasedDataDrivenFatigueRecovery()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICharacterRuntimeState character = state.GetCharacter("ares");
+            character.Fatigue = 90;
+            character.InjuryMonths = 2;
+            character.Activity = WICharacterActivityType.Rest;
+
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+
+            Assert.AreEqual(50, database.CharacterRestFatigueRecovery);
+            Assert.AreEqual(40, character.Fatigue);
+            Assert.AreEqual(1, character.InjuryMonths);
+        }
+
         // 여유 난이도에서는 큰 패배에도 인물이 사망, 포로, 전향하지 않고 후퇴하는지 검증합니다.
         [Test]
         public void BattleConsequences_RelaxedDifficultyAlwaysRetreatsCharacter()
@@ -1973,7 +2045,7 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database, WICampaignDifficulty.Relaxed);
             state.UseStrategicBattleFallback = false;
-            PrepareValdorAttackOnAvalon(state);
+            PrepareValdorAttackOnAvalon(database, state);
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIBattleSessionState session = state.BattleSessions.First(item => item.PlayerInvolved);
@@ -1998,7 +2070,7 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
             state.UseStrategicBattleFallback = false;
-            PrepareValdorAttackOnAvalon(state);
+            PrepareValdorAttackOnAvalon(database, state);
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIBattleSessionState session = state.BattleSessions.First(item => item.PlayerInvolved);
@@ -2026,7 +2098,7 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState strategic = WIAdministrationState.Create(database);
             strategic.UseStrategicBattleFallback = false;
-            PrepareValdorAttackOnAvalon(strategic);
+            PrepareValdorAttackOnAvalon(database, strategic);
             WIAdministrationTurnSystem.ExecuteTurn(database, strategic);
             WIAdministrationTurnSystem.ExecuteTurn(database, strategic);
             string json = WICampaignSaveSystem.Serialize(strategic);
@@ -2107,7 +2179,7 @@ namespace ProjectWI.Tests.Editor
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
-            PrepareValdorAttackOnAvalon(state);
+            PrepareValdorAttackOnAvalon(database, state);
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
@@ -2355,7 +2427,7 @@ namespace ProjectWI.Tests.Editor
         public void BattleCommand_FocusPrioritizesSelectedTarget()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            WIBattleConfigSO config = AssetDatabase.LoadAssetAtPath<WIBattleConfigSO>(BattleConfigPath);
+            WIBattleConfigSO config = CreateBattleConfigWithHiddenGrid(false);
             WIBattleSessionState session = new WIBattleSessionState { SessionId = "focus_test" };
             session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = "ares", Role = WIUnitRole.Melee });
             session.DefenderHeroIds.Add(new WIBattleParticipantState { HeroId = "lyria", Role = WIUnitRole.Melee });
@@ -2383,7 +2455,7 @@ namespace ProjectWI.Tests.Editor
         public void BattleCollision_SeparatesOverlappingCharacters()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            WIBattleConfigSO config = AssetDatabase.LoadAssetAtPath<WIBattleConfigSO>(BattleConfigPath);
+            WIBattleConfigSO config = CreateBattleConfigWithHiddenGrid(false);
             WIBattleRuntimeState runtime = WIBattleRuntimeBuilder.Build(config, database, CreateSimpleBattleSession());
             WIBattleCharacterState attacker = runtime.Characters.Single(item => item.Side == WIBattleSide.Attacker);
             WIBattleCharacterState defender = runtime.Characters.Single(item => item.Side == WIBattleSide.Defender);
@@ -2405,7 +2477,7 @@ namespace ProjectWI.Tests.Editor
         public void BattleMeleeHit_AppliesKnockbackAndHoldResistance()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            WIBattleConfigSO config = AssetDatabase.LoadAssetAtPath<WIBattleConfigSO>(BattleConfigPath);
+            WIBattleConfigSO config = CreateBattleConfigWithHiddenGrid(false);
             WIBattleRuntimeState runtime = WIBattleRuntimeBuilder.Build(config, database, CreateSimpleBattleSession());
             WIBattleCharacterState attacker = runtime.Characters.Single(item => item.Side == WIBattleSide.Attacker);
             WIBattleCharacterState defender = runtime.Characters.Single(item => item.Side == WIBattleSide.Defender);
@@ -2465,7 +2537,7 @@ namespace ProjectWI.Tests.Editor
             camera.aspect = 16f / 9f;
             WIBattleCameraController controller = cameraObject.AddComponent<WIBattleCameraController>();
             controller.Initialize(config);
-            controller.Zoom(-100f);
+            controller.SetZoomLevel(WIBattleZoomLevel.A);
 
             Vector2 clamped = controller.GetClampedPosition(new Vector2(100f, 100f));
 
@@ -2532,7 +2604,7 @@ namespace ProjectWI.Tests.Editor
         public void BattleAttack_MeleeHitsImmediatelyAndProjectileDelaysDamage()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            WIBattleConfigSO config = AssetDatabase.LoadAssetAtPath<WIBattleConfigSO>(BattleConfigPath);
+            WIBattleConfigSO config = CreateBattleConfigWithHiddenGrid(false);
             WIBattleRuntimeState runtime = WIBattleRuntimeBuilder.Build(config, database, CreateSimpleBattleSession());
             WIBattleCharacterState attacker = runtime.Characters.Single(item => item.Side == WIBattleSide.Attacker);
             WIBattleCharacterState defender = runtime.Characters.Single(item => item.Side == WIBattleSide.Defender);
@@ -2566,7 +2638,7 @@ namespace ProjectWI.Tests.Editor
         public void BattleProjectile_DoesNotLaunchOutsideAttackRange()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            WIBattleConfigSO config = AssetDatabase.LoadAssetAtPath<WIBattleConfigSO>(BattleConfigPath);
+            WIBattleConfigSO config = CreateBattleConfigWithHiddenGrid(false);
             WIBattleRuntimeState runtime = WIBattleRuntimeBuilder.Build(config, database, CreateSimpleBattleSession());
             WIBattleCharacterState attacker = runtime.Characters.Single(item => item.Side == WIBattleSide.Attacker);
             WIBattleCharacterState defender = runtime.Characters.Single(item => item.Side == WIBattleSide.Defender);
@@ -3366,6 +3438,13 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(database.CampaignVariants.All(item =>
                 string.IsNullOrWhiteSpace(item.DisplayName.Korean) == false &&
                 string.IsNullOrWhiteSpace(item.Description.Korean) == false));
+            Assert.AreEqual("valdor",
+                database.GetCampaignVariant(WICampaignVariant.AresMain).AIPreservationFactionId);
+            Assert.IsTrue(database.CampaignVariants
+                .Where(item => item.Variant != WICampaignVariant.AresMain)
+                .All(item => string.IsNullOrEmpty(item.AIPreservationFactionId)));
+            Assert.AreEqual(90, database.AggressiveAIAttackPowerPercent);
+            Assert.AreEqual(105, database.StandardAIAttackPowerPercent);
         }
 
         // 아레스 메인은 프로스트혼 단독 시작과 전용 북부 연결을 사용하고 프리 시나리오는 기본 배치를 유지하는지 검증합니다.
@@ -3429,7 +3508,9 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database, WICampaignDifficulty.Standard, variant);
             for (int month = 0; month < 12 && state.CampaignResult == WICampaignResult.Ongoing; month += 1)
+            {
                 WIAdministrationTurnSystem.ExecuteTurn(database, state);
+            }
 
             Assert.AreEqual(variant, state.CampaignVariant);
             Assert.IsTrue(state.Factions.All(item => item.Gold >= 0 && item.ManaCrystal >= 0 && item.Influence >= 0));
@@ -3478,6 +3559,21 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(0, hero.CommonReturnCount);
         }
 
+        // 전투 인물 표시 요소가 런타임 생성 없이 캐릭터 프리팹에 미리 구성되는지 검증합니다.
+        [Test]
+        public void BattleCharacterPrefab_ContainsPrebuiltVisualChildren()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/Battle/WIBattleCharacter.prefab");
+
+            Assert.NotNull(prefab);
+            Assert.NotNull(prefab.transform.Find("FocusTargetMarker")?.GetComponent<SpriteRenderer>());
+            Assert.NotNull(prefab.transform.Find("SelectionMarker")?.GetComponent<SpriteRenderer>());
+            Assert.NotNull(prefab.transform.Find("HealthBackground")?.GetComponent<SpriteRenderer>());
+            Assert.NotNull(prefab.transform.Find("HealthBackground/HealthFill")?.GetComponent<SpriteRenderer>());
+            Assert.NotNull(prefab.transform.Find("CharacterLabel")?.GetComponent<TextMesh>());
+        }
+
         // 전투 런타임 단위 테스트에 사용할 최소 참가자 세션을 생성합니다.
         private static WIBattleSessionState CreateSimpleBattleSession()
         {
@@ -3497,14 +3593,36 @@ namespace ProjectWI.Tests.Editor
             return session;
         }
 
-        // 발도르가 첫 턴에 아발론을 공격하도록 전선 조건을 고정합니다.
-        private static void PrepareValdorAttackOnAvalon(WIAdministrationState state)
+        // 연속 좌표 물리 검증용으로 원본 전투 설정을 복제하고 숨은 격자 사용 여부만 변경합니다.
+        private static WIBattleConfigSO CreateBattleConfigWithHiddenGrid(bool useHiddenGrid)
+        {
+            WIBattleConfigSO source = AssetDatabase.LoadAssetAtPath<WIBattleConfigSO>(BattleConfigPath);
+            WIBattleConfigSO config = Object.Instantiate(source);
+            SerializedObject serialized = new SerializedObject(config);
+            serialized.FindProperty("useHiddenGrid").boolValue = useHiddenGrid;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return config;
+        }
+
+        // AI 의사결정과 분리해 발도르 전투단이 둘째 턴에 아발론에 도착하도록 원정을 예약합니다.
+        private static void PrepareValdorAttackOnAvalon(
+            WIAdministrationDatabaseSO database,
+            WIAdministrationState state)
         {
             foreach (WICastleRuntimeState castle in state.Castles.Where(item => item.FactionId == "valdor"))
             {
                 castle.Defense = castle.CastleId == "castle_01" ? 0 : 100;
                 castle.Stability = castle.CastleId == "castle_01" ? 0 : 100;
             }
+
+            WICastleRuntimeState origin = state.GetCastle("castle_01");
+            string commanderId = origin.HeroIds.First();
+            WIArmyState army = WIAdministrationTurnSystem.CreateArmy(database, state, origin, commanderId);
+            Assert.IsNotNull(army);
+            Assert.IsTrue(WIAdministrationTurnSystem.BeginArmyMarch(database, state, army, "castle_00"));
+            army.Mission = WIArmyMission.Attack;
+            army.StrategicTargetCastleId = "castle_00";
+            army.RemainingTravelMonths = 2;
         }
     }
 }

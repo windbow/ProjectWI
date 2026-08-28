@@ -5,16 +5,10 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public sealed class WIAdministrationWorldUGUIController : MonoBehaviour
+    public sealed class WIAdministrationWorldUGUIController : WIAdministrationUGUIPanelController
     {
-        [SerializeField] private WIAdministrationUIController administrationController;
         [SerializeField] private GameObject contentRoot;
-        [SerializeField] private TMP_Text factionLabel;
-        [SerializeField] private TMP_Text dateLabel;
-        [SerializeField] private TMP_Text turnDescriptionLabel;
-        [SerializeField] private TMP_Text goldLabel;
-        [SerializeField] private TMP_Text manaLabel;
-        [SerializeField] private TMP_Text influenceLabel;
+        [SerializeField] private WIAdministrationTopHUDUGUIController topHUD;
         [SerializeField] private TMP_Text castleNameLabel;
         [SerializeField] private TMP_Text castleOwnerLabel;
         [SerializeField] private TMP_Text[] castleDetailRows;
@@ -35,9 +29,7 @@ namespace ProjectWI.Administration
         [SerializeField] private Button objectiveButton;
         [SerializeField] private Button[] commandButtons;
         [SerializeField] private WIAdministrationShortcutAction[] commandActions;
-        [SerializeField] private Button endTurnButton;
-        [SerializeField] private TMP_Text endTurnLabel;
-        [SerializeField] private Button systemButton;
+        [SerializeField] private WIAdministrationEndTurnUGUIController endTurn;
         private Canvas rootCanvas;
         private GraphicRaycaster rootRaycaster;
 
@@ -46,10 +38,7 @@ namespace ProjectWI.Administration
         {
             rootCanvas = GetComponent<Canvas>();
             rootRaycaster = GetComponent<GraphicRaycaster>();
-            if (administrationController == null)
-            {
-                administrationController = FindFirstObjectByType<WIAdministrationUIController>();
-            }
+            ResolveAdministrationController();
 
             if (administrationController == null)
             {
@@ -62,11 +51,17 @@ namespace ProjectWI.Administration
             castleRecordButton.onClick.AddListener(administrationController.OpenUGUIGlobalSummaryCastle);
             objectiveButton.onClick.AddListener(administrationController.OpenUGUIObjective);
             battleAlertButton.onClick.AddListener(administrationController.OpenUGUIBattleAlert);
-            endTurnButton.onClick.AddListener(() => administrationController.ExecuteUGUIShortcut(WIAdministrationShortcutAction.EndTurn));
-            systemButton.onClick.AddListener(administrationController.OpenUGUISystem);
+            endTurn.Initialize(administrationController);
+            topHUD.Initialize(administrationController);
             int count = Mathf.Min(commandButtons.Length, commandActions.Length);
             for (int index = 0; index < count; index += 1)
             {
+                if (commandButtons[index] == null)
+                {
+                    Debug.LogError($"월드 UGUI 명령 버튼 {index}번 참조가 비어 있습니다.", this);
+                    continue;
+                }
+
                 WIAdministrationShortcutAction action = commandActions[index];
                 commandButtons[index].onClick.AddListener(() => administrationController.ExecuteUGUIShortcut(action));
             }
@@ -97,33 +92,73 @@ namespace ProjectWI.Administration
         private void Update()
         {
             Keyboard keyboard = Keyboard.current;
-            if (keyboard == null) return;
-            if (keyboard.escapeKey.wasPressedThisFrame && WIAdministrationModalUGUIController.TryHideTopmost()) return;
-            if (contentRoot.activeInHierarchy == false || WIAdministrationModalUGUIController.AnyVisible) return;
+            if (keyboard == null)
+            {
+                return;
+            }
+            if (keyboard.escapeKey.wasPressedThisFrame && WIAdministrationModalUGUIController.TryHideTopmost())
+            {
+                return;
+            }
+            if (contentRoot.activeInHierarchy == false || WIAdministrationModalUGUIController.AnyVisible)
+            {
+                return;
+            }
 
             WIAdministrationShortcutAction action = ResolveKeyboardShortcut(keyboard);
-            if (action != WIAdministrationShortcutAction.None) administrationController.ExecuteUGUIShortcut(action);
+            if (action != WIAdministrationShortcutAction.None)
+            {
+                administrationController.ExecuteUGUIShortcut(action);
+            }
         }
 
         // 현재 프레임에 눌린 전역 키를 행정 명령으로 변환합니다.
         private static WIAdministrationShortcutAction ResolveKeyboardShortcut(Keyboard keyboard)
         {
-            if (keyboard.mKey.wasPressedThisFrame) return WIAdministrationShortcutAction.Military;
-            if (keyboard.hKey.wasPressedThisFrame) return WIAdministrationShortcutAction.Heroes;
-            if (keyboard.dKey.wasPressedThisFrame) return WIAdministrationShortcutAction.Diplomacy;
-            if (keyboard.sKey.wasPressedThisFrame) return WIAdministrationShortcutAction.Scheme;
-            if (keyboard.rKey.wasPressedThisFrame) return WIAdministrationShortcutAction.Research;
-            if (keyboard.gKey.wasPressedThisFrame) return WIAdministrationShortcutAction.Faction;
-            if (keyboard.cKey.wasPressedThisFrame) return WIAdministrationShortcutAction.Council;
-            if (keyboard.lKey.wasPressedThisFrame) return WIAdministrationShortcutAction.MonthlyReport;
-            if (keyboard.tKey.wasPressedThisFrame) return WIAdministrationShortcutAction.EndTurn;
+            if (keyboard.mKey.wasPressedThisFrame)
+            {
+                return WIAdministrationShortcutAction.Military;
+            }
+            if (keyboard.hKey.wasPressedThisFrame)
+            {
+                return WIAdministrationShortcutAction.Heroes;
+            }
+            if (keyboard.dKey.wasPressedThisFrame)
+            {
+                return WIAdministrationShortcutAction.Diplomacy;
+            }
+            if (keyboard.sKey.wasPressedThisFrame)
+            {
+                return WIAdministrationShortcutAction.Scheme;
+            }
+            if (keyboard.rKey.wasPressedThisFrame)
+            {
+                return WIAdministrationShortcutAction.Research;
+            }
+            if (keyboard.gKey.wasPressedThisFrame)
+            {
+                return WIAdministrationShortcutAction.Faction;
+            }
+            if (keyboard.cKey.wasPressedThisFrame)
+            {
+                return WIAdministrationShortcutAction.Council;
+            }
+            if (keyboard.lKey.wasPressedThisFrame)
+            {
+                return WIAdministrationShortcutAction.MonthlyReport;
+            }
+            if (keyboard.tKey.wasPressedThisFrame)
+            {
+                return WIAdministrationShortcutAction.EndTurn;
+            }
             return WIAdministrationShortcutAction.None;
         }
 
         // 읽기 전용 월드 스냅샷을 UGUI 표시 요소에 반영합니다.
         private void Refresh()
         {
-            if (administrationController.TryGetUGUIWorldSnapshot(out WIAdministrationWorldSnapshot snapshot) == false)
+            if (administrationController.TryGetUGUIWorldSnapshot(out WIAdministrationWorldSnapshot snapshot)
+                == false)
             {
                 contentRoot.SetActive(false);
                 SetCanvasVisible(false);
@@ -138,12 +173,8 @@ namespace ProjectWI.Administration
                 return;
             }
 
-            factionLabel.text = snapshot.FactionName;
-            dateLabel.text = snapshot.Date;
-            turnDescriptionLabel.text = snapshot.TurnDescription;
-            goldLabel.text = snapshot.Gold;
-            manaLabel.text = snapshot.Mana;
-            influenceLabel.text = snapshot.Influence;
+            topHUD.Apply(snapshot.FactionName, snapshot.Date, snapshot.TurnDescription,
+                snapshot.Gold, snapshot.Mana, snapshot.Influence);
             castleNameLabel.text = snapshot.CastleName;
             castleOwnerLabel.text = snapshot.CastleOwner;
             for (int index = 0; index < castleDetailRows.Length; index += 1)
@@ -169,8 +200,7 @@ namespace ProjectWI.Administration
             battleAlertLabel.text = snapshot.BattleAlert;
             battleAlertButton.interactable = snapshot.HasBattleAlert;
             monthlyNewsLabel.text = snapshot.MonthlyNews;
-            endTurnButton.interactable = snapshot.CanEndTurn;
-            endTurnLabel.text = snapshot.EndTurnText;
+            endTurn.Apply(snapshot.CanEndTurn, snapshot.EndTurnText);
         }
 
         // 선택 성에 주둔한 최대 네 명의 영웅 초상과 이름을 카드에 반영합니다.
