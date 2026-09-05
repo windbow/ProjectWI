@@ -26,10 +26,13 @@ namespace ProjectWI.Administration
         [SerializeField] private Image[] heroImages;
         [SerializeField] private TMP_Text[] heroCaptions;
         [SerializeField] private GameObject[] facilitySlots;
+        [SerializeField] private Button[] facilitySlotButtons;
         [SerializeField] private Image[] facilityImages;
         [SerializeField] private TMP_Text[] facilityCaptions;
         [SerializeField] private Button[] commandButtons;
         [SerializeField] private WIAdministrationTerritoryCommand[] commandActions;
+        [SerializeField] private Button[] basicFacilityButtons;
+        [SerializeField] private WIAdministrationTerritoryCommand[] basicFacilityActions;
         private Canvas rootCanvas;
         private GraphicRaycaster rootRaycaster;
 
@@ -55,6 +58,21 @@ namespace ProjectWI.Administration
                 WIAdministrationTerritoryCommand action = commandActions[index];
                 commandButtons[index].onClick.AddListener(() =>
                     administrationController.ExecuteUGUITerritoryCommand(action));
+            }
+
+            int facilityCount = Mathf.Min(basicFacilityButtons.Length, basicFacilityActions.Length);
+            for (int index = 0; index < facilityCount; index += 1)
+            {
+                WIAdministrationTerritoryCommand action = basicFacilityActions[index];
+                basicFacilityButtons[index].onClick.AddListener(() =>
+                    administrationController.ExecuteUGUITerritoryCommand(action));
+            }
+
+            for (int index = 0; index < facilitySlotButtons.Length; index += 1)
+            {
+                int captured = index;
+                facilitySlotButtons[index].onClick.AddListener(() =>
+                    administrationController.ExecuteUGUIFacilitySlot(captured));
             }
         }
 
@@ -113,6 +131,11 @@ namespace ProjectWI.Administration
             bottomProjectStatusLabel.text = snapshot.ProjectStatus;
             ApplySlots(snapshot.HeroSlots, heroSlots, heroImages, heroCaptions);
             ApplySlots(snapshot.FacilitySlots, facilitySlots, facilityImages, facilityCaptions);
+            for (int index = 0; index < facilitySlotButtons.Length; index += 1)
+            {
+                facilitySlotButtons[index].interactable = snapshot.Manageable &&
+                    index < snapshot.FacilitySlots.Count && snapshot.FacilitySlots[index].Visible;
+            }
 
             for (int index = 0; index < commandButtons.Length; index += 1)
             {
@@ -121,6 +144,10 @@ namespace ProjectWI.Administration
                 commandButtons[index].interactable = specialFacility
                     ? snapshot.CanChooseSpecialFacility
                     : snapshot.Manageable || castleRecord;
+            }
+            for (int index = 0; index < basicFacilityButtons.Length; index += 1)
+            {
+                basicFacilityButtons[index].interactable = snapshot.Manageable;
             }
         }
 

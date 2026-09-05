@@ -51,6 +51,11 @@ namespace ProjectWI.Administration
         public Vector2 NormalizedMapPosition;
         public List<string> AdjacentCastleIds = new List<string>();
         public WICastleProjectState ActiveProject;
+        // 다음 달부터 재사용할 지시이며 실제 임무를 점유하지 않습니다.
+        public WICastleProjectState StandingProject;
+        public bool RepeatProject;
+        // 점령 후 대기 내정 인물이 도착하면 영지관을 한 번 자동 임명합니다.
+        public bool PendingGovernorAppointment;
         public bool DelegatedToGovernor;
         public WIGovernorPolicy GovernorPolicy = WIGovernorPolicy.Balanced;
         public int GovernorMonthlyBudget = 100;
@@ -113,6 +118,9 @@ namespace ProjectWI.Administration
         public string HeroId;
         public string OriginCastleId;
         public string TargetCastleId;
+        public string CurrentCastleId;
+        public List<string> RouteCastleIds = new List<string>();
+        public int RouteIndex;
         public int RemainingMonths = 1;
     }
 
@@ -219,6 +227,7 @@ namespace ProjectWI.Administration
         public string SessionId;
         public string CastleId;
         public string AttackerArmyId;
+        public List<string> AttackerArmyIds = new List<string>();
         public string CounterAttackerArmyId;
         public List<string> DefenderArmyIds = new List<string>();
         public string AttackerFactionId;
@@ -329,6 +338,13 @@ namespace ProjectWI.Administration
         public bool PromotionAchievement;
         public WICharacterActivityType Activity;
         public string ActivityTargetHeroId;
+        // 마스터 데이터에서 복사한 특성으로 저장 복원 직후에도 자격을 판정합니다.
+        public List<WITraitType> Traits = new List<WITraitType>();
+        // 개인 활동의 유지 지시와 피로에 따른 자동 휴식 상태입니다.
+        public bool RepeatActivity;
+        public WICharacterActivityType StandingActivity;
+        public string StandingActivityTargetHeroId;
+        public bool AutomaticRecovery;
     }
 
     [Serializable]
@@ -354,10 +370,12 @@ namespace ProjectWI.Administration
     }
 
     [Serializable]
-    public class WIAdministrationState
+    public partial class WIAdministrationState
     {
         public WICampaignDifficulty Difficulty = WICampaignDifficulty.Standard;
         public WICampaignVariant CampaignVariant = WICampaignVariant.Free;
+        // 자동 시뮬레이션의 재현 가능한 전투·인물 운명 표본을 구분합니다. 실제 캠페인은 기본값 0을 사용합니다.
+        public int SimulationSeed;
         public int Year;
         public int Month;
         public int Turn;
@@ -475,6 +493,7 @@ namespace ProjectWI.Administration
                 {
                     HeroId = hero.Id,
                     LoyaltyState = hero.LoyaltyState,
+                    Traits = hero.Traits.ToList(),
                     BaseGrade = hero.Grade
                 });
             }
@@ -497,7 +516,7 @@ namespace ProjectWI.Administration
                 character.Discovered = true;
                 character.Recruited = true;
                 if (placement.Governor == true &&
-                    (character.BaseGrade == WICharacterGrade.Hero || character.PromotedToHero))
+                    WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId))
                 {
                     castle.GovernorHeroId = placement.HeroId;
                 }
@@ -566,7 +585,7 @@ namespace ProjectWI.Administration
                 character.Recruited = true;
                 character.Discovered = true;
                 if (placement.Governor && string.IsNullOrEmpty(castle.GovernorHeroId) &&
-                    (character.BaseGrade == WICharacterGrade.Hero || character.PromotedToHero))
+                    WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId))
                 {
                     castle.GovernorHeroId = placement.HeroId;
                 }

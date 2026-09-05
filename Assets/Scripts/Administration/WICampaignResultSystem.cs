@@ -14,7 +14,12 @@ namespace ProjectWI.Administration
 
             int playerCastles = state.Castles.Count(castle => castle.FactionId == state.PlayerFactionId);
             WICampaignRuleDefinition rules = database.CampaignRules;
-            if (rules.VictoryRequiresAllCastles && state.Castles.Count > 0 && playerCastles == state.Castles.Count)
+            bool aresMainVictory = state.CampaignVariant == WICampaignVariant.AresMain &&
+                                   state.Castles.Any(castle => castle.FactionId == "valdor") == false;
+            bool freeScenarioVictory = state.CampaignVariant != WICampaignVariant.AresMain &&
+                                       rules.VictoryRequiresAllCastles && state.Castles.Count > 0 &&
+                                       playerCastles == state.Castles.Count;
+            if (aresMainVictory || freeScenarioVictory)
             {
                 state.CampaignEnding = DetermineEnding(state);
                 SetResult(state, WICampaignResult.Victory);

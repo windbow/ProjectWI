@@ -14,6 +14,8 @@ namespace ProjectWI.Administration
         public string HeroId;
         public string DisplayName;
         public string Summary;
+        public string ClassName;
+        public WICharacterGrade Grade;
         public Sprite Portrait;
         public bool Interactable = true;
     }

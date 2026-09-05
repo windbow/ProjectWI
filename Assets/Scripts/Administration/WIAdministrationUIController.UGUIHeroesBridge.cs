@@ -73,7 +73,7 @@ namespace ProjectWI.Administration
                 {
                     Action = "hero", Id = character.HeroId,
                     Title = $"[{GetGradeDisplayName(grade)}] {hero.DisplayName.Get(database.UseEnglish)}",
-                    Description = $"{hero.HeroClass} · 공훈 {character.Merit} · 명성 {character.Reputation}\n{titleName} · {activity}",
+                    Description = $"{GetTraitDisplayText(hero)}\n{hero.HeroClass} · 공훈 {character.Merit} · 명성 {character.Reputation}\n{titleName} · {activity}",
                     Portrait = hero.Portrait
                 });
             }
@@ -98,7 +98,7 @@ namespace ProjectWI.Administration
             if (character == null || hero == null) return;
             snapshot.Title = "영웅 관리 · " + hero.DisplayName.Get(database.UseEnglish);
             snapshot.Summary = $"공훈 {character.Merit} · 명성 {character.Reputation} · 충성 {character.LoyaltyState}\n" +
-                $"내정 특기 · {GetTraitDisplayText(hero)}\n전투 특성 · {GetBattleTraitDisplayText(hero)}";
+                $"{database.GetText("UI_CHARACTER_TRAITS")} · {GetTraitDisplayText(hero)}\n전투 특성 · {GetBattleTraitDisplayText(hero)}";
             if (state.PendingHeroPromotionIds.Contains(heroId))
             {
                 snapshot.Cards.Add(new WIAdministrationHeroCardSnapshot

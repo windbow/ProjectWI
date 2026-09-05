@@ -84,7 +84,8 @@ namespace ProjectWI.Administration
             snapshot.Summary = "다른 임무가 없는 인물 중 지력이 높은 담당자를 선택하십시오.";
             foreach (WICastleRuntimeState castle in state.Castles.Where(item => item.FactionId == state.PlayerFactionId))
             {
-                foreach (string heroId in castle.HeroIds.Where(id => state.IsCharacterBusy(id) == false))
+                foreach (string heroId in castle.HeroIds.Where(id => state.IsCharacterBusy(id) == false &&
+                    WIAdministrationTurnSystem.CanPerformScheme(state, id)))
                 {
                     WIHeroDefinition hero = database.GetHero(heroId);
                     if (hero == null) continue;

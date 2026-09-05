@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using TMPro;
 using UnityEditor;
@@ -61,7 +62,11 @@ namespace ProjectWI.Tests.Editor
             ProjectWI.Administration.WIAdministrationDatabaseSO database =
                 AssetDatabase.LoadAssetAtPath<ProjectWI.Administration.WIAdministrationDatabaseSO>(AdministrationDatabasePath);
 
-            Assert.That(database.Heroes.Count, Is.EqualTo(500));
+            Assert.That(database.Heroes.Count, Is.EqualTo(1200));
+            Assert.That(database.Heroes.Count(hero =>
+                hero.Grade == ProjectWI.Administration.WICharacterGrade.Hero), Is.EqualTo(200));
+            Assert.That(database.Heroes.Count(hero =>
+                hero.Grade == ProjectWI.Administration.WICharacterGrade.Common), Is.EqualTo(1000));
             foreach (ProjectWI.Administration.WIHeroDefinition character in database.Heroes)
             {
                 Assert.That(character.BattleSprite, Is.Not.Null, character.Id);
@@ -109,13 +114,16 @@ namespace ProjectWI.Tests.Editor
         public void CampaignTitleVisibilityGatesWorldScreens()
         {
             const string bridgePath = "Assets/Scripts/Administration/WIAdministrationUIController.UGUIBridge.cs";
+            const string worldSnapshotPath =
+                "Assets/Scripts/Administration/WIAdministrationUIController.UGUIWorldSnapshot.cs";
             const string titleControllerPath = "Assets/Scripts/Administration/WICampaignTitleUGUIController.cs";
             string bridgeSource = System.IO.File.ReadAllText(bridgePath);
+            string worldSnapshotSource = System.IO.File.ReadAllText(worldSnapshotPath);
             string titleControllerSource = System.IO.File.ReadAllText(titleControllerPath);
 
             StringAssert.Contains("private bool uguiCampaignTitleVisible = true;", bridgeSource);
             Assert.That(
-                bridgeSource.Split("uguiCampaignTitleVisible == false").Length - 1,
+                (bridgeSource + worldSnapshotSource).Split("uguiCampaignTitleVisible == false").Length - 1,
                 Is.GreaterThanOrEqualTo(2),
                 "월드와 영지 화면 모두 캠페인 타이틀 표시 상태를 확인해야 합니다.");
             StringAssert.Contains("SetUGUICampaignTitleVisibility(campaignStarted == false)", titleControllerSource);
@@ -481,6 +489,8 @@ namespace ProjectWI.Tests.Editor
             ProjectWI.Administration.WIAdministrationTerritoryUGUIController controller =
                 prefab.GetComponent<ProjectWI.Administration.WIAdministrationTerritoryUGUIController>();
             SerializedObject serialized = new SerializedObject(controller);
+            Transform bottomSummaryPanel = prefab.transform.Find("TerritoryContent/BottomSummaryPanel");
+            Image bottomSummaryImage = bottomSummaryPanel?.GetComponent<Image>();
 
             Assert.That(prefab, Is.Not.Null);
             Assert.That(controller, Is.Not.Null);
@@ -488,8 +498,15 @@ namespace ProjectWI.Tests.Editor
             Assert.That(prefab.GetComponentsInChildren<EventSystem>(true), Is.Empty);
             Assert.That(serialized.FindProperty("heroSlots").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("facilitySlots").arraySize, Is.EqualTo(2));
+            Assert.That(serialized.FindProperty("facilitySlotButtons").arraySize, Is.EqualTo(2));
             Assert.That(serialized.FindProperty("commandButtons").arraySize, Is.EqualTo(8));
+            Assert.That(serialized.FindProperty("basicFacilityButtons").arraySize, Is.EqualTo(4));
+            Assert.That(serialized.FindProperty("basicFacilityActions").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("topHUD").objectReferenceValue, Is.Not.Null);
+            Assert.That(bottomSummaryPanel, Is.Not.Null);
+            Assert.That(bottomSummaryImage?.sprite, Is.Not.Null);
+            Assert.That(AssetDatabase.GetAssetPath(bottomSummaryImage.sprite),
+                Is.EqualTo("Assets/Resources/UI/Generated/territory_bottom_panel_v1.png"));
         }
 
         // 월드와 성 내정 화면이 동일한 공용 상단 HUD 프리팹을 중첩 사용하는지 확인합니다.
@@ -611,7 +628,7 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("candidateLabels").arraySize, Is.EqualTo(8));
         }
 
-        // 인재 활동 프리팹이 공통 모달과 8개 후보 카드, 5개 고정 활동 버튼을 갖는지 확인합니다.
+        // 인재 활동 프리팹이 공통 모달, 4열 2행 후보 카드와 고정 검색 도구막대를 갖는지 확인합니다.
         [Test]
         public void CharacterActivityPrefabUsesReusableModalAndFixedSteps()
         {
@@ -630,6 +647,10 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("cardButtons").arraySize, Is.EqualTo(8));
             Assert.That(serialized.FindProperty("cardPortraits").arraySize, Is.EqualTo(8));
             Assert.That(serialized.FindProperty("activityButtons").arraySize, Is.EqualTo(6));
+            Assert.That(serialized.FindProperty("toolbarRoot").objectReferenceValue, Is.Not.Null);
+            Assert.That(serialized.FindProperty("searchInput").objectReferenceValue, Is.Not.Null);
+            Assert.That(serialized.FindProperty("filterButtons").arraySize, Is.EqualTo(3));
+            Assert.That(serialized.FindProperty("sortButton").objectReferenceValue, Is.Not.Null);
         }
 
         // 특화 시설 프리팹이 공통 모달과 8개의 고정 선택 카드를 갖는지 확인합니다.
@@ -651,7 +672,7 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("optionLabels").arraySize, Is.EqualTo(8));
         }
 
-        // 기본 시설 프리팹이 고정 안내와 의뢰·담당자용 8개 카드를 갖는지 확인합니다.
+        // 기본 시설 프리팹이 네 시설 기능 버튼과 의뢰·담당자용 8개 카드를 갖는지 확인합니다.
         [Test]
         public void BasicFacilityPrefabContainsFacilityGuideAndQuestCards()
         {
@@ -666,6 +687,9 @@ namespace ProjectWI.Tests.Editor
             Assert.That(prefab.GetComponentsInChildren<Text>(true), Is.Empty);
             Assert.That(prefab.GetComponentsInChildren<EventSystem>(true), Is.Empty);
             Assert.That(serialized.FindProperty("facilityRoot").objectReferenceValue, Is.Not.Null);
+            Assert.That(serialized.FindProperty("castleHallButton").objectReferenceValue, Is.Not.Null);
+            Assert.That(serialized.FindProperty("marketButton").objectReferenceValue, Is.Not.Null);
+            Assert.That(serialized.FindProperty("trainingGroundButton").objectReferenceValue, Is.Not.Null);
             Assert.That(serialized.FindProperty("tavernButton").objectReferenceValue, Is.Not.Null);
             Assert.That(serialized.FindProperty("cardButtons").arraySize, Is.EqualTo(8));
         }

@@ -46,6 +46,7 @@ namespace ProjectWI.Administration
             WICastleRuntimeState targetCastle = state.GetCastle(targetCastleId);
             state.SchemeMissions = state.SchemeMissions ?? new System.Collections.Generic.List<WISchemeMissionState>();
             if (scheme == null || faction == null || agent == null || agentCastle == null || targetCastle == null ||
+                WIAdministrationTurnSystem.CanPerformScheme(state, agentHeroId) == false ||
                 state.IsCharacterBusy(agentHeroId) || faction.Influence < scheme.InfluenceCost)
             {
                 message = "첩보 조건이나 영향력이 부족합니다.";
@@ -98,6 +99,7 @@ namespace ProjectWI.Administration
                 castle.FactionId == initiatorFactionId && castle.HeroIds.Contains(agentHeroId));
             WICastleRuntimeState targetCastle = state.GetCastle(targetCastleId);
             if (scheme == null || faction == null || agent == null || agentCastle == null || targetCastle == null ||
+                WIAdministrationTurnSystem.CanPerformScheme(state, agentHeroId) == false ||
                 state.IsCharacterBusy(agentHeroId) || (consumeInfluence && faction.Influence < scheme.InfluenceCost))
             {
                 return new WISchemeResult(false, false, false, 0, 0, "첩보 조건이나 영향력이 부족합니다.");
@@ -122,8 +124,20 @@ namespace ProjectWI.Administration
 
             if (consumeInfluence) faction.Influence -= scheme.InfluenceCost;
             int chance = CalculateSuccessChance(scheme, agent, targetCastle);
+            if (WIAdministrationTurnSystem.HasSpecialFacility(agentCastle, "spy_outpost"))
+            {
+                chance = Mathf.Clamp(chance + 10, 10, 95);
+            }
             bool succeeded = scheme.SchemeType == WISchemeType.Counterintelligence || roll < chance;
             int detectionChance = CalculateDetectionChance(scheme, agent, targetCastle, succeeded);
+            if (WIAdministrationTurnSystem.HasSpecialFacility(agentCastle, "spy_outpost"))
+            {
+                detectionChance = Mathf.Clamp(detectionChance - 10, 0, 90);
+            }
+            if (WIAdministrationTurnSystem.HasSpecialFacility(targetCastle, "spy_outpost"))
+            {
+                detectionChance = Mathf.Clamp(detectionChance + 10, 0, 95);
+            }
             int detectionRoll = (Mathf.Clamp(roll, 0, 99) * 37 + 17) % 100;
             bool detected = scheme.SchemeType != WISchemeType.Counterintelligence && detectionRoll < detectionChance;
             if (succeeded)
@@ -262,8 +276,12 @@ namespace ProjectWI.Administration
             {
                 if (state.GetFactionState(faction.Id)?.Eliminated == true) continue;
                 WICastleRuntimeState baseCastle = state.Castles.FirstOrDefault(castle =>
-                    castle.FactionId == faction.Id && castle.HeroIds.Any(heroId => state.IsCharacterBusy(heroId) == false));
-                string agentId = baseCastle?.HeroIds.FirstOrDefault(heroId => state.IsCharacterBusy(heroId) == false);
+                    castle.FactionId == faction.Id && castle.HeroIds.Any(heroId =>
+                        state.IsCharacterBusy(heroId) == false &&
+                        WIAdministrationTurnSystem.CanPerformScheme(state, heroId)));
+                string agentId = baseCastle?.HeroIds.FirstOrDefault(heroId =>
+                    state.IsCharacterBusy(heroId) == false &&
+                    WIAdministrationTurnSystem.CanPerformScheme(state, heroId));
                 System.Collections.Generic.List<WICastleRuntimeState> targets = state.Castles
                     .Where(castle => castle.FactionId != faction.Id)
                     .OrderBy(castle => castle.Stability)

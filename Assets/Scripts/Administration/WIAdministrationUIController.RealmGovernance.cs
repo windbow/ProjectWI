@@ -10,7 +10,7 @@ namespace ProjectWI.Administration
         {
             if (WIAdministrationTurnSystem.IsAdministrationCapable(state, manager.Id) == false)
             {
-                ShowMessage("영웅 등급의 인물만 내정 사업을 담당할 수 있습니다.");
+                ShowMessage("UI_ADMIN_TRAIT_REQUIRED");
                 return;
             }
 
@@ -38,6 +38,7 @@ namespace ProjectWI.Administration
                     ? database.ProjectBalance.ExpansionDurationMonths
                     : 1
             };
+            selectedCastle.StandingProject = selectedCastle.RepeatProject ? CopyProjectOrder(selectedCastle.ActiveProject) : null;
             WITutorialSystem.Complete(state, "tutorial_project");
             CloseModal();
             SelectCastle(selectedCastle.CastleId);

@@ -11,6 +11,9 @@ namespace ProjectWI.Administration
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
         [SerializeField] private GameObject facilityRoot;
+        [SerializeField] private Button castleHallButton;
+        [SerializeField] private Button marketButton;
+        [SerializeField] private Button trainingGroundButton;
         [SerializeField] private Button tavernButton;
         [SerializeField] private GameObject cardRoot;
         [SerializeField] private Button[] cardButtons;
@@ -20,11 +23,15 @@ namespace ProjectWI.Administration
         private WIAdministrationBasicFacilitySnapshot snapshot;
         private PageMode pageMode;
         private string selectedQuestId;
+        private const string TalentOfficeCardId = "talent_office";
 
-        // 선술집 버튼과 고정 선택 카드를 기본 시설 흐름에 연결합니다.
+        // 네 기본 시설 버튼과 고정 선택 카드를 시설별 실제 기능 흐름에 연결합니다.
         private void Awake()
         {
             ResolveAdministrationController();
+            castleHallButton.onClick.AddListener(OpenCastleHall);
+            marketButton.onClick.AddListener(OpenMarket);
+            trainingGroundButton.onClick.AddListener(OpenTrainingGround);
             tavernButton.onClick.AddListener(OpenQuests);
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
@@ -57,10 +64,31 @@ namespace ProjectWI.Administration
         {
             modal.Show("기본 시설");
             pageMode = PageMode.Facility;
-            statusLabel.text = "모든 성이 기본으로 보유하며 건설하거나 강화하지 않습니다.";
+            statusLabel.text = "시설을 선택해 현재 성의 운영 기능을 이용하십시오.";
             messageLabel.gameObject.SetActive(false);
             facilityRoot.SetActive(true);
             cardRoot.SetActive(false);
+        }
+
+        // 성관에서 현재 성의 영지관 임명과 위임 운영 화면으로 이동합니다.
+        private void OpenCastleHall()
+        {
+            modal.Hide();
+            administrationController.ExecuteUGUITerritoryCommand(WIAdministrationTerritoryCommand.Delegation);
+        }
+
+        // 시장에서 현재 성의 수입과 운영 기록을 확인하는 화면으로 이동합니다.
+        private void OpenMarket()
+        {
+            modal.Hide();
+            administrationController.ExecuteUGUITerritoryCommand(WIAdministrationTerritoryCommand.CastleRecord);
+        }
+
+        // 훈련소에서 개인 훈련을 포함한 주둔 인물 활동 화면으로 이동합니다.
+        private void OpenTrainingGround()
+        {
+            modal.Hide();
+            administrationController.ExecuteUGUITerritoryCommand(WIAdministrationTerritoryCommand.CharacterActivity);
         }
 
         // 현재 성의 월간 선술집 의뢰를 카드 목록으로 표시합니다.
@@ -125,6 +153,12 @@ namespace ProjectWI.Administration
                     return;
                 }
                 selectedQuestId = snapshot.Quests[index].QuestId;
+                if (selectedQuestId == TalentOfficeCardId)
+                {
+                    modal.Hide();
+                    administrationController.OpenUGUICharacterActivity(true);
+                    return;
+                }
                 if (administrationController.TryGetUGUIQuestHeroes(selectedQuestId, out snapshot, out string error)
                     == false)
                 {

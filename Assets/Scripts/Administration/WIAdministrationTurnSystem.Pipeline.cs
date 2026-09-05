@@ -9,6 +9,7 @@ namespace ProjectWI.Administration
             summary.GoldSpent = state.PendingPlayerGoldSpent;
             state.PendingPlayerGoldSpent = 0;
 
+            PrepareStandingOrders(database, state, summary);
             PrepareTurn(database, state, summary);
             ApplyCastleTurns(database, state, summary, out int appliedPlayerGold,
                 out int appliedPlayerMana, out int appliedPlayerInfluence);
@@ -25,6 +26,7 @@ namespace ProjectWI.Administration
             WITurnSummary summary)
         {
             ResolveFactionEliminations(database, state, summary);
+            ResolveAISpecialFacilityChoices(database, state);
             PlanAIResearch(database, state, summary);
             PlanFreeScenarioAIRecruitment(database, state, summary);
         }
@@ -87,6 +89,7 @@ namespace ProjectWI.Administration
             WITurnSummary summary)
         {
             ResolveFactionResearch(database, state, summary);
+            ResolveFacilityPassives(database, state, summary);
             ResolveCharacterActivities(database, state, summary);
             CreateRelationshipEventCandidates(database, state, summary);
             ResolveTavernQuests(database, state, summary);

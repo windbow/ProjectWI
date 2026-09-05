@@ -2,6 +2,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using ProjectWI.Administration;
+using ProjectWI.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -19,6 +20,9 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database =
                 AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             StringBuilder report = new StringBuilder("아레스 메인 240개월 전체 매트릭스\n");
+            int relaxedDeaths = 0;
+            int standardDeaths = 0;
+            int hardDeaths = 0;
             foreach (WICampaignDifficulty difficulty in System.Enum.GetValues(typeof(WICampaignDifficulty)))
             {
                 foreach (WIAutoPlayerPolicy policy in System.Enum.GetValues(typeof(WIAutoPlayerPolicy)))
@@ -27,6 +31,18 @@ namespace ProjectWI.Tests.Editor
                         database, difficulty, WICampaignVariant.AresMain);
                     WIAutoCampaignMetrics metrics = WICampaignAutoPlayer.Run(
                         database, state, policy, 240, false);
+                    if (difficulty == WICampaignDifficulty.Relaxed)
+                    {
+                        relaxedDeaths += metrics.CharacterDeaths;
+                    }
+                    else if (difficulty == WICampaignDifficulty.Hard)
+                    {
+                        hardDeaths += metrics.CharacterDeaths;
+                    }
+                    else
+                    {
+                        standardDeaths += metrics.CharacterDeaths;
+                    }
                     report.AppendLine($"{difficulty}/{policy} · 성 {metrics.FinalPlayerCastleCount} · " +
                         $"전투 {metrics.BattlesResolved}({metrics.PlayerVictories}/{metrics.PlayerDefeats}) · " +
                         $"인물 {metrics.FinalEmployedCharacters}({metrics.FinalHeroCharacters}/{metrics.FinalCommonCharacters}) · " +
@@ -36,7 +52,9 @@ namespace ProjectWI.Tests.Editor
             }
 
             Debug.Log(report.ToString());
-            Assert.IsTrue(report.Length > 0);
+            Assert.AreEqual(0, relaxedDeaths, "여유 난이도에서는 전투 사망이 발생하지 않아야 합니다.");
+            Assert.Greater(standardDeaths, 0, "표준 난이도의 장기 전투에서는 사망 판정 경로가 실제로 실행되어야 합니다.");
+            Assert.Greater(hardDeaths, 0, "도전 난이도의 장기 전투에서는 사망 판정 경로가 실제로 실행되어야 합니다.");
         }
 
         // 표준 난이도 아레스 메인을 정책별 240개월 실행해 고용 수치가 단일 캠페인 기준인지 확인합니다.
@@ -56,12 +74,107 @@ namespace ProjectWI.Tests.Editor
                     $"최종 {metrics.FinalEmployedCharacters}({metrics.FinalHeroCharacters}/{metrics.FinalCommonCharacters}) · " +
                     $"신규 영입 성공 {metrics.CharactersRecruited} · 발견 {metrics.CharactersDiscovered} · " +
                     $"복귀 {metrics.CommonCharactersReturned} · 사망 {metrics.CharacterDeaths} · " +
-                    $"성 {metrics.FinalPlayerCastleCount} · 결과 {metrics.CampaignResult}");
+                    $"포로 {metrics.CharacterCaptures} · 적 합류 {metrics.CharacterDefections} · " +
+                    $"교환 {metrics.PrisonerExchanges} · 몸값 {metrics.PrisonerRansoms} · 포로 귀환 {metrics.PrisonersRecovered} · " +
+                    $"성 {metrics.FinalPlayerCastleCount} · 승패 {metrics.PlayerVictories}/{metrics.PlayerDefeats} · " +
+                    $"출정 {metrics.MarchesStarted} · 보충 {metrics.ArmyReinforcements} · " +
+                    $"목표 포기 {metrics.GoalsAbandoned} · 결과 {metrics.CampaignResult}");
+                report.AppendLine("  판단: " + string.Join(", ", metrics.DecisionReasonCounts
+                    .OrderByDescending(item => item.Value)
+                    .Take(6)
+                    .Select(item => $"{item.Key}={item.Value}")));
+                report.AppendLine("  전투단: " + string.Join(", ", state.Armies
+                    .Where(army => army.FactionId == state.PlayerFactionId)
+                    .Select(army => $"{army.ArmyId}@{army.CurrentCastleId}:{army.Mission}:" +
+                        $"{army.Members.Count}명/{WIAdministrationTurnSystem.GetArmyBattlePower(database, state, army)}")));
+                report.AppendLine("  성별 대기 일반: " + string.Join(", ", state.Castles
+                    .Where(castle => castle.FactionId == state.PlayerFactionId)
+                    .Select(castle => $"{castle.CastleId}=" + castle.HeroIds.Count(heroId =>
+                        state.GetCharacter(heroId)?.BaseGrade == WICharacterGrade.Common &&
+                        state.IsCharacterBusy(heroId) == false))));
+                report.AppendLine("  마지막 판단: " + string.Join(" / ", metrics.DecisionTraces
+                    .TakeLast(12)
+                    .Select(trace => $"{trace.Month}:{trace.ReasonCode}:{trace.TargetCastleId}")));
 
-                Assert.LessOrEqual(metrics.CharactersRecruited, 250,
-                    "단일 실행의 신규 영입 성공은 초기 미고용 250명을 넘을 수 없습니다.");
+                Assert.LessOrEqual(metrics.CharactersRecruited, 950,
+                    "단일 실행의 신규 영입 성공은 초기 재야 950명을 넘을 수 없습니다.");
+                if (policy == WIAutoPlayerPolicy.Balanced)
+                {
+                    if (metrics.PlayerDefeats > 0)
+                    {
+                        Assert.GreaterOrEqual(metrics.FinalPlayerCastleCount, 10,
+                            "균형형은 패전 뒤 보충·재집결하여 장기 확장을 재개해야 합니다.");
+                    }
+                }
             }
             Debug.Log(report.ToString());
+        }
+
+        // 표준 난이도 내정형 240개월을 5시드로 반복해 인물 운명과 확장 분포를 출력합니다.
+        [Test]
+        public void AresMain_Standard240AdministrationFiveSeedsProducesFateStatistics()
+        {
+            RunStandardFiveSeedStatistics(WIAutoPlayerPolicy.Administration);
+        }
+
+        // 표준 난이도 균형형 240개월을 5시드로 반복해 인물 운명과 확장 분포를 출력합니다.
+        [Test]
+        public void AresMain_Standard240BalancedFiveSeedsProducesFateStatistics()
+        {
+            RunStandardFiveSeedStatistics(WIAutoPlayerPolicy.Balanced);
+        }
+
+        // 표준 난이도 공세형 240개월을 5시드로 반복해 인물 운명과 확장 분포를 출력합니다.
+        [Test]
+        public void AresMain_Standard240AggressiveFiveSeedsProducesFateStatistics()
+        {
+            RunStandardFiveSeedStatistics(WIAutoPlayerPolicy.Aggressive);
+        }
+
+        // 공세형 아레스 메인이 720개월 동안 다수 표본에서 발도르 멸망에 도달하는지 5시드로 확인합니다.
+        [Test]
+        public void AresMain_Standard720AggressiveFiveSeedsMostlyDefeatValdor()
+        {
+            WIAdministrationDatabaseSO database =
+                AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            System.Collections.Generic.List<WICampaignAutoTestSample> samples =
+                new System.Collections.Generic.List<WICampaignAutoTestSample>();
+            for (int seed = 1; seed <= 5; seed += 1)
+            {
+                WIAdministrationState state = WIAdministrationState.Create(
+                    database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+                state.SimulationSeed = seed;
+                samples.Add(new WICampaignAutoTestSample
+                {
+                    Seed = seed,
+                    Metrics = WICampaignAutoPlayer.Run(
+                        database, state, WIAutoPlayerPolicy.Aggressive, 720, true)
+                });
+            }
+
+            WICampaignAutoBatchStatistics statistics = WICampaignAutoBatchStatistics.Create(samples);
+            int victoryCount = samples.Count(item => item.Metrics.CampaignResult == WICampaignResult.Victory);
+            string report = $"표준 720개월 공세형 5시드 · 승리 " +
+                $"{victoryCount}/5 · " +
+                $"완료개월 {statistics.CompletionMonths} · 발도르 잔여성 {statistics.ValdorCastles} · " +
+                $"플레이어성 {statistics.FinalCastles} · " + string.Join(" / ", samples.Select(item =>
+                    $"시드{item.Seed}:{item.Metrics.CampaignResult}:{item.Metrics.MonthsSimulated}개월:" +
+                    $"발도르{item.Metrics.FinalValdorCastleCount}:아레스{item.Metrics.FinalPlayerCastleCount}:" +
+                    $"군단{item.Metrics.FinalOperationalArmyCount}:병력{item.Metrics.FinalArmyMemberCount}:" +
+                    $"이동{item.Metrics.FinalMovingArmyCount}:대기{item.Metrics.FinalAwaitingBattleArmyCount}:재편{item.Metrics.FinalReorganizingArmyCount}:" +
+                    $"이동월{item.Metrics.MovingArmyMonths}/{item.Metrics.LongestMovingArmyMonths}:" +
+                    $"대기월{item.Metrics.AwaitingBattleArmyMonths}/{item.Metrics.LongestAwaitingBattleArmyMonths}:" +
+                    $"재편월{item.Metrics.ReorganizingArmyMonths}/{item.Metrics.LongestReorganizingArmyMonths}:" +
+                    $"전력{item.Metrics.FinalPlayerArmyPower}:피로{item.Metrics.FinalAverageArmyFatigue}:" +
+                    $"유휴일반{item.Metrics.FinalIdleCommonCharacters}:접경{item.Metrics.FinalValdorBorderCastleCount}:" +
+                    $"공격가능{item.Metrics.FinalAttackableValdorBorderCount}:무원정{item.Metrics.FinalCurrentNoMarchMonths}:" +
+                    $"목표{item.Metrics.FinalStrategicTargetCastleId}:" +
+                    $"집결{item.Metrics.FinalStrategicAssemblyPower}/{item.Metrics.FinalStrategicRequiredPower}"));
+            Debug.Log(report);
+            Assert.GreaterOrEqual(victoryCount, 3,
+                $"공세형 아레스 메인은 720개월 안에 과반 표본에서 발도르를 멸망시켜야 합니다. {report}");
+            Assert.LessOrEqual(statistics.ValdorCastles.Median, 0f,
+                $"720개월 발도르 잔여 성 중앙값은 0이어야 합니다. {report}");
         }
 
         // 아레스 메인의 정책별 장기 진행을 반복 실행하고 밸런스 검토용 원시 지표를 출력합니다.
@@ -85,9 +198,9 @@ namespace ProjectWI.Tests.Editor
                 {
                     for (int seed = 1; seed <= 5; seed += 1)
                     {
-                        Random.InitState(seed * 7919 + duration);
                         WIAdministrationState state = WIAdministrationState.Create(
                             database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+                        state.SimulationSeed = seed;
                         WIAutoCampaignMetrics metrics = WICampaignAutoPlayer.Run(
                             database, state, policy, duration, true);
                         WIFactionRuntimeState player = state.GetFactionState(state.PlayerFactionId);
@@ -115,6 +228,7 @@ namespace ProjectWI.Tests.Editor
                             $"{metrics.FinalWanderingCharacters}" +
                             $"|death={metrics.CharacterDeaths}:" +
                             $"{metrics.PermanentHeroDeaths}:{metrics.CommonCharacterDeaths}" +
+                            $"|capture={metrics.CharacterCaptures}|defect={metrics.CharacterDefections}" +
                             $"|counts={castleCounts}");
                     }
                 }
@@ -154,8 +268,16 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationState state = WIAdministrationState.Create(
                 database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
 
-            Assert.AreEqual(500, state.Characters.Count);
+            Assert.AreEqual(1200, state.Characters.Count);
             Assert.AreEqual(250, state.Castles.Sum(castle => castle.HeroIds.Count));
+            Assert.AreEqual(100, state.Castles.SelectMany(castle => castle.HeroIds)
+                .Count(heroId => state.GetCharacter(heroId).BaseGrade == WICharacterGrade.Hero));
+            Assert.AreEqual(150, state.Castles.SelectMany(castle => castle.HeroIds)
+                .Count(heroId => state.GetCharacter(heroId).BaseGrade == WICharacterGrade.Common));
+            Assert.AreEqual(100, state.Characters.Count(character =>
+                character.BaseGrade == WICharacterGrade.Hero && character.Recruited == false));
+            Assert.AreEqual(850, state.Characters.Count(character =>
+                character.BaseGrade == WICharacterGrade.Common && character.Recruited == false));
             Assert.AreEqual(14, state.Castles.Where(castle => castle.FactionId == state.PlayerFactionId)
                 .Sum(castle => castle.HeroIds.Count));
             Assert.AreEqual(10, state.GetCastle("castle_28").HeroIds.Count(heroId =>
@@ -168,9 +290,9 @@ namespace ProjectWI.Tests.Editor
                     .Sum(castle => castle.HeroIds.Count))));
         }
 
-        // 일반 등급은 개인 활동과 내정·영지관·연구 담당자가 될 수 없는지 검증합니다.
+        // 내정 특성이 없는 일반 인물은 행정을 맡지 못하지만 훈련은 할 수 있는지 검증합니다.
         [Test]
-        public void CommonCharacters_CannotPerformAdministration()
+        public void CommonCharactersWithoutTrait_CannotPerformAdministration()
         {
             WIAdministrationDatabaseSO database =
                 AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
@@ -180,10 +302,11 @@ namespace ProjectWI.Tests.Editor
             string commonId = frosthorn.HeroIds.First(heroId =>
                 state.GetCharacter(heroId).BaseGrade == WICharacterGrade.Common);
 
+            state.GetCharacter(commonId).Traits.Remove(WITraitType.Administration);
             Assert.IsFalse(WIAdministrationTurnSystem.IsAdministrationCapable(state, commonId));
             Assert.IsFalse(WIAdministrationTurnSystem.CanPerformCharacterActivity(
                 state, commonId, WICharacterActivityType.Search));
-            Assert.IsFalse(WIAdministrationTurnSystem.CanPerformCharacterActivity(
+            Assert.IsTrue(WIAdministrationTurnSystem.CanPerformCharacterActivity(
                 state, commonId, WICharacterActivityType.Training));
             Assert.IsFalse(WIAdministrationTurnSystem.AssignGovernor(state, frosthorn.CastleId, commonId));
             Assert.IsFalse(WIAdministrationTurnSystem.BeginResearch(
@@ -194,6 +317,39 @@ namespace ProjectWI.Tests.Editor
                     CastleId = frosthorn.CastleId,
                     HeroIds = new System.Collections.Generic.List<string> { commonId }
                 }, WICastleProjectType.Prosperity));
+        }
+
+        // 전략 자동 전투의 전술 변동이 같은 상태에서는 재현되고 근소 우세의 이변을 허용하는지 검증합니다.
+        [Test]
+        public void StrategicBattleOutcome_IsDeterministicAndAllowsCloseUpsets()
+        {
+            WIAdministrationDatabaseSO database =
+                AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(
+                database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+            WIBattleSessionState session = new WIBattleSessionState
+            {
+                SessionId = "variation_test",
+                AttackerPowerSnapshot = 110,
+                DefenderPowerSnapshot = 100
+            };
+
+            WIBattleOutcome first = WICampaignAutoPlayer.ResolveStrategicBattleOutcome(state, session);
+            WIBattleOutcome second = WICampaignAutoPlayer.ResolveStrategicBattleOutcome(state, session);
+            Assert.AreEqual(first, second);
+
+            bool foundUpset = false;
+            for (int turn = 1; turn <= 100; turn += 1)
+            {
+                state.Turn = turn;
+                session.SessionId = $"variation_test_{turn}";
+                if (WICampaignAutoPlayer.ResolveStrategicBattleOutcome(state, session) == WIBattleOutcome.Defeat)
+                {
+                    foundUpset = true;
+                    break;
+                }
+            }
+            Assert.IsTrue(foundUpset, "표준 난이도의 근소 우세 전투에서는 전술적 이변이 발생할 수 있어야 합니다.");
         }
 
         // 프리 시나리오에서는 비플레이어 군주도 남은 방랑 인물을 실제로 고용하는지 검증합니다.
@@ -212,6 +368,60 @@ namespace ProjectWI.Tests.Editor
             }
 
             Assert.Greater(state.Characters.Count(character => character.Recruited), initialRecruited);
+        }
+
+        // 지정 정책의 표준 240개월 캠페인을 5개 시드로 실행하고 통계 한 줄을 출력합니다.
+        private static void RunStandardFiveSeedStatistics(WIAutoPlayerPolicy policy)
+        {
+            WIAdministrationDatabaseSO database =
+                AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            System.Collections.Generic.List<WICampaignAutoTestSample> samples =
+                new System.Collections.Generic.List<WICampaignAutoTestSample>();
+            System.Collections.Generic.Dictionary<int, string> terminalDiagnostics =
+                new System.Collections.Generic.Dictionary<int, string>();
+            for (int seed = 1; seed <= 5; seed += 1)
+            {
+                WIAdministrationState state = WIAdministrationState.Create(
+                    database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+                state.SimulationSeed = seed;
+                samples.Add(new WICampaignAutoTestSample
+                {
+                    Seed = seed,
+                    Metrics = WICampaignAutoPlayer.Run(database, state, policy, 240, false)
+                });
+                terminalDiagnostics[seed] = "전투단 " + string.Join(",", state.Armies
+                    .Where(army => army.FactionId == state.PlayerFactionId)
+                    .Select(army => $"{army.CurrentCastleId}:{army.Members.Count}:" +
+                        $"{WIAdministrationTurnSystem.GetArmyBattlePower(database, state, army)}:{army.Mission}"));
+            }
+
+            WICampaignAutoBatchStatistics statistics = WICampaignAutoBatchStatistics.Create(samples);
+            string report = $"표준 240개월 5시드 · {policy} · 성 {statistics.FinalCastles} · " +
+                $"승 {statistics.Victories} · 패 {statistics.Defeats} · 사망 {statistics.Deaths} · " +
+                $"영웅사망 {statistics.PermanentHeroDeaths} · 포로 {statistics.Captures} · " +
+                $"전향 {statistics.Defections}";
+            foreach (WICampaignAutoTestSample sample in samples)
+            {
+                WIAutoCampaignMetrics metrics = sample.Metrics;
+                string reasons = string.Join("/", new[]
+                {
+                    "NO_ATTACKABLE_TARGET", "DEFEAT_RECOVERY", "THREAT_RESPONSE",
+                    "MARCH_STARTED", "ARMY_REINFORCED", "GOAL_ABANDONED"
+                }.Select(code => $"{code}:{(metrics.DecisionReasonCounts.TryGetValue(code, out int count) ? count : 0)}"));
+                report += $"\n시드 {sample.Seed} · 성 {metrics.FinalPlayerCastleCount} · " +
+                    $"승패 {metrics.PlayerVictories}/{metrics.PlayerDefeats} · 목표포기 {metrics.GoalsAbandoned} · " +
+                    $"최장무원정 {metrics.LongestNoMarchMonths} · 보충 {metrics.ArmyReinforcements} · {reasons} · " +
+                    terminalDiagnostics[sample.Seed];
+            }
+            Debug.Log(report);
+            Assert.AreEqual(5, samples.Count);
+            if (policy == WIAutoPlayerPolicy.Aggressive)
+            {
+                Assert.GreaterOrEqual(samples.Min(item => item.Metrics.FinalPlayerCastleCount), 12,
+                    "공세형은 단일 강적 전선에 봉쇄돼 6성에서 장기 정체하면 안 됩니다.");
+                Assert.Greater(samples.Sum(item => item.Metrics.WarsDeclared), 0,
+                    "공세형 반복 표본은 장기 교착 시 대체 전선 개방 정책을 실제로 검증해야 합니다.");
+            }
         }
     }
 }

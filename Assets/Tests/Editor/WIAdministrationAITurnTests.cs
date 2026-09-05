@@ -208,6 +208,23 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(WICampaignResult.Victory, state.CampaignResult);
         }
 
+        // 아레스 메인은 다른 진영 성이 남아 있어도 발도르가 멸망하면 승리하는지 검증합니다.
+        [Test]
+        public void CampaignResult_AresMainValdorEliminationTriggersVictory()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(
+                database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+            foreach (WICastleRuntimeState castle in state.Castles.Where(castle => castle.FactionId == "valdor"))
+            {
+                castle.FactionId = "ironheart";
+            }
+
+            Assert.IsTrue(state.Castles.Any(castle => castle.FactionId != state.PlayerFactionId));
+            Assert.IsTrue(WICampaignResultSystem.Evaluate(database, state));
+            Assert.AreEqual(WICampaignResult.Victory, state.CampaignResult);
+        }
+
         // 플레이어 소유 성이 하나도 남지 않으면 패배하고 일반 시작 상태는 계속 진행 중인지 검증합니다.
         [Test]
         public void CampaignResult_NoPlayerCastleTriggersDefeat()
@@ -337,11 +354,11 @@ namespace ProjectWI.Tests.Editor
         public void ContentAudit_ReportsCharacterAndCombatTypeCounts()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            Assert.AreEqual(100, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Hero));
-            Assert.AreEqual(400, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Common));
+            Assert.AreEqual(200, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Hero));
+            Assert.AreEqual(1000, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Common));
             Assert.AreEqual(12, System.Enum.GetValues(typeof(WIHeroClass)).Length);
             Assert.AreEqual(6, System.Enum.GetValues(typeof(WIUnitRole)).Length);
-            TestContext.WriteLine("영웅 100 · 일반 인물 400 · 클래스 12 · 전투단 역할 6 · 병사/병종 데이터 없음(기획 의도)");
+            TestContext.WriteLine("영웅 200 · 일반 인물 1000 · 클래스 12 · 전투단 역할 6 · 일반 인물은 병사 역할");
         }
 
         // 특기 8종의 표시 문구와 적용 사업이 모두 데이터에 있고 실제 +2 성과로 연결되는지 검증합니다.
@@ -349,13 +366,20 @@ namespace ProjectWI.Tests.Editor
         public void TraitDefinitions_CoverAllTraitsAndProjectBonuses()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            Assert.AreEqual(8, database.TraitDefinitions.Count);
+            Assert.AreEqual(11, database.TraitDefinitions.Count);
             CollectionAssert.AreEquivalent(System.Enum.GetValues(typeof(WITraitType)),
                 database.TraitDefinitions.Select(item => item.TraitType).ToArray());
             foreach (WITraitDefinition definition in database.TraitDefinitions)
             {
                 Assert.IsFalse(string.IsNullOrWhiteSpace(definition.DisplayName.Korean));
                 Assert.IsFalse(string.IsNullOrWhiteSpace(definition.Description.Korean));
+                if (definition.TraitType == WITraitType.Administration ||
+                    definition.TraitType == WITraitType.TalentRecruitment ||
+                    definition.TraitType == WITraitType.Espionage)
+                {
+                    Assert.IsEmpty(definition.ProjectTypes.ToList());
+                    continue;
+                }
                 Assert.IsNotEmpty(definition.ProjectTypes.ToList());
                 WIHeroDefinition owner = database.Heroes.FirstOrDefault(hero => hero.Traits.Contains(definition.TraitType));
                 Assert.IsNotNull(owner, $"특기 보유 인물 누락: {definition.TraitType}");
@@ -747,6 +771,81 @@ namespace ProjectWI.Tests.Editor
             string reason = WIAdministrationTurnSystem.GetGovernorReason(database, castle, selected, database.GetHero("ares"));
             Assert.IsFalse(string.IsNullOrWhiteSpace(reason));
             Assert.IsFalse(reason.Contains("방침에 따라"));
+        }
+
+        // 전선 위임이 기본 방어선을 확보한 뒤 훈련 사업으로 전환되는지 검증합니다.
+        [Test]
+        public void FrontlineGovernor_AfterSecuringCastle_SelectsTraining()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState castle = state.GetCastle("castle_00");
+            castle.GovernorPolicy = WIGovernorPolicy.Frontline;
+            castle.Stability = 50;
+            castle.Defense = 50;
+
+            Assert.AreEqual(WICastleProjectType.Training,
+                WIAdministrationTurnSystem.ChooseGovernorProject(castle));
+        }
+
+        // 인물 경험치가 상한 안에서 실제 전투단 전투력으로 변환되는지 검증합니다.
+        [Test]
+        public void CharacterExperience_IncreasesArmyBattlePower()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState castle = state.GetCastle("castle_00");
+            castle.GovernorHeroId = string.Empty;
+            WIArmyState army = WIAdministrationTurnSystem.CreateArmy(database, state, castle, "ares");
+            int powerBefore = WIAdministrationTurnSystem.GetArmyBattlePower(database, state, army);
+
+            state.GetCharacter("ares").Experience += 250;
+
+            Assert.AreEqual(powerBefore + 10,
+                WIAdministrationTurnSystem.GetArmyBattlePower(database, state, army));
+        }
+
+        // 훈련 사업이 주둔 전투단의 숙련과 구성원 경험을 함께 높이는지 검증합니다.
+        [Test]
+        public void TrainingProject_ImprovesGarrisonArmyAndMembers()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState castle = state.GetCastle("castle_00");
+            castle.GovernorHeroId = string.Empty;
+            WIArmyState army = WIAdministrationTurnSystem.CreateArmy(database, state, castle, "ares");
+            army.CohesionExperience = 25;
+            int experienceBefore = state.GetCharacter("ares").Experience;
+            castle.ActiveProject = new WICastleProjectState
+            {
+                ProjectType = WICastleProjectType.Training,
+                Investment = WIProjectInvestment.Basic,
+                ManagerHeroId = "lyria",
+                RemainingMonths = 1
+            };
+
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+
+            Assert.Greater(army.CohesionExperience, 25);
+            Assert.Greater(state.GetCharacter("ares").Experience, experienceBefore);
+            Assert.AreEqual(WIUnitProficiency.Trained, army.Proficiency);
+        }
+
+        // 보유 성의 번영과 기술 투자가 진영 군사 기반 보너스를 높이는지 검증합니다.
+        [Test]
+        public void RealmDevelopment_IncreasesMilitaryInfrastructureBonus()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState castle = state.GetCastle("castle_00");
+            int bonusBefore = WIAdministrationTurnSystem.GetFactionMilitaryInfrastructureBonus(
+                state, state.PlayerFactionId);
+
+            castle.Prosperity = 100;
+            castle.Technology = 100;
+
+            Assert.Greater(WIAdministrationTurnSystem.GetFactionMilitaryInfrastructureBonus(
+                state, state.PlayerFactionId), bonusBefore);
         }
 
         // 위임 설정 화면의 미리보기에 사업·이유·성과·비용·기간이 모두 포함되는지 검증합니다.
@@ -1497,6 +1596,70 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(state.Castles.Any(item => item.FactionId == "valdor" && item.HeroIds.Contains("lyria")));
         }
 
+        // 가상 플레이어가 아군 영웅 포로를 몸값보다 상대 일반 포로와의 맞교환으로 먼저 구조하는지 검증합니다.
+        [Test]
+        public void AutoPlayer_PrisonerPolicyPrioritizesExchangeForHero()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICharacterRuntimeState ares = state.GetCharacter("ares");
+            WICharacterRuntimeState counterpart = state.GetCharacter("common_gareth");
+            ares.Captured = true;
+            ares.CapturedFromFactionId = "avalon";
+            ares.CaptorFactionId = "valdor";
+            ares.RansomRequested = true;
+            ares.RansomResourceType = WIResourceType.Gold;
+            ares.RansomAmount = database.PrisonerRansomGold;
+            counterpart.Captured = true;
+            counterpart.CapturedFromFactionId = "valdor";
+            counterpart.CaptorFactionId = "avalon";
+            foreach (WICastleRuntimeState castle in state.Castles)
+            {
+                castle.HeroIds.Remove(ares.HeroId);
+                castle.HeroIds.Remove(counterpart.HeroId);
+            }
+            WIAutoCampaignMetrics metrics = new WIAutoCampaignMetrics();
+
+            Assert.IsTrue(WICampaignAutoPlayer.ResolvePrisonerPolicy(database, state,
+                WIAutoPlayerPolicy.Balanced, metrics, new WIAutoStrategicPlan(), 1));
+
+            Assert.IsFalse(ares.Captured);
+            Assert.IsFalse(counterpart.Captured);
+            Assert.AreEqual(1, metrics.PrisonerExchanges);
+            Assert.AreEqual(0, metrics.PrisonerRansoms);
+            Assert.AreEqual(1, metrics.PrisonersRecovered);
+        }
+
+        // 교환 상대가 없는 아군 영웅은 보유 자원으로 몸값을 지불해 즉시 귀환하는지 검증합니다.
+        [Test]
+        public void AutoPlayer_PrisonerPolicyRansomsHeroWhenAffordable()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICharacterRuntimeState ares = state.GetCharacter("ares");
+            ares.Captured = true;
+            ares.CapturedFromFactionId = "avalon";
+            ares.CaptorFactionId = "valdor";
+            ares.RansomRequested = true;
+            ares.RansomResourceType = WIResourceType.ManaCrystal;
+            ares.RansomAmount = 50;
+            foreach (WICastleRuntimeState castle in state.Castles)
+            {
+                castle.HeroIds.Remove(ares.HeroId);
+            }
+            int manaBefore = state.GetPlayerFactionState().ManaCrystal;
+            WIAutoCampaignMetrics metrics = new WIAutoCampaignMetrics();
+
+            Assert.IsTrue(WICampaignAutoPlayer.ResolvePrisonerPolicy(database, state,
+                WIAutoPlayerPolicy.Administration, metrics, new WIAutoStrategicPlan(), 1));
+
+            Assert.IsFalse(ares.Captured);
+            Assert.AreEqual(manaBefore - 50, state.GetPlayerFactionState().ManaCrystal);
+            Assert.AreEqual(1, metrics.PrisonerRansoms);
+            Assert.AreEqual(50, metrics.PrisonerRansomManaSpent);
+            Assert.AreEqual(1, metrics.PrisonersRecovered);
+        }
+
         // 동맹 양측이 교전 중인 성을 공동 공격 목표로 지정하고 비용과 기간을 저장하는지 검증합니다.
         [Test]
         public void Diplomacy_JointAttackStoresSharedTarget()
@@ -1871,6 +2034,64 @@ namespace ProjectWI.Tests.Editor
             Assert.Greater(session.DefenderPowerSnapshot, 0);
         }
 
+        // 같은 달 같은 적성에 도착한 아군 전투단이 한 세션의 공동 공격군으로 합산되는지 검증합니다.
+        [Test]
+        public void JointAttack_CombinesSameFactionArmiesAndOccupiesTogether()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            state.CampaignVariant = WICampaignVariant.AresMain;
+            state.UseStrategicBattleFallback = false;
+            WICastleRuntimeState origin = state.Castles.First(castle =>
+                castle.FactionId == state.PlayerFactionId && castle.AdjacentCastleIds.Any(id =>
+                    state.GetCastle(id)?.FactionId != state.PlayerFactionId &&
+                    WIAdministrationTurnSystem.AreFactionsAtWar(
+                        state, state.PlayerFactionId, state.GetCastle(id).FactionId)));
+            WICastleRuntimeState target = origin.AdjacentCastleIds.Select(state.GetCastle).First(castle =>
+                castle != null && castle.FactionId != state.PlayerFactionId &&
+                WIAdministrationTurnSystem.AreFactionsAtWar(state, state.PlayerFactionId, castle.FactionId));
+            List<string> memberIds = origin.HeroIds.Take(2).ToList();
+            Assert.AreEqual(2, memberIds.Count, "공동 공격 검사에 필요한 시작 인물이 부족합니다.");
+            state.Armies.Clear();
+            WIArmyState first = new WIArmyState
+            {
+                ArmyId = "joint_first", DisplayName = "공동 공격 1군", FactionId = state.PlayerFactionId,
+                CurrentCastleId = origin.CastleId, OriginCastleId = origin.CastleId,
+                TargetCastleId = target.CastleId, StrategicTargetCastleId = target.CastleId,
+                RemainingTravelMonths = 1
+            };
+            first.Members.Add(new WIArmyMemberState { HeroId = memberIds[0], Role = WIUnitRole.Commander });
+            WIArmyState second = new WIArmyState
+            {
+                ArmyId = "joint_second", DisplayName = "공동 공격 2군", FactionId = state.PlayerFactionId,
+                CurrentCastleId = origin.CastleId, OriginCastleId = origin.CastleId,
+                TargetCastleId = target.CastleId, StrategicTargetCastleId = target.CastleId,
+                RemainingTravelMonths = 1
+            };
+            second.Members.Add(new WIArmyMemberState { HeroId = memberIds[1], Role = WIUnitRole.Commander });
+            state.Armies.Add(first);
+            state.Armies.Add(second);
+
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+
+            WIBattleSessionState session = state.BattleSessions.Single(item =>
+                item.Status == WIBattleSessionStatus.Pending && item.CastleId == target.CastleId);
+            CollectionAssert.AreEquivalent(new[] { first.ArmyId, second.ArmyId }, session.AttackerArmyIds);
+            Assert.AreEqual(
+                WIAdministrationTurnSystem.GetArmyBattlePower(database, state, first) +
+                WIAdministrationTurnSystem.GetArmyBattlePower(database, state, second),
+                session.AttackerPowerSnapshot);
+
+            Assert.IsTrue(WIAdministrationTurnSystem.SubmitBattleResult(
+                database, state, session.SessionId, WIBattleOutcome.Victory,
+                WIBattleResolutionSource.StrategicFallback, new WITurnSummary()));
+            Assert.AreEqual(state.PlayerFactionId, target.FactionId);
+            Assert.IsFalse(first.AwaitingBattle);
+            Assert.IsFalse(second.AwaitingBattle);
+            Assert.AreEqual(target.CastleId, first.CurrentCastleId);
+            Assert.AreEqual(target.CastleId, second.CurrentCastleId);
+        }
+
         // 실시간 전투 모드에서는 세션을 보류하고 외부 결과를 한 번만 반영하는지 검증합니다.
         [Test]
         public void RealTimeBattle_SubmitsExternalResultOnce()
@@ -2018,6 +2239,16 @@ namespace ProjectWI.Tests.Editor
                 .ToArray();
             Assert.AreEqual(3, markerPaths.Length);
             Assert.IsTrue(markerPaths.All(path => path.StartsWith("Assets/Resources/UI/Generated/map_marker_castle_")));
+        }
+
+        // 월드 화면이 채택된 V2 글로벌맵 Sprite를 사용하는지 검증합니다.
+        [Test]
+        public void GlobalMapImage_UsesWorldConceptV2()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            Assert.IsNotNull(database.GlobalMapImage);
+            Assert.AreEqual("Assets/Art/Maps/ProjectWI_GlobalMap_Concept_V2.png",
+                AssetDatabase.GetAssetPath(database.GlobalMapImage));
         }
 
         // 개인 휴식이 데이터에 설정된 상향 회복량만큼 피로와 부상을 회복하는지 검증합니다.
@@ -2517,16 +2748,6 @@ namespace ProjectWI.Tests.Editor
             Assert.Less(Mathf.Abs(attacker.Position.y - attacker.FormationPosition.y), distanceBefore);
         }
 
-        // 실제 아트가 없어도 캐릭터와 전장에 사용할 절차형 도형이 생성되는지 검증합니다.
-        [Test]
-        public void BattlePlaceholders_CreateCharacterShapesAndArenaGrid()
-        {
-            Assert.IsNotNull(WIBattlePlaceholderSprites.GetCircle());
-            Assert.IsNotNull(WIBattlePlaceholderSprites.GetSquare());
-            Assert.IsNotNull(WIBattlePlaceholderSprites.GetArenaGrid());
-            Assert.Greater(WIBattlePlaceholderSprites.GetArenaGrid().bounds.size.x, 10f);
-        }
-
         // PC 전투 카메라가 확대 범위와 16:9 전장 경계를 넘지 않도록 좌표를 제한하는지 검증합니다.
         [Test]
         public void BattleCamera_ClampsZoomAndPositionInsideArena()
@@ -2781,7 +3002,7 @@ namespace ProjectWI.Tests.Editor
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIAdministrationState state = WIAdministrationState.Create(database);
 
-            Assert.AreEqual(400, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Common));
+            Assert.AreEqual(1000, database.Heroes.Count(hero => hero.Grade == WICharacterGrade.Common));
             Assert.AreEqual(WICharacterGrade.Common, state.GetCharacter("common_gareth").BaseGrade);
             Assert.IsFalse(state.GetCharacter("common_gareth").PromotedToHero);
         }
@@ -2890,6 +3111,108 @@ namespace ProjectWI.Tests.Editor
 
             Assert.IsTrue(target.HeroIds.Contains("ares"));
             Assert.IsFalse(state.CharacterTransfers.Any(transfer => transfer.HeroId == "ares"));
+        }
+
+        // 멀리 있는 아군 성을 한 번 지정하면 최단 경로 거리만큼 이동한 뒤 최종 목적지에 도착하는지 검증합니다.
+        [Test]
+        public void CharacterTransfer_LongDistanceOrderTraversesFriendlyRoute()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState origin = state.GetCastle("castle_00");
+            foreach (WICastleRuntimeState castle in state.Castles)
+            {
+                castle.FactionId = origin.FactionId;
+                castle.HeroIds.Remove("ares");
+                if (castle.GovernorHeroId == "ares") castle.GovernorHeroId = string.Empty;
+            }
+            origin.HeroIds.Add("ares");
+            WICastleRuntimeState target = state.Castles.First(castle =>
+                castle.CastleId != origin.CastleId &&
+                origin.AdjacentCastleIds.Contains(castle.CastleId) == false);
+            target.HeroIds.Clear();
+            List<string> route = WIAdministrationTurnSystem.GetCharacterTransferPath(
+                state, origin.CastleId, target.CastleId);
+
+            Assert.GreaterOrEqual(route.Count, 2);
+            Assert.IsTrue(WIAdministrationTurnSystem.StartCharacterTransfer(
+                database, state, "ares", target.CastleId));
+            Assert.AreEqual(route.Count, state.CharacterTransfers.Single().RemainingMonths);
+            for (int month = 1; month < route.Count; month += 1)
+            {
+                WIAdministrationTurnSystem.ExecuteTurn(database, state);
+                Assert.IsTrue(state.CharacterTransfers.Any(transfer => transfer.HeroId == "ares"));
+            }
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+
+            Assert.Contains("ares", target.HeroIds);
+            Assert.IsFalse(state.CharacterTransfers.Any(transfer => transfer.HeroId == "ares"));
+        }
+
+        // 이동 도중 최종 목적지가 적성이 되면 인물이 사라지지 않고 현재 경유 성에서 이동을 중단하는지 검증합니다.
+        [Test]
+        public void CharacterTransfer_BrokenRouteSettlesAtCurrentFriendlyCastle()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState origin = state.GetCastle("castle_00");
+            foreach (WICastleRuntimeState castle in state.Castles)
+            {
+                castle.FactionId = origin.FactionId;
+                castle.HeroIds.Clear();
+                castle.GovernorHeroId = string.Empty;
+            }
+            origin.HeroIds.Add("ares");
+            WICastleRuntimeState target = state.Castles.First(castle =>
+                castle.CastleId != origin.CastleId &&
+                origin.AdjacentCastleIds.Contains(castle.CastleId) == false);
+
+            Assert.IsTrue(WIAdministrationTurnSystem.StartCharacterTransfer(
+                database, state, "ares", target.CastleId));
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+            WICharacterTransferState transfer = state.CharacterTransfers.Single();
+            string currentCastleId = transfer.CurrentCastleId;
+            target.FactionId = "valdor";
+
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+
+            Assert.IsFalse(state.CharacterTransfers.Any(item => item.HeroId == "ares"));
+            Assert.Contains("ares", state.GetCastle(currentCastleId).HeroIds);
+        }
+
+        // 장거리 이동의 최종 목적지·경로·현재 위치가 저장 JSON 왕복 후 유지되는지 검증합니다.
+        [Test]
+        public void CharacterTransfer_SaveRoundTripPreservesRouteProgress()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState origin = state.GetCastle("castle_00");
+            foreach (WICastleRuntimeState castle in state.Castles)
+            {
+                castle.FactionId = origin.FactionId;
+                castle.HeroIds.Remove("ares");
+                if (castle.GovernorHeroId == "ares") castle.GovernorHeroId = string.Empty;
+            }
+            origin.HeroIds.Add("ares");
+            WICastleRuntimeState target = state.Castles.First(castle =>
+                castle.CastleId != origin.CastleId &&
+                origin.AdjacentCastleIds.Contains(castle.CastleId) == false);
+            target.HeroIds.Clear();
+            Assert.IsTrue(WIAdministrationTurnSystem.StartCharacterTransfer(
+                database, state, "ares", target.CastleId));
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+            WICharacterTransferState before = state.CharacterTransfers.Single();
+
+            string json = WICampaignSaveSystem.Serialize(state, false);
+            Assert.IsTrue(WICampaignSaveSystem.TryDeserialize(
+                json, out WIAdministrationState loaded, out string error), error);
+            WICharacterTransferState after = loaded.CharacterTransfers.Single();
+
+            Assert.AreEqual(before.TargetCastleId, after.TargetCastleId);
+            Assert.AreEqual(before.CurrentCastleId, after.CurrentCastleId);
+            CollectionAssert.AreEqual(before.RouteCastleIds, after.RouteCastleIds);
+            Assert.AreEqual(before.RouteIndex, after.RouteIndex);
+            Assert.AreEqual(before.RemainingMonths, after.RemainingMonths);
         }
 
         // 적대 성으로의 개인 이동과 이동 중인 인물의 중복 명령을 거부하는지 검증합니다.
@@ -3458,6 +3781,11 @@ namespace ProjectWI.Tests.Editor
                 database, WICampaignDifficulty.Standard, WICampaignVariant.Free);
             WICastleRuntimeState frosthorn = ares.GetCastle("castle_28");
             WICastleRuntimeState cardia = ares.GetCastle("castle_04");
+            WICampaignVariantDefinition aresDefinition = database.GetCampaignVariant(WICampaignVariant.AresMain);
+            WICampaignCastlePlacement frosthornPlacement = aresDefinition.CastlePlacements
+                .First(item => item.CastleId == "castle_28");
+            WICampaignCastlePlacement cardiaPlacement = aresDefinition.CastlePlacements
+                .First(item => item.CastleId == "castle_04");
 
             Assert.AreEqual(1, ares.Castles.Count(item => item.FactionId == ares.PlayerFactionId));
             Assert.AreEqual(47, ares.Castles.Count(item => item.FactionId == "valdor"));
@@ -3470,8 +3798,10 @@ namespace ProjectWI.Tests.Editor
                 cardia.AdjacentCastleIds);
             Assert.Contains("castle_04", ares.GetCastle("castle_33").AdjacentCastleIds);
             Assert.Contains("castle_04", ares.GetCastle("castle_34").AdjacentCastleIds);
-            Assert.AreEqual(new Vector2(0.54f, 0.18f), frosthorn.NormalizedMapPosition);
-            Assert.AreEqual(new Vector2(0.54f, 0.11f), cardia.NormalizedMapPosition);
+            Assert.IsTrue(frosthornPlacement.OverrideMapPosition);
+            Assert.IsTrue(cardiaPlacement.OverrideMapPosition);
+            Assert.AreEqual(frosthornPlacement.NormalizedMapPosition, frosthorn.NormalizedMapPosition);
+            Assert.AreEqual(cardiaPlacement.NormalizedMapPosition, cardia.NormalizedMapPosition);
             Assert.AreEqual(10, cardia.Defense);
             Assert.AreEqual("castle_28", ares.GetCharacter("common_012").RecruitmentCastleId);
             Assert.AreEqual("castle_04", ares.GetCharacter("common_016").RecruitmentCastleId);
@@ -3482,6 +3812,26 @@ namespace ProjectWI.Tests.Editor
                 free.GetCastle("castle_28").NormalizedMapPosition);
             Assert.AreEqual(24, database.GetCampaignVariant(WICampaignVariant.AresMain).ValdorAttackIntervalMonths);
             Assert.AreEqual(3, database.GetCampaignVariant(WICampaignVariant.Free).ValdorAttackIntervalMonths);
+        }
+
+        // 수동 배치된 모든 성 좌표가 정규화 범위 안에 있고 완전히 중복되지 않는지 검증합니다.
+        [Test]
+        public void CastleMapPositions_AreNormalizedAndDistinct()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            Assert.IsTrue(database.Castles.All(castle =>
+                castle.NormalizedMapPosition.x > 0f && castle.NormalizedMapPosition.x < 1f &&
+                castle.NormalizedMapPosition.y > 0f && castle.NormalizedMapPosition.y < 1f));
+
+            for (int first = 0; first < database.Castles.Count; first += 1)
+            {
+                for (int second = first + 1; second < database.Castles.Count; second += 1)
+                {
+                    Assert.AreNotEqual(
+                        database.Castles[first].NormalizedMapPosition,
+                        database.Castles[second].NormalizedMapPosition);
+                }
+            }
         }
 
         // 아레스 메인의 발도르는 첫 11개월 동안 공격 출정을 예약하지 않는지 검증합니다.
@@ -3559,6 +3909,201 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(0, hero.CommonReturnCount);
         }
 
+        // 8종 특화 시설이 의도한 사업 유형에만 고유 보너스를 제공하는지 검증합니다.
+        [Test]
+        public void SpecialFacilities_ProvideExpectedProjectBonuses()
+        {
+            WICastleRuntimeState castle = new WICastleRuntimeState();
+            castle.SpecialFacilityIds.AddRange(new[]
+            {
+                "grand_forge", "knightly_order", "adventurers_guild", "sanctuary"
+            });
+
+            Assert.AreEqual(6, WIAdministrationTurnSystem.GetFacilityProjectBonus(castle, WICastleProjectType.Fortification));
+            Assert.AreEqual(3, WIAdministrationTurnSystem.GetFacilityProjectBonus(castle, WICastleProjectType.Technology));
+            Assert.AreEqual(3, WIAdministrationTurnSystem.GetFacilityProjectBonus(castle, WICastleProjectType.Training));
+            Assert.AreEqual(3, WIAdministrationTurnSystem.GetFacilityProjectBonus(castle, WICastleProjectType.Recruitment));
+            Assert.AreEqual(3, WIAdministrationTurnSystem.GetFacilityProjectBonus(castle, WICastleProjectType.Recovery));
+            Assert.AreEqual(0, WIAdministrationTurnSystem.GetFacilityProjectBonus(castle, WICastleProjectType.Prosperity));
+        }
+
+        // 마법 탑과 대시장이 성 규모에 비례한 월간 마나·금화 수입을 제공하는지 검증합니다.
+        [Test]
+        public void IncomeFacilities_AddMonthlyResources()
+        {
+            WICastleRuntimeState baseline = new WICastleRuntimeState
+            {
+                CastleSize = WICastleSize.Large,
+                Prosperity = 50,
+                Technology = 50,
+                Stability = 50
+            };
+            WICastleRuntimeState facilities = JsonUtility.FromJson<WICastleRuntimeState>(JsonUtility.ToJson(baseline));
+            facilities.SpecialFacilityIds.Add("mage_tower");
+            facilities.SpecialFacilityIds.Add("grand_market");
+            WITurnSummary baseIncome = new WITurnSummary();
+            WITurnSummary facilityIncome = new WITurnSummary();
+
+            WIAdministrationTurnSystem.AddCastleIncome(null, baseline, baseIncome);
+            WIAdministrationTurnSystem.AddCastleIncome(null, facilities, facilityIncome);
+
+            Assert.AreEqual(baseIncome.ManaGained + 30, facilityIncome.ManaGained);
+            Assert.AreEqual(baseIncome.GoldGained + 45, facilityIncome.GoldGained);
+        }
+
+        // 대사관이 친선 외교에 필요한 영향력을 절감하는지 검증합니다.
+        [Test]
+        public void Embassy_DiscountsDiplomaticInfluenceCost()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WIFactionRuntimeState player = state.GetPlayerFactionState();
+            WICastleRuntimeState capital = state.Castles.First(castle => castle.FactionId == state.PlayerFactionId);
+            string targetFactionId = state.Factions.First(faction => faction.FactionId != state.PlayerFactionId).FactionId;
+            WIDiplomaticRelationState relation = state.GetOrCreateDiplomaticRelation(state.PlayerFactionId, targetFactionId);
+            relation.Status = WIDiplomaticStatus.Neutral;
+            player.Gold = 1000;
+            player.Influence = 100;
+            capital.SpecialFacilityIds.Add("embassy");
+
+            Assert.IsTrue(WIAdministrationTurnSystem.ImproveDiplomaticRelations(state, state.PlayerFactionId, targetFactionId));
+            Assert.AreEqual(100 - WIAdministrationTurnSystem.ImproveRelationsInfluenceCost +
+                WIAdministrationTurnSystem.FacilityEmbassyCostDiscount, player.Influence);
+        }
+
+        // 시설 ID 목록이 별도 상태 추가 없이 캠페인 저장 JSON에 보존되는지 검증합니다.
+        [Test]
+        public void SpecialFacilities_SaveRoundTripPreservesAllFacilityIds()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState capital = state.Castles.First(castle => castle.FactionId == state.PlayerFactionId);
+            string[] facilityIds = database.SpecialFacilities.Select(facility => facility.Id).ToArray();
+            capital.SpecialFacilityIds.AddRange(facilityIds);
+
+            string json = WICampaignSaveSystem.Serialize(state);
+            Assert.IsTrue(WICampaignSaveSystem.TryDeserialize(json, out WIAdministrationState loaded, out string error), error);
+
+            CollectionAssert.AreEquivalent(facilityIds, loaded.GetCastle(capital.CastleId).SpecialFacilityIds);
+        }
+
+        // AI가 확장 후 남은 시설 선택권을 성향에 맞게 자동 소모하는지 검증합니다.
+        [Test]
+        public void AIExpansion_AutomaticallySelectsPreferredFacility()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState aiCastle = state.Castles.First(castle => castle.FactionId != state.PlayerFactionId);
+            WIFactionDefinition faction = database.GetFaction(aiCastle.FactionId);
+            aiCastle.CastleSize = WICastleSize.Medium;
+            aiCastle.PendingSpecialFacilityChoice = true;
+            aiCastle.SpecialFacilityIds.Clear();
+
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+
+            Assert.IsFalse(aiCastle.PendingSpecialFacilityChoice);
+            Assert.AreEqual(1, aiCastle.SpecialFacilityIds.Count);
+            Assert.NotNull(database.GetSpecialFacility(aiCastle.SpecialFacilityIds[0]));
+            if (faction.AIStrategy == WIAIStrategy.Development)
+            {
+                Assert.AreEqual("mage_tower", aiCastle.SpecialFacilityIds[0]);
+            }
+        }
+
+        // 마법 탑이 2개월 연구의 기간을 실제로 1개월 단축하는지 검증합니다.
+        [Test]
+        public void MageTower_ReducesResearchDurationByOneMonth()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState baseline = WIAdministrationState.Create(database);
+            WIAdministrationState enhanced = WIAdministrationState.Create(database);
+            foreach (WIAdministrationState state in new[] { baseline, enhanced })
+            {
+                WICastleRuntimeState capital = state.GetCastle("castle_00");
+                capital.Technology = 100;
+                capital.GovernorHeroId = string.Empty;
+                state.GetPlayerFactionState().CompletedResearchIds.Add("mana_circulation");
+            }
+            enhanced.GetCastle("castle_00").SpecialFacilityIds.Add("mage_tower");
+
+            Assert.IsTrue(WIAdministrationTurnSystem.BeginResearch(
+                database, baseline, baseline.PlayerFactionId, "arcane_administration", "ares"));
+            Assert.IsTrue(WIAdministrationTurnSystem.BeginResearch(
+                database, enhanced, enhanced.PlayerFactionId, "arcane_administration", "ares"));
+
+            Assert.AreEqual(2, baseline.GetPlayerFactionState().ResearchRemainingMonths);
+            Assert.AreEqual(1, enhanced.GetPlayerFactionState().ResearchRemainingMonths);
+        }
+
+        // 기사단 훈련 경험치와 성소의 피로·부상·질서 회복이 같은 월간 처리에 적용되는지 검증합니다.
+        [Test]
+        public void KnightlyOrderAndSanctuary_ApplyMonthlyCharacterPassives()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState capital = state.GetCastle("castle_00");
+            WICharacterRuntimeState character = state.GetCharacter("ares");
+            WIHeroDefinition hero = database.GetHero("ares");
+            capital.GovernorHeroId = string.Empty;
+            capital.SpecialFacilityIds.Add("knightly_order");
+            capital.SpecialFacilityIds.Add("sanctuary");
+            character.Activity = WICharacterActivityType.Training;
+            character.Fatigue = 80;
+            character.InjuryMonths = 2;
+            int experienceBefore = character.Experience;
+            int stabilityBefore = capital.Stability;
+
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+
+            Assert.AreEqual(experienceBefore + 10 + hero.Leadership / 10 +
+                WIAdministrationTurnSystem.FacilityTrainingExperienceBonus, character.Experience);
+            Assert.AreEqual(75, character.Fatigue);
+            Assert.AreEqual(1, character.InjuryMonths);
+            Assert.AreEqual(Mathf.Min(100, stabilityBefore + 1), capital.Stability);
+        }
+
+        // 모험가 길드가 발견 인재의 월간 영입 설득 진척에 고유 보너스를 더하는지 검증합니다.
+        [Test]
+        public void AdventurersGuild_AddsRecruitmentProgressBonus()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(database);
+            WICastleRuntimeState capital = state.GetCastle("castle_00");
+            WICharacterRuntimeState recruiter = state.GetCharacter("ares");
+            WICharacterRuntimeState candidate = state.GetCharacter("selene");
+            capital.GovernorHeroId = string.Empty;
+            capital.SpecialFacilityIds.Add("adventurers_guild");
+            recruiter.Reputation = 100;
+            recruiter.Activity = WICharacterActivityType.Recruit;
+            recruiter.ActivityTargetHeroId = candidate.HeroId;
+            candidate.Discovered = true;
+            candidate.Recruited = false;
+            candidate.RecruitmentProgress = 0;
+
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+
+            int expected = database.RecruitmentBaseProgress + database.GetHero("ares").Charisma / 4 + 10;
+            Assert.AreEqual(expected, candidate.RecruitmentProgress);
+        }
+
+        // 첩보원 거점이 공격 계략의 성공 확률을 높이고 발각 확률을 낮추는지 검증합니다.
+        [Test]
+        public void SpyOutpost_ImprovesSchemeSuccessAndConcealment()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState baseline = WIAdministrationState.Create(database);
+            WIAdministrationState enhanced = WIAdministrationState.Create(database);
+            enhanced.GetCastle("castle_00").SpecialFacilityIds.Add("spy_outpost");
+
+            WISchemeResult baselineResult = WISchemeSystem.Execute(database, baseline, "scheme_investigation",
+                "avalon", "ares", "castle_01", null, 0);
+            WISchemeResult enhancedResult = WISchemeSystem.Execute(database, enhanced, "scheme_investigation",
+                "avalon", "ares", "castle_01", null, 0);
+
+            Assert.AreEqual(Mathf.Min(95, baselineResult.SuccessChance + 10), enhancedResult.SuccessChance);
+            Assert.AreEqual(Mathf.Max(0, baselineResult.DetectionChance - 10), enhancedResult.DetectionChance);
+        }
+
         // 전투 인물 표시 요소가 런타임 생성 없이 캐릭터 프리팹에 미리 구성되는지 검증합니다.
         [Test]
         public void BattleCharacterPrefab_ContainsPrebuiltVisualChildren()
@@ -3572,6 +4117,52 @@ namespace ProjectWI.Tests.Editor
             Assert.NotNull(prefab.transform.Find("HealthBackground")?.GetComponent<SpriteRenderer>());
             Assert.NotNull(prefab.transform.Find("HealthBackground/HealthFill")?.GetComponent<SpriteRenderer>());
             Assert.NotNull(prefab.transform.Find("CharacterLabel")?.GetComponent<TextMesh>());
+            Assert.NotNull(prefab.GetComponent<SpriteRenderer>()?.sprite);
+            Assert.NotNull(prefab.transform.Find("FocusTargetMarker")?.GetComponent<SpriteRenderer>()?.sprite);
+            Assert.NotNull(prefab.transform.Find("SelectionMarker")?.GetComponent<SpriteRenderer>()?.sprite);
+            Assert.NotNull(prefab.transform.Find("HealthBackground")?.GetComponent<SpriteRenderer>()?.sprite);
+            Assert.NotNull(prefab.transform.Find("HealthBackground/HealthFill")?.GetComponent<SpriteRenderer>()?.sprite);
+        }
+
+        // 종료된 전투 표시 렌더러가 파괴되지 않고 다음 요청에서 같은 인스턴스로 재사용되는지 검증합니다.
+        [Test]
+        public void BattleSpriteRendererPool_ReusesReleasedPrefabInstance()
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/Prefabs/Battle/WIBattleProjectile.prefab");
+            GameObject rootObject = new GameObject("BattleSpritePoolTestRoot");
+            WIBattleSpriteRendererPool pool = new WIBattleSpriteRendererPool(prefab, rootObject.transform);
+
+            SpriteRenderer first = pool.Acquire();
+            Assert.NotNull(first);
+            Assert.AreEqual(1, pool.ActiveCount);
+            pool.Release(first);
+            Assert.AreEqual(0, pool.ActiveCount);
+            Assert.AreEqual(1, pool.InactiveCount);
+
+            SpriteRenderer reused = pool.Acquire();
+            Assert.AreSame(first, reused);
+            Assert.AreEqual(1, pool.ActiveCount);
+            Assert.AreEqual(0, pool.InactiveCount);
+
+            Object.DestroyImmediate(rootObject);
+        }
+
+        // 원본 프리팹 참조가 소실되어도 풀 유효성 검사가 예외 없이 실패하는지 검증합니다.
+        [Test]
+        public void BattleSpriteRendererPool_ReturnsInvalidWhenPrefabReferenceIsDestroyed()
+        {
+            GameObject prefab = new GameObject("DestroyedBattleSpritePrefab");
+            prefab.AddComponent<SpriteRenderer>();
+            GameObject rootObject = new GameObject("DestroyedBattleSpritePoolTestRoot");
+            WIBattleSpriteRendererPool pool = new WIBattleSpriteRendererPool(prefab, rootObject.transform);
+
+            Object.DestroyImmediate(prefab);
+
+            Assert.IsFalse(pool.IsValid);
+            Assert.IsNull(pool.Acquire());
+
+            Object.DestroyImmediate(rootObject);
         }
 
         // 전투 런타임 단위 테스트에 사용할 최소 참가자 세션을 생성합니다.

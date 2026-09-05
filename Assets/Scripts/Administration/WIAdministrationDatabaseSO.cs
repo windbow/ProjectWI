@@ -113,7 +113,13 @@ namespace ProjectWI.Administration
         Scholar,
         Negotiator,
         Doctor,
-        Instructor
+        Instructor,
+        // 등급과 무관하게 영지 관리 업무를 수행할 수 있는 자격입니다.
+        Administration,
+        // 선술집 인재실에서 탐색과 영입을 담당할 수 있는 자격입니다.
+        TalentRecruitment,
+        // 계략과 방첩 임무를 담당할 수 있는 자격입니다.
+        Espionage
     }
 
     public enum WIBattleTraitType
@@ -679,6 +685,9 @@ namespace ProjectWI.Administration
         [SerializeField] private bool activeSkillAvailable;
         [SerializeField] private string recruitmentEventId;
 
+        // 이 인물에게 데이터로 지정된 특성의 보유 여부를 반환합니다.
+        public bool HasTrait(WITraitType trait) => traits != null && traits.Contains(trait);
+
         public string Id => id;
         public WILocalizedString DisplayName => displayName;
         public WIHeroRace Race => race;
@@ -930,6 +939,9 @@ namespace ProjectWI.Administration
         [SerializeField] private WICampaignRuleDefinition campaignRules = new WICampaignRuleDefinition();
         [SerializeField] private List<WICampaignObjectiveDefinition> campaignObjectives = new List<WICampaignObjectiveDefinition>();
         [SerializeField] private WIProjectBalanceDefinition projectBalance = new WIProjectBalanceDefinition();
+        // 유지 지시의 회복·훈련 종료 기준입니다.
+        [SerializeField] private WIAdministrationAutomationDefinition automation = new WIAdministrationAutomationDefinition();
+        public WIAdministrationAutomationDefinition Automation => automation;
         [SerializeField] private List<WITraitDefinition> traitDefinitions = new List<WITraitDefinition>();
         [SerializeField] private List<WIRelationshipEventDefinition> relationshipEventDefinitions = new List<WIRelationshipEventDefinition>();
         [SerializeField] private List<WIStartingRelationshipDefinition> startingRelationships = new List<WIStartingRelationshipDefinition>();

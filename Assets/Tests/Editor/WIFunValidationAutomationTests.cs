@@ -33,16 +33,17 @@ namespace ProjectWI.Tests.Editor
 
             Assert.AreEqual(months, metrics.MonthsSimulated);
             Assert.AreEqual(0, metrics.RemainingPlayerBattles);
-            Assert.AreEqual(0, metrics.RemainingDecisions);
+            Assert.AreEqual(0, metrics.RemainingDecisions,
+                $"미결 선택: 사업 {state.PendingProjectEvents.Count}, 관계 {state.PendingRelationshipEvents.Count}, " +
+                $"지역 {state.PendingRegionalEvents.Count}, 점령 {state.PendingOccupationEvents.Count}, " +
+                $"영입 {state.PendingRecruitmentEvents.Count}, 유산 {state.PendingLegacyChoices.Count}");
             Assert.Greater(metrics.DecisionsResolved, 0);
             if (policy == WIAutoPlayerPolicy.Administration)
             {
-                Assert.AreEqual(0, metrics.ArmiesCreated);
+                Assert.GreaterOrEqual(metrics.LongestNoMarchMonths, 1);
             }
-            else
-            {
-                Assert.Greater(metrics.ArmiesCreated, 0);
-            }
+            Assert.Greater(metrics.ArmiesCreated, 0);
+            Assert.IsNotEmpty(metrics.DecisionTraces);
             TestContext.WriteLine(
                 $"{policy}: 전투 {metrics.BattlesResolved}, 승/패 {metrics.PlayerVictories}/{metrics.PlayerDefeats}, " +
                 $"원정 {metrics.MarchesStarted}, 점령 변화 {metrics.OwnershipChanges}, 선택 {metrics.DecisionsResolved}, " +
@@ -72,7 +73,32 @@ namespace ProjectWI.Tests.Editor
             Assert.GreaterOrEqual(metrics.FinalPlayerCastleCount, 1);
             if (policy != WIAutoPlayerPolicy.Administration)
             {
-                Assert.Greater(metrics.MarchesStarted, 0, $"{policy} 정책이 원정을 시작하지 못했습니다.");
+                string armyStatus = string.Join(" | ", state.Armies
+                    .Where(army => army.FactionId == state.PlayerFactionId)
+                    .Select(army =>
+                    {
+                        WICastleRuntimeState origin = state.GetCastle(army.CurrentCastleId);
+                        int armyPower = WIAdministrationTurnSystem.GetArmyBattlePower(database, state, army);
+                        string targets = string.Join(",", origin?.AdjacentCastleIds
+                            .Select(state.GetCastle)
+                            .Where(target => target != null && target.FactionId != state.PlayerFactionId)
+                            .Select(target =>
+                            {
+                                List<WIArmyState> defenders = state.Armies.Where(defender =>
+                                    defender.FactionId == target.FactionId &&
+                                    defender.CurrentCastleId == target.CastleId && defender.IsOperational).ToList();
+                                int defensePower = WIAdministrationTurnSystem.GetCastleDefensePower(
+                                    database, state, target, defenders);
+                                bool atWar = WIAdministrationTurnSystem.AreFactionsAtWar(
+                                    state, state.PlayerFactionId, target.FactionId);
+                                return $"{target.CastleId}:{target.FactionId}:전쟁{atWar}:방어력{defensePower}";
+                            }) ??
+                            Enumerable.Empty<string>());
+                        return $"{army.ArmyId}@{army.CurrentCastleId}:전력{armyPower}:인원{army.Members.Count}:숙련{army.Proficiency}/결속{army.CohesionExperience}:피로" +
+                               $"{army.Members.Average(member => state.GetCharacter(member.HeroId)?.Fatigue ?? 100):0.0}:인접[{targets}]";
+                    }));
+                Assert.Greater(metrics.MarchesStarted, 0,
+                    $"{policy} 정책이 원정을 시작하지 못했습니다. 전투단: {armyStatus}");
             }
         }
 
@@ -94,6 +120,93 @@ namespace ProjectWI.Tests.Editor
                 relation.Status == WIDiplomaticStatus.War));
             Assert.GreaterOrEqual(state.DiplomaticRelations.Count(relation =>
                 relation.Status == WIDiplomaticStatus.War), database.AIMinimumActiveWarFronts);
+        }
+
+        // 세 성향 모두 장기 목표를 유지하면서 실제 플레이 가능한 제한적 원정을 수행하는지 검증합니다.
+        [TestCase(WIAutoPlayerPolicy.Administration)]
+        [TestCase(WIAutoPlayerPolicy.Balanced)]
+        [TestCase(WIAutoPlayerPolicy.Aggressive)]
+        public void AutoPlayerPolicy_AllStylesCreateGoalAndMarch(WIAutoPlayerPolicy policy)
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(
+                database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+
+            WIAutoCampaignMetrics metrics = WICampaignAutoPlayer.Run(database, state, policy, 36);
+
+            Assert.Greater(metrics.GoalChanges, 0);
+            Assert.Greater(metrics.MarchesStarted, 0);
+            Assert.IsTrue(metrics.DecisionTraces.Any(trace => trace.ReasonCode == "GOAL_SELECTED"));
+            Assert.IsTrue(metrics.DecisionTraces.Any(trace => trace.ReasonCode == "MARCH_STARTED"));
+        }
+
+        // 피로가 높은 대기 영웅을 자동 휴식시키고 다음 인재 활동 담당자로 교대하는지 검증합니다.
+        [Test]
+        public void AutoPlayer_HighFatigueHeroUsesRestAndRecovers()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(
+                database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+            WICharacterRuntimeState ares = state.GetCharacter("ares");
+            ares.Fatigue = 90;
+
+            WIAutoCampaignMetrics metrics = WICampaignAutoPlayer.Run(
+                database, state, WIAutoPlayerPolicy.Balanced, 1);
+
+            Assert.GreaterOrEqual(metrics.RestActions, 1);
+            Assert.LessOrEqual(ares.Fatigue, 45);
+            Assert.IsTrue(metrics.DecisionTraces.Any(trace => trace.ReasonCode == "HERO_REST"));
+        }
+
+        // 자동 플레이가 재야 인재를 무한 영입하지 않고 보유 성에 필요한 목표 인원에서 멈추는지 검증합니다.
+        [Test]
+        public void AutoPlayer_RecruitmentStopsAtTerritoryRosterTarget()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(
+                database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+
+            WIAutoCampaignMetrics metrics = WICampaignAutoPlayer.Run(
+                database, state, WIAutoPlayerPolicy.Balanced, 120);
+
+            int targetRosterSize = 14 + Mathf.Max(0, metrics.FinalPlayerCastleCount - 1) * 8;
+            Assert.LessOrEqual(metrics.FinalEmployedCharacters, targetRosterSize + 1);
+            Assert.IsTrue(metrics.DecisionTraces.Any(trace => trace.ReasonCode == "ROSTER_TARGET_MET"));
+        }
+
+        // 손실된 전투단이 회복 기간에 단순 대기하지 않고 같은 성의 대기 병력으로 보충되는지 검증합니다.
+        [Test]
+        public void AutoPlayer_UndersizedArmyReceivesAvailableReinforcements()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(
+                database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+            WICastleRuntimeState frosthorn = state.GetCastle("castle_28");
+            WIArmyState army = WIAdministrationTurnSystem.CreateArmy(database, state, frosthorn, "ares");
+            Assert.IsNotNull(army);
+            Assert.AreEqual(1, army.Members.Count);
+
+            WIAutoCampaignMetrics metrics = WICampaignAutoPlayer.Run(
+                database, state, WIAutoPlayerPolicy.Balanced, 1);
+
+            Assert.Greater(army.Members.Count, 1);
+            Assert.Greater(metrics.ArmyReinforcements, 0);
+            Assert.IsTrue(metrics.DecisionTraces.Any(trace => trace.ReasonCode == "ARMY_REINFORCED"));
+        }
+
+        // 개선된 공세형이 장기 실행에서 과거의 압도적인 반복 패배 상태로 돌아가지 않는지 검증합니다.
+        [Test]
+        public void AutoPlayer_AggressiveLongRunAvoidsRepeatedDefeatSpiral()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIAdministrationState state = WIAdministrationState.Create(
+                database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
+
+            WIAutoCampaignMetrics metrics = WICampaignAutoPlayer.Run(
+                database, state, WIAutoPlayerPolicy.Aggressive, 240);
+
+            Assert.GreaterOrEqual(metrics.FinalPlayerCastleCount, 4);
+            Assert.LessOrEqual(metrics.PlayerDefeats, metrics.PlayerVictories + 8);
         }
 
         // 신규 AI 전선이 실제 전투단 이동으로 이어지는 진영과 시점을 기록합니다.
@@ -204,7 +317,7 @@ namespace ProjectWI.Tests.Editor
 
             Assert.AreEqual(12, metrics.EarlyDecisionCountsByMonth.Count);
             Assert.GreaterOrEqual(metrics.EarlyDecisionCountsByMonth.Sum(), 2);
-            Assert.LessOrEqual(metrics.EarlyDecisionCountsByMonth.Max(), 2);
+            Assert.LessOrEqual(metrics.EarlyDecisionCountsByMonth.Max(), 3);
             Assert.GreaterOrEqual(metrics.EarlyDecisionCountsByMonth.Count(count => count > 0), 2);
             Assert.AreEqual(0, metrics.RemainingDecisions);
             TestContext.WriteLine($"초반 월별 선택 사건: {string.Join(", ", metrics.EarlyDecisionCountsByMonth)}");

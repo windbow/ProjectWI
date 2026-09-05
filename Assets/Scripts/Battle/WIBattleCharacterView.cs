@@ -31,11 +31,11 @@ namespace ProjectWI.Battle
             farOutlineMaterial = config.CharacterFarOutlineMaterial;
             spriteRenderer.sprite = battleSprite != null
                 ? battleSprite
-                : config.PlaceholderSprite != null
-                ? config.PlaceholderSprite
-                : state.Grade == ProjectWI.Administration.WICharacterGrade.Hero
-                    ? WIBattlePlaceholderSprites.GetCircle()
-                    : WIBattlePlaceholderSprites.GetSquare();
+                : config.PlaceholderSprite;
+            if (spriteRenderer.sprite == null)
+            {
+                Debug.LogError("전투 캐릭터 대체 Sprite가 BattleConfig에 연결되지 않았습니다.", config);
+            }
             spriteRenderer.color = battleSprite != null
                 ? Color.white
                 : state.Side == WIBattleSide.Attacker
@@ -81,7 +81,7 @@ namespace ProjectWI.Battle
             BindCharacterLabel(config.ShowCharacterLabels);
         }
 
-        // 프리팹 마커의 Sprite와 색상, 정렬 순서를 설정하고 비활성 상태로 반환합니다.
+        // 프리팹 마커의 색상과 정렬 순서를 설정하고 비활성 상태로 반환합니다.
         private GameObject BindMarker(string childName, Color color, int sortingOrder)
         {
             Transform markerTransform = transform.Find(childName);
@@ -93,7 +93,6 @@ namespace ProjectWI.Battle
             SpriteRenderer markerRenderer = markerTransform.GetComponent<SpriteRenderer>();
             if (markerRenderer != null)
             {
-                markerRenderer.sprite = WIBattlePlaceholderSprites.GetCircle();
                 markerRenderer.color = color;
                 markerRenderer.sortingOrder = sortingOrder;
             }
@@ -130,13 +129,11 @@ namespace ProjectWI.Battle
             SpriteRenderer fillRenderer = healthFill?.GetComponent<SpriteRenderer>();
             if (backgroundRenderer != null)
             {
-                backgroundRenderer.sprite = WIBattlePlaceholderSprites.GetSquare();
                 backgroundRenderer.color = new Color(0.08f, 0.08f, 0.08f, 1f);
                 backgroundRenderer.sortingOrder = 11;
             }
             if (fillRenderer != null)
             {
-                fillRenderer.sprite = WIBattlePlaceholderSprites.GetSquare();
                 fillRenderer.color = new Color(0.25f, 0.9f, 0.3f, 1f);
                 fillRenderer.sortingOrder = 12;
             }

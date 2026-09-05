@@ -34,6 +34,7 @@ namespace ProjectWI.Administration
     {
         public bool Visible;
         public bool Occupied;
+        public string ContentId;
         public string Caption;
         public Sprite Image;
     }

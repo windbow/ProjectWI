@@ -97,7 +97,7 @@ namespace ProjectWI.Administration
             foreach (WICharacterRuntimeState character in state.Characters)
             {
                 if (character.Recruited == false || state.IsCharacterBusy(character.HeroId) ||
-                    WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId) == false) continue;
+                    WIAdministrationTurnSystem.CanResearch(state, character.HeroId) == false) continue;
                 bool inPlayerFaction = state.Castles.Exists(castle => castle.FactionId == state.PlayerFactionId && castle.HeroIds.Contains(character.HeroId));
                 if (inPlayerFaction == false) continue;
                 WIHeroDefinition hero = database.GetHero(character.HeroId);

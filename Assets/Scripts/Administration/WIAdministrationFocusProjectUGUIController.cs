@@ -20,6 +20,9 @@ namespace ProjectWI.Administration
         [SerializeField] private TMP_Text[] managerLabels;
         [SerializeField] private Button managerBackButton;
 
+        // 프리팹에 미리 저장된 유지 설정 버튼입니다.
+        [SerializeField] private Button repeatButton;
+
         private WIAdministrationFocusProjectSnapshot currentSnapshot;
         private WICastleProjectType selectedProject;
         private WIProjectInvestment selectedInvestment;
@@ -42,6 +45,10 @@ namespace ProjectWI.Administration
                 managerButtons[index].onClick.AddListener(() => AssignManager(captured));
             }
             managerBackButton.onClick.AddListener(ShowProjectPage);
+            if (repeatButton != null)
+            {
+                repeatButton.onClick.AddListener(ToggleRepeat);
+            }
         }
 
         // UGUI 중점 사업 열기 요청을 구독합니다.
@@ -66,6 +73,7 @@ namespace ProjectWI.Administration
         // 현재 선택 성의 사업 목록과 비용을 첫 페이지에 표시합니다.
         private void Open()
         {
+            RefreshRepeat();
             if (administrationController.TryGetUGUIFocusProjectSnapshot(out currentSnapshot, out string error)
                 == false)
             {
@@ -89,10 +97,27 @@ namespace ProjectWI.Administration
             ShowProjectPage();
         }
 
+        // 다음 달 유지 지시를 전환하고 현재 버튼의 상태를 갱신합니다.
+        private void ToggleRepeat()
+        {
+            administrationController.ToggleStandingOrder(false, string.Empty);
+            RefreshRepeat();
+        }
+
+        // 데이터베이스 문자열로 고정 유지 버튼을 표시합니다.
+        private void RefreshRepeat()
+        {
+            if (repeatButton != null)
+            {
+                repeatButton.GetComponentInChildren<TMP_Text>().text = administrationController.GetStandingOrderText(false, string.Empty);
+            }
+        }
+
         // 사업 목록 페이지를 표시합니다.
         private void ShowProjectPage()
         {
-            messageLabel.gameObject.SetActive(false);
+            messageLabel.gameObject.SetActive(true);
+            messageLabel.text = administrationController.GetAdministrationText("UI_ORDER_HINT");
             projectPage.SetActive(true);
             managerPage.SetActive(false);
         }

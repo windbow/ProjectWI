@@ -11,12 +11,19 @@ namespace ProjectWI.Battle
         [SerializeField] private WIBattleConfigSO config;
         [SerializeField] private WIBattleCharacterView characterPrefab;
         [SerializeField] private Transform characterRoot;
+        [SerializeField] private Transform arenaRoot;
+        [SerializeField] private Transform visualEffectRoot;
+        [SerializeField] private Transform projectileRoot;
+        [SerializeField] private GameObject visualEffectPrefab;
+        [SerializeField] private GameObject projectilePrefab;
+        [SerializeField] private WIBattleCameraController cameraController;
 
         private WIBattleRuntimeState runtime;
         private readonly List<WIBattleCharacterView> views = new List<WIBattleCharacterView>();
         private readonly Dictionary<int, SpriteRenderer> visualEffects = new Dictionary<int, SpriteRenderer>();
         private readonly Dictionary<int, SpriteRenderer> projectileViews = new Dictionary<int, SpriteRenderer>();
-        private WIBattleCameraController cameraController;
+        private WIBattleSpriteRendererPool visualEffectPool;
+        private WIBattleSpriteRendererPool projectilePool;
         private string selectedHeroId;
 
         public WIBattleRuntimeState Runtime => runtime;
@@ -29,7 +36,8 @@ namespace ProjectWI.Battle
             WIAdministrationDatabaseSO database,
             WIBattleSessionState session)
         {
-            PreparePlaceholderArena();
+            PrepareBattlePresentation();
+            PreparePresentationPools();
             runtime = WIBattleRuntimeBuilder.Build(config, database, session);
             if (cameraController != null)
             {
@@ -138,36 +146,45 @@ namespace ProjectWI.Battle
             return selected;
         }
 
-        // 전투 아트가 없어도 공간을 확인할 수 있도록 격자 전장과 2D 직교 카메라를 준비합니다.
-        private void PreparePlaceholderArena()
+        // 씬에 연결된 카메라와 전장 프리팹을 사용해 전투 표시 환경을 준비합니다.
+        private void PrepareBattlePresentation()
         {
-            Camera battleCamera = Camera.main;
-            if (battleCamera != null)
+            if (cameraController == null)
             {
-                cameraController = battleCamera.GetComponent<WIBattleCameraController>();
-                if (cameraController == null) cameraController = battleCamera.gameObject.AddComponent<WIBattleCameraController>();
-                cameraController.Initialize(config);
+                Debug.LogError("전투 카메라 컨트롤러가 BattleRuntime에 연결되지 않았습니다.", this);
+                return;
             }
-            if (config.ArenaPrefab != null)
+            cameraController.Initialize(config);
+
+            if (config.ArenaPrefab == null)
             {
-                GameObject arenaPrefabInstance = Instantiate(config.ArenaPrefab, transform);
-                arenaPrefabInstance.name = config.ArenaPrefab.name;
+                Debug.LogError("전투 전장 프리팹이 BattleConfig에 연결되지 않았습니다.", config);
                 return;
             }
 
-            GameObject arena = new GameObject(config.ArenaBackground == null ? "PlaceholderArenaGrid" : "BattleArenaBackground");
-            arena.transform.SetParent(transform, false);
-            arena.transform.position = new Vector3(0f, 0f, 2f);
-            SpriteRenderer renderer = arena.AddComponent<SpriteRenderer>();
-            renderer.sprite = config.ArenaBackground != null
-                ? config.ArenaBackground
-                : WIBattlePlaceholderSprites.GetArenaGrid();
-            renderer.sortingOrder = -100;
-            Vector2 spriteSize = renderer.sprite.bounds.size;
-            arena.transform.localScale = new Vector3(
-                config.ArenaBackgroundSize.x / Mathf.Max(0.01f, spriteSize.x),
-                config.ArenaBackgroundSize.y / Mathf.Max(0.01f, spriteSize.y),
-                1f);
+            Transform parent = arenaRoot == null ? transform : arenaRoot;
+            GameObject arenaPrefabInstance = Instantiate(config.ArenaPrefab, parent);
+            arenaPrefabInstance.name = config.ArenaPrefab.name;
+        }
+
+        // 전투 효과와 투사체 프리팹을 재사용할 표시 오브젝트 풀을 준비합니다.
+        private void PreparePresentationPools()
+        {
+            Transform effectParent = visualEffectRoot == null ? transform : visualEffectRoot;
+            visualEffectPool = new WIBattleSpriteRendererPool(visualEffectPrefab, effectParent);
+            if (visualEffectPool.IsValid == false)
+            {
+                Debug.LogError("전투 효과 프리팹과 SpriteRenderer 연결을 확인해야 합니다.", this);
+                visualEffectPool = null;
+            }
+
+            Transform projectileParent = projectileRoot == null ? transform : projectileRoot;
+            projectilePool = new WIBattleSpriteRendererPool(projectilePrefab, projectileParent);
+            if (projectilePool.IsValid == false)
+            {
+                Debug.LogError("전투 투사체 프리팹과 SpriteRenderer 연결을 확인해야 합니다.", this);
+                projectilePool = null;
+            }
         }
 
         // 시뮬레이션이 예약한 근접 섬광과 원거리 발사체 도형을 생성하고 이동시킵니다.
@@ -177,18 +194,18 @@ namespace ProjectWI.Battle
             {
                 if (visualEffects.ContainsKey(effect.EffectId) == false)
                 {
-                    GameObject effectObject = new GameObject(effect.EffectType.ToString());
-                    effectObject.transform.SetParent(transform, false);
-                    SpriteRenderer renderer = effectObject.AddComponent<SpriteRenderer>();
-                    renderer.sprite = effect.EffectType == WIBattleVisualEffectType.Projectile
-                        ? WIBattlePlaceholderSprites.GetSquare()
-                        : WIBattlePlaceholderSprites.GetCircle();
+                    if (visualEffectPool == null)
+                    {
+                        return;
+                    }
+                    SpriteRenderer renderer = visualEffectPool.Acquire();
+                    renderer.name = effect.EffectType.ToString();
                     renderer.color = GetVisualEffectColor(effect);
                     renderer.sortingOrder = 20;
                     float size = effect.Radius > 0f ? effect.Radius * 2f : effect.EffectType == WIBattleVisualEffectType.Projectile
                         ? config.PlaceholderProjectileSize
                         : config.PlaceholderCharacterSize * 0.55f;
-                    effectObject.transform.localScale = Vector3.one * size;
+                    renderer.transform.localScale = Vector3.one * size;
                     visualEffects[effect.EffectId] = renderer;
                 }
                 float progress = effect.Duration <= 0f ? 1f : Mathf.Clamp01((runtime.ElapsedSeconds - effect.StartedAt) / effect.Duration);
@@ -198,7 +215,7 @@ namespace ProjectWI.Battle
             }
             foreach (int effectId in visualEffects.Keys.Where(id => runtime.VisualEffects.All(item => item.EffectId != id)).ToList())
             {
-                Destroy(visualEffects[effectId].gameObject);
+                visualEffectPool?.Release(visualEffects[effectId]);
                 visualEffects.Remove(effectId);
             }
         }
@@ -221,22 +238,24 @@ namespace ProjectWI.Battle
             {
                 if (projectileViews.ContainsKey(projectile.ProjectileId) == false)
                 {
-                    GameObject projectileObject = new GameObject("Projectile");
-                    projectileObject.transform.SetParent(transform, false);
-                    SpriteRenderer renderer = projectileObject.AddComponent<SpriteRenderer>();
-                    renderer.sprite = WIBattlePlaceholderSprites.GetSquare();
+                    if (projectilePool == null)
+                    {
+                        return;
+                    }
+                    SpriteRenderer renderer = projectilePool.Acquire();
+                    renderer.name = "Projectile";
                     renderer.color = projectile.Side == WIBattleSide.Attacker
                         ? config.AttackerPlaceholderColor
                         : config.DefenderPlaceholderColor;
                     renderer.sortingOrder = 20;
-                    projectileObject.transform.localScale = Vector3.one * config.PlaceholderProjectileSize;
+                    renderer.transform.localScale = Vector3.one * config.PlaceholderProjectileSize;
                     projectileViews[projectile.ProjectileId] = renderer;
                 }
                 projectileViews[projectile.ProjectileId].transform.position = projectile.Position;
             }
             foreach (int projectileId in projectileViews.Keys.Where(id => runtime.Projectiles.All(item => item.ProjectileId != id)).ToList())
             {
-                Destroy(projectileViews[projectileId].gameObject);
+                projectilePool?.Release(projectileViews[projectileId]);
                 projectileViews.Remove(projectileId);
             }
         }

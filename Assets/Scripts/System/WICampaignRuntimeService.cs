@@ -158,6 +158,7 @@ namespace ProjectWI.Systems
             }
             State = loaded;
             State.EnsureRuntimeCastleMap(database);
+            State.SynchronizeCharacterTraits(database);
             foreach (WICharacterRuntimeState character in State.Characters)
             {
                 WIHeroDefinition definition = database.GetHero(character.HeroId);

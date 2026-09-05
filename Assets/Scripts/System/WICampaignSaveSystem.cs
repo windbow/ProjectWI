@@ -195,6 +195,12 @@ namespace ProjectWI.Systems
             state.Castles.RemoveAll(item => item == null);
             state.Armies.RemoveAll(item => item == null);
             state.BattleSessions.RemoveAll(item => item == null);
+            state.CharacterTransfers.RemoveAll(item => item == null);
+            foreach (WICharacterTransferState transfer in state.CharacterTransfers)
+            {
+                transfer.RouteCastleIds = transfer.RouteCastleIds ??
+                    new System.Collections.Generic.List<string>();
+            }
             if (state.LastMonthlyReport != null)
             {
                 state.LastMonthlyReport.News = state.LastMonthlyReport.News ?? new System.Collections.Generic.List<string>();

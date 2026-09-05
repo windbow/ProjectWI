@@ -177,7 +177,7 @@ namespace ProjectWI.Administration
         public void OpenCharacterActivityUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUICharacterActivityRequested?.Invoke();
+            OpenUGUICharacterActivity(false);
         }
 
         // QA에서 아발론 영지의 특화 시설 선택 권한과 UGUI 모달을 바로 표시합니다.
@@ -282,4 +282,3 @@ namespace ProjectWI.Administration
 
     }
 }
-

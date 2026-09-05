@@ -25,6 +25,21 @@ namespace ProjectWI.Administration
             return names.Count == 0 ? "없음" : string.Join(", ", names);
         }
 
+        // 좁은 선택 카드에서는 설명을 제외하고 특성 이름만 간결하게 조합합니다.
+        private string GetTraitNameText(WIHeroDefinition hero)
+        {
+            List<string> names = new List<string>();
+            foreach (WITraitType trait in hero.Traits)
+            {
+                WITraitDefinition definition = database.GetTrait(trait);
+                if (definition != null)
+                {
+                    names.Add(definition.DisplayName.Get(database.UseEnglish));
+                }
+            }
+            return names.Count == 0 ? "특성 없음" : string.Join(", ", names);
+        }
+
         // 인물의 전투 운명 특성을 효과 설명과 함께 UI 문자열로 조합합니다.
         private static string GetBattleTraitDisplayText(WIHeroDefinition hero)
         {

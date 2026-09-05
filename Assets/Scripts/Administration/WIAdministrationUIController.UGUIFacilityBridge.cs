@@ -83,6 +83,16 @@ namespace ProjectWI.Administration
             {
                 CastleName = castle.DisplayName.Get(database.UseEnglish)
             };
+            int workers = WIAdministrationTurnSystem.GetTalentOfficeWorkerCount(state, selectedCastle);
+            int capacity = database.Automation.TalentOfficeCapacity;
+            snapshot.Quests.Add(new WIAdministrationTavernQuestSnapshot
+            {
+                QuestId = "talent_office",
+                DisplayName = database.GetText("UI_TALENT_OFFICE"),
+                Summary = $"담당자 {workers}/{capacity} · 탐색과 영입",
+                Description = database.GetText(workers < capacity ? "UI_TALENT_OFFICE_DESCRIPTION" : "UI_TALENT_OFFICE_FULL"),
+                Available = true
+            });
             foreach (WITavernQuestState quest in selectedCastle.TavernQuests)
             {
                 WITavernQuestDefinition definition = database.GetTavernQuest(quest.QuestType);
@@ -205,7 +215,7 @@ namespace ProjectWI.Administration
             if (selectedCastle.HeroIds.Contains(heroId) == false ||
                 WIAdministrationTurnSystem.AssignGovernor(state, selectedCastle.CastleId, heroId) == false)
             {
-                error = "영웅 등급의 대기 인물만 영지관으로 임명할 수 있습니다.";
+                error = database.GetText("UI_ADMIN_TRAIT_REQUIRED");
                 return false;
             }
             RefreshAll();
@@ -218,6 +228,7 @@ namespace ProjectWI.Administration
             error = string.Empty;
             selectedCastle.GovernorHeroId = string.Empty;
             selectedCastle.DelegatedToGovernor = false;
+            selectedCastle.PendingGovernorAppointment = false;
             RefreshAll();
             return true;
         }
@@ -251,6 +262,7 @@ namespace ProjectWI.Administration
                 return false;
             }
             selectedCastle.DelegatedToGovernor = selectedCastle.DelegatedToGovernor == false;
+            selectedCastle.PendingGovernorAppointment = false;
             SelectCastle(selectedCastle.CastleId);
             RefreshAll();
             return true;

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace ProjectWI.Administration
@@ -85,11 +86,17 @@ namespace ProjectWI.Administration
             RefreshAll();
         }
 
-        // QA에서 아발론 소유 성을 선택하고 영지 UGUI를 표시합니다.
+        // QA에서 현재 시나리오의 플레이어 소유 성을 선택하고 영지 UGUI를 표시합니다.
         public void OpenCastlePreviewForQA()
         {
             BeginCampaignForQA(WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
-            SelectCastle("castle_00");
+            WICastleRuntimeState previewCastle = state.Castles
+                .Where(castle => castle.FactionId == state.PlayerFactionId && castle.HeroIds.Count > 0)
+                .FirstOrDefault() ?? state.Castles.FirstOrDefault(castle => castle.FactionId == state.PlayerFactionId);
+            if (previewCastle != null)
+            {
+                SelectCastle(previewCastle.CastleId);
+            }
             RefreshAll();
         }
 

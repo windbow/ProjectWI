@@ -36,7 +36,7 @@ namespace ProjectWI.Administration
                 snapshot.Projects.Add(new WIAdministrationProjectOptionSnapshot
                 {
                     ProjectType = projectType,
-                    DisplayName = GetProjectDisplayName(projectType),
+                    DisplayName = GetProjectDisplayName(projectType) + GetProjectCombatHint(projectType),
                     BasicCost = WIAdministrationTurnSystem.GetProjectCost(database, projectType, WIProjectInvestment.Basic),
                     IntensiveCost = WIAdministrationTurnSystem.GetProjectCost(database, projectType, WIProjectInvestment.Intensive)
                 });
@@ -207,8 +207,7 @@ namespace ProjectWI.Administration
             {
                 WICharacterRuntimeState character = state.GetCharacter(heroId);
                 WIHeroDefinition hero = database.GetHero(heroId);
-                if (character == null || hero == null || state.IsCharacterBusy(heroId) || character.InjuryMonths > 0 ||
-                    WIAdministrationTurnSystem.IsAdministrationCapable(state, heroId) == false)
+                if (character == null || hero == null || state.IsCharacterBusy(heroId))
                 {
                     continue;
                 }
@@ -216,7 +215,10 @@ namespace ProjectWI.Administration
                 {
                     HeroId = heroId,
                     DisplayName = hero.DisplayName.Get(database.UseEnglish),
-                    Summary = $"피로 {character.Fatigue} · 명성 {character.Reputation}",
+                    Summary = $"{GetTraitNameText(hero)}\n피로 {character.Fatigue} · 명성 {character.Reputation}",
+                    ClassName = database.GetHeroClass(hero.HeroClass)?.DisplayName.Get(database.UseEnglish) ??
+                        hero.HeroClass.ToString(),
+                    Grade = hero.Grade,
                     Portrait = hero.Portrait
                 });
             }
@@ -233,7 +235,8 @@ namespace ProjectWI.Administration
             error = string.Empty;
             WICharacterRuntimeState actor = state.GetCharacter(actorHeroId);
             if (actor == null || selectedCastle.HeroIds.Contains(actorHeroId) == false || state.IsCharacterBusy(actorHeroId) ||
-                WIAdministrationTurnSystem.CanPerformCharacterActivity(state, actorHeroId, activity) == false)
+                WIAdministrationTurnSystem.CanPerformCharacterActivity(state, actorHeroId, activity,
+                    database.Automation.TalentOfficeCapacity) == false)
             {
                 error = "활동을 수행할 인물을 다시 선택하십시오.";
                 return false;
@@ -250,6 +253,9 @@ namespace ProjectWI.Administration
                         HeroId = targetId,
                         DisplayName = hero.DisplayName.Get(database.UseEnglish),
                         Summary = "같은 성 주둔 인물",
+                        ClassName = database.GetHeroClass(hero.HeroClass)?.DisplayName.Get(database.UseEnglish) ??
+                            hero.HeroClass.ToString(),
+                        Grade = hero.Grade,
                         Portrait = hero.Portrait
                     });
                 }
@@ -269,6 +275,9 @@ namespace ProjectWI.Administration
                         HeroId = candidate.HeroId,
                         DisplayName = hero.DisplayName.Get(database.UseEnglish),
                         Summary = $"설득 {candidate.RecruitmentProgress}% · 필요 명성 {hero.RequiredReputation}",
+                        ClassName = database.GetHeroClass(hero.HeroClass)?.DisplayName.Get(database.UseEnglish) ??
+                            hero.HeroClass.ToString(),
+                        Grade = hero.Grade,
                         Portrait = hero.Portrait,
                         Interactable = actor.Reputation >= hero.RequiredReputation
                     });
@@ -288,8 +297,9 @@ namespace ProjectWI.Administration
             error = string.Empty;
             WICharacterRuntimeState actor = state.GetCharacter(actorHeroId);
             if (actor == null || selectedCastle.HeroIds.Contains(actorHeroId) == false ||
-                state.IsCharacterBusy(actorHeroId) || actor.InjuryMonths > 0 ||
-                WIAdministrationTurnSystem.CanPerformCharacterActivity(state, actorHeroId, activity) == false)
+                state.IsCharacterBusy(actorHeroId) || (actor.InjuryMonths > 0 && activity != WICharacterActivityType.Rest) ||
+                WIAdministrationTurnSystem.CanPerformCharacterActivity(state, actorHeroId, activity,
+                    database.Automation.TalentOfficeCapacity) == false)
             {
                 error = "선택한 인물은 현재 개인 활동을 수행할 수 없습니다.";
                 return false;
@@ -313,6 +323,9 @@ namespace ProjectWI.Administration
             }
             actor.Activity = activity;
             actor.ActivityTargetHeroId = targetHeroId;
+            actor.StandingActivity = actor.RepeatActivity ? activity : WICharacterActivityType.None;
+            actor.StandingActivityTargetHeroId = targetHeroId;
+            actor.AutomaticRecovery = false;
             SelectCastle(selectedCastle.CastleId);
             RefreshAll();
             return true;
