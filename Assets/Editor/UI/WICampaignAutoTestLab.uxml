@@ -8,6 +8,8 @@
                 <ui:DropdownField name="difficulty-field" label="난이도" class="setting-field" />
                 <ui:DropdownField name="policy-field" label="정책" class="setting-field" />
                 <ui:IntegerField name="maximum-months-field" label="최대 개월" class="setting-field" />
+                <ui:IntegerField name="seed-start-field" label="시작 시드" class="setting-field" />
+                <ui:IntegerField name="seed-count-field" label="반복 횟수" class="setting-field" />
             </ui:VisualElement>
             <ui:Toggle name="run-matrix-toggle" label="정책 3종 × 난이도 3종 전체 비교" />
             <ui:VisualElement class="button-row">

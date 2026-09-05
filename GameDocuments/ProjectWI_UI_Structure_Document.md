@@ -125,7 +125,7 @@ ProjectWI의 UI는 역할과 실행 환경에 따라 2가지 기술 스택으로
 * **주요 기능**:
   * **Excel 그리드 방식 데이터 편집기**: `WI_AdministrationDatabase.asset`에 등록된 캐릭터 데이터를 테이블 형태로 한눈에 조회 및 즉시 편집.
   * **극강의 렌더링 성능 최적화 (Virtual Scroll Windowing & Pagination)**:
-    * 500명의 캐릭터 데이터 처리 시 프레임 드랍을 막기 위해 **25/50/100/500개씩 보기 페이지네이션** 및 **현재 화면 뷰포트에 보이는 20개 행만 선택적 렌더링하는 가상 스크롤** 기법 적용.
+    * 1200명의 캐릭터 데이터 처리 시 프레임 드랍을 막기 위해 **25/50/100/1200개씩 보기 페이지네이션** 및 **현재 화면 뷰포트에 보이는 20개 행만 선택적 렌더링하는 가상 스크롤** 기법 적용.
     * **C# `CharacterCache` 메모리 캐싱**: 유니티 C++ Native `SerializedProperty` 72,000회 호출을 20회(99.97% 감소)로 줄여 **60+ FPS 초고속 반응속도** 보장.
   * **정밀 픽셀 정렬 그리드 Layout**: headers와 data rows 간 오차 없는 absolute `Rect` pixel-grid 렌더링.
   * **컬럼 정렬 & 검색**: ID, 한글 이름, 영문 이름, 등급, 종족, 직업, 5대 능력치(통솔, 무력, 지력, 정치, 매력), 충성도, 명성 헤더 클릭 시 오름차순/내림차순 정렬 및 검색어 필터링.
@@ -137,7 +137,7 @@ ProjectWI의 UI는 역할과 실행 환경에 따라 2가지 기술 스택으로
 ### 3.2 대규모 인물 시딩 툴 (`WIMassCharacterSeeder.cs`)
 * **메뉴 경로**: `ProjectWI > Data > Seed Mass Character Roster (100 Heroes, 400 Commons)`
 * **주요 기능**:
-  * 총 500명(영웅 100명 + 일반 400명, Human 60%, 기타 6종족 각 6.67%)의 판타지 이름 및 직업 밸런스 능력치를 자동 생성하여 `WI_AdministrationDatabase.asset`에 구워 넣음.
+  * 총 1200명(영웅 200명 + 일반 1000명)의 판타지 이름 및 직업 밸런스 능력치를 자동 생성하여 `WI_AdministrationDatabase.asset`에 구워 넣음.
   * 8대 세력 주요 영웅 식별자 (`ares`, `lyria`, `brom`, `morrigan`, `theron` 등) 보존.
   * 전체 500명 중 **1/3(167명)을 60개 성에 무작위 비율 배치**하며, 주인공 아발론 수도(`castle_00`)에는 영웅 1, 2호인 `ares`와 `lyria`가 반드시 배치되도록 자동 시딩 처리.
 
@@ -155,6 +155,6 @@ ProjectWI의 UI는 역할과 실행 환경에 따라 2가지 기술 스택으로
 | **C#** | [`Assets/Scripts/Administration/WIAdministrationMapUGUIController.cs`](file:///c:/Fork/ProjectWI/Assets/Scripts/Administration/WIAdministrationMapUGUIController.cs) | UGUI 지도 성 노드의 소유·선택 상태와 입력 갱신 |
 | **C#** | [`Assets/Scripts/Battle/WIBattleHUDController.cs`](file:///c:/Fork/ProjectWI/Assets/Scripts/Battle/WIBattleHUDController.cs) | 전투 HUD 컨트롤러 (명령, 스킬, 이벤트) |
 | **C# (Editor)** | [`Assets/Editor/WICharacterDataViewerWindow.cs`](file:///c:/Fork/ProjectWI/Assets/Editor/WICharacterDataViewerWindow.cs) | 에디터 캐릭터 데이터 뷰어 (Virtual Scroll Windowing) |
-| **C# (Editor)** | [`Assets/Editor/WIMassCharacterSeeder.cs`](file:///c:/Fork/ProjectWI/Assets/Editor/WIMassCharacterSeeder.cs) | 에디터 500명 인물 생성 및 1/3 성 배치 시더 |
+| **C# (Editor)** | [`Assets/Editor/WIMassCharacterSeeder.cs`](file:///c:/Fork/ProjectWI/Assets/Editor/WIMassCharacterSeeder.cs) | 에디터 1200명 인물 생성 시더 |
 | **에셋 문서** | [`GameDocuments/UIManual.md`](file:///c:/Fork/ProjectWI/GameDocuments/UIManual.md) | UI/UX 매뉴얼 |
 | **인수인계** | [`GameDocuments/UIHandoffReport.md`](file:///c:/Fork/ProjectWI/GameDocuments/UIHandoffReport.md) | UI 디자인 인수인계 및 시안 보고서 |

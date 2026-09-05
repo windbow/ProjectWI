@@ -9,7 +9,7 @@ namespace ProjectWI.Editor
     public class WICharacterDataViewerWindow : EditorWindow
     {
         private const string DatabasePath = "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset";
-        private const float TotalTableWidth = 1180f;
+        private const float TotalTableWidth = 1360f;
         private const float RowHeight = 24f;
 
         private enum SortColumn
@@ -64,8 +64,8 @@ namespace ProjectWI.Editor
 
         private int currentPage = 0;
         private int pageSizeIndex = 1; // 기본 50개씩 보기
-        private readonly int[] pageSizes = { 25, 50, 100, 500 };
-        private readonly string[] pageSizeLabels = { "25개씩", "50개씩", "100개씩", "500개(전체)" };
+        private readonly int[] pageSizes = { 25, 50, 100, 1200 };
+        private readonly string[] pageSizeLabels = { "25개씩", "50개씩", "100개씩", "1200개(전체)" };
 
         private SortColumn currentSortColumn = SortColumn.None;
         private bool sortAscending = true;
@@ -252,9 +252,9 @@ namespace ProjectWI.Editor
             GUILayout.Label("ProjectWI 캐릭터 데이터 뷰어 (Excel 그리드 편집기)", EditorStyles.boldLabel);
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button("🎲 500명 인물 생성", GUILayout.Height(22f), GUILayout.Width(135f)))
+            if (GUILayout.Button("🎲 1200명 인물 생성", GUILayout.Height(22f), GUILayout.Width(145f)))
             {
-                if (EditorUtility.DisplayDialog("인물 데이터 생성", "100명의 영웅과 400명의 일반 인물 데이터(총 500명)를 생성하여 데이터베이스를 갱신하시겠습니까?", "생성", "취소"))
+                if (EditorUtility.DisplayDialog("인물 데이터 생성", "200명의 영웅과 1000명의 일반 인물 데이터(총 1200명)를 생성하여 데이터베이스를 갱신하시겠습니까?", "생성", "취소"))
                 {
                     WIMassCharacterSeeder.SeedMassRoster();
                     LoadDatabase();
@@ -433,6 +433,8 @@ namespace ProjectWI.Editor
             GUI.Label(new Rect(x, y, 80f, h), "초상화", EditorStyles.centeredGreyMiniLabel);
             x += 80f + 4f;
 
+            GUI.Label(new Rect(x, y, 170f, h), "특성", EditorStyles.centeredGreyMiniLabel);
+            x += 174f;
             GUI.Label(new Rect(x, y, 40f, h), "삭제", EditorStyles.centeredGreyMiniLabel);
         }
 
@@ -604,6 +606,9 @@ namespace ProjectWI.Editor
             }
             x += 80f + 4f;
 
+            DrawTraitsField(heroProp.FindPropertyRelative("traits"), new Rect(x, y, 170f, h));
+            x += 174f;
+
             // 삭제 버튼
             if (GUI.Button(new Rect(x, y, 40f, h), "X"))
             {
@@ -615,6 +620,32 @@ namespace ProjectWI.Editor
                     GUIUtility.ExitGUI();
                 }
             }
+        }
+
+        // 기존 특성을 보존하면서 캐릭터의 특성 목록을 선택 상자로 편집합니다.
+        private void DrawTraitsField(SerializedProperty traits, Rect rect)
+        {
+            string[] labels = { "농정가", "상인", "건축가", "질서관", "학자", "교섭가", "의사", "교관", "내정" };
+            int mask = 0;
+            for (int index = 0; index < traits.arraySize; index += 1)
+            {
+                mask |= 1 << traits.GetArrayElementAtIndex(index).intValue;
+            }
+            int next = EditorGUI.MaskField(rect, mask, labels);
+            if (next == mask)
+            {
+                return;
+            }
+            traits.ClearArray();
+            for (int index = 0; index < labels.Length; index += 1)
+            {
+                if ((next & (1 << index)) != 0)
+                {
+                    traits.InsertArrayElementAtIndex(traits.arraySize);
+                    traits.GetArrayElementAtIndex(traits.arraySize - 1).intValue = index;
+                }
+            }
+            MarkCacheDirty();
         }
 
         private void DrawFooterSummary()

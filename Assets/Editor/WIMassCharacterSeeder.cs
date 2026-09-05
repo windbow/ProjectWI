@@ -96,7 +96,7 @@ namespace ProjectWI.Editor
             }
         }
 
-        [MenuItem("ProjectWI/Data/Seed Mass Character Roster (100 Heroes, 400 Commons)")]
+        [MenuItem("ProjectWI/Data/Seed Mass Character Roster (200 Heroes, 1000 Commons)")]
         public static void SeedMassRoster()
         {
             UnityEngine.Object databaseAsset = AssetDatabase.LoadMainAssetAtPath(DatabasePath);
@@ -112,13 +112,13 @@ namespace ProjectWI.Editor
 
             System.Random rand = new System.Random(20260806); // 결정론적 시드 생성
 
-            int totalHeroesTarget = 100;
-            int totalCommonsTarget = 400;
+            int totalHeroesTarget = 200;
+            int totalCommonsTarget = 1000;
 
             int[] heroRaceCounts = CalculateRaceDistribution(totalHeroesTarget);
             int[] commonRaceCounts = CalculateRaceDistribution(totalCommonsTarget);
 
-            // 1. Hero 100명 생성 (시작 영웅 ID 보존)
+            // 1. 영웅 200명을 생성하고 기존 핵심 영웅 ID를 보존합니다.
             string[] startingHeroIds = { "ares", "lyria", "elwyn", "selene", "brom", "morrigan", "kael", "theron" };
             string[] startingHeroNamesKR = { "아레스", "리리아", "엘윈", "셀레네", "브롬", "모리건", "케일", "테론" };
             string[] startingHeroNamesEN = { "Ares", "Lyria", "Elwyn", "Selene", "Brom", "Morrigan", "Kael", "Theron" };
@@ -151,7 +151,7 @@ namespace ProjectWI.Editor
                 }
             }
 
-            // 2. Common 400명 생성 (시작 일반 인물 ID 보존)
+            // 2. 일반 인물 1000명을 생성하고 기존 핵심 일반 인물 ID를 보존합니다.
             string[] startingCommonIds = { "common_alden", "common_sable", "common_gareth", "common_varek", "common_mira", "common_thane", "common_nym", "common_raska", "common_veil" };
             string[] startingCommonNamesKR = { "알덴", "세이블", "가레스", "바렉", "미라", "테인", "님", "라스카", "베일" };
             string[] startingCommonNamesEN = { "Alden", "Sable", "Gareth", "Varek", "Mira", "Thane", "Nym", "Raska", "Veil" };
@@ -192,7 +192,8 @@ namespace ProjectWI.Editor
             EditorUtility.SetDirty(databaseAsset);
             AssetDatabase.SaveAssets();
 
-            Debug.Log("ProjectWI 대규모 인물 로스터 및 시작 성 배치 완료! 총 500명(영웅 100명, 일반 400명) 중 핵심 인물 19명이 시작 성에 배치되었습니다.");
+            ProjectWI.EditorTools.WIAdministrationTraitSetup.Apply();
+            Debug.Log("ProjectWI 대규모 인물 로스터 및 시작 성 배치 완료! 총 1200명(영웅 200명, 일반 1000명) 중 핵심 인물 19명이 기본 시작 성에 배치되었습니다.");
         }
 
         // 세력별 핵심 관계와 초기 편성에 필요한 최소 인물만 시작 성에 배치합니다.
@@ -349,6 +350,9 @@ namespace ProjectWI.Editor
             // 특기 및 초상화 초기화
             charProp.FindPropertyRelative("traits").arraySize = 0;
             charProp.FindPropertyRelative("portrait").objectReferenceValue = null;
+            charProp.FindPropertyRelative("battleSprite").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(
+                "Assets/Art/Characters/Ares/Ares_Battle_1WU_A_OutlineBake_V1.png");
+            charProp.FindPropertyRelative("battleTraits").arraySize = 0;
         }
 
         // 기존 핵심 인물의 특기·초상화·능력치와 전용 스킬 자격을 보존합니다.

@@ -11,8 +11,10 @@ namespace ProjectWI.Editor
         private const string DatabasePath =
             "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset";
         private const int TargetPlacementCount = 250;
+        private const int TargetHeroPlacementCount = 100;
+        private const int TargetCommonPlacementCount = 150;
 
-        // 현재 500명 로스터의 절반을 시나리오별 시작 성에 결정적으로 배치합니다.
+        // 1200명 중 영웅 100명과 일반 150명만 시나리오 시작 성에 결정적으로 배치합니다.
         [MenuItem("ProjectWI/Data/Build Scenario Character Placements")]
         public static void BuildScenarioCharacterPlacements()
         {
@@ -83,16 +85,10 @@ namespace ProjectWI.Editor
                 .OrderBy(id => id)
                 .ToList();
             int castleIndex = 0;
-            foreach (WIHeroDefinition hero in database.Heroes.Where(hero => used.Contains(hero.Id) == false))
-            {
-                if (placements.Count >= TargetPlacementCount || eligibleCastles.Count == 0)
-                {
-                    break;
-                }
-                placements.Add((eligibleCastles[castleIndex % eligibleCastles.Count], hero.Id));
-                used.Add(hero.Id);
-                castleIndex += 1;
-            }
+            AddGradePlacements(database, placements, used, eligibleCastles,
+                WICharacterGrade.Hero, TargetHeroPlacementCount, ref castleIndex);
+            AddGradePlacements(database, placements, used, eligibleCastles,
+                WICharacterGrade.Common, TargetCommonPlacementCount, ref castleIndex);
 
             SerializedProperty list = variant.FindPropertyRelative("characterPlacements");
             list.ClearArray();
@@ -105,6 +101,32 @@ namespace ProjectWI.Editor
                 item.FindPropertyRelative("heroId").stringValue = heroId;
                 bool governor = governedCastles.Add(castleId);
                 item.FindPropertyRelative("governor").boolValue = governor;
+            }
+        }
+
+        // 지정 등급의 시작 배치 수가 목표에 도달할 때까지 성에 순환 배치합니다.
+        private static void AddGradePlacements(
+            WIAdministrationDatabaseSO database,
+            List<(string CastleId, string HeroId)> placements,
+            HashSet<string> used,
+            List<string> eligibleCastles,
+            WICharacterGrade grade,
+            int targetCount,
+            ref int castleIndex)
+        {
+            int placedGradeCount = placements.Count(item => database.GetHero(item.HeroId)?.Grade == grade);
+            foreach (WIHeroDefinition hero in database.Heroes.Where(hero =>
+                         hero.Grade == grade && used.Contains(hero.Id) == false))
+            {
+                if (placedGradeCount >= targetCount || placements.Count >= TargetPlacementCount ||
+                    eligibleCastles.Count == 0)
+                {
+                    break;
+                }
+                placements.Add((eligibleCastles[castleIndex % eligibleCastles.Count], hero.Id));
+                used.Add(hero.Id);
+                placedGradeCount += 1;
+                castleIndex += 1;
             }
         }
 
