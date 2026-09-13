@@ -1,0 +1,49 @@
+경제 시작: 금화 336, 번영합 365
+AresMain Balanced 60: 성 7, 원정 11, 승/패 7/0, 선택 48, 결과 Ongoing, 발도르 잔여 40, 신규영입 11
+대기 ares: 등급 Hero, 내정 True, 영입 True, 탐색가능 True
+대기 common_alden: 등급 Common, 내정 True, 영입 False, 탐색가능 False
+대기 hero_107: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_104: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_106: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_102: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_111: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_110: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+목표 castle_03, 집결 1345, 필요 959, 전체전력 1345, 영향력 329, 전쟁 True
+전투단 army_1@castle_29 -> , 임무 Reserve, 인원 6, 전력 451, 이동 False, 재편 0
+전투단 army_2@castle_29 -> , 임무 Reserve, 인원 6, 전력 428, 이동 False, 재편 0
+전투단 army_12@castle_29 -> , 임무 Reserve, 인원 6, 전력 466, 이동 False, 재편 0
+49: PREPARATION_INTERVAL castle_31 다음 원정 검토 주기 8개월을 준비합니다.
+49: RECRUITMENT_PROGRESS castle_31 hero_104 영입 설득을 진행합니다.
+49: JOINT_ATTACK_RESOLVED castle_31 2개 전투단이 castle_31 공동 공격에 참가했습니다.
+50: GOAL_SELECTED castle_29 장기 공략 목표를 castle_29(으)로 정했습니다.
+50: PREPARATION_INTERVAL castle_29 다음 원정 검토 주기 8개월을 준비합니다.
+50: RECRUITMENT_PROGRESS castle_29 hero_104 영입 설득을 진행합니다.
+51: PREPARATION_INTERVAL castle_29 다음 원정 검토 주기 8개월을 준비합니다.
+51: RECRUITMENT_PROGRESS castle_29 hero_106 영입 설득을 진행합니다.
+52: REINFORCEMENT_TRANSFER castle_29 hero_101을(를) castle_31의 army_12 보충을 위해 castle_31(으)로 이동시켰습니다.
+52: PREPARATION_INTERVAL castle_29 다음 원정 검토 주기 8개월을 준비합니다.
+52: RECRUITMENT_PROGRESS castle_29 hero_106 영입 설득을 진행합니다.
+53: ARMY_REINFORCED castle_29 army_12에 1명을 보충했습니다.
+53: PREPARATION_INTERVAL castle_29 다음 원정 검토 주기 8개월을 준비합니다.
+53: RECRUITMENT_PROGRESS castle_29 hero_106 영입 설득을 진행합니다.
+54: HERO_REST castle_29 ares의 피로 75 회복을 우선합니다.
+54: PREPARATION_INTERVAL castle_29 다음 원정 검토 주기 8개월을 준비합니다.
+54: RECRUITMENT_NO_ACTOR castle_29 인재 활동이 가능한 대기 영웅이 없습니다.
+55: PREPARATION_INTERVAL castle_29 다음 원정 검토 주기 8개월을 준비합니다.
+55: RECRUITMENT_PROGRESS castle_29 hero_102 영입 설득을 진행합니다.
+56: MARCH_STARTED castle_29 castle_31에서 castle_29(으)로 원정을 시작합니다.
+56: MARCH_STARTED castle_29 castle_31에서 castle_29(으)로 원정을 시작합니다.
+56: MARCH_STARTED castle_29 castle_31에서 castle_29(으)로 원정을 시작합니다.
+56: RECRUITMENT_PROGRESS castle_29 hero_102 영입 설득을 진행합니다.
+57: NO_STRATEGIC_TARGET  전쟁 중인 도달 가능 접경 목표가 없습니다.
+57: PREPARATION_INTERVAL  다음 원정 검토 주기 8개월을 준비합니다.
+57: RECRUITMENT_PROGRESS  hero_102 영입 설득을 진행합니다.
+57: JOINT_ATTACK_RESOLVED  3개 전투단이 castle_29 공동 공격에 참가했습니다.
+58: PREPARATION_INTERVAL  다음 원정 검토 주기 8개월을 준비합니다.
+58: RECRUITMENT_PROGRESS  hero_105 영입 설득을 진행합니다.
+59: GOAL_SELECTED castle_03 장기 공략 목표를 castle_03(으)로 정했습니다.
+59: PREPARATION_INTERVAL castle_03 다음 원정 검토 주기 8개월을 준비합니다.
+59: RECRUITMENT_PROGRESS castle_03 hero_105 영입 설득을 진행합니다.
+60: HERO_REST castle_03 ares의 피로 75 회복을 우선합니다.
+60: PREPARATION_INTERVAL castle_03 다음 원정 검토 주기 8개월을 준비합니다.
+60: RECRUITMENT_NO_ACTOR castle_03 인재 활동이 가능한 대기 영웅이 없습니다.

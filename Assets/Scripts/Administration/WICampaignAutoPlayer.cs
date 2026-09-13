@@ -411,7 +411,7 @@ namespace ProjectWI.Administration
             WICharacterRuntimeState actor = state.Characters
                 .Where(character => character.Recruited && character.IsDead == false && character.Captured == false &&
                                     character.Activity == WICharacterActivityType.None &&
-                                    WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId) &&
+                                    (state.CampaignVariant == WICampaignVariant.AresMain ? WIAdministrationTurnSystem.CanRecruitTalent(state, character.HeroId) : WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId)) &&
                                     state.IsCharacterBusy(character.HeroId) == false)
                 .Where(character => state.Castles.Any(castle =>
                     castle.FactionId == state.PlayerFactionId && castle.HeroIds.Contains(character.HeroId)))
@@ -458,7 +458,7 @@ namespace ProjectWI.Administration
             foreach (WICharacterRuntimeState character in state.Characters.Where(character =>
                          character.Recruited && character.IsDead == false && character.Captured == false &&
                          character.Activity == WICharacterActivityType.None && character.Fatigue >= 70 &&
-                         WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId) &&
+                         (state.CampaignVariant == WICampaignVariant.AresMain ? WIAdministrationTurnSystem.CanRecruitTalent(state, character.HeroId) : WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId)) &&
                          state.IsCharacterBusy(character.HeroId) == false &&
                          state.Castles.Any(castle => castle.FactionId == state.PlayerFactionId &&
                                                      castle.HeroIds.Contains(character.HeroId))))
@@ -475,7 +475,7 @@ namespace ProjectWI.Administration
         {
             return state.Characters.Where(character =>
                     character.Recruited && character.IsDead == false &&
-                    WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId) &&
+                    (state.CampaignVariant == WICampaignVariant.AresMain ? WIAdministrationTurnSystem.CanRecruitTalent(state, character.HeroId) : WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId)) &&
                     (state.Castles.Any(castle => castle.FactionId == state.PlayerFactionId &&
                                                 castle.HeroIds.Contains(character.HeroId)) ||
                      state.Armies.Any(army => army.FactionId == state.PlayerFactionId &&

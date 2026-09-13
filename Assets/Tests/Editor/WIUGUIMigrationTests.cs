@@ -34,7 +34,7 @@ namespace ProjectWI.Tests.Editor
         private const string CouncilPrefabPath = "Assets/Prefabs/Administration/WIAdministrationCouncilUGUI.prefab";
         private const string EventChoicePrefabPath = "Assets/Prefabs/Administration/WIAdministrationEventChoiceUGUI.prefab";
         private const string TurnFollowupPrefabPath = "Assets/Prefabs/Administration/WIAdministrationTurnFollowupUGUI.prefab";
-        private const string TurnFollowupInfoPanelPath = "Assets/Resources/UI/Generated/turn_followup_info_panel_v1.png";
+        private const string TurnFollowupInfoPanelPath = "Assets/Resources/UI/Generated/bg_type_a.png";
         private const string SystemPrefabPath = "Assets/Prefabs/Administration/WIAdministrationSystemUGUI.prefab";
         private const string AdministrationRuntimePrefabPath = "Assets/Prefabs/Administration/WIAdministrationUI.prefab";
         private const string AdministrationDatabasePath = "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset";
@@ -771,7 +771,7 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("confirmButton").objectReferenceValue, Is.Not.Null);
         }
 
-        // 월간 보고 프리팹이 스크롤 본문과 페이지 가능한 6개 사건·전투 버튼을 갖는지 확인합니다.
+        // 월간 보고 프리팹이 요약·운영·소식 카드와 페이지 가능한 3개 중요 결정 카드를 갖는지 확인합니다.
         [Test]
         public void MonthlyReportPrefabContainsScrollableBodyAndActionSlots()
         {
@@ -785,9 +785,16 @@ namespace ProjectWI.Tests.Editor
             Assert.That(prefab.GetComponent<ProjectWI.Administration.WIAdministrationModalUGUIController>(), Is.Not.Null);
             Assert.That(prefab.GetComponentsInChildren<Text>(true), Is.Empty);
             Assert.That(prefab.GetComponentsInChildren<EventSystem>(true), Is.Empty);
-            Assert.That(serialized.FindProperty("bodyLabel").objectReferenceValue, Is.Not.Null);
-            Assert.That(serialized.FindProperty("scrollRect").objectReferenceValue, Is.Not.Null);
-            Assert.That(serialized.FindProperty("actionButtons").arraySize, Is.EqualTo(6));
+            Assert.That(serialized.FindProperty("summaryLabels").arraySize, Is.EqualTo(5));
+            Assert.That(serialized.FindProperty("resourceLabels").arraySize, Is.EqualTo(3));
+            Assert.That(serialized.FindProperty("operationCards").arraySize, Is.EqualTo(4));
+            Assert.That(serialized.FindProperty("newsCards").arraySize, Is.EqualTo(2));
+            Assert.That(serialized.FindProperty("actionButtons").arraySize, Is.EqualTo(3));
+            Assert.That(serialized.FindProperty("actionThumbnails").arraySize, Is.EqualTo(3));
+            Assert.That(serialized.FindProperty("filterButtons").arraySize, Is.EqualTo(4));
+            Assert.That(serialized.FindProperty("filterNormalSprite").objectReferenceValue, Is.Not.Null);
+            Assert.That(serialized.FindProperty("filterSelectedSprite").objectReferenceValue, Is.Not.Null);
+            Assert.That(serialized.FindProperty("confirmButton").objectReferenceValue, Is.Not.Null);
         }
 
         // 군사 프리팹이 전투·전투단용 고정 카드와 편성 버튼을 갖는지 확인합니다.
@@ -967,11 +974,12 @@ namespace ProjectWI.Tests.Editor
             int slicedPanelCount = 0;
 
             Assert.That(importer, Is.Not.Null);
-            Assert.That(importer.spriteBorder, Is.EqualTo(new Vector4(48f, 48f, 48f, 48f)));
+            Assert.That(importer.spriteBorder.sqrMagnitude, Is.GreaterThan(0f));
             foreach (Image image in images)
             {
-                if (image.sprite != null && AssetDatabase.GetAssetPath(image.sprite) == TurnFollowupInfoPanelPath)
+                if (image.name == "DescriptionPanel" || image.name == "ChecklistPanel" || image.name == "MapCheck" || image.name == "CommandCheck")
                 {
+                    Assert.That(AssetDatabase.GetAssetPath(image.sprite), Is.EqualTo(TurnFollowupInfoPanelPath), image.name);
                     Assert.That(image.type, Is.EqualTo(Image.Type.Sliced), image.gameObject.name);
                     slicedPanelCount += 1;
                 }

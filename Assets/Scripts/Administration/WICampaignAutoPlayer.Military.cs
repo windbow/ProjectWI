@@ -262,11 +262,16 @@ namespace ProjectWI.Administration
             {
                 return;
             }
+            // 메인에서는 이동 예약 인원까지 보충 인원에 포함해 과잉 이동을 막습니다.
+            if (state.CampaignVariant == WICampaignVariant.AresMain && army.Members.Count + state.CharacterTransfers.Count(item => item.TargetCastleId == destination.CastleId) >= targetSize)
+            {
+                return;
+            }
             var transferCandidate = state.Castles
                 .Where(castle => castle.FactionId == state.PlayerFactionId && castle.CastleId != destination.CastleId)
                 .SelectMany(castle => castle.HeroIds
                     .Where(heroId => state.IsCharacterBusy(heroId) == false)
-                    .Where(heroId => state.GetCharacter(heroId)?.BaseGrade == WICharacterGrade.Common)
+                    .Where(heroId => state.CampaignVariant == WICampaignVariant.AresMain || state.GetCharacter(heroId)?.BaseGrade == WICharacterGrade.Common)
                     .Where(heroId => IsReservedAdministrator(state, castle, heroId) == false)
                     .Select(heroId => new
                     {
@@ -280,7 +285,7 @@ namespace ProjectWI.Administration
                 .FirstOrDefault();
             if (transferCandidate == null ||
                 WIAdministrationTurnSystem.StartCharacterTransfer(
-                    database, state, transferCandidate.HeroId, transferCandidate.NextCastleId) == false)
+                    database, state, transferCandidate.HeroId, state.CampaignVariant == WICampaignVariant.AresMain ? destination.CastleId : transferCandidate.NextCastleId) == false)
             {
                 return;
             }
@@ -847,7 +852,7 @@ namespace ProjectWI.Administration
             int roleIndex = 0;
             foreach (string heroId in castle.HeroIds
                          .Where(id => state.IsCharacterBusy(id) == false)
-                         .Where(id => state.GetCharacter(id)?.BaseGrade == WICharacterGrade.Common)
+                         .Where(id => state.CampaignVariant == WICampaignVariant.AresMain || state.GetCharacter(id)?.BaseGrade == WICharacterGrade.Common)
                          .Where(id => IsReservedAdministrator(state, castle, id) == false)
                          .OrderBy(id => WIAdministrationTurnSystem.IsAdministrationCapable(state, id) ? 1 : 0)
                          .ThenByDescending(id => database.GetHero(id)?.Might ?? 0)
@@ -866,6 +871,14 @@ namespace ProjectWI.Administration
         // 성마다 영지관과 마지막 대기 내정 인물 한 명은 전투단 편입·전선 이동에서 보존합니다.
         private static bool IsReservedAdministrator(WIAdministrationState state, WICastleRuntimeState castle, string heroId)
         {
+            // 메인에서는 마지막 대기 영입 담당자를 전선에 보내 후방 영입이 끊기지 않게 합니다.
+            if (state.CampaignVariant == WICampaignVariant.AresMain &&
+                WIAdministrationTurnSystem.CanRecruitTalent(state, heroId) &&
+                castle.HeroIds.Count(id => state.IsCharacterBusy(id) == false &&
+                    WIAdministrationTurnSystem.CanRecruitTalent(state, id)) <= 1)
+            {
+                return true;
+            }
             if (heroId == castle.GovernorHeroId)
             {
                 return true;

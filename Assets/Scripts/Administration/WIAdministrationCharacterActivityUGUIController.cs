@@ -40,6 +40,8 @@ namespace ProjectWI.Administration
         private PageMode pageMode;
         private WICharacterActivityType pendingActivity;
         private string selectedHeroId;
+        // 대상 선택에서도 유지할 활동 담당자의 표시 이름입니다.
+        private string selectedHeroName;
         private int pageIndex;
         private GradeFilter gradeFilter;
         private bool sortByName;
@@ -171,6 +173,9 @@ namespace ProjectWI.Administration
             }
             previousButton.interactable = pageIndex > 0;
             nextButton.interactable = pageIndex + 1 < pageCount;
+            previousButton.gameObject.SetActive(pageCount > 1);
+            nextButton.gameObject.SetActive(pageCount > 1);
+            pageLabel.gameObject.SetActive(pageCount > 1);
             pageLabel.text = $"{pageIndex + 1} / {pageCount}";
             RefreshToolbar();
         }
@@ -188,8 +193,9 @@ namespace ProjectWI.Administration
             if (pageMode == PageMode.Actor)
             {
                 selectedHeroId = candidate.HeroId;
+                selectedHeroName = candidate.DisplayName;
                 pageMode = PageMode.Activity;
-                modal.SetTitle(candidate.DisplayName + " · 개인 활동");
+                modal.SetTitle(string.Format(administrationController.GetAdministrationText("UI_ACTIVITY_ACTOR_TITLE"), selectedHeroName));
                 contextLabel.text = administrationController.GetAdministrationText("UI_ACTIVITY_REPEAT_HINT");
                 WICharacterActivityType[] activities = { WICharacterActivityType.Search, WICharacterActivityType.Socialize,
                     WICharacterActivityType.Recruit, WICharacterActivityType.Training, WICharacterActivityType.Rest };
@@ -208,6 +214,7 @@ namespace ProjectWI.Administration
                 RefreshRepeatActivity();
                 cardRoot.SetActive(false);
                 activityRoot.SetActive(true);
+                ArrangeVisibleActivities();
                 if (toolbarRoot != null)
                 {
                     toolbarRoot.SetActive(false);
@@ -241,6 +248,28 @@ namespace ProjectWI.Administration
             }
         }
 
+        // 숨겨진 업무를 제외하고 기존 행동 버튼만 같은 간격으로 재배치합니다.
+        private void ArrangeVisibleActivities()
+        {
+            int visibleCount = activityButtons.Count(button => button.gameObject.activeSelf);
+            int row = 0;
+            foreach (Button button in activityButtons)
+            {
+                if (button.gameObject.activeSelf == false)
+                {
+                    continue;
+                }
+                RectTransform rect = (RectTransform)button.transform;
+                float top = 1f - row / (float)Mathf.Max(visibleCount, 1);
+                rect.anchorMin = new Vector2(0f, top - .17f);
+                rect.anchorMax = new Vector2(1f, top);
+                rect.offsetMin = rect.offsetMax = Vector2.zero;
+                row += 1;
+            }
+            previousButton.gameObject.SetActive(false);
+            nextButton.gameObject.SetActive(false);
+        }
+
         // 대상 없는 활동은 즉시 배정하고, 교류와 영입은 대상 선택으로 전환합니다.
         private void SelectActivity(WICharacterActivityType activity)
         {
@@ -258,10 +287,8 @@ namespace ProjectWI.Administration
                 ShowError(error);
                 return;
             }
-            modal.SetTitle(activity == WICharacterActivityType.Socialize ? "교류 대상 선택" : "영입 대상 선택");
-            contextLabel.text = activity == WICharacterActivityType.Socialize
-                ? "관계를 개선할 같은 성의 인물을 선택하십시오."
-                : "발견한 인재 중 설득할 대상을 선택하십시오.";
+            modal.SetTitle(string.Format(administrationController.GetAdministrationText(activity == WICharacterActivityType.Socialize ? "UI_ACTIVITY_SOCIAL_TARGET" : "UI_ACTIVITY_RECRUIT_TARGET"), selectedHeroName));
+            contextLabel.text = string.Format(administrationController.GetAdministrationText("UI_ACTIVITY_TARGET_HINT"), selectedHeroName);
             messageLabel.gameObject.SetActive(false);
             ResetCandidateViewOptions();
             RefreshCards();
@@ -342,7 +369,10 @@ namespace ProjectWI.Administration
         private void ApplyCandidateViewOptions()
         {
             pageIndex = 0;
-            RefreshCards();
+            if (pageMode != PageMode.Activity)
+            {
+                RefreshCards();
+            }
         }
 
         // 선택한 등급 필터를 적용합니다.

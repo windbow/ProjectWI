@@ -136,6 +136,9 @@ namespace ProjectWI.Administration
             }
             previousButton.interactable = pageIndex > 0;
             nextButton.interactable = pageIndex + 1 < pageCount;
+            previousButton.gameObject.SetActive(pageCount > 1);
+            nextButton.gameObject.SetActive(pageCount > 1);
+            pageLabel.gameObject.SetActive(pageCount > 1);
             pageLabel.text = $"{pageIndex + 1} / {pageCount}";
         }
 

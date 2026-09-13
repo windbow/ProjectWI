@@ -357,3 +357,16 @@
     border-width:0;
     font-size:13px;
 }
+
+/* 실제 슬롯 경계 안에 명령과 스킬을 고정하고 페이지 조작 공간을 확보합니다. */
+.battle-command-frame { padding: 16px 38px 16px 38px; }
+.battle-command-frame .command-feedback { position:absolute; left:10px; right:10px; bottom:130px; height:42px; white-space:normal; font-size:15px; -unity-text-align:middle-center; background-color:rgba(7,13,19,.92); }
+.battle-command-frame .command-group { height:100%; }
+.battle-command-frame .command-button { height:100%; min-height:0; width:25%; flex-shrink:1; -unity-text-align:middle-center; padding:0; }
+.battle-skill-frame { height:148px; padding:12px 14px 42px 14px; background-image:url("project://database/Assets/Resources/UI/Generated/bg_type_a.png"); }
+.battle-skill-frame .skill-button { width:25%; flex-shrink:1; white-space:normal; -unity-text-align:middle-center; background-color:rgb(17,28,37); border-width:1px; border-color:rgb(83,100,112); }
+.skill-pager { position:absolute; left:14px; right:14px; bottom:5px; height:32px; flex-direction:row; justify-content:space-between; align-items:center; }
+.skill-pager Button { width:64px; height:32px; margin:0; background-color:rgb(25,38,49); color:rgb(237,243,246); }
+.skill-pager Label { color:rgb(237,243,246); font-size:15px; }
+.battle-top-status-frame .battle-status { width:90%; -unity-text-align:middle-left; color:rgb(238,242,245); }
+.battle-character-info-frame .selection-info { align-self:flex-start; margin-top:36px; height:74px; font-size:14px; }

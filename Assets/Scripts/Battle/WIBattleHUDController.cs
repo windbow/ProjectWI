@@ -14,8 +14,12 @@ namespace ProjectWI.Battle
         private Label statusLabel;
         private Label commandFeedbackLabel;
         private Label selectionInfoLabel;
-        private VisualElement skillButtons;
-        private readonly HashSet<string> builtSkillHeroes = new HashSet<string>();
+        // UXML에 저장된 네 슬롯과 페이지 이동 요소를 재사용합니다.
+        private readonly Button[] skillSlots = new Button[4];
+        private Button skillPrevious;
+        private Button skillNext;
+        private Label skillPageLabel;
+        private int skillPage;
         private readonly Dictionary<string, Button> skillButtonByHeroId = new Dictionary<string, Button>();
         private readonly Dictionary<WIBattleCommand, Button> commandButtons = new Dictionary<WIBattleCommand, Button>();
         private float retreatConfirmUntil;
@@ -33,7 +37,23 @@ namespace ProjectWI.Battle
             statusLabel = root.Q<Label>("battle-status");
             commandFeedbackLabel = root.Q<Label>("command-feedback");
             selectionInfoLabel = root.Q<Label>("selection-info");
-            skillButtons = root.Q<VisualElement>("skill-buttons");
+            skillPrevious = root.Q<Button>("skill-previous");
+            skillNext = root.Q<Button>("skill-next");
+            skillPageLabel = root.Q<Label>("skill-page");
+            skillPrevious.clicked += () => skillPage = Mathf.Max(0, skillPage - 1);
+            skillNext.clicked += () => skillPage += 1;
+            for (int index = 0; index < skillSlots.Length; index += 1)
+            {
+                Button slot = root.Q<Button>("skill-slot-" + index);
+                skillSlots[index] = slot;
+                slot.clicked += () =>
+                {
+                    if (slot.userData is string heroId)
+                    {
+                        battleController.TryActivateHeroSkill(heroId);
+                    }
+                };
+            }
             RegisterCommandButton(root, "advance-command", WIBattleCommand.Advance);
             RegisterCommandButton(root, "hold-command", WIBattleCommand.Hold);
             RegisterCommandButton(root, "focus-command", WIBattleCommand.Focus);
@@ -195,22 +215,32 @@ namespace ProjectWI.Battle
                    keyCode == KeyCode.LeftArrow || keyCode == KeyCode.RightArrow;
         }
 
-        // 플레이어 진영 영웅마다 재사용 가능한 액티브 스킬 버튼을 생성합니다.
+        // 현재 페이지의 스킬을 저장된 네 슬롯에 연결하며 UI를 동적으로 생성하지 않습니다.
         private void BuildSkillButtons(WIBattleRuntimeState runtime)
         {
-            foreach (WIBattleCharacterState character in runtime.Characters.Where(item => item.Side == playerSide))
+            List<WIBattleCharacterState> characters = runtime.Characters
+                .Where(item => item.Side == playerSide && battleController.Config.GetCharacterSkill(item.HeroId, item.HeroClass) != null)
+                .GroupBy(item => item.HeroId).Select(group => group.First()).ToList();
+            int pageCount = Mathf.Max(1, Mathf.CeilToInt(characters.Count / (float)skillSlots.Length));
+            skillPage = Mathf.Clamp(skillPage, 0, pageCount - 1);
+            skillPrevious.SetEnabled(skillPage > 0);
+            skillNext.SetEnabled(skillPage + 1 < pageCount);
+            skillPageLabel.text = $"{skillPage + 1} / {pageCount}";
+            skillButtonByHeroId.Clear();
+            for (int index = 0; index < skillSlots.Length; index += 1)
             {
-                WIBattleSkillDefinition skill = battleController.Config.GetCharacterSkill(character.HeroId, character.HeroClass);
-                if (skill == null) continue;
-                if (builtSkillHeroes.Add(character.HeroId) == false)
+                Button button = skillSlots[index];
+                int source = skillPage * skillSlots.Length + index;
+                button.style.display = source < characters.Count ? DisplayStyle.Flex : DisplayStyle.None;
+                if (source >= characters.Count)
                 {
+                    button.userData = null;
                     continue;
                 }
-                Button button = new Button(() => battleController.TryActivateHeroSkill(character.HeroId));
-                button.text = skill.DisplayName;
-                button.tooltip = $"{skill.Description}\n마나 {skill.ManaCost} · 범위 {skill.Range:0.#} · 재사용 {skill.Cooldown:0.#}초";
-                button.AddToClassList("skill-button");
-                skillButtons.Add(button);
+                WIBattleCharacterState character = characters[source];
+                WIBattleSkillDefinition skill = battleController.Config.GetCharacterSkill(character.HeroId, character.HeroClass);
+                button.userData = character.HeroId;
+                button.tooltip = $"{character.DisplayName}\n{skill.Description}\n마나 {skill.ManaCost} · 범위 {skill.Range:0.#} · 재사용 {skill.Cooldown:0.#}초";
                 skillButtonByHeroId[character.HeroId] = button;
             }
         }

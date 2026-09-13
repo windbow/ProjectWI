@@ -1,0 +1,54 @@
+경제 시작: 금화 15440, 번영합 839
+AresMain Balanced 120: 성 15, 원정 29, 승/패 15/0, 선택 84, 결과 Ongoing, 발도르 잔여 32, 신규영입 24
+대기 common_063: 등급 Common, 내정 True, 영입 True, 탐색가능 True
+대기 ares: 등급 Hero, 내정 True, 영입 True, 탐색가능 True
+대기 common_alden: 등급 Common, 내정 True, 영입 False, 탐색가능 False
+대기 hero_107: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_104: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_106: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_118: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_119: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_120: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_121: 등급 Hero, 내정 False, 영입 False, 탐색가능 False
+대기 hero_122: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_123: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_124: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_111: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+대기 hero_110: 등급 Hero, 내정 True, 영입 False, 탐색가능 False
+목표 castle_18, 집결 582, 필요 141, 전체전력 1162, 영향력 1720, 전쟁 True
+전투단 army_1@castle_03 -> , 임무 Reinforce, 인원 6, 전력 580, 이동 False, 재편 0
+전투단 army_2@castle_25 -> , 임무 Reinforce, 인원 6, 전력 582, 이동 False, 재편 0
+전투단 army_12@castle_18 -> , 임무 Attack, 인원 6, 전력 617, 이동 False, 재편 1
+전투단 army_13@castle_18 -> , 임무 Reserve, 인원 7, 전력 701, 이동 False, 재편 1
+109: PREPARATION_INTERVAL castle_25 다음 원정 검토 주기 8개월을 준비합니다.
+109: RECRUITMENT_PROGRESS castle_25 hero_122 영입 설득을 진행합니다.
+110: PREPARATION_INTERVAL castle_25 다음 원정 검토 주기 8개월을 준비합니다.
+110: RECRUITMENT_SEARCH castle_25 영입 후보를 찾기 위해 재야 인재를 탐색합니다.
+111: PREPARATION_INTERVAL castle_25 다음 원정 검토 주기 8개월을 준비합니다.
+111: RECRUITMENT_PROGRESS castle_25 hero_123 영입 설득을 진행합니다.
+112: MARCH_STARTED castle_25 castle_24에서 castle_25(으)로 원정을 시작합니다.
+112: MARCH_STARTED castle_25 castle_24에서 castle_25(으)로 원정을 시작합니다.
+112: MARCH_STARTED castle_25 castle_24에서 castle_25(으)로 원정을 시작합니다.
+112: RECRUITMENT_PROGRESS castle_25 hero_123 영입 설득을 진행합니다.
+112: JOINT_ATTACK_RESOLVED castle_25 3개 전투단이 castle_25 공동 공격에 참가했습니다.
+113: GOAL_SELECTED castle_18 장기 공략 목표를 castle_18(으)로 정했습니다.
+113: PREPARATION_INTERVAL castle_18 다음 원정 검토 주기 8개월을 준비합니다.
+113: RECRUITMENT_PROGRESS castle_18 hero_123 영입 설득을 진행합니다.
+114: HERO_REST castle_18 ares의 피로 75 회복을 우선합니다.
+114: PREPARATION_INTERVAL castle_18 다음 원정 검토 주기 8개월을 준비합니다.
+114: RECRUITMENT_NO_ACTOR castle_18 인재 활동이 가능한 대기 영웅이 없습니다.
+115: PREPARATION_INTERVAL castle_18 다음 원정 검토 주기 8개월을 준비합니다.
+115: RECRUITMENT_SEARCH castle_18 영입 후보를 찾기 위해 재야 인재를 탐색합니다.
+116: PREPARATION_INTERVAL castle_18 다음 원정 검토 주기 8개월을 준비합니다.
+116: RECRUITMENT_PROGRESS castle_18 hero_124 영입 설득을 진행합니다.
+117: PREPARATION_INTERVAL castle_18 다음 원정 검토 주기 8개월을 준비합니다.
+117: RECRUITMENT_PROGRESS castle_18 hero_124 영입 설득을 진행합니다.
+118: PREPARATION_INTERVAL castle_18 다음 원정 검토 주기 8개월을 준비합니다.
+118: RECRUITMENT_PROGRESS castle_18 hero_124 영입 설득을 진행합니다.
+119: PREPARATION_INTERVAL castle_18 다음 원정 검토 주기 8개월을 준비합니다.
+119: RECRUITMENT_SEARCH castle_18 영입 후보를 찾기 위해 재야 인재를 탐색합니다.
+120: HERO_REST castle_18 ares의 피로 75 회복을 우선합니다.
+120: MARCH_STARTED castle_18 castle_25에서 castle_18(으)로 원정을 시작합니다.
+120: MARCH_STARTED castle_18 castle_25에서 castle_18(으)로 원정을 시작합니다.
+120: RECRUITMENT_NO_ACTOR castle_18 인재 활동이 가능한 대기 영웅이 없습니다.
+120: JOINT_ATTACK_RESOLVED castle_18 2개 전투단이 castle_18 공동 공격에 참가했습니다.

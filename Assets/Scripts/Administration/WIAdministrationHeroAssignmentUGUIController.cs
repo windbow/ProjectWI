@@ -55,14 +55,14 @@ namespace ProjectWI.Administration
         // 현재 성의 슬롯과 배치 가능한 후보를 표시합니다.
         private void Open()
         {
-            modal.Show("영웅 배치");
+            modal.Show(administrationController.GetAdministrationText("UI_ASSIGN_RESIDENT_TITLE"));
             pageIndex = 0;
             if (administrationController.TryGetUGUIHeroAssignmentSnapshot(out currentSnapshot, out string error)
                 == false)
             {
                 slotStatusLabel.text = string.Empty;
                 messageLabel.gameObject.SetActive(true);
-                messageLabel.text = error;
+                messageLabel.text = administrationController.GetAdministrationText("UI_ASSIGN_RESIDENT_HINT") + "\n\n" + error;
                 HideCandidates();
                 return;
             }
@@ -96,6 +96,9 @@ namespace ProjectWI.Administration
             }
             previousButton.interactable = pageIndex > 0;
             nextButton.interactable = pageIndex + 1 < pageCount;
+            previousButton.gameObject.SetActive(pageCount > 1);
+            nextButton.gameObject.SetActive(pageCount > 1);
+            pageLabel.gameObject.SetActive(pageCount > 1);
             pageLabel.text = $"{pageIndex + 1} / {pageCount}";
         }
 
@@ -134,6 +137,9 @@ namespace ProjectWI.Administration
             }
             previousButton.interactable = false;
             nextButton.interactable = false;
+            previousButton.gameObject.SetActive(false);
+            nextButton.gameObject.SetActive(false);
+            pageLabel.gameObject.SetActive(false);
             pageLabel.text = string.Empty;
         }
     }

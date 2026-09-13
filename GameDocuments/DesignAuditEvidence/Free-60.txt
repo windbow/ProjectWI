@@ -1,0 +1,7 @@
+Free Balanced 60: 성 1, 원정 0, 승/패 12/0, 선택 23, 결과 Ongoing, 발도르 잔여 25, 신규영입 0
+대기 common_alden: 등급 Common, 내정 True, 영입 False, 탐색가능 False
+편성 전후 army_1: 703 -> 703
+편성 전후 army_12: 175 -> 175
+실반로드 선전포고 가능: True
+대체 전선 원정 명령 성공: army_1
+대체 전선 원정 명령 성공: army_12

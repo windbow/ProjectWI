@@ -2,7 +2,7 @@ namespace ProjectWI.Administration
 {
     public partial class WIAdministrationUIController
     {
-        // 비용을 지불하고 선택한 성에 월간 중점 사업을 지정합니다.
+        // 비용을 지불하고 중점 사업을 지정하며 확장을 제외한 지시를 다음 달에도 기본 유지합니다.
         private void AssignCastleProject(
             WICastleProjectType projectType,
             WIProjectInvestment investment,
@@ -38,6 +38,7 @@ namespace ProjectWI.Administration
                     ? database.ProjectBalance.ExpansionDurationMonths
                     : 1
             };
+            selectedCastle.RepeatProject = projectType != WICastleProjectType.Expansion;
             selectedCastle.StandingProject = selectedCastle.RepeatProject ? CopyProjectOrder(selectedCastle.ActiveProject) : null;
             WITutorialSystem.Complete(state, "tutorial_project");
             CloseModal();

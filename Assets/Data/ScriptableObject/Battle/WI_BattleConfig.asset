@@ -302,6 +302,6 @@ MonoBehaviour:
     controlRadius: 2
   arenaBackground: {fileID: 21300000, guid: aadb20e638a958b42a600f5eca06ecd4, type: 3}
   arenaPrefab: {fileID: 162355369505947602, guid: e6335956ab4fefb469be06d4d1fbf8ae, type: 3}
-  placeholderSprite: {fileID: 0}
+  placeholderSprite: {fileID: 21300000, guid: f9f1dfc0703698949a7ac4e920f3a878, type: 3}
   characterDefaultMaterial: {fileID: 2100000, guid: e6490c0cc933d534782b66eca552d219, type: 2}
   characterFarOutlineMaterial: {fileID: 2100000, guid: e6490c0cc933d534782b66eca552d219, type: 2}

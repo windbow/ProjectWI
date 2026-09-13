@@ -126,7 +126,8 @@ namespace ProjectWI.Administration
                     WIAdministrationTavernQuestSnapshot quest = snapshot.Quests[index];
                     cardImages[index].enabled = false;
                     RectTransform questLabelRect = cardLabels[index].rectTransform;
-                    questLabelRect.anchorMax = Vector2.one;
+                    questLabelRect.anchorMin = new Vector2(0.04f, 0.08f);
+                    questLabelRect.anchorMax = new Vector2(0.97f, 0.92f);
                     cardLabels[index].text = quest.DisplayName + "\n" + quest.Summary + "\n" + quest.Description;
                     cardButtons[index].interactable = quest.Available;
                 }
@@ -136,7 +137,8 @@ namespace ProjectWI.Administration
                     cardImages[index].sprite = hero.Portrait;
                     cardImages[index].enabled = hero.Portrait != null;
                     RectTransform heroLabelRect = cardLabels[index].rectTransform;
-                    heroLabelRect.anchorMax = new Vector2(1f, 0.31f);
+                    heroLabelRect.anchorMin = new Vector2(0.23f, 0.08f);
+                    heroLabelRect.anchorMax = new Vector2(0.97f, 0.92f);
                     cardLabels[index].text = hero.DisplayName + "\n" + hero.Summary;
                     cardButtons[index].interactable = true;
                 }

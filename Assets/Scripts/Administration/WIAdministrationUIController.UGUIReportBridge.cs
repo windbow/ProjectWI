@@ -36,7 +36,7 @@ namespace ProjectWI.Administration
                 body.AppendLine();
                 body.AppendLine($"번영 {selectedCastle.Prosperity} · 기술 {selectedCastle.Technology}");
                 body.AppendLine($"질서 {selectedCastle.Stability} · 방어 {selectedCastle.Defense}");
-                body.AppendLine($"주둔 인물 {selectedCastle.HeroIds.Count}/{selectedCastle.GetHeroSlotCount()}");
+                body.AppendLine($"주둔 인물 {WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, selectedCastle).Count}/{selectedCastle.GetHeroSlotCount()}");
                 body.AppendLine($"특화 시설 {selectedCastle.SpecialFacilityIds.Count}/{selectedCastle.GetSpecialFacilitySlotCount()}");
                 if (selectedCastle.OccupationUnrestMonths > 0)
                 {
@@ -97,55 +97,103 @@ namespace ProjectWI.Administration
             snapshot = null;
             WITurnSummary report = state?.LastMonthlyReport;
             if (report == null) return false;
-            System.Text.StringBuilder body = new System.Text.StringBuilder();
-            body.AppendLine($"금화 +{report.GoldGained} / 지출 -{report.GoldSpent}");
-            body.AppendLine($"마나 +{report.ManaGained} / 영향력 +{report.InfluenceGained}");
-            foreach (string entry in report.DelegationReports) body.AppendLine(entry);
-            if (report.AIReasonReports != null && report.AIReasonReports.Count > 0)
+            System.Collections.Generic.HashSet<string> characterIds = new System.Collections.Generic.HashSet<string>();
+            foreach (WICastleRuntimeState castle in state.Castles.FindAll(item => item.FactionId == state.PlayerFactionId))
             {
-                body.AppendLine();
-                body.AppendLine("AI 진영 판단 근거");
-                foreach (string entry in report.AIReasonReports) body.AppendLine(entry);
+                characterIds.UnionWith(castle.HeroIds);
             }
-            if (report.News.Count > 0) body.AppendLine();
-            foreach (string news in report.News) body.AppendLine(news);
-            snapshot = new WIAdministrationMonthlyReportSnapshot { Body = body.ToString().TrimEnd() };
+            foreach (WIArmyState army in state.Armies.FindAll(item => item.FactionId == state.PlayerFactionId))
+            {
+                characterIds.UnionWith(army.Members.ConvertAll(member => member.HeroId));
+            }
+            System.Collections.Generic.List<WICastleRuntimeState> playerCastles = state.Castles.FindAll(
+                item => item.FactionId == state.PlayerFactionId);
+            WIFactionRuntimeState faction = state.GetPlayerFactionState();
+            int year = ((System.Math.Max(1, state.Turn) - 1) / 12) + 1;
+            int month = ((System.Math.Max(1, state.Turn) - 1) % 12) + 1;
+            snapshot = new WIAdministrationMonthlyReportSnapshot
+            {
+                Title = $"{year}년 {month:00}월 월간 보고",
+                TerritorySummary = $"영지 수  {playerCastles.Count}",
+                CharacterSummary = $"인물  {characterIds.Count}",
+                ArmySummary = $"전투단  {state.Armies.FindAll(item => item.FactionId == state.PlayerFactionId && item.IsOperational).Count}",
+                StabilitySummary = $"평균 질서  {(playerCastles.Count == 0 ? 0 : (int)playerCastles.Average(item => item.Stability))}",
+                ResearchSummary = string.IsNullOrEmpty(faction?.ActiveResearchId) ? "연구  대기" : "연구  진행 중",
+                GoldSummary = $"금화\n{FormatSignedReportValue(report.GoldGained - report.GoldSpent)}",
+                ManaSummary = $"마나\n{FormatSignedReportValue(report.ManaGained)}",
+                InfluenceSummary = $"영향력\n{FormatSignedReportValue(report.InfluenceGained)}"
+            };
+            snapshot.Operations.AddRange(report.DelegationReports.Take(4));
+            snapshot.News.AddRange(report.News.Take(2));
+            if (snapshot.News.Count < 2 && report.AIReasonReports != null)
+            {
+                snapshot.News.AddRange(report.AIReasonReports.Take(2 - snapshot.News.Count));
+            }
             for (int index = 0; index < state.PendingProjectEvents.Count; index += 1)
-                snapshot.Actions.Add(new WIAdministrationReportActionSnapshot { Type = WIAdministrationReportActionType.ProjectEvent, Id = index.ToString(), Caption = "선택 사건 · " + state.PendingProjectEvents[index].Title });
+                snapshot.Actions.Add(CreateReportAction(WIAdministrationReportActionType.ProjectEvent,
+                    index.ToString(), "영지", "선택 사건 · " + state.PendingProjectEvents[index].Title,
+                    "사업의 성과 처리 방식을 결정합니다.", false));
             for (int index = 0; index < state.PendingRelationshipEvents.Count; index += 1)
             {
                 WIRelationshipEventDefinition definition = database.GetRelationshipEvent(state.PendingRelationshipEvents[index].EventId);
-                if (definition != null) snapshot.Actions.Add(new WIAdministrationReportActionSnapshot { Type = WIAdministrationReportActionType.RelationshipEvent, Id = index.ToString(), Caption = "관계 사건 · " + definition.Title.Get(database.UseEnglish) });
+                if (definition != null) snapshot.Actions.Add(CreateReportAction(WIAdministrationReportActionType.RelationshipEvent,
+                    index.ToString(), "인물", "관계 사건 · " + definition.Title.Get(database.UseEnglish),
+                    "두 인물의 관계와 공훈이 달라집니다.", false));
             }
             for (int index = 0; index < state.PendingRegionalEvents.Count; index += 1)
             {
                 WIRegionalEventDefinition definition = database.GetRegionalEvent(state.PendingRegionalEvents[index].EventId);
-                if (definition != null) snapshot.Actions.Add(new WIAdministrationReportActionSnapshot { Type = WIAdministrationReportActionType.RegionalEvent, Id = index.ToString(), Caption = "지역 사건 · " + definition.Title.Get(database.UseEnglish) });
+                if (definition != null) snapshot.Actions.Add(CreateReportAction(WIAdministrationReportActionType.RegionalEvent,
+                    index.ToString(), "영지", "지역 사건 · " + definition.Title.Get(database.UseEnglish),
+                    "자원과 지역 상태에 영향을 줍니다.", false));
             }
             for (int index = 0; index < state.PendingOccupationEvents.Count; index += 1)
             {
                 WICastleDefinition castle = database.GetCastle(state.PendingOccupationEvents[index].CastleId);
-                snapshot.Actions.Add(new WIAdministrationReportActionSnapshot { Type = WIAdministrationReportActionType.OccupationEvent, Id = index.ToString(), Caption = "점령 통치 · " + (castle?.DisplayName.Get(database.UseEnglish) ?? state.PendingOccupationEvents[index].CastleId) });
+                snapshot.Actions.Add(CreateReportAction(WIAdministrationReportActionType.OccupationEvent,
+                    index.ToString(), "군사", "점령 통치 · " + (castle?.DisplayName.Get(database.UseEnglish) ?? state.PendingOccupationEvents[index].CastleId),
+                    "새 점령지의 질서와 통치 비용을 결정합니다.", true));
             }
             for (int index = 0; index < state.PendingRecruitmentEvents.Count; index += 1)
             {
                 WIRecruitmentEventDefinition definition = database.GetRecruitmentEvent(state.PendingRecruitmentEvents[index].EventId);
-                if (definition != null) snapshot.Actions.Add(new WIAdministrationReportActionSnapshot { Type = WIAdministrationReportActionType.RecruitmentEvent, Id = index.ToString(), Caption = "영입 요구 · " + definition.Title.Get(database.UseEnglish) });
+                if (definition != null) snapshot.Actions.Add(CreateReportAction(WIAdministrationReportActionType.RecruitmentEvent,
+                    index.ToString(), "인물", "영입 요구 · " + definition.Title.Get(database.UseEnglish),
+                    "요구를 검토하고 합류 여부를 결정합니다.", false));
             }
             for (int index = 0; index < state.PendingLegacyChoices.Count; index += 1)
-                snapshot.Actions.Add(new WIAdministrationReportActionSnapshot { Type = WIAdministrationReportActionType.LegacyChoice, Id = index.ToString(), Caption = "영웅의 흔적 · " + state.PendingLegacyChoices[index].Legacy.DisplayName });
+                snapshot.Actions.Add(CreateReportAction(WIAdministrationReportActionType.LegacyChoice,
+                    index.ToString(), "인물", "영웅의 흔적 · " + state.PendingLegacyChoices[index].Legacy.DisplayName,
+                    "새 흔적을 기록하거나 기존 흔적을 교체합니다.", false));
             foreach (WIBattleSessionState battle in state.BattleSessions.FindAll(item => item.PlayerInvolved && item.Status == WIBattleSessionStatus.Pending))
             {
                 WICastleDefinition castle = database.GetCastle(battle.CastleId);
-                snapshot.Actions.Add(new WIAdministrationReportActionSnapshot
-                {
-                    Type = WIAdministrationReportActionType.Battle,
-                    Id = battle.SessionId,
-                    Caption = $"전투 시작 · {castle?.DisplayName.Get(database.UseEnglish) ?? battle.CastleId} · 아군 {battle.AttackerPowerSnapshot} / 적군 {battle.DefenderPowerSnapshot}",
-                    Danger = true
-                });
+                snapshot.Actions.Add(CreateReportAction(WIAdministrationReportActionType.Battle,
+                    battle.SessionId, "군사", $"전투 발생 · {castle?.DisplayName.Get(database.UseEnglish) ?? battle.CastleId}",
+                    $"아군 {battle.AttackerPowerSnapshot} / 적군 {battle.DefenderPowerSnapshot}", true));
             }
             return true;
+        }
+
+        // 월간 자원 증감을 양수와 음수 모두 자연스러운 부호로 표시합니다.
+        private static string FormatSignedReportValue(int value)
+        {
+            return value > 0 ? $"+{value}" : value.ToString();
+        }
+        // 월간 보고의 결정 카드를 공통 형식으로 생성합니다.
+        private static WIAdministrationReportActionSnapshot CreateReportAction(
+            WIAdministrationReportActionType type, string id, string category,
+            string caption, string detail, bool danger)
+        {
+            return new WIAdministrationReportActionSnapshot
+            {
+                Type = type,
+                Id = id,
+                Category = category,
+                Caption = caption,
+                Detail = detail,
+                Danger = danger
+            };
         }
 
         // 월간 보고에서 선택한 사건은 기존 모달로, 전투는 기존 런타임 서비스로 전달합니다.

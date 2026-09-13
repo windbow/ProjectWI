@@ -1,0 +1,122 @@
+[
+  {
+    "prefab": "WIAdministrationBasicFacilityUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 5675
+  },
+  {
+    "prefab": "WIAdministrationCastleRecordUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 1618
+  },
+  {
+    "prefab": "WIAdministrationCharacterActivityUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 8065
+  },
+  {
+    "prefab": "WIAdministrationCouncilUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 2577
+  },
+  {
+    "prefab": "WIAdministrationDelegationUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 6741
+  },
+  {
+    "prefab": "WIAdministrationDiplomacyUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 2687
+  },
+  {
+    "prefab": "WIAdministrationEventChoiceUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 1253
+  },
+  {
+    "prefab": "WIAdministrationFactionUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 4458
+  },
+  {
+    "prefab": "WIAdministrationFocusProjectUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 1764
+  },
+  {
+    "prefab": "WIAdministrationHeroAssignmentUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 3175
+  },
+  {
+    "prefab": "WIAdministrationHeroesUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 3952
+  },
+  {
+    "prefab": "WIAdministrationMarchUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 3819
+  },
+  {
+    "prefab": "WIAdministrationMilitaryUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 3148
+  },
+  {
+    "prefab": "WIAdministrationMonthlyReportUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 883
+  },
+  {
+    "prefab": "WIAdministrationResearchUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 2917
+  },
+  {
+    "prefab": "WIAdministrationSchemeUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 5126
+  },
+  {
+    "prefab": "WIAdministrationSpecialFacilityUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 3487
+  },
+  {
+    "prefab": "WIAdministrationSystemUGUI.prefab",
+    "object": "Header",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 3211
+  },
+  {
+    "prefab": "WIAdministrationTerritoryUGUI.prefab",
+    "object": "Command-6",
+    "guid": "9cc490981813429449c56dc193d38cc0",
+    "line": 6139
+  },
+  {
+    "prefab": "WIAdministrationTurnFollowupUGUI.prefab",
+    "object": "HeaderPanel",
+    "guid": "b4a1e2dcb5aac0544b0963ff6e9ebb02",
+    "line": 1336
+  }
+]

@@ -89,7 +89,7 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("overflow:hidden", stylesheet);
         }
 
-        // 월간 보고 UGUI가 스크롤 본문과 고정 행동 슬롯을 프리팹에 보유하는지 검증합니다.
+        // 월간 보고 UGUI가 카드형 요약과 세 개의 중요 결정 슬롯을 프리팹에 보유하는지 검증합니다.
         [Test]
         public void MonthlyReport_BattleActionsUseFixedFooter()
         {
@@ -101,8 +101,9 @@ namespace ProjectWI.Tests.Editor
 
             Assert.That(prefab, Is.Not.Null);
             Assert.That(controller, Is.Not.Null);
-            Assert.That(serialized.FindProperty("scrollRect").objectReferenceValue, Is.Not.Null);
-            Assert.That(serialized.FindProperty("actionButtons").arraySize, Is.EqualTo(6));
+            Assert.That(serialized.FindProperty("summaryLabels").arraySize, Is.EqualTo(5));
+            Assert.That(serialized.FindProperty("resourceLabels").arraySize, Is.EqualTo(3));
+            Assert.That(serialized.FindProperty("actionButtons").arraySize, Is.EqualTo(3));
         }
 
         // 전투 장면이 중립 글로벌 광원과 약한 전장 강조광을 함께 사용하는지 검증합니다.

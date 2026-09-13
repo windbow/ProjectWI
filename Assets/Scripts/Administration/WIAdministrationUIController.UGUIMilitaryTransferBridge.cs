@@ -64,7 +64,7 @@ namespace ProjectWI.Administration
                     state, originState.CastleId, target.CastleId);
                 if (route.Count == 0) continue;
                 int reservedSlots = state.CharacterTransfers.Count(transfer => transfer.TargetCastleId == target.CastleId);
-                int occupiedSlots = target.HeroIds.Count + reservedSlots;
+                int occupiedSlots = WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, target).Count + reservedSlots;
                 snapshot.Candidates.Add(new WIAdministrationCharacterActivityCandidateSnapshot
                 {
                     HeroId = target.CastleId,

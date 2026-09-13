@@ -7,6 +7,17 @@ namespace ProjectWI.Administration
     public static partial class WIAdministrationTurnSystem
     {
 
+        // 성에 등록된 인물 중 전투단 편성 인원을 제외한 거주 인물 목록을 반환합니다.
+        public static List<string> GetCastleResidentHeroIds(WIAdministrationState state, WICastleRuntimeState castle)
+        {
+            if (state == null || castle == null)
+            {
+                return new List<string>();
+            }
+            var armyMembers = new HashSet<string>(state.Armies.SelectMany(army => army.Members).Select(member => member.HeroId));
+            return castle.HeroIds.Where(id => armyMembers.Contains(id) == false).Distinct().ToList();
+        }
+
         // 이번 달에 배정된 인물 활동을 처리하고 인물 상태와 소식을 갱신합니다.
         private static void ResolveCharacterActivities(
             WIAdministrationDatabaseSO database,
@@ -122,7 +133,7 @@ namespace ProjectWI.Administration
             if (origin == null || target == null || origin.CastleId == targetCastleId ||
                 origin.FactionId != target.FactionId ||
                 route.Count == 0 ||
-                target.HeroIds.Count + reservedSlots >= target.GetHeroSlotCount() ||
+                GetCastleResidentHeroIds(state, target).Count + reservedSlots >= target.GetHeroSlotCount() ||
                 state.IsCharacterBusy(heroId) || origin.GovernorHeroId == heroId)
             {
                 return false;
@@ -361,7 +372,7 @@ namespace ProjectWI.Administration
                 }
 
                 target = state.GetCastle(transfer.TargetCastleId);
-                if (target != null && target.HeroIds.Count < target.GetHeroSlotCount())
+                if (target != null && GetCastleResidentHeroIds(state, target).Count < target.GetHeroSlotCount())
                 {
                     target.HeroIds.Add(transfer.HeroId);
                     string heroName = database.GetHero(transfer.HeroId).DisplayName.Get(database.UseEnglish);
@@ -407,13 +418,13 @@ namespace ProjectWI.Administration
             WICastleRuntimeState origin = state.GetCastle(transfer.OriginCastleId);
             string factionId = current?.FactionId ?? origin?.FactionId ?? string.Empty;
             WICastleRuntimeState settlement = current != null && current.FactionId == factionId &&
-                                              current.HeroIds.Count < current.GetHeroSlotCount()
+                                              GetCastleResidentHeroIds(state, current).Count < current.GetHeroSlotCount()
                 ? current
                 : origin != null && origin.FactionId == factionId &&
-                  origin.HeroIds.Count < origin.GetHeroSlotCount()
+                  GetCastleResidentHeroIds(state, origin).Count < origin.GetHeroSlotCount()
                     ? origin
                     : state.Castles.FirstOrDefault(castle => castle.FactionId == factionId &&
-                        castle.HeroIds.Count < castle.GetHeroSlotCount());
+                        GetCastleResidentHeroIds(state, castle).Count < castle.GetHeroSlotCount());
             if (settlement != null && settlement.HeroIds.Contains(transfer.HeroId) == false)
             {
                 settlement.HeroIds.Add(transfer.HeroId);

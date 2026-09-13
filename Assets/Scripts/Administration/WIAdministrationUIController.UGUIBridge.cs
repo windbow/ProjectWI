@@ -71,7 +71,7 @@ namespace ProjectWI.Administration
                 Influence = $"영향력  {FormatHudNumber(state.Influence, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.InfluenceGained, database.UseEnglish)}/월)</color></size>",
                 CastleTitle = definition?.DisplayName.Get(database.UseEnglish) ?? selectedCastle.CastleId,
                 CastleInfo = detailed
-                    ? $"{ownerName} · {selectedCastle.CastleSize} · {definition?.TerrainTrait.Get(database.UseEnglish)} · 인물 {selectedCastle.HeroIds.Count}/{selectedCastle.GetHeroSlotCount()}"
+                    ? $"{ownerName} · {selectedCastle.CastleSize} · {definition?.TerrainTrait.Get(database.UseEnglish)} · 인물 {WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, selectedCastle).Count}/{selectedCastle.GetHeroSlotCount()}"
                     : $"{ownerName} 소유 · 상세 정보 미확보",
                 CastleImage = definition?.CastleImage,
                 GovernorPortrait = governor?.Portrait,
@@ -90,12 +90,13 @@ namespace ProjectWI.Administration
                     : "첩보 조사를 성공하면 상세 정보가 공개됩니다."
             };
 
+            var residentHeroIds = WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, selectedCastle);
             for (int index = 0; index < 8; index += 1)
             {
                 bool visible = detailed && index < selectedCastle.GetHeroSlotCount();
-                bool occupied = visible && index < selectedCastle.HeroIds.Count;
-                WIHeroDefinition hero = occupied ? database.GetHero(selectedCastle.HeroIds[index]) : null;
-                WICharacterRuntimeState character = occupied ? state.GetCharacter(selectedCastle.HeroIds[index]) : null;
+                bool occupied = visible && index < WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, selectedCastle).Count;
+                WIHeroDefinition hero = occupied ? database.GetHero(residentHeroIds[index]) : null;
+                WICharacterRuntimeState character = occupied ? state.GetCharacter(residentHeroIds[index]) : null;
                 string activity = character == null || character.Activity == WICharacterActivityType.None
                     ? "대기"
                     : character.Activity.ToString();
@@ -104,7 +105,7 @@ namespace ProjectWI.Administration
                     Visible = visible,
                     Occupied = occupied,
                     Caption = occupied
-                        ? hero == null ? selectedCastle.HeroIds[index] : $"{hero.DisplayName.Get(database.UseEnglish)}\n{activity}"
+                        ? hero == null ? residentHeroIds[index] : $"{hero.DisplayName.Get(database.UseEnglish)}\n{activity}"
                         : database.GetText("UI_EMPTY_HERO"),
                     Image = hero?.Portrait
                 });

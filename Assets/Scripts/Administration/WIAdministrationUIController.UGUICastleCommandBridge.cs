@@ -121,7 +121,7 @@ namespace ProjectWI.Administration
                 error = "다른 진영의 성에는 영웅을 배치할 수 없습니다.";
                 return false;
             }
-            if (selectedCastle.HeroIds.Count >= selectedCastle.GetHeroSlotCount())
+            if (WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, selectedCastle).Count >= selectedCastle.GetHeroSlotCount())
             {
                 error = "현재 성 규모의 주둔 인물 슬롯이 가득 찼습니다.";
                 return false;
@@ -131,7 +131,7 @@ namespace ProjectWI.Administration
             snapshot = new WIAdministrationHeroAssignmentSnapshot
             {
                 CastleName = castle.DisplayName.Get(database.UseEnglish),
-                OccupiedSlots = selectedCastle.HeroIds.Count,
+                OccupiedSlots = WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, selectedCastle).Count,
                 MaximumSlots = selectedCastle.GetHeroSlotCount()
             };
             foreach (WICharacterRuntimeState character in state.Characters)
@@ -168,7 +168,7 @@ namespace ProjectWI.Administration
         public bool AssignUGUIHeroToSelectedCastle(string heroId, out string error)
         {
             error = string.Empty;
-            if (selectedCastle.HeroIds.Count >= selectedCastle.GetHeroSlotCount())
+            if (WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, selectedCastle).Count >= selectedCastle.GetHeroSlotCount())
             {
                 error = "현재 성의 주둔 인물 슬롯이 가득 찼습니다.";
                 return false;

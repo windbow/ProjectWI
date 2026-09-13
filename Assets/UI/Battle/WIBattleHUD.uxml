@@ -19,7 +19,17 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="battle-skill-frame">
-                <ui:VisualElement name="skill-buttons" class="skill-group" />
+                <ui:VisualElement name="skill-buttons" class="skill-group">
+                    <ui:Button name="skill-slot-0" class="skill-button" />
+                    <ui:Button name="skill-slot-1" class="skill-button" />
+                    <ui:Button name="skill-slot-2" class="skill-button" />
+                    <ui:Button name="skill-slot-3" class="skill-button" />
+                </ui:VisualElement>
+                <ui:VisualElement class="skill-pager">
+                    <ui:Button name="skill-previous" text="◀" />
+                    <ui:Label name="skill-page" text="1 / 1" />
+                    <ui:Button name="skill-next" text="▶" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

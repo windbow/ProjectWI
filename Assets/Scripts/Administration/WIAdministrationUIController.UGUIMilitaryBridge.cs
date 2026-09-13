@@ -32,11 +32,38 @@ namespace ProjectWI.Administration
                 case "army": BuildArmyDetail(snapshot, context); break;
                 case "castles": BuildArmyCastles(snapshot); break;
                 case "commanders": BuildArmyCommanders(snapshot, context); break;
-                case "roles": BuildArmyRoles(snapshot, context); break;
-                case "members": BuildArmyMembers(snapshot, context, (WIUnitRole)role); break;
+                case "roles": BuildArmyMembers(snapshot, context); break;
+                case "members": BuildArmyMembers(snapshot, context); break;
                 case "targets": BuildArmyTargets(snapshot, context); break;
                 default: error = "알 수 없는 군사 화면입니다."; return false;
             }
+            return true;
+        }
+
+        // 선택 인원을 모두 검증한 뒤 클래스 권장 역할로 한 번에 편성합니다.
+        public bool AssignUGUIArmyMembers(string armyId, System.Collections.Generic.IEnumerable<string> ids, out string error)
+        {
+            error = database.GetText("UI_ARMY_BATCH_INVALID");
+            var army = state.Armies.FirstOrDefault(item => item.ArmyId == armyId);
+            var selected = ids.Distinct().ToList();
+            var castle = army == null ? null : state.GetCastle(army.CurrentCastleId);
+            if (army == null || castle == null || army.FactionId != state.PlayerFactionId || army.IsMoving || army.AwaitingBattle || army.ReorganizationMonths > 0 || selected.Count == 0 ||
+                army.Members.Count + selected.Count > WIAdministrationTurnSystem.GetRecommendedArmySize(database, army) ||
+                selected.Any(id => castle.HeroIds.Contains(id) == false || state.IsCharacterBusy(id) || database.GetHero(id) == null))
+            {
+                return false;
+            }
+            foreach (string id in selected)
+            {
+                var role = database.GetHeroClass(database.GetHero(id).HeroClass)?.RecommendedRole ?? WIUnitRole.Melee;
+                if (role == WIUnitRole.Commander)
+                {
+                    role = WIUnitRole.Melee;
+                }
+                WIAdministrationTurnSystem.AddArmyMember(database,state,army,id,role);
+            }
+            error = string.Empty;
+            RefreshAll();
             return true;
         }
 
@@ -127,7 +154,7 @@ namespace ProjectWI.Administration
                 });
             }
             if (army.IsMoving || army.AwaitingBattle) return;
-            snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "roles", Title = "전투단원 추가", Description = "역할과 대기 인물을 선택합니다." });
+            snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "members", Title = "전투단원 추가", Description = database.GetText("UI_ARMY_MULTI_HINT") });
             snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "targets", Title = "이동 / 원정", Description = "인접 성을 목표로 지정합니다." });
             snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "training", Title = "합동 훈련", Description = army.JointTrainingScheduled ? "이미 다음 달 훈련이 예약되었습니다." : "다음 달 합동 훈련을 예약합니다.", Interactable = army.JointTrainingScheduled == false });
             snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "disband", Title = "전투단 해산", Description = "모든 구성원을 현재 성의 대기 상태로 돌립니다." });
@@ -157,29 +184,18 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 추가할 전투단 역할 목록을 구성합니다.
-        private void BuildArmyRoles(WIAdministrationMilitarySnapshot snapshot, string armyId)
-        {
-            snapshot.Title = "전투단원 추가 · 역할";
-            snapshot.Summary = "새 구성원이 담당할 역할을 선택하십시오.";
-            foreach (WIUnitRole role in Enum.GetValues(typeof(WIUnitRole)))
-            {
-                if (role == WIUnitRole.Commander) continue;
-                snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "role", Value = (int)role, Title = GetUnitRoleDisplayName(role), Description = "대기 인물 선택으로 이동" });
-            }
-        }
-
         // 선택한 역할에 배치 가능한 같은 성의 대기 영웅을 구성합니다.
-        private void BuildArmyMembers(WIAdministrationMilitarySnapshot snapshot, string armyId, WIUnitRole role)
+        private void BuildArmyMembers(WIAdministrationMilitarySnapshot snapshot, string armyId)
         {
             WIArmyState army = state.Armies.FirstOrDefault(item => item.ArmyId == armyId);
             WICastleRuntimeState castle = state.GetCastle(army.CurrentCastleId);
-            snapshot.Title = GetUnitRoleDisplayName(role) + " · 인물 선택";
+            snapshot.Title = database.GetText("UI_ARMY_MEMBER_TITLE");
+            snapshot.AvailableMemberSlots = Math.Max(0, WIAdministrationTurnSystem.GetRecommendedArmySize(database, army) - army.Members.Count);
             snapshot.Summary = "전투단과 같은 성의 대기 인물을 선택하십시오.";
             foreach (string heroId in castle.HeroIds.Where(id => state.IsCharacterBusy(id) == false))
             {
                 WIHeroDefinition hero = database.GetHero(heroId);
-                snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "add-member", Id = heroId, Value = (int)role, Title = hero.DisplayName.Get(database.UseEnglish), Description = $"통솔 {hero.Leadership} · 무력 {hero.Might}" });
+                snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "add-member", Id = heroId, Value = (int)(database.GetHeroClass(hero.HeroClass)?.RecommendedRole ?? WIUnitRole.Melee), Title = hero.DisplayName.Get(database.UseEnglish), Description = $"통솔 {hero.Leadership} · 무력 {hero.Might}" });
             }
         }
 

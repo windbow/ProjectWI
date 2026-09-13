@@ -10,7 +10,17 @@ namespace ProjectWI.Administration
 
     public sealed class WIAdministrationMonthlyReportSnapshot
     {
-        public string Body;
+        public string Title;
+        public string TerritorySummary;
+        public string CharacterSummary;
+        public string ArmySummary;
+        public string StabilitySummary;
+        public string ResearchSummary;
+        public string GoldSummary;
+        public string ManaSummary;
+        public string InfluenceSummary;
+        public List<string> Operations = new();
+        public List<string> News = new();
         public List<WIAdministrationReportActionSnapshot> Actions = new();
     }
 
@@ -19,6 +29,8 @@ namespace ProjectWI.Administration
         public WIAdministrationReportActionType Type;
         public string Id;
         public string Caption;
+        public string Category;
+        public string Detail;
         public bool Danger;
     }
 }

@@ -1,0 +1,10 @@
+경제 시작: 금화 4967, 번영합 255
+접경 castle_29: 전쟁 True, 수비 872
+접경 castle_34: 전쟁 False, 수비 473
+접경 castle_38: 전쟁 False, 수비 506
+출발 전력 976, 턴 61
+원정 army_1: True
+원정 army_2: True
+원정 army_12: True
+전투 battle_10: 공격 925, 수비 872, 상태 Pending
+무조작 전투: Victory, 종료 True, 시간 63.03271, 공격 전투불능 7/13
