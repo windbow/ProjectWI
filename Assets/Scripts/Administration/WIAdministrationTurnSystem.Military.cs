@@ -12,7 +12,8 @@ namespace ProjectWI.Administration
             WICastleRuntimeState castle,
             string commanderHeroId)
         {
-            if (castle == null || castle.HeroIds.Contains(commanderHeroId) == false || state.IsCharacterBusy(commanderHeroId))
+            if (castle == null || castle.HeroIds.Contains(commanderHeroId) == false ||
+                state.IsCharacterBusy(commanderHeroId, ignoreAdministration: true) == true)
             {
                 return null;
             }
@@ -40,7 +41,7 @@ namespace ProjectWI.Administration
         {
             WICastleRuntimeState castle = state.GetCastle(army.CurrentCastleId);
             if (army.IsMoving || army.AwaitingBattle || army.ReorganizationMonths > 0 || castle == null ||
-                castle.HeroIds.Contains(heroId) == false || state.IsCharacterBusy(heroId))
+                castle.HeroIds.Contains(heroId) == false || state.IsCharacterBusy(heroId, ignoreAdministration: true) == true)
             {
                 return false;
             }
@@ -171,11 +172,6 @@ namespace ProjectWI.Administration
             foreach (WIArmyMemberState member in army.Members)
             {
                 origin.HeroIds.Remove(member.HeroId);
-                if (origin.GovernorHeroId == member.HeroId)
-                {
-                    origin.GovernorHeroId = string.Empty;
-                    origin.DelegatedToGovernor = false;
-                }
             }
 
             return true;
@@ -201,32 +197,40 @@ namespace ProjectWI.Administration
                     continue;
                 }
 
-                WICastleRuntimeState target = state.GetCastle(army.TargetCastleId);
-                army.CurrentCastleId = army.TargetCastleId;
-                army.CohesionExperience += 10;
-                UpdateArmyProficiency(army);
-                ApplyMarchFatigue(state, army);
-
-                if (target.FactionId == army.FactionId)
-                {
-                    foreach (WIArmyMemberState member in army.Members)
-                    {
-                        if (target.HeroIds.Contains(member.HeroId) == false)
-                        {
-                            target.HeroIds.Add(member.HeroId);
-                        }
-                    }
-
-                    summary.News.Add($"{army.DisplayName} · {database.GetCastle(target.CastleId).DisplayName.Get(database.UseEnglish)} 도착");
-                }
-                else
-                {
-                    army.AwaitingBattle = true;
-                    summary.News.Add($"{army.DisplayName} · {database.GetCastle(target.CastleId).DisplayName.Get(database.UseEnglish)} 성외 도착 · 전투 대기");
-                }
-
-                army.TargetCastleId = string.Empty;
+                CompleteArmyMarchArrival(database, state, army, summary);
             }
+        }
+
+        // 월 이동과 전투 중 증원이 동일한 도착·피로·숙련 처리를 사용합니다.
+        public static void CompleteArmyMarchArrival(WIAdministrationDatabaseSO database, WIAdministrationState state,
+            WIArmyState army, WITurnSummary summary)
+        {
+            army.RemainingTravelMonths = 0;
+            WICastleRuntimeState target = state.GetCastle(army.TargetCastleId);
+            army.CurrentCastleId = army.TargetCastleId;
+            army.CohesionExperience += 10;
+            UpdateArmyProficiency(army);
+            ApplyMarchFatigue(state, army);
+
+            if (target.FactionId == army.FactionId)
+            {
+                foreach (WIArmyMemberState member in army.Members)
+                {
+                    if (target.HeroIds.Contains(member.HeroId) == false)
+                    {
+                        target.HeroIds.Add(member.HeroId);
+                    }
+                }
+
+                summary.News.Add($"{army.DisplayName} · {database.GetCastle(target.CastleId).DisplayName.Get(database.UseEnglish)} 도착");
+            }
+            else
+            {
+                army.AwaitingBattle = true;
+                summary.News.Add($"{army.DisplayName} · {database.GetCastle(target.CastleId).DisplayName.Get(database.UseEnglish)} 성외 도착 · 전투 대기");
+            }
+
+            army.TargetCastleId = string.Empty;
         }
 
         // 예약된 합동 훈련을 처리해 전투단 숙련과 구성원 경험을 높입니다.

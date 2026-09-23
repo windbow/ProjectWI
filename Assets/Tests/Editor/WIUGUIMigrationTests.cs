@@ -8,6 +8,50 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Tests.Editor
 {
+    [ExecuteAlways]
+    public sealed class WITestLazyUGUIPanelController :
+        ProjectWI.Administration.WIAdministrationUGUIPanelController
+    {
+        // 최초 생성 직후 표시 요청을 받은 횟수와 전달 인자를 기록합니다.
+        public int RequestCount;
+        public string LastId;
+
+        // 실제 화면처럼 활성화될 때 행정 화면 요청을 구독합니다.
+        private void OnEnable()
+        {
+            if (ResolveAdministrationController() == null)
+            {
+                return;
+            }
+            administrationController.UGUIDelegationRequested += HandleRequest;
+            administrationController.UGUIEventChoiceRequested += HandleChoice;
+        }
+
+        // 검사 종료 시 이벤트 구독을 해제합니다.
+        private void OnDisable()
+        {
+            if (administrationController == null)
+            {
+                return;
+            }
+            administrationController.UGUIDelegationRequested -= HandleRequest;
+            administrationController.UGUIEventChoiceRequested -= HandleChoice;
+        }
+
+        // 인자 없는 최초 표시 요청을 기록합니다.
+        private void HandleRequest()
+        {
+            RequestCount += 1;
+        }
+
+        // 선택 화면 최초 요청의 인자를 기록합니다.
+        private void HandleChoice(ProjectWI.Administration.WIAdministrationReportActionType type, string id)
+        {
+            RequestCount += 1;
+            LastId = id;
+        }
+    }
+
     public class WIUGUIMigrationTests
     {
         private const string CampaignTitlePrefabPath = "Assets/Prefabs/Administration/WICampaignTitleUGUI.prefab";
@@ -366,6 +410,8 @@ namespace ProjectWI.Tests.Editor
         public void ScreenBootstrapInstantiatesRegisteredPrefabs()
         {
             GameObject root = new GameObject("BootstrapTestRoot");
+            ProjectWI.Administration.WIAdministrationUIController administrationController =
+                root.AddComponent<ProjectWI.Administration.WIAdministrationUIController>();
             GameObject first = new GameObject("FirstScreenPrefab");
             GameObject second = new GameObject("SecondScreenPrefab");
             GameObject firstChild = new GameObject("FirstScreenChild");
@@ -373,6 +419,7 @@ namespace ProjectWI.Tests.Editor
             ProjectWI.Administration.WIUIScreenManager screenManager =
                 root.AddComponent<ProjectWI.Administration.WIUIScreenManager>();
             SerializedObject serialized = new SerializedObject(screenManager);
+            serialized.FindProperty("administrationController").objectReferenceValue = administrationController;
             SerializedProperty screens = serialized.FindProperty("screenPrefabs");
             screens.arraySize = 2;
             screens.GetArrayElementAtIndex(0).objectReferenceValue = first;
@@ -390,9 +437,102 @@ namespace ProjectWI.Tests.Editor
                 root.transform.GetChild(0).gameObject, false), Is.True);
             Assert.That(UnityEditor.SceneVisibilityManager.instance.IsPickingDisabled(
                 root.transform.GetChild(0).GetChild(0).gameObject, false), Is.False);
+            Assert.That(screenManager.TryGetScreenInstance(first, out GameObject firstInstance), Is.True);
+            Assert.That(firstInstance, Is.SameAs(root.transform.GetChild(0).gameObject));
             Object.DestroyImmediate(first);
             Object.DestroyImmediate(second);
             Object.DestroyImmediate(root);
+        }
+
+        // 일반 화면은 시작 시 만들지 않고 최초 타입 요청에서 한 번만 생성해 캐시하는지 확인합니다.
+        [Test]
+        public void ScreenBootstrapLazilyInstantiatesTypedScreensOnce()
+        {
+            GameObject root = new GameObject("LazyBootstrapTestRoot");
+            ProjectWI.Administration.WIAdministrationUIController administrationController =
+                root.AddComponent<ProjectWI.Administration.WIAdministrationUIController>();
+            GameObject lazyPrefab = new GameObject("LazyScreenPrefab");
+            lazyPrefab.AddComponent<WITestLazyUGUIPanelController>();
+            ProjectWI.Administration.WIUIScreenManager screenManager =
+                root.AddComponent<ProjectWI.Administration.WIUIScreenManager>();
+            SerializedObject serialized = new SerializedObject(screenManager);
+            serialized.FindProperty("administrationController").objectReferenceValue = administrationController;
+            SerializedProperty screens = serialized.FindProperty("screenPrefabs");
+            screens.arraySize = 1;
+            screens.GetArrayElementAtIndex(0).objectReferenceValue = lazyPrefab;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+
+            typeof(ProjectWI.Administration.WIUIScreenManager)
+                .GetMethod("Awake", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                ?.Invoke(screenManager, null);
+
+            Assert.That(root.transform.childCount, Is.Zero);
+            Assert.That(screenManager.EnsureScreen<WITestLazyUGUIPanelController>(), Is.True);
+            Assert.That(root.transform.childCount, Is.EqualTo(1));
+            Assert.That(screenManager.EnsureScreen<WITestLazyUGUIPanelController>(), Is.True);
+            Assert.That(root.transform.childCount, Is.EqualTo(1));
+            Assert.That(screenManager.TryGetScreen(out WITestLazyUGUIPanelController controller), Is.True);
+            Assert.That(controller, Is.SameAs(root.transform.GetChild(0).GetComponent<WITestLazyUGUIPanelController>()));
+
+            Object.DestroyImmediate(lazyPrefab);
+            Object.DestroyImmediate(root);
+        }
+
+        // 지연 생성된 화면의 구독자가 첫 요청부터 이벤트와 인자를 받는지 확인합니다.
+        [TestCase(false)]
+        [TestCase(true)]
+        public void LazyScreenReceivesFirstRequest(bool withArguments)
+        {
+            GameObject root = new GameObject("FirstRequestTestRoot");
+            GameObject prefab = new GameObject("FirstRequestPrefab");
+            try
+            {
+                var administration = root.AddComponent<ProjectWI.Administration.WIAdministrationUIController>();
+                prefab.AddComponent<WITestLazyUGUIPanelController>();
+                var manager = root.AddComponent<ProjectWI.Administration.WIUIScreenManager>();
+                SerializedObject serialized = new SerializedObject(manager);
+                serialized.FindProperty("administrationController").objectReferenceValue = administration;
+                SerializedProperty screens = serialized.FindProperty("screenPrefabs");
+                screens.arraySize = 1;
+                screens.GetArrayElementAtIndex(0).objectReferenceValue = prefab;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+                typeof(ProjectWI.Administration.WIUIScreenManager).GetMethod("Awake", flags).Invoke(manager, null);
+                var controllerType = typeof(ProjectWI.Administration.WIAdministrationUIController);
+                var request = controllerType.GetMethods(flags).Single(method =>
+                    method.Name == "RaiseUGUIScreenRequest" &&
+                    method.GetGenericArguments().Length == (withArguments ? 3 : 1));
+
+                Assert.That(root.transform.childCount, Is.Zero);
+                if (withArguments)
+                {
+                    System.Func<System.Action<ProjectWI.Administration.WIAdministrationReportActionType, string>> getter =
+                        () => (System.Action<ProjectWI.Administration.WIAdministrationReportActionType, string>)
+                            controllerType.GetField("UGUIEventChoiceRequested", flags).GetValue(administration);
+                    request.MakeGenericMethod(typeof(WITestLazyUGUIPanelController),
+                        typeof(ProjectWI.Administration.WIAdministrationReportActionType), typeof(string))
+                        .Invoke(administration, new object[] { getter, default(ProjectWI.Administration.WIAdministrationReportActionType), "first-choice" });
+                }
+                else
+                {
+                    System.Func<System.Action> getter = () => (System.Action)
+                        controllerType.GetField("UGUIDelegationRequested", flags).GetValue(administration);
+                    request.MakeGenericMethod(typeof(WITestLazyUGUIPanelController))
+                        .Invoke(administration, new object[] { getter });
+                }
+
+                Assert.That(manager.TryGetScreen(out WITestLazyUGUIPanelController screen), Is.True);
+                Assert.That(screen.RequestCount, Is.EqualTo(1));
+                if (withArguments)
+                {
+                    Assert.That(screen.LastId, Is.EqualTo("first-choice"));
+                }
+            }
+            finally
+            {
+                Object.DestroyImmediate(prefab);
+                Object.DestroyImmediate(root);
+            }
         }
 
         // 런타임에 생성되는 UGUI 프리팹 계층에 누락된 MonoBehaviour가 없는지 확인합니다.
@@ -499,7 +639,7 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("heroSlots").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("facilitySlots").arraySize, Is.EqualTo(2));
             Assert.That(serialized.FindProperty("facilitySlotButtons").arraySize, Is.EqualTo(2));
-            Assert.That(serialized.FindProperty("commandButtons").arraySize, Is.EqualTo(8));
+            Assert.That(serialized.FindProperty("commandButtons").arraySize, Is.EqualTo(7));
             Assert.That(serialized.FindProperty("basicFacilityButtons").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("basicFacilityActions").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("topHUD").objectReferenceValue, Is.Not.Null);

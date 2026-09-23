@@ -30,7 +30,7 @@ namespace ProjectWI.Battle
                 : WIBattleSide.Defender;
             hudController.SetPlayerSide(playerSide);
             battleController.BattleFinished += OnBattleFinished;
-            battleController.Initialize(service.Database, session);
+            battleController.Initialize(service.Database, session, service.IsTestBattle == true ? null : service.State);
         }
 
         // 전투 런타임 승패를 캠페인 서비스에 전달해 전략 씬으로 복귀시킵니다.

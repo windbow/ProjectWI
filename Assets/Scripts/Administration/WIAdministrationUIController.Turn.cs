@@ -10,7 +10,7 @@ namespace ProjectWI.Administration
         {
             if (WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state))
             {
-                UGUIMonthlyReportRequested?.Invoke();
+                RaiseUGUIScreenRequest<WIAdministrationMonthlyReportUGUIController>(() => UGUIMonthlyReportRequested);
                 return;
             }
             StartCoroutine(ExecuteUGUITurnRoutine());

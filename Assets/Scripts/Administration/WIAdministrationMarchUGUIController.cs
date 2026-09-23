@@ -8,6 +8,8 @@ namespace ProjectWI.Administration
     {
         private const int PageSize = 8;
         private enum PageMode { Army, Commander, Target }
+        // 모든 후보를 스크롤 행으로 표시하는 공통 목록입니다.
+        [SerializeField] private WICharacterSelectionList selectionList;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -63,6 +65,7 @@ namespace ProjectWI.Administration
             modal.Show("원정 전투단 선택");
             pageMode = PageMode.Army;
             pageIndex = 0;
+            selectionList.ResetView();
             if (administrationController.TryGetUGUIMarchArmies(out snapshot, out string error)
                 == false)
             {
@@ -81,6 +84,7 @@ namespace ProjectWI.Administration
         {
             pageMode = PageMode.Commander;
             pageIndex = 0;
+            selectionList.ResetView();
             modal.SetTitle("새 전투단 · 대장 선택");
             createArmyButton.gameObject.SetActive(false);
             if (administrationController.TryGetUGUIMarchCommanders(out snapshot, out string error)
@@ -100,6 +104,7 @@ namespace ProjectWI.Administration
             selectedArmyId = armyId;
             pageMode = PageMode.Target;
             pageIndex = 0;
+            selectionList.ResetView();
             modal.SetTitle("이동 / 원정 목표");
             createArmyButton.gameObject.SetActive(false);
             if (administrationController.TryGetUGUIMarchTargets(armyId, out snapshot, out string error)
@@ -116,8 +121,10 @@ namespace ProjectWI.Administration
         // 현재 단계의 스냅샷을 8개 고정 카드와 페이지 컨트롤에 반영합니다.
         private void RefreshCards()
         {
+            selectionList.Prepare(snapshot?.Options.Count ?? 0, SelectCard, administrationController,
+                out cardButtons, out cardLabels, out cardImages);
             int count = snapshot?.Options.Count ?? 0;
-            int pageCount = Mathf.Max(1, Mathf.CeilToInt(count / (float)PageSize));
+            int pageCount = 1;
             pageIndex = Mathf.Clamp(pageIndex, 0, pageCount - 1);
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
@@ -131,7 +138,7 @@ namespace ProjectWI.Administration
                 WIAdministrationMarchOptionSnapshot option = snapshot.Options[optionIndex];
                 cardImages[index].sprite = option.Image;
                 cardImages[index].enabled = option.Image != null;
-                cardLabels[index].text = option.DisplayName + "\n" + option.Summary;
+                cardLabels[index].text = option.DisplayName + "\n" + option.Summary + "\n" + administrationController.GetSelectionCharacterSummary(option.Id);
                 cardButtons[index].interactable = option.Interactable;
             }
             previousButton.interactable = pageIndex > 0;

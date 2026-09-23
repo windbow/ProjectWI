@@ -38,7 +38,7 @@ namespace ProjectWI.Administration
                     assigned.Add(heroId);
                 }
                 WICharacterRuntimeState candidate = state.Characters
-                    .Where(character => character.Recruited == false && character.IsDead == false &&
+                    .Where(character => IsHeroRecruitmentCandidate(character) == true && character.IsDead == false &&
                                         character.Captured == false &&
                                         string.IsNullOrEmpty(character.JoinedEnemyFactionId) &&
                                         assigned.Contains(character.HeroId) == false)

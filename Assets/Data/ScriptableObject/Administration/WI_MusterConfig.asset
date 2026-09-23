@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30f0831e0e38e974185f27fe45cb6ec2, type: 3}
+  m_Name: WI_MusterConfig
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Administration.WIMusterConfigSO
+  goldPerCharacter: 60
+  smallCastleMonthlyLimit: 1
+  developedCastleMonthlyLimit: 2
+  factionBaseCapacity: 8
+  capacityPerCastle: 4
+  factionMaximumCapacity: 80
+  aiOrdersPerMonth: 2
+  aiRearTarget: 3
+  aiFrontTarget: 6

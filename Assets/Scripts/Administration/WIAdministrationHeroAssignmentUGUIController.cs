@@ -7,6 +7,8 @@ namespace ProjectWI.Administration
     public sealed class WIAdministrationHeroAssignmentUGUIController : WIAdministrationUGUIPanelController
     {
         private const int PageSize = 8;
+        // 모든 후보를 스크롤 행으로 표시하는 공통 목록입니다.
+        [SerializeField] private WICharacterSelectionList selectionList;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text slotStatusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -57,6 +59,7 @@ namespace ProjectWI.Administration
         {
             modal.Show(administrationController.GetAdministrationText("UI_ASSIGN_RESIDENT_TITLE"));
             pageIndex = 0;
+            selectionList.ResetView();
             if (administrationController.TryGetUGUIHeroAssignmentSnapshot(out currentSnapshot, out string error)
                 == false)
             {
@@ -76,7 +79,9 @@ namespace ProjectWI.Administration
         // 현재 후보 페이지를 고정된 8개 카드에 반영합니다.
         private void RefreshPage()
         {
-            int pageCount = Mathf.Max(1, Mathf.CeilToInt(currentSnapshot.Candidates.Count / (float)PageSize));
+            selectionList.Prepare(currentSnapshot.Candidates.Count, Assign, administrationController,
+                out candidateButtons, out candidateLabels, out candidatePortraits);
+            int pageCount = 1;
             pageIndex = Mathf.Clamp(pageIndex, 0, pageCount - 1);
             for (int index = 0; index < candidateButtons.Length; index += 1)
             {
@@ -112,7 +117,7 @@ namespace ProjectWI.Administration
         // 선택한 후보를 현재 성에 배치하고 성공 시 모달을 닫습니다.
         private void Assign(int cardIndex)
         {
-            int candidateIndex = pageIndex * PageSize + cardIndex;
+            int candidateIndex = cardIndex;
             if (candidateIndex >= currentSnapshot.Candidates.Count)
             {
                 return;

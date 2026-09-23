@@ -8,7 +8,7 @@ namespace ProjectWI.Administration
         public void OpenDiplomacyUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIDiplomacyRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationDiplomacyUGUIController>(() => UGUIDiplomacyRequested);
         }
 
         // 외교 대상 진영 또는 선택 진영의 실행 명령 카드를 구성합니다.

@@ -28,7 +28,7 @@ namespace ProjectWI.Administration
                 projectType = WICastleProjectType.Prosperity;
             }
             WIHeroDefinition manager = SelectAIProjectManager(database, state, castleState, projectType);
-            if (manager == null)
+            if (HasUsefulProjectWork(state, castleState, projectType) == false)
             {
                 return;
             }
@@ -38,7 +38,8 @@ namespace ProjectWI.Administration
             {
                 ProjectType = projectType,
                 Investment = WIProjectInvestment.Basic,
-                ManagerHeroId = manager.Id,
+                ManagerHeroId = manager?.Id ?? string.Empty,
+                Delegated = manager == null,
                 RemainingMonths = 1
             };
             string reason = castleState.Stability < 35 ? $"질서 {castleState.Stability} 보완" :
@@ -52,7 +53,7 @@ namespace ProjectWI.Administration
             WIAdministrationState state, WICastleRuntimeState castleState, WICastleProjectType projectType)
         {
             List<WIHeroDefinition> candidates = castleState.HeroIds
-                .Where(heroId => state.IsCharacterBusy(heroId) == false)
+                .Where(heroId => state.IsCharacterBusy(heroId, ignoreArmy: true) == false)
                 .Where(heroId => IsAdministrationCapable(state, heroId))
                 .Select(database.GetHero)
                 .Where(hero => hero != null)

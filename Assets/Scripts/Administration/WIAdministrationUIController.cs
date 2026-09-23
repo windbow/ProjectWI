@@ -44,7 +44,7 @@ namespace ProjectWI.Administration
         private IEnumerator OpenPendingBattleReportUGUIAfterInitialization()
         {
             yield return null;
-            UGUIMonthlyReportRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationMonthlyReportUGUIController>(() => UGUIMonthlyReportRequested);
         }
 
         // 현재 캠페인 상태가 바뀌었음을 UGUI 화면들에 알립니다.

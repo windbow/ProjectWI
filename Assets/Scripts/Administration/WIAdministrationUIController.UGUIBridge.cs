@@ -13,6 +13,13 @@ namespace ProjectWI.Administration
         public event Action UGUICharacterActivityRequested;
         public event Action UGUISpecialFacilityRequested;
         public event Action UGUIBasicFacilityRequested;
+        // 성 화면의 선술집 바로가기는 시설 목록을 거치지 않습니다.
+        public event Action UGUITavernRequested;
+        // 선술집의 인재실과 월간 의뢰를 직접 엽니다.
+        public void OpenUGUITavern()
+        {
+            RaiseUGUIScreenRequest<WIAdministrationBasicFacilityUGUIController>(() => UGUITavernRequested);
+        }
         public event Action UGUIDelegationRequested;
         public event Action UGUIMarchRequested;
         public event Action UGUICastleRecordRequested;
@@ -75,7 +82,7 @@ namespace ProjectWI.Administration
                     : $"{ownerName} 소유 · 상세 정보 미확보",
                 CastleImage = definition?.CastleImage,
                 GovernorPortrait = governor?.Portrait,
-                GovernorName = governor == null ? "영지관 미배치" : governor.DisplayName.Get(database.UseEnglish),
+                GovernorName = governor == null ? database.GetText("UI_ADMIN_GOVERNOR_OPTIONAL") : governor.DisplayName.Get(database.UseEnglish),
                 Prosperity = detailed ? $"번영 {selectedCastle.Prosperity} · {GetCastleStatusName(selectedCastle.Prosperity)}" : "번영 ??",
                 Technology = detailed ? $"기술 {selectedCastle.Technology} · {GetCastleStatusName(selectedCastle.Technology)}" : "기술 ??",
                 Stability = detailed ? $"질서 {selectedCastle.Stability} · {GetCastleStatusName(selectedCastle.Stability)}" : "질서 ??",
@@ -85,7 +92,8 @@ namespace ProjectWI.Administration
                     : "수입 정보 미확보",
                 ProjectStatus = detailed
                     ? selectedCastle.DelegatedToGovernor && selectedCastle.ActiveProject == null
-                        ? $"영지관 위임 · {GetGovernorPolicyDisplayName(selectedCastle.GovernorPolicy)} · 월 {selectedCastle.GovernorMonthlyBudget}G"
+                        ? string.Format(database.GetText("UI_ADMIN_OPERATION_STATUS"),
+                            GetGovernorPolicyDisplayName(selectedCastle.GovernorPolicy), selectedCastle.GovernorMonthlyBudget)
                         : GetProjectStatusText(selectedCastle.ActiveProject)
                     : "첩보 조사를 성공하면 상세 정보가 공개됩니다."
             };
@@ -179,7 +187,7 @@ namespace ProjectWI.Administration
         // UGUI 우측 전투 알림에서 기존 전투 또는 월간 보고 화면을 엽니다.
         public void OpenUGUIBattleAlert()
         {
-            UGUIMonthlyReportRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationMonthlyReportUGUIController>(() => UGUIMonthlyReportRequested);
         }
 
         // 신규 UGUI 영지 화면에서 대륙 지도로 돌아갑니다.
@@ -194,28 +202,28 @@ namespace ProjectWI.Administration
             switch (command)
             {
                 case WIAdministrationTerritoryCommand.FocusProject:
-                    UGUIFocusProjectRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationFocusProjectUGUIController>(() => UGUIFocusProjectRequested);
                     return;
                 case WIAdministrationTerritoryCommand.AssignHero:
-                    UGUIHeroAssignmentRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationHeroAssignmentUGUIController>(() => UGUIHeroAssignmentRequested);
                     return;
                 case WIAdministrationTerritoryCommand.CharacterActivity:
                     OpenUGUICharacterActivity(false);
                     return;
                 case WIAdministrationTerritoryCommand.ChooseSpecialFacility:
-                    UGUISpecialFacilityRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationSpecialFacilityUGUIController>(() => UGUISpecialFacilityRequested);
                     return;
                 case WIAdministrationTerritoryCommand.BasicFacility:
-                    UGUIBasicFacilityRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationBasicFacilityUGUIController>(() => UGUIBasicFacilityRequested);
                     return;
                 case WIAdministrationTerritoryCommand.Delegation:
-                    UGUIDelegationRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationDelegationUGUIController>(() => UGUIDelegationRequested);
                     return;
                 case WIAdministrationTerritoryCommand.March:
-                    UGUIMarchRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationMarchUGUIController>(() => UGUIMarchRequested);
                     return;
                 case WIAdministrationTerritoryCommand.CastleRecord:
-                    UGUICastleRecordRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationCastleRecordUGUIController>(() => UGUICastleRecordRequested);
                     return;
             }
             SuspendUGUIForLegacyModal();
@@ -250,36 +258,36 @@ namespace ProjectWI.Administration
             }
             if (index >= selectedCastle.SpecialFacilityIds.Count)
             {
-                UGUISpecialFacilityRequested?.Invoke();
+                RaiseUGUIScreenRequest<WIAdministrationSpecialFacilityUGUIController>(() => UGUISpecialFacilityRequested);
                 return;
             }
 
             switch (selectedCastle.SpecialFacilityIds[index])
             {
                 case "mage_tower":
-                    UGUIResearchRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationResearchUGUIController>(() => UGUIResearchRequested);
                     break;
                 case "knightly_order":
-                    UGUIMilitaryRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationMilitaryUGUIController>(() => UGUIMilitaryRequested);
                     break;
                 case "adventurers_guild":
-                    UGUIBasicFacilityRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationBasicFacilityUGUIController>(() => UGUIBasicFacilityRequested);
                     break;
                 case "sanctuary":
                     OpenUGUICharacterActivity(false);
                     break;
                 case "spy_outpost":
-                    UGUISchemeRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationSchemeUGUIController>(() => UGUISchemeRequested);
                     break;
                 case "embassy":
-                    UGUIDiplomacyRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationDiplomacyUGUIController>(() => UGUIDiplomacyRequested);
                     break;
                 case "grand_forge":
                 case "grand_market":
-                    UGUICastleRecordRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationCastleRecordUGUIController>(() => UGUICastleRecordRequested);
                     break;
                 default:
-                    UGUICastleRecordRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationCastleRecordUGUIController>(() => UGUICastleRecordRequested);
                     break;
             }
         }
@@ -288,7 +296,7 @@ namespace ProjectWI.Administration
         public void OpenUGUICharacterActivity(bool talentOfficeOnly)
         {
             uguiTalentOfficeOnly = talentOfficeOnly;
-            UGUICharacterActivityRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationCharacterActivityUGUIController>(() => UGUICharacterActivityRequested);
         }
 
         // 현재 인재 활동 화면이 선술집 인재실 전용으로 요청되었는지 반환합니다.

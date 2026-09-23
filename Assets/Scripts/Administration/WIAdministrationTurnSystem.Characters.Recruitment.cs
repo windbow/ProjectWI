@@ -38,9 +38,7 @@ namespace ProjectWI.Administration
         // 재야 탐색에 노출할 수 있는 생존·미고용 인물인지 확인합니다.
         private static bool IsAvailableWanderingCandidate(WICharacterRuntimeState character)
         {
-            return character != null && character.Discovered == false && character.Recruited == false &&
-                   character.IsDead == false && character.Captured == false &&
-                   string.IsNullOrEmpty(character.JoinedEnemyFactionId);
+            return IsHeroRecruitmentCandidate(character) == true && character.Discovered == false;
         }
 
         // 교류 활동으로 두 인물의 관계를 한 단계 개선합니다.
@@ -74,7 +72,7 @@ namespace ProjectWI.Administration
             WITurnSummary summary)
         {
             WICharacterRuntimeState target = state.GetCharacter(character.ActivityTargetHeroId);
-            if (target == null || target.Discovered == false || target.Recruited)
+            if (IsHeroRecruitmentCandidate(target) == false || target.Discovered == false)
             {
                 return;
             }
@@ -170,7 +168,7 @@ namespace ProjectWI.Administration
 
             WICharacterRuntimeState recruiter = state.GetCharacter(pendingEvent.RecruiterHeroId);
             WICharacterRuntimeState candidate = state.GetCharacter(pendingEvent.CandidateHeroId);
-            if (candidate == null || candidate.Recruited)
+            if (IsHeroRecruitmentCandidate(candidate) == false)
             {
                 return false;
             }

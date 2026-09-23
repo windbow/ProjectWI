@@ -1,0 +1,429 @@
+fileFormatVersion: 2
+guid: 06e399bc1de8faf438ee2bf7592641f6
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5505665042014634111
+    second: monthly_report_close_button_v1_0
+  - first:
+      213: 7412049006417321322
+    second: monthly_report_close_button_v1_1
+  - first:
+      213: -2765042267800511590
+    second: monthly_report_close_button_v1_2
+  - first:
+      213: -8282360456522225235
+    second: monthly_report_close_button_v1_3
+  - first:
+      213: 6486647412925908916
+    second: monthly_report_close_button_v1_4
+  - first:
+      213: -793673546262860416
+    second: monthly_report_close_button_v1_5
+  - first:
+      213: -3686749134492488187
+    second: monthly_report_close_button_v1_6
+  - first:
+      213: 4582235202647682448
+    second: monthly_report_close_button_v1_7
+  - first:
+      213: 5407584428625955644
+    second: monthly_report_close_button_v1_8
+  - first:
+      213: 8517698321361558802
+    second: monthly_report_close_button_v1_9
+  - first:
+      213: -4489818694135099815
+    second: monthly_report_close_button_v1_10
+  - first:
+      213: -2212065382469273384
+    second: monthly_report_close_button_v1_11
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 903
+        width: 79
+        height: 78
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7081997f2d086c40800000000000000
+      internalID: 5505665042014634111
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_1
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 98
+        width: 1135
+        height: 1056
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6d9a45fc43ecd660800000000000000
+      internalID: 7412049006417321322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_2
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 949
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9b5fce05b890a9d0800000000000000
+      internalID: -2765042267800511590
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_3
+      rect:
+        serializedVersion: 2
+        x: 1141
+        y: 819
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da9204feb052f0d80800000000000000
+      internalID: -8282360456522225235
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_4
+      rect:
+        serializedVersion: 2
+        x: 1141
+        y: 813
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b7c7ae4473350a50800000000000000
+      internalID: 6486647412925908916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_5
+      rect:
+        serializedVersion: 2
+        x: 1155
+        y: 795
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08da06f5d1e4cf4f0800000000000000
+      internalID: -793673546262860416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_6
+      rect:
+        serializedVersion: 2
+        x: 1133
+        y: 779
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50ea896023906dcc0800000000000000
+      internalID: -3686749134492488187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_7
+      rect:
+        serializedVersion: 2
+        x: 1155
+        y: 361
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09dea1b93ae579f30800000000000000
+      internalID: 4582235202647682448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_8
+      rect:
+        serializedVersion: 2
+        x: 716
+        y: 102
+        width: 29
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3b0f2123699b0b40800000000000000
+      internalID: 5407584428625955644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_9
+      rect:
+        serializedVersion: 2
+        x: 856
+        y: 97
+        width: 35
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21d52bc9e71f43670800000000000000
+      internalID: 8517698321361558802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_10
+      rect:
+        serializedVersion: 2
+        x: 890
+        y: 98
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95e4b2e8fa5f0b1c0800000000000000
+      internalID: -4489818694135099815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: monthly_report_close_button_v1_11
+      rect:
+        serializedVersion: 2
+        x: 900
+        y: 7
+        width: 66
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d8faf1314a2d41e0800000000000000
+      internalID: -2212065382469273384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      monthly_report_close_button_v1_0: 5505665042014634111
+      monthly_report_close_button_v1_1: 7412049006417321322
+      monthly_report_close_button_v1_10: -4489818694135099815
+      monthly_report_close_button_v1_11: -2212065382469273384
+      monthly_report_close_button_v1_2: -2765042267800511590
+      monthly_report_close_button_v1_3: -8282360456522225235
+      monthly_report_close_button_v1_4: 6486647412925908916
+      monthly_report_close_button_v1_5: -793673546262860416
+      monthly_report_close_button_v1_6: -3686749134492488187
+      monthly_report_close_button_v1_7: 4582235202647682448
+      monthly_report_close_button_v1_8: 5407584428625955644
+      monthly_report_close_button_v1_9: 8517698321361558802
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

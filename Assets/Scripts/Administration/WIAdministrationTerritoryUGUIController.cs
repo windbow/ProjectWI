@@ -64,8 +64,15 @@ namespace ProjectWI.Administration
             for (int index = 0; index < facilityCount; index += 1)
             {
                 WIAdministrationTerritoryCommand action = basicFacilityActions[index];
-                basicFacilityButtons[index].onClick.AddListener(() =>
-                    administrationController.ExecuteUGUITerritoryCommand(action));
+                if (action == WIAdministrationTerritoryCommand.BasicFacility)
+                {
+                    basicFacilityButtons[index].onClick.AddListener(administrationController.OpenUGUITavern);
+                }
+                else
+                {
+                    basicFacilityButtons[index].onClick.AddListener(() =>
+                        administrationController.ExecuteUGUITerritoryCommand(action));
+                }
             }
 
             for (int index = 0; index < facilitySlotButtons.Length; index += 1)

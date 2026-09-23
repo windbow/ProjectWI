@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 073e6fb2e70dc0c49a88575d9785bffa, type: 3}
   m_Name: WI_AdministrationDatabase
   m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Administration.WIAdministrationDatabaseSO
+  musterConfig: {fileID: 11400000, guid: 4a6008847a788744fb0c3d9435607f14, type: 2}
   useEnglish: 0
   gameTitle:
     uid: UI_GAME_TITLE
@@ -89,9 +90,10 @@ MonoBehaviour:
     korean: "\uB2F4\uB2F9\uC790 \uC5C6\uC74C"
     english: No manager
   - uid: UI_ADMIN_TRAIT_REQUIRED
-    korean: "[\uB0B4\uC815] \uD2B9\uC131\uC744 \uAC00\uC9C4 \uB300\uAE30 \uC778\uBB3C\uC774
-      \uD544\uC694\uD569\uB2C8\uB2E4."
-    english: An available character with [Administration] is required.
+    korean: "\uB0B4\uC815 \uD2B9\uC131\uC744 \uAC00\uC9C4 \uC601\uC6C5\uB9CC \uB2F4\uB2F9\uD560
+      \uC218 \uC788\uC2B5\uB2C8\uB2E4. Common\uC740 \uC804\uD22C \uC804\uC6A9\uC785\uB2C8\uB2E4."
+    english: Requires a Hero with Administration. Common characters serve in combat
+      only.
   - uid: UI_CHARACTER_TRAITS
     korean: "\uD2B9\uC131"
     english: Traits
@@ -186,6 +188,268 @@ MonoBehaviour:
       \uBCC0\uACBD\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uD3B8\uC131 \uAC00\uB2A5 \uC778\uC6D0\uC744
       \uB2E4\uC2DC \uD655\uC778\uD558\uC138\uC694."
     english: Selection or availability changed. Check capacity and retry.
+  - uid: UI_TAVERN_DIRECT_TITLE
+    korean: "\uC120\uC220\uC9D1 \xB7 \uC778\uC7AC\uC2E4\uACFC \uC758\uB8B0"
+    english: "Tavern \xB7 Talent Office and Quests"
+  - uid: REPORT_UNOPPOSED_OCCUPATION
+    korean: "\uBB34\uD608 \uC810\uB839 \xB7 {0}\uC5D0 \uBC29\uC5B4 \uBCD1\uB825\uC774
+      \uC5C6\uC5B4 {1}\uC774 \uC804\uD22C \uC5C6\uC774 \uC810\uB839\uD588\uC2B5\uB2C8\uB2E4."
+    english: "Unopposed occupation \xB7 {1} occupied {0} without a battle because
+      no defenders remained."
+  - uid: UI_GROUP_MARCH_TITLE
+    korean: "\uCD9C\uC815 \uC804\uD22C\uB2E8 \uC120\uD0DD"
+    english: Select Marching Armies
+  - uid: UI_GROUP_MARCH_ROUTE
+    korean: "{0} \u2192 {1} \xB7 \uD568\uAED8 \uCD9C\uC815\uD560 \uC804\uD22C\uB2E8\uC744
+      \uC120\uD0DD\uD558\uC138\uC694."
+    english: "{0} \u2192 {1} \xB7 Select armies to march together."
+  - uid: UI_GROUP_MARCH_STATUS
+    korean: "\uC120\uD0DD {0}\uAC1C \xB7 \uCD1D \uC601\uD5A5\uB825 {1} \xB7 {2}/{3}\uCABD"
+    english: "Selected {0} \xB7 Total influence {1} \xB7 Page {2}/{3}"
+  - uid: UI_GROUP_MARCH_CONFIRM
+    korean: "\uC120\uD0DD\uD55C {0}\uAC1C \uC804\uD22C\uB2E8 \uCD9C\uC815"
+    english: March with {0} selected armies
+  - uid: UI_GROUP_MARCH_ARMY
+    korean: "\uC778\uC6D0 {0}/{1}\uBA85 \xB7 \uC804\uB825 {2}"
+    english: "Members {0}/{1} \xB7 Power {2}"
+  - uid: UI_GROUP_MARCH_INVALID
+    korean: "\uCD9C\uC815\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4. \uAC19\uC740 \uC131\uC758
+      \uB300\uAE30 \uC804\uD22C\uB2E8, \uBAA9\uD45C\uC640\uC758 \uAD50\uC804 \uC0C1\uD0DC,
+      \uCD1D \uC601\uD5A5\uB825\uC744 \uD655\uC778\uD558\uC138\uC694."
+    english: Cannot march. Check that armies are ready in the same castle, the target
+      is at war, and total influence is sufficient.
+  - uid: UI_BATTLE_REINFORCEMENT_PENDING
+    korean: "\uC99D\uC6D0 \uC608\uC815 \xB7 {0} \xB7 {1:0}\uCD08 \uD6C4 \uD569\uB958"
+    english: "Reinforcements \xB7 {0} \xB7 arriving in {1:0}s"
+  - uid: UI_BATTLE_REINFORCEMENT_ARRIVED
+    korean: "\uC99D\uC6D0 \uD569\uB958 \xB7 {0}"
+    english: "Reinforcements arrived \xB7 {0}"
+  - uid: UI_ADMIN_BASIC_OPERATION
+    korean: "\uAE30\uBCF8 \uB0B4\uC815"
+    english: Basic administration
+  - uid: UI_ADMIN_OPERATION_HELP
+    korean: "\uC601\uC9C0\uAD00\uC740 \uCD9C\uC804 \uC911\uC5D0\uB3C4 \uB0B4\uC815\uC744
+      \uC9C0\uD718\uD569\uB2C8\uB2E4. Common\uC740 \uC804\uD22C \uC804\uC6A9\uC785\uB2C8\uB2E4."
+    english: Governors lead administration even while deployed. Common characters
+      serve in combat only.
+  - uid: UI_ADMIN_OPERATION_START
+    korean: "\uAE30\uBCF8 \uC6B4\uC601 \uC2DC\uC791"
+    english: Start administration
+  - uid: UI_ADMIN_OPERATION_STOP
+    korean: "\uAE30\uBCF8 \uC6B4\uC601 \uC911\uC9C0"
+    english: Stop administration
+  - uid: UI_ADMIN_GOVERNOR_OPTIONAL
+    korean: "\uC601\uC9C0\uAD00 \uC120\uD0DD \uBC30\uCE58"
+    english: Optional governor
+  - uid: UI_ADMIN_OPERATION_STATUS
+    korean: "\uAE30\uBCF8 \uC6B4\uC601 \xB7 {0} \xB7 \uC6D4 {1}G"
+    english: "Administration \xB7 {0} \xB7 {1}G/month"
+  - uid: UI_ADMIN_OPERATION_PREVIEW
+    korean: "\uC608\uC0C1 \uACC4\uD68D \xB7 {0} \xB7 {1} \xB7 \uC131\uACFC +{2} \xB7
+      \uBE44\uC6A9 {3}G \xB7 1\uAC1C\uC6D4 \xB7 {4}"
+    english: "Plan \xB7 {0} \xB7 {1} \xB7 gain +{2} \xB7 cost {3}G \xB7 1 month \xB7
+      {4}"
+  - uid: UI_ADMIN_OCCUPATION_PROGRESS
+    korean: "\uC810\uB839 \uC548\uC815\uD654 \xB7 \uB0A8\uC740 {0}\uAC1C\uC6D4 \xB7
+      \uC6D4 \uC9C8\uC11C +{1} \xB7 \uC778\uC6D0 \uC794\uB958 \uBD88\uD544\uC694"
+    english: "Stabilization \xB7 {0} months left \xB7 order +{1}/month \xB7 no personnel
+      required"
+  - uid: UI_COMMON_COMBAT_ONLY
+    korean: "\uC804\uD22C \uC804\uC6A9 \xB7 \uC8FC\uB454 \uC911 \uC790\uB3D9 \uD6C8\uB828"
+    english: "Combat only \xB7 automatic training while stationed"
+  - uid: UI_AUTOMATIC_TRAINING_HINT
+    korean: "\uD6C8\uB828\uC740 \uC790\uB3D9\uC785\uB2C8\uB2E4. \uACFC\uB85C\xB7\uBD80\uC0C1
+      \uC2DC \uD68C\uBCF5\uD558\uBA70 \uCD9C\uC815 \uBA85\uB839\uC744 \uC6B0\uC120\uD569\uB2C8\uB2E4."
+    english: Training is automatic. Fatigued or injured characters recover; marching
+      takes priority.
+  - uid: REPORT_AUTOMATIC_TRAINING
+    korean: "\uC790\uB3D9 \uD6C8\uB828 \xB7 {0}\uBA85 \uC131\uC7A5 \xB7 {1}\uBA85
+      \uD68C\uBCF5"
+    english: "Automatic training \xB7 {0} trained \xB7 {1} recovered"
+  - uid: UI_SELECTION_SEARCH
+    korean: "\uC774\uB984\xB7\uC815\uBCF4 \uAC80\uC0C9"
+    english: Search name or details
+  - uid: UI_SELECTION_ALL
+    korean: "\uC804\uCCB4"
+    english: All
+  - uid: UI_SELECTION_AVAILABLE
+    korean: "\uC120\uD0DD \uAC00\uB2A5"
+    english: Available
+  - uid: UI_SELECTION_NAME
+    korean: "\uC774\uB984\uC21C"
+    english: Name
+  - uid: UI_SELECTION_DEFAULT
+    korean: "\uAE30\uBCF8\uC21C"
+    english: Default
+  - uid: UI_SELECTION_COUNT
+    korean: "{0} / {1}\uBA85"
+    english: '{0} / {1}'
+  - uid: UI_SELECTION_COMMON
+    korean: "\uC77C\uBC18"
+    english: Common
+  - uid: UI_SELECTION_HERO
+    korean: "\uC601\uC6C5"
+    english: Hero
+  - uid: UI_SELECTION_FATIGUE
+    korean: "\uD53C\uB85C {0}"
+    english: Fatigue {0}
+  - uid: UI_SELECTION_INJURY
+    korean: "\uBD80\uC0C1 {0}\uAC1C\uC6D4"
+    english: Injured {0} months
+  - uid: UI_SELECTION_DUTY
+    korean: "\uB0B4\uC815: {0} \xB7 \uC804\uD22C \uBCD1\uD589"
+    english: "Administration: {0} \xB7 combat compatible"
+  - uid: UI_ARMY_LIST_STATUS
+    korean: "\uC120\uD0DD {0}\uBA85 / \uCD94\uAC00 \uAC00\uB2A5 {1}\uBA85"
+    english: Selected {0} / Capacity {1}
+  - uid: UI_MARCH_LIST_STATUS
+    korean: "\uC120\uD0DD {0}\uAC1C \xB7 \uCD1D \uC601\uD5A5\uB825 {1}"
+    english: "Selected {0} \xB7 Total influence {1}"
+  - uid: UI_SELECTION_IN_ARMY
+    korean: "\uD3B8\uC131 \uBD88\uAC00 \xB7 \uC804\uD22C\uB2E8 \uC18C\uC18D"
+    english: "Unavailable \xB7 already in an army"
+  - uid: UI_SELECTION_BUSY
+    korean: "\uD3B8\uC131 \uBD88\uAC00 \xB7 \uB2E4\uB978 \uC784\uBB34 \uC9C4\uD589
+      \uC911"
+    english: "Unavailable \xB7 assigned to another task"
+  - uid: UI_SELECTION_READY
+    korean: "\uD3B8\uC131 \uAC00\uB2A5"
+    english: Available for assignment
+  - uid: UI_MUSTER_TITLE
+    korean: "\uBAA8\uBCD1 \xB7 \uC77C\uBC18 \uC778\uBB3C \uCDA9\uC6D0"
+    english: "Muster \xB7 Common Characters"
+  - uid: UI_MUSTER_HINT
+    korean: "\uC131\uC5D0\uC11C \uC5ED\uD560\uACFC \uD569\uB958 \uB300\uC0C1\uC744
+      \uC815\uD574 \uC77C\uBC18 \uC778\uBB3C\uC744 \uBAA8\uC9D1\uD569\uB2C8\uB2E4.
+      \uC601\uC6C5 \uB2F4\uB2F9\uC790\uB294 \uD544\uC694\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+    english: Choose a castle, role and destination. No hero officer is required.
+  - uid: UI_MUSTER_INVALID
+    korean: "\uBAA8\uBCD1 \uC124\uC815 \uB610\uB294 \uC131 \uC18C\uC720\uAD8C\uC744
+      \uD655\uC778\uD558\uC138\uC694."
+    english: Check muster settings and castle ownership.
+  - uid: UI_MUSTER_ALREADY
+    korean: "\uC774 \uC131\uC5D0\uB294 \uC774\uBBF8 \uB2E4\uC74C \uB2EC \uBAA8\uC9D1
+      \uC608\uC57D\uC774 \uC788\uC2B5\uB2C8\uB2E4."
+    english: This castle already has a pending muster order.
+  - uid: UI_MUSTER_LIMIT
+    korean: "\uC131\uC758 \uC6D4 \uBAA8\uC9D1 \uD55C\uB3C4 \uB610\uB294 \uC138\uB825
+      \uC804\uCCB4 \uC778\uC6D0 \uC0C1\uD55C\uC5D0 \uB3C4\uB2EC\uD588\uC2B5\uB2C8\uB2E4."
+    english: Monthly castle limit or faction roster capacity reached.
+  - uid: UI_MUSTER_SPACE
+    korean: "\uD569\uB958\uD560 \uBE48\uC790\uB9AC\uAC00 \uC5C6\uAC70\uB098 \uC804\uD22C
+      \uC911\uC785\uB2C8\uB2E4. \uC804\uD22C\uB2E8 \uD3B8\uC131 \uB610\uB294 \uB2E4\uB978
+      \uD569\uB958 \uB300\uC0C1\uC744 \uD655\uC778\uD558\uC138\uC694."
+    english: No arrival space, or a battle is pending. Check the destination.
+  - uid: UI_MUSTER_GOLD
+    korean: "\uBAA8\uC9D1 \uBE44\uC6A9\uC744 \uC9C0\uBD88\uD560 \uAE08\uD654\uAC00
+      \uBD80\uC871\uD569\uB2C8\uB2E4."
+    english: Not enough gold for muster.
+  - uid: UI_MUSTER_POOL
+    korean: "\uC774 \uC5ED\uD560\uB85C \uBAA8\uC9D1\uD560 \uC218 \uC788\uB294 \uC77C\uBC18
+      \uC778\uBB3C\uC774 \uBD80\uC871\uD569\uB2C8\uB2E4."
+    english: Not enough available common characters for this role.
+  - uid: UI_MUSTER_CASTLE
+    korean: "\uC6D4 \uCD5C\uB300 {0}\uBA85 \xB7 \uBAA8\uC9D1 \uC911 {1}\uBA85"
+    english: "Up to {0}/month \xB7 {1} pending"
+  - uid: UI_MUSTER_STATUS
+    korean: "\uAE08\uD654 {0} \xB7 \uC138\uB825 \uC778\uC6D0 {1}/{2}\n\uC120\uD0DD
+      \xB7 {3} / {4} \xB7 \uBAA8\uC9D1 \uC911 {5}\uBA85\n\uC790\uB3D9 \uCDA9\uC6D0
+      {6} \xB7 \uBAA9\uD45C {7}\uBA85 \xB7 \uC6D4 \uC608\uC0B0 {8}G"
+    english: "Gold {0} \xB7 Roster {1}/{2}\nSelected: {3} / {4} \xB7 {5} pending\nAuto
+      {6} \xB7 Target {7} \xB7 Budget {8}G/month"
+  - uid: UI_MUSTER_RESERVE
+    korean: "\uC131\uC5D0\uC11C \uB300\uAE30"
+    english: Castle reserve
+  - uid: UI_MUSTER_RESERVE_HINT
+    korean: "\uD569\uB958 \uD6C4 \uC6D0\uD558\uB294 \uC804\uD22C\uB2E8\uC5D0 \uC9C1\uC811
+      \uD3B8\uC131\uD569\uB2C8\uB2E4. \uAC70\uC8FC \uACF5\uAC04\uC774 \uD544\uC694\uD569\uB2C8\uB2E4."
+    english: Arrive as residents for manual assignment. Requires resident space.
+  - uid: UI_MUSTER_CANCEL
+    korean: "\uBAA8\uC9D1 \uCDE8\uC18C"
+    english: Cancel muster
+  - uid: UI_MUSTER_REFUND
+    korean: "{0}G \uBC18\uD658 \xB7 \uC790\uB3D9 \uCDA9\uC6D0\uB3C4 \uC911\uC9C0"
+    english: "Refund {0}G \xB7 also stop automatic replenishment"
+  - uid: UI_MUSTER_QUEUE
+    korean: "{0}\uBA85 \uBAA8\uC9D1 \xB7 {1}G"
+    english: "Muster {0} \xB7 {1}G"
+  - uid: UI_MUSTER_NEXT_MONTH
+    korean: "\uC120\uD0DD\uD55C \uC5ED\uD560\uACFC \uD569\uB958 \uB300\uC0C1\uC73C\uB85C
+      \uB2E4\uC74C \uB2EC\uC5D0 \uD569\uB958\uD569\uB2C8\uB2E4."
+    english: Arrives next month with the selected role and destination.
+  - uid: UI_MUSTER_ROLE_1
+    korean: "\uC804\uC704"
+    english: Vanguard
+  - uid: UI_MUSTER_ROLE_2
+    korean: "\uADFC\uC811"
+    english: Melee
+  - uid: UI_MUSTER_ROLE_3
+    korean: "\uC6D0\uAC70\uB9AC"
+    english: Ranged
+  - uid: UI_MUSTER_ROLE_4
+    korean: "\uB9C8\uBC95"
+    english: Magic
+  - uid: UI_MUSTER_ROLE_5
+    korean: "\uC9C0\uC6D0"
+    english: Support
+  - uid: UI_MUSTER_SELECTED
+    korean: "\uD604\uC7AC \uC120\uD0DD\uD55C \uBAA8\uC9D1 \uC5ED\uD560"
+    english: Selected muster role
+  - uid: UI_MUSTER_CHOOSE_ROLE
+    korean: "\uC55E\uC73C\uB85C \uBAA8\uC9D1\uD560 \uC778\uBB3C\uC758 \uC804\uD22C
+      \uC5ED\uD560\uC744 \uC120\uD0DD\uD569\uB2C8\uB2E4."
+    english: Select the role for future orders.
+  - uid: UI_MUSTER_DESTINATION
+    korean: "\uD569\uB958 \uB300\uC0C1 \xB7 {0}"
+    english: "Destination \xB7 {0}"
+  - uid: UI_MUSTER_ARMY_SIZE
+    korean: "\uC804\uD22C\uB2E8 {0}/{1}\uBA85 \xB7 \uAC19\uC740 \uC131\uC5D0 \uBA38\uBB3C\uB7EC\uC57C
+      \uC790\uB3D9 \uD3B8\uC131\uB429\uB2C8\uB2E4."
+    english: "Army {0}/{1} \xB7 Must remain here for automatic assignment."
+  - uid: UI_MUSTER_START
+    korean: "\uC790\uB3D9 \uCDA9\uC6D0 \uC2DC\uC791"
+    english: Start automatic replenishment
+  - uid: UI_MUSTER_STOP
+    korean: "\uC790\uB3D9 \uCDA9\uC6D0 \uC911\uC9C0"
+    english: Stop automatic replenishment
+  - uid: UI_MUSTER_AUTO_HINT
+    korean: "\uC120\uD0DD \uC804\uD22C\uB2E8\uC774 \uC774 \uC131\uC5D0 \uC788\uC744
+      \uB54C \uBAA9\uD45C\uAE4C\uC9C0 \uBAA8\uC9D1\uD569\uB2C8\uB2E4. \uC790\uAE08\xB7\uACF5\uAC04\xB7\uD6C4\uBCF4
+      \uBD80\uC871 \uC2DC \uB300\uAE30\uD569\uB2C8\uB2E4. \uC608\uC57D\uB41C \uBAA8\uC9D1\uC740
+      \uBCC4\uB3C4\uB85C \uCDE8\uC18C\uD558\uC138\uC694."
+    english: Muster to the target while the army is here. Waits for funds, space
+      or candidates. Cancel pending orders separately.
+  - uid: UI_MUSTER_TARGET_LESS
+    korean: "\uCDA9\uC6D0 \uBAA9\uD45C 1\uBA85 \uC904\uC774\uAE30"
+    english: Decrease target by 1
+  - uid: UI_MUSTER_TARGET_MORE
+    korean: "\uCDA9\uC6D0 \uBAA9\uD45C 1\uBA85 \uB298\uB9AC\uAE30"
+    english: Increase target by 1
+  - uid: UI_MUSTER_TARGET
+    korean: "\uC804\uD22C\uB2E8 \uC804\uCCB4 \uBAA9\uD45C {0}\uBA85"
+    english: 'Target army size: {0}'
+  - uid: UI_MUSTER_BUDGET_LESS
+    korean: "\uC6D4 \uC608\uC0B0 \uD55C \uBA85\uBD84 \uC904\uC774\uAE30"
+    english: Decrease monthly budget
+  - uid: UI_MUSTER_BUDGET_MORE
+    korean: "\uC6D4 \uC608\uC0B0 \uD55C \uBA85\uBD84 \uB298\uB9AC\uAE30"
+    english: Increase monthly budget
+  - uid: UI_MUSTER_BUDGET
+    korean: "\uC6D4 \uBAA8\uBCD1 \uC608\uC0B0 \uC0C1\uD55C {0}G"
+    english: 'Monthly muster budget: {0}G'
+  - uid: UI_MUSTER_ON
+    korean: "\uC0AC\uC6A9"
+    english: On
+  - uid: UI_MUSTER_OFF
+    korean: "\uC911\uC9C0"
+    english: Off
+  - uid: REPORT_MUSTER_DONE
+    korean: "\uBAA8\uBCD1 \uC644\uB8CC \xB7 {0} \xB7 {1} \uD569\uB958"
+    english: "Muster completed \xB7 {0} \xB7 {1} arrived"
+  - uid: REPORT_MUSTER_CANCEL
+    korean: "\uBAA8\uC9D1 \uCDE8\uC18C \xB7 {0} \xB7 \uD569\uB958 \uC870\uAC74 \uBCC0\uACBD\uC73C\uB85C
+      {1}G \uBC18\uD658"
+    english: "Muster cancelled \xB7 {0} \xB7 conditions changed, refunded {1}G"
   factions:
   - id: avalon
     displayName:
@@ -32827,6 +33091,12 @@ MonoBehaviour:
     restEndFatigue: 20
     trainingTargetExperience: 500
     talentOfficeCapacity: 2
+    automaticTrainingEnabled: 1
+    automaticTrainingExperience: 8
+    automaticTrainingFatigue: 5
+    occupationUnrestMonths: 3
+    occupationStabilityGain: 5
+    victoryReorganizationMonths: 0
   traitDefinitions:
   - traitType: 0
     displayName:
@@ -32932,9 +33202,10 @@ MonoBehaviour:
       english: Administration
     description:
       uid: TRAIT_ADMINISTRATION_DESC
-      korean: "\uB4F1\uAE09\uACFC \uBB34\uAD00\uD558\uAC8C \uC601\uC9C0\uAD00\uACFC
-        \uC131 \uC911\uC810 \uC0AC\uC5C5\uC744 \uB2F4\uB2F9\uD569\uB2C8\uB2E4."
-      english: Allows governance and castle projects regardless of grade.
+      korean: "\uC601\uC6C5 \uB4F1\uAE09\uC5D0\uC11C \uC601\uC9C0\uAD00\uACFC \uC131
+        \uC911\uC810 \uC0AC\uC5C5\uC744 \uB2F4\uB2F9\uD569\uB2C8\uB2E4. \uCD9C\uC815
+        \uC911\uC5D0\uB3C4 \uC5C5\uBB34\uB97C \uC720\uC9C0\uD569\uB2C8\uB2E4."
+      english: Heroes can govern and manage castle projects, including while deployed.
     projectTypes: 
     uniqueEffectValue: 0
   - traitType: 9
@@ -33451,48 +33722,20 @@ MonoBehaviour:
     aiPreservationFactionId: valdor
     valdorAIPreservationCastleCount: 36
     nonPlayerRecruitmentEnabled: 0
+    aiBorderReserveCount: 2
+    aiFrontlineReinforcementTarget: 6
     characterPlacements:
     - castleId: castle_28
       heroId: ares
-      governor: 0
+      governor: 1
     - castleId: castle_28
       heroId: lyria
       governor: 0
     - castleId: castle_28
-      heroId: hero_009
-      governor: 0
-    - castleId: castle_28
-      heroId: hero_010
-      governor: 0
-    - castleId: castle_28
       heroId: common_alden
-      governor: 1
+      governor: 0
     - castleId: castle_28
       heroId: common_sable
-      governor: 0
-    - castleId: castle_28
-      heroId: common_013
-      governor: 0
-    - castleId: castle_28
-      heroId: common_014
-      governor: 0
-    - castleId: castle_28
-      heroId: common_015
-      governor: 0
-    - castleId: castle_28
-      heroId: common_016
-      governor: 0
-    - castleId: castle_28
-      heroId: common_017
-      governor: 0
-    - castleId: castle_28
-      heroId: common_018
-      governor: 0
-    - castleId: castle_28
-      heroId: common_019
-      governor: 0
-    - castleId: castle_28
-      heroId: common_020
       governor: 0
     - castleId: castle_00
       heroId: elwyn
@@ -33505,6 +33748,15 @@ MonoBehaviour:
       governor: 0
     - castleId: castle_00
       heroId: common_varek
+      governor: 0
+    - castleId: castle_04
+      heroId: hero_072
+      governor: 1
+    - castleId: castle_04
+      heroId: common_049
+      governor: 0
+    - castleId: castle_04
+      heroId: common_048
       governor: 0
     - castleId: castle_26
       heroId: brom
@@ -33540,667 +33792,388 @@ MonoBehaviour:
       heroId: common_veil
       governor: 0
     - castleId: castle_00
-      heroId: hero_011
+      heroId: hero_009
       governor: 0
     - castleId: castle_01
+      heroId: hero_010
+      governor: 1
+    - castleId: castle_02
+      heroId: hero_011
+      governor: 1
+    - castleId: castle_03
       heroId: hero_012
       governor: 1
-    - castleId: castle_02
+    - castleId: castle_05
       heroId: hero_013
       governor: 1
-    - castleId: castle_03
+    - castleId: castle_06
       heroId: hero_014
       governor: 1
-    - castleId: castle_05
+    - castleId: castle_07
       heroId: hero_015
       governor: 1
-    - castleId: castle_06
+    - castleId: castle_08
       heroId: hero_016
       governor: 1
-    - castleId: castle_07
+    - castleId: castle_09
       heroId: hero_017
       governor: 1
-    - castleId: castle_08
+    - castleId: castle_10
       heroId: hero_018
       governor: 1
-    - castleId: castle_09
+    - castleId: castle_11
       heroId: hero_019
       governor: 1
-    - castleId: castle_10
+    - castleId: castle_12
       heroId: hero_020
       governor: 1
-    - castleId: castle_11
+    - castleId: castle_13
       heroId: hero_021
       governor: 1
-    - castleId: castle_12
+    - castleId: castle_14
       heroId: hero_022
       governor: 1
-    - castleId: castle_13
+    - castleId: castle_15
       heroId: hero_023
       governor: 1
-    - castleId: castle_14
+    - castleId: castle_16
       heroId: hero_024
       governor: 1
-    - castleId: castle_15
+    - castleId: castle_17
       heroId: hero_025
       governor: 1
-    - castleId: castle_16
+    - castleId: castle_18
       heroId: hero_026
       governor: 1
-    - castleId: castle_17
+    - castleId: castle_19
       heroId: hero_027
       governor: 1
-    - castleId: castle_18
+    - castleId: castle_20
       heroId: hero_028
       governor: 1
-    - castleId: castle_19
+    - castleId: castle_21
       heroId: hero_029
       governor: 1
-    - castleId: castle_20
+    - castleId: castle_22
       heroId: hero_030
       governor: 1
-    - castleId: castle_21
+    - castleId: castle_23
       heroId: hero_031
       governor: 1
-    - castleId: castle_22
+    - castleId: castle_24
       heroId: hero_032
       governor: 1
-    - castleId: castle_23
+    - castleId: castle_25
       heroId: hero_033
       governor: 1
-    - castleId: castle_24
+    - castleId: castle_26
       heroId: hero_034
-      governor: 1
-    - castleId: castle_25
+      governor: 0
+    - castleId: castle_27
       heroId: hero_035
       governor: 1
-    - castleId: castle_26
+    - castleId: castle_29
       heroId: hero_036
-      governor: 0
-    - castleId: castle_27
+      governor: 1
+    - castleId: castle_30
       heroId: hero_037
       governor: 1
-    - castleId: castle_29
+    - castleId: castle_31
       heroId: hero_038
       governor: 1
-    - castleId: castle_30
+    - castleId: castle_32
       heroId: hero_039
       governor: 1
-    - castleId: castle_31
+    - castleId: castle_33
       heroId: hero_040
       governor: 1
-    - castleId: castle_32
+    - castleId: castle_34
       heroId: hero_041
       governor: 1
-    - castleId: castle_33
+    - castleId: castle_35
       heroId: hero_042
       governor: 1
-    - castleId: castle_34
+    - castleId: castle_36
       heroId: hero_043
       governor: 1
-    - castleId: castle_35
+    - castleId: castle_37
       heroId: hero_044
       governor: 1
-    - castleId: castle_36
+    - castleId: castle_38
       heroId: hero_045
-      governor: 1
-    - castleId: castle_37
+      governor: 0
+    - castleId: castle_39
       heroId: hero_046
       governor: 1
-    - castleId: castle_38
+    - castleId: castle_40
       heroId: hero_047
-      governor: 0
-    - castleId: castle_39
+      governor: 1
+    - castleId: castle_41
       heroId: hero_048
       governor: 1
-    - castleId: castle_40
+    - castleId: castle_42
       heroId: hero_049
       governor: 1
-    - castleId: castle_41
+    - castleId: castle_43
       heroId: hero_050
       governor: 1
-    - castleId: castle_42
+    - castleId: castle_44
       heroId: hero_051
       governor: 1
-    - castleId: castle_43
+    - castleId: castle_45
       heroId: hero_052
       governor: 1
-    - castleId: castle_44
+    - castleId: castle_46
       heroId: hero_053
       governor: 1
-    - castleId: castle_45
+    - castleId: castle_47
       heroId: hero_054
       governor: 1
-    - castleId: castle_46
+    - castleId: castle_48
       heroId: hero_055
       governor: 1
-    - castleId: castle_47
+    - castleId: castle_49
       heroId: hero_056
       governor: 1
-    - castleId: castle_48
+    - castleId: castle_50
       heroId: hero_057
-      governor: 1
-    - castleId: castle_49
+      governor: 0
+    - castleId: castle_51
       heroId: hero_058
       governor: 1
-    - castleId: castle_50
-      heroId: hero_059
-      governor: 0
-    - castleId: castle_51
-      heroId: hero_060
-      governor: 1
     - castleId: castle_52
-      heroId: hero_061
+      heroId: hero_059
       governor: 1
     - castleId: castle_53
-      heroId: hero_062
+      heroId: common_012
       governor: 1
     - castleId: castle_54
-      heroId: hero_063
+      heroId: common_013
       governor: 1
     - castleId: castle_55
-      heroId: hero_064
+      heroId: common_014
       governor: 1
     - castleId: castle_56
-      heroId: hero_065
+      heroId: common_015
       governor: 1
     - castleId: castle_57
-      heroId: hero_066
+      heroId: common_016
       governor: 1
     - castleId: castle_58
-      heroId: hero_067
+      heroId: common_017
       governor: 1
     - castleId: castle_59
-      heroId: hero_068
+      heroId: common_018
       governor: 1
     - castleId: castle_00
-      heroId: hero_069
+      heroId: common_019
       governor: 0
     - castleId: castle_01
-      heroId: hero_070
+      heroId: common_020
       governor: 0
     - castleId: castle_02
-      heroId: hero_071
-      governor: 0
-    - castleId: castle_03
-      heroId: hero_072
-      governor: 0
-    - castleId: castle_05
-      heroId: hero_073
-      governor: 0
-    - castleId: castle_06
-      heroId: hero_074
-      governor: 0
-    - castleId: castle_07
-      heroId: hero_075
-      governor: 0
-    - castleId: castle_08
-      heroId: hero_076
-      governor: 0
-    - castleId: castle_09
-      heroId: hero_077
-      governor: 0
-    - castleId: castle_10
-      heroId: hero_078
-      governor: 0
-    - castleId: castle_11
-      heroId: hero_079
-      governor: 0
-    - castleId: castle_12
-      heroId: hero_080
-      governor: 0
-    - castleId: castle_13
-      heroId: hero_081
-      governor: 0
-    - castleId: castle_14
-      heroId: hero_082
-      governor: 0
-    - castleId: castle_15
-      heroId: hero_083
-      governor: 0
-    - castleId: castle_16
-      heroId: hero_084
-      governor: 0
-    - castleId: castle_17
-      heroId: hero_085
-      governor: 0
-    - castleId: castle_18
-      heroId: hero_086
-      governor: 0
-    - castleId: castle_19
-      heroId: hero_087
-      governor: 0
-    - castleId: castle_20
-      heroId: hero_088
-      governor: 0
-    - castleId: castle_21
-      heroId: hero_089
-      governor: 0
-    - castleId: castle_22
-      heroId: hero_090
-      governor: 0
-    - castleId: castle_23
-      heroId: hero_091
-      governor: 0
-    - castleId: castle_24
-      heroId: hero_092
-      governor: 0
-    - castleId: castle_25
-      heroId: hero_093
-      governor: 0
-    - castleId: castle_26
-      heroId: hero_094
-      governor: 0
-    - castleId: castle_27
-      heroId: hero_095
-      governor: 0
-    - castleId: castle_29
-      heroId: hero_096
-      governor: 0
-    - castleId: castle_30
-      heroId: hero_097
-      governor: 0
-    - castleId: castle_31
-      heroId: hero_098
-      governor: 0
-    - castleId: castle_32
-      heroId: hero_099
-      governor: 0
-    - castleId: castle_33
-      heroId: hero_100
-      governor: 0
-    - castleId: castle_34
-      heroId: common_012
-      governor: 0
-    - castleId: castle_35
       heroId: common_021
       governor: 0
-    - castleId: castle_36
+    - castleId: castle_03
       heroId: common_022
       governor: 0
-    - castleId: castle_37
+    - castleId: castle_05
       heroId: common_023
       governor: 0
-    - castleId: castle_38
+    - castleId: castle_06
       heroId: common_024
       governor: 0
-    - castleId: castle_39
+    - castleId: castle_07
       heroId: common_025
       governor: 0
-    - castleId: castle_40
+    - castleId: castle_08
       heroId: common_026
       governor: 0
-    - castleId: castle_41
+    - castleId: castle_09
       heroId: common_027
       governor: 0
-    - castleId: castle_42
+    - castleId: castle_10
       heroId: common_028
       governor: 0
-    - castleId: castle_43
+    - castleId: castle_11
       heroId: common_029
       governor: 0
-    - castleId: castle_44
+    - castleId: castle_12
       heroId: common_030
       governor: 0
-    - castleId: castle_45
+    - castleId: castle_13
       heroId: common_031
       governor: 0
-    - castleId: castle_46
+    - castleId: castle_14
       heroId: common_032
       governor: 0
-    - castleId: castle_47
+    - castleId: castle_15
       heroId: common_033
       governor: 0
-    - castleId: castle_48
+    - castleId: castle_16
       heroId: common_034
       governor: 0
-    - castleId: castle_49
+    - castleId: castle_17
       heroId: common_035
       governor: 0
-    - castleId: castle_50
+    - castleId: castle_18
       heroId: common_036
       governor: 0
-    - castleId: castle_51
+    - castleId: castle_19
       heroId: common_037
       governor: 0
-    - castleId: castle_52
+    - castleId: castle_20
       heroId: common_038
       governor: 0
-    - castleId: castle_53
+    - castleId: castle_21
       heroId: common_039
       governor: 0
-    - castleId: castle_54
+    - castleId: castle_22
       heroId: common_040
       governor: 0
-    - castleId: castle_55
+    - castleId: castle_23
       heroId: common_041
       governor: 0
-    - castleId: castle_56
+    - castleId: castle_24
       heroId: common_042
       governor: 0
-    - castleId: castle_57
+    - castleId: castle_25
       heroId: common_043
       governor: 0
-    - castleId: castle_58
+    - castleId: castle_26
       heroId: common_044
       governor: 0
-    - castleId: castle_59
+    - castleId: castle_27
       heroId: common_045
       governor: 0
-    - castleId: castle_00
+    - castleId: castle_29
       heroId: common_046
       governor: 0
-    - castleId: castle_01
+    - castleId: castle_30
       heroId: common_047
       governor: 0
-    - castleId: castle_02
-      heroId: common_048
-      governor: 0
-    - castleId: castle_03
-      heroId: common_049
-      governor: 0
-    - castleId: castle_05
+    - castleId: castle_31
       heroId: common_050
       governor: 0
-    - castleId: castle_06
+    - castleId: castle_32
       heroId: common_051
       governor: 0
-    - castleId: castle_07
+    - castleId: castle_33
       heroId: common_052
       governor: 0
-    - castleId: castle_08
+    - castleId: castle_34
       heroId: common_053
       governor: 0
-    - castleId: castle_09
+    - castleId: castle_35
       heroId: common_054
       governor: 0
-    - castleId: castle_10
+    - castleId: castle_36
       heroId: common_055
       governor: 0
-    - castleId: castle_11
+    - castleId: castle_37
       heroId: common_056
       governor: 0
-    - castleId: castle_12
+    - castleId: castle_38
       heroId: common_057
       governor: 0
-    - castleId: castle_13
+    - castleId: castle_39
       heroId: common_058
       governor: 0
-    - castleId: castle_14
+    - castleId: castle_40
       heroId: common_059
       governor: 0
-    - castleId: castle_15
+    - castleId: castle_41
       heroId: common_060
       governor: 0
-    - castleId: castle_16
+    - castleId: castle_42
       heroId: common_061
       governor: 0
-    - castleId: castle_17
+    - castleId: castle_43
       heroId: common_062
       governor: 0
-    - castleId: castle_18
+    - castleId: castle_44
       heroId: common_063
       governor: 0
-    - castleId: castle_19
+    - castleId: castle_45
       heroId: common_064
       governor: 0
-    - castleId: castle_20
+    - castleId: castle_46
       heroId: common_065
       governor: 0
-    - castleId: castle_21
+    - castleId: castle_47
       heroId: common_066
       governor: 0
-    - castleId: castle_22
+    - castleId: castle_48
       heroId: common_067
       governor: 0
-    - castleId: castle_23
+    - castleId: castle_49
       heroId: common_068
       governor: 0
-    - castleId: castle_24
+    - castleId: castle_50
       heroId: common_069
       governor: 0
-    - castleId: castle_25
+    - castleId: castle_51
       heroId: common_070
       governor: 0
-    - castleId: castle_26
+    - castleId: castle_52
       heroId: common_071
       governor: 0
-    - castleId: castle_27
+    - castleId: castle_53
       heroId: common_072
       governor: 0
-    - castleId: castle_29
+    - castleId: castle_54
       heroId: common_073
       governor: 0
-    - castleId: castle_30
+    - castleId: castle_55
       heroId: common_074
       governor: 0
-    - castleId: castle_31
+    - castleId: castle_56
       heroId: common_075
       governor: 0
-    - castleId: castle_32
+    - castleId: castle_57
       heroId: common_076
       governor: 0
-    - castleId: castle_33
+    - castleId: castle_58
       heroId: common_077
       governor: 0
-    - castleId: castle_34
+    - castleId: castle_59
       heroId: common_078
       governor: 0
-    - castleId: castle_35
+    - castleId: castle_00
       heroId: common_079
       governor: 0
-    - castleId: castle_36
+    - castleId: castle_01
       heroId: common_080
       governor: 0
-    - castleId: castle_37
+    - castleId: castle_02
       heroId: common_081
       governor: 0
-    - castleId: castle_38
+    - castleId: castle_03
       heroId: common_082
       governor: 0
-    - castleId: castle_39
+    - castleId: castle_05
       heroId: common_083
       governor: 0
-    - castleId: castle_40
+    - castleId: castle_06
       heroId: common_084
       governor: 0
-    - castleId: castle_41
+    - castleId: castle_07
       heroId: common_085
       governor: 0
-    - castleId: castle_42
+    - castleId: castle_08
       heroId: common_086
       governor: 0
-    - castleId: castle_43
+    - castleId: castle_09
       heroId: common_087
       governor: 0
-    - castleId: castle_44
+    - castleId: castle_10
       heroId: common_088
       governor: 0
-    - castleId: castle_45
+    - castleId: castle_11
       heroId: common_089
       governor: 0
-    - castleId: castle_46
-      heroId: common_090
-      governor: 0
-    - castleId: castle_47
-      heroId: common_091
-      governor: 0
-    - castleId: castle_48
-      heroId: common_092
-      governor: 0
-    - castleId: castle_49
-      heroId: common_093
-      governor: 0
-    - castleId: castle_50
-      heroId: common_094
-      governor: 0
-    - castleId: castle_51
-      heroId: common_095
-      governor: 0
-    - castleId: castle_52
-      heroId: common_096
-      governor: 0
-    - castleId: castle_53
-      heroId: common_097
-      governor: 0
-    - castleId: castle_54
-      heroId: common_098
-      governor: 0
-    - castleId: castle_55
-      heroId: common_099
-      governor: 0
-    - castleId: castle_56
-      heroId: common_100
-      governor: 0
-    - castleId: castle_57
-      heroId: common_101
-      governor: 0
-    - castleId: castle_58
-      heroId: common_102
-      governor: 0
-    - castleId: castle_59
-      heroId: common_103
-      governor: 0
-    - castleId: castle_00
-      heroId: common_104
-      governor: 0
-    - castleId: castle_01
-      heroId: common_105
-      governor: 0
-    - castleId: castle_02
-      heroId: common_106
-      governor: 0
-    - castleId: castle_03
-      heroId: common_107
-      governor: 0
-    - castleId: castle_05
-      heroId: common_108
-      governor: 0
-    - castleId: castle_06
-      heroId: common_109
-      governor: 0
-    - castleId: castle_07
-      heroId: common_110
-      governor: 0
-    - castleId: castle_08
-      heroId: common_111
-      governor: 0
-    - castleId: castle_09
-      heroId: common_112
-      governor: 0
-    - castleId: castle_10
-      heroId: common_113
-      governor: 0
-    - castleId: castle_11
-      heroId: common_114
-      governor: 0
     - castleId: castle_12
-      heroId: common_115
-      governor: 0
-    - castleId: castle_13
-      heroId: common_116
-      governor: 0
-    - castleId: castle_14
-      heroId: common_117
-      governor: 0
-    - castleId: castle_15
-      heroId: common_118
-      governor: 0
-    - castleId: castle_16
-      heroId: common_119
-      governor: 0
-    - castleId: castle_17
-      heroId: common_120
-      governor: 0
-    - castleId: castle_18
-      heroId: common_121
-      governor: 0
-    - castleId: castle_19
-      heroId: common_122
-      governor: 0
-    - castleId: castle_20
-      heroId: common_123
-      governor: 0
-    - castleId: castle_21
-      heroId: common_124
-      governor: 0
-    - castleId: castle_22
-      heroId: common_125
-      governor: 0
-    - castleId: castle_23
-      heroId: common_126
-      governor: 0
-    - castleId: castle_24
-      heroId: common_127
-      governor: 0
-    - castleId: castle_25
-      heroId: common_128
-      governor: 0
-    - castleId: castle_26
-      heroId: common_129
-      governor: 0
-    - castleId: castle_27
-      heroId: common_130
-      governor: 0
-    - castleId: castle_29
-      heroId: common_131
-      governor: 0
-    - castleId: castle_30
-      heroId: common_132
-      governor: 0
-    - castleId: castle_31
-      heroId: common_133
-      governor: 0
-    - castleId: castle_32
-      heroId: common_134
-      governor: 0
-    - castleId: castle_33
-      heroId: common_135
-      governor: 0
-    - castleId: castle_34
-      heroId: common_136
-      governor: 0
-    - castleId: castle_35
-      heroId: common_137
-      governor: 0
-    - castleId: castle_36
-      heroId: common_138
-      governor: 0
-    - castleId: castle_37
-      heroId: common_139
-      governor: 0
-    - castleId: castle_38
-      heroId: common_140
-      governor: 0
-    - castleId: castle_39
-      heroId: common_141
-      governor: 0
-    - castleId: castle_40
-      heroId: common_142
-      governor: 0
-    - castleId: castle_41
-      heroId: common_143
-      governor: 0
-    - castleId: castle_42
-      heroId: common_144
-      governor: 0
-    - castleId: castle_43
-      heroId: common_145
-      governor: 0
-    - castleId: castle_44
-      heroId: common_146
-      governor: 0
-    - castleId: castle_45
-      heroId: common_147
-      governor: 0
-    - castleId: castle_46
-      heroId: common_148
-      governor: 0
-    - castleId: castle_47
-      heroId: common_149
-      governor: 0
-    - castleId: castle_48
-      heroId: common_150
+      heroId: common_090
       governor: 0
     castlePlacements:
     - castleId: castle_00
@@ -34621,16 +34594,18 @@ MonoBehaviour:
     aiPreservationFactionId: 
     valdorAIPreservationCastleCount: 0
     nonPlayerRecruitmentEnabled: 1
+    aiBorderReserveCount: 2
+    aiFrontlineReinforcementTarget: 0
     characterPlacements:
     - castleId: castle_00
       heroId: ares
-      governor: 0
+      governor: 1
     - castleId: castle_00
       heroId: lyria
       governor: 0
     - castleId: castle_00
       heroId: common_alden
-      governor: 1
+      governor: 0
     - castleId: castle_00
       heroId: common_sable
       governor: 0
@@ -34836,541 +34811,241 @@ MonoBehaviour:
       heroId: hero_060
       governor: 1
     - castleId: castle_52
-      heroId: hero_061
+      heroId: common_012
       governor: 1
     - castleId: castle_53
-      heroId: hero_062
+      heroId: common_013
       governor: 1
     - castleId: castle_54
-      heroId: hero_063
+      heroId: common_014
       governor: 1
     - castleId: castle_55
-      heroId: hero_064
+      heroId: common_015
       governor: 1
     - castleId: castle_56
-      heroId: hero_065
+      heroId: common_016
       governor: 1
     - castleId: castle_57
-      heroId: hero_066
+      heroId: common_017
       governor: 1
     - castleId: castle_58
-      heroId: hero_067
+      heroId: common_018
       governor: 1
     - castleId: castle_59
-      heroId: hero_068
+      heroId: common_019
       governor: 1
     - castleId: castle_00
-      heroId: hero_069
-      governor: 0
-    - castleId: castle_01
-      heroId: hero_070
-      governor: 0
-    - castleId: castle_02
-      heroId: hero_071
-      governor: 0
-    - castleId: castle_03
-      heroId: hero_072
-      governor: 0
-    - castleId: castle_04
-      heroId: hero_073
-      governor: 0
-    - castleId: castle_05
-      heroId: hero_074
-      governor: 0
-    - castleId: castle_06
-      heroId: hero_075
-      governor: 0
-    - castleId: castle_07
-      heroId: hero_076
-      governor: 0
-    - castleId: castle_08
-      heroId: hero_077
-      governor: 0
-    - castleId: castle_09
-      heroId: hero_078
-      governor: 0
-    - castleId: castle_10
-      heroId: hero_079
-      governor: 0
-    - castleId: castle_11
-      heroId: hero_080
-      governor: 0
-    - castleId: castle_12
-      heroId: hero_081
-      governor: 0
-    - castleId: castle_13
-      heroId: hero_082
-      governor: 0
-    - castleId: castle_14
-      heroId: hero_083
-      governor: 0
-    - castleId: castle_15
-      heroId: hero_084
-      governor: 0
-    - castleId: castle_16
-      heroId: hero_085
-      governor: 0
-    - castleId: castle_17
-      heroId: hero_086
-      governor: 0
-    - castleId: castle_18
-      heroId: hero_087
-      governor: 0
-    - castleId: castle_19
-      heroId: hero_088
-      governor: 0
-    - castleId: castle_20
-      heroId: hero_089
-      governor: 0
-    - castleId: castle_21
-      heroId: hero_090
-      governor: 0
-    - castleId: castle_22
-      heroId: hero_091
-      governor: 0
-    - castleId: castle_23
-      heroId: hero_092
-      governor: 0
-    - castleId: castle_24
-      heroId: hero_093
-      governor: 0
-    - castleId: castle_25
-      heroId: hero_094
-      governor: 0
-    - castleId: castle_26
-      heroId: hero_095
-      governor: 0
-    - castleId: castle_27
-      heroId: hero_096
-      governor: 0
-    - castleId: castle_28
-      heroId: hero_097
-      governor: 0
-    - castleId: castle_29
-      heroId: hero_098
-      governor: 0
-    - castleId: castle_30
-      heroId: hero_099
-      governor: 0
-    - castleId: castle_31
-      heroId: hero_100
-      governor: 0
-    - castleId: castle_32
-      heroId: common_012
-      governor: 0
-    - castleId: castle_33
-      heroId: common_013
-      governor: 0
-    - castleId: castle_34
-      heroId: common_014
-      governor: 0
-    - castleId: castle_35
-      heroId: common_015
-      governor: 0
-    - castleId: castle_36
-      heroId: common_016
-      governor: 0
-    - castleId: castle_37
-      heroId: common_017
-      governor: 0
-    - castleId: castle_38
-      heroId: common_018
-      governor: 0
-    - castleId: castle_39
-      heroId: common_019
-      governor: 0
-    - castleId: castle_40
       heroId: common_020
       governor: 0
-    - castleId: castle_41
+    - castleId: castle_01
       heroId: common_021
       governor: 0
-    - castleId: castle_42
+    - castleId: castle_02
       heroId: common_022
       governor: 0
-    - castleId: castle_43
+    - castleId: castle_03
       heroId: common_023
       governor: 0
-    - castleId: castle_44
+    - castleId: castle_04
       heroId: common_024
       governor: 0
-    - castleId: castle_45
+    - castleId: castle_05
       heroId: common_025
       governor: 0
-    - castleId: castle_46
+    - castleId: castle_06
       heroId: common_026
       governor: 0
-    - castleId: castle_47
+    - castleId: castle_07
       heroId: common_027
       governor: 0
-    - castleId: castle_48
+    - castleId: castle_08
       heroId: common_028
       governor: 0
-    - castleId: castle_49
+    - castleId: castle_09
       heroId: common_029
       governor: 0
-    - castleId: castle_50
+    - castleId: castle_10
       heroId: common_030
       governor: 0
-    - castleId: castle_51
+    - castleId: castle_11
       heroId: common_031
       governor: 0
-    - castleId: castle_52
+    - castleId: castle_12
       heroId: common_032
       governor: 0
-    - castleId: castle_53
+    - castleId: castle_13
       heroId: common_033
       governor: 0
-    - castleId: castle_54
+    - castleId: castle_14
       heroId: common_034
       governor: 0
-    - castleId: castle_55
+    - castleId: castle_15
       heroId: common_035
       governor: 0
-    - castleId: castle_56
+    - castleId: castle_16
       heroId: common_036
       governor: 0
-    - castleId: castle_57
+    - castleId: castle_17
       heroId: common_037
       governor: 0
-    - castleId: castle_58
+    - castleId: castle_18
       heroId: common_038
       governor: 0
-    - castleId: castle_59
+    - castleId: castle_19
       heroId: common_039
       governor: 0
-    - castleId: castle_00
+    - castleId: castle_20
       heroId: common_040
       governor: 0
-    - castleId: castle_01
+    - castleId: castle_21
       heroId: common_041
       governor: 0
-    - castleId: castle_02
+    - castleId: castle_22
       heroId: common_042
       governor: 0
-    - castleId: castle_03
+    - castleId: castle_23
       heroId: common_043
       governor: 0
-    - castleId: castle_04
+    - castleId: castle_24
       heroId: common_044
       governor: 0
-    - castleId: castle_05
+    - castleId: castle_25
       heroId: common_045
       governor: 0
-    - castleId: castle_06
+    - castleId: castle_26
       heroId: common_046
       governor: 0
-    - castleId: castle_07
+    - castleId: castle_27
       heroId: common_047
       governor: 0
-    - castleId: castle_08
+    - castleId: castle_28
       heroId: common_048
       governor: 0
-    - castleId: castle_09
+    - castleId: castle_29
       heroId: common_049
       governor: 0
-    - castleId: castle_10
+    - castleId: castle_30
       heroId: common_050
       governor: 0
-    - castleId: castle_11
+    - castleId: castle_31
       heroId: common_051
       governor: 0
-    - castleId: castle_12
+    - castleId: castle_32
       heroId: common_052
       governor: 0
-    - castleId: castle_13
+    - castleId: castle_33
       heroId: common_053
       governor: 0
-    - castleId: castle_14
+    - castleId: castle_34
       heroId: common_054
       governor: 0
-    - castleId: castle_15
+    - castleId: castle_35
       heroId: common_055
       governor: 0
-    - castleId: castle_16
+    - castleId: castle_36
       heroId: common_056
       governor: 0
-    - castleId: castle_17
+    - castleId: castle_37
       heroId: common_057
       governor: 0
-    - castleId: castle_18
+    - castleId: castle_38
       heroId: common_058
       governor: 0
-    - castleId: castle_19
+    - castleId: castle_39
       heroId: common_059
       governor: 0
-    - castleId: castle_20
+    - castleId: castle_40
       heroId: common_060
       governor: 0
-    - castleId: castle_21
+    - castleId: castle_41
       heroId: common_061
       governor: 0
-    - castleId: castle_22
+    - castleId: castle_42
       heroId: common_062
       governor: 0
-    - castleId: castle_23
+    - castleId: castle_43
       heroId: common_063
       governor: 0
-    - castleId: castle_24
+    - castleId: castle_44
       heroId: common_064
       governor: 0
-    - castleId: castle_25
+    - castleId: castle_45
       heroId: common_065
       governor: 0
-    - castleId: castle_26
+    - castleId: castle_46
       heroId: common_066
       governor: 0
-    - castleId: castle_27
+    - castleId: castle_47
       heroId: common_067
       governor: 0
-    - castleId: castle_28
+    - castleId: castle_48
       heroId: common_068
       governor: 0
-    - castleId: castle_29
+    - castleId: castle_49
       heroId: common_069
       governor: 0
-    - castleId: castle_30
+    - castleId: castle_50
       heroId: common_070
       governor: 0
-    - castleId: castle_31
+    - castleId: castle_51
       heroId: common_071
       governor: 0
-    - castleId: castle_32
+    - castleId: castle_52
       heroId: common_072
       governor: 0
-    - castleId: castle_33
+    - castleId: castle_53
       heroId: common_073
       governor: 0
-    - castleId: castle_34
+    - castleId: castle_54
       heroId: common_074
       governor: 0
-    - castleId: castle_35
+    - castleId: castle_55
       heroId: common_075
       governor: 0
-    - castleId: castle_36
+    - castleId: castle_56
       heroId: common_076
       governor: 0
-    - castleId: castle_37
+    - castleId: castle_57
       heroId: common_077
       governor: 0
-    - castleId: castle_38
+    - castleId: castle_58
       heroId: common_078
       governor: 0
-    - castleId: castle_39
+    - castleId: castle_59
       heroId: common_079
       governor: 0
-    - castleId: castle_40
+    - castleId: castle_00
       heroId: common_080
       governor: 0
-    - castleId: castle_41
+    - castleId: castle_01
       heroId: common_081
       governor: 0
-    - castleId: castle_42
+    - castleId: castle_02
       heroId: common_082
       governor: 0
-    - castleId: castle_43
+    - castleId: castle_03
       heroId: common_083
       governor: 0
-    - castleId: castle_44
+    - castleId: castle_04
       heroId: common_084
       governor: 0
-    - castleId: castle_45
+    - castleId: castle_05
       heroId: common_085
       governor: 0
-    - castleId: castle_46
+    - castleId: castle_06
       heroId: common_086
       governor: 0
-    - castleId: castle_47
+    - castleId: castle_07
       heroId: common_087
       governor: 0
-    - castleId: castle_48
+    - castleId: castle_08
       heroId: common_088
       governor: 0
-    - castleId: castle_49
+    - castleId: castle_09
       heroId: common_089
       governor: 0
-    - castleId: castle_50
-      heroId: common_090
-      governor: 0
-    - castleId: castle_51
-      heroId: common_091
-      governor: 0
-    - castleId: castle_52
-      heroId: common_092
-      governor: 0
-    - castleId: castle_53
-      heroId: common_093
-      governor: 0
-    - castleId: castle_54
-      heroId: common_094
-      governor: 0
-    - castleId: castle_55
-      heroId: common_095
-      governor: 0
-    - castleId: castle_56
-      heroId: common_096
-      governor: 0
-    - castleId: castle_57
-      heroId: common_097
-      governor: 0
-    - castleId: castle_58
-      heroId: common_098
-      governor: 0
-    - castleId: castle_59
-      heroId: common_099
-      governor: 0
-    - castleId: castle_00
-      heroId: common_100
-      governor: 0
-    - castleId: castle_01
-      heroId: common_101
-      governor: 0
-    - castleId: castle_02
-      heroId: common_102
-      governor: 0
-    - castleId: castle_03
-      heroId: common_103
-      governor: 0
-    - castleId: castle_04
-      heroId: common_104
-      governor: 0
-    - castleId: castle_05
-      heroId: common_105
-      governor: 0
-    - castleId: castle_06
-      heroId: common_106
-      governor: 0
-    - castleId: castle_07
-      heroId: common_107
-      governor: 0
-    - castleId: castle_08
-      heroId: common_108
-      governor: 0
-    - castleId: castle_09
-      heroId: common_109
-      governor: 0
     - castleId: castle_10
-      heroId: common_110
-      governor: 0
-    - castleId: castle_11
-      heroId: common_111
-      governor: 0
-    - castleId: castle_12
-      heroId: common_112
-      governor: 0
-    - castleId: castle_13
-      heroId: common_113
-      governor: 0
-    - castleId: castle_14
-      heroId: common_114
-      governor: 0
-    - castleId: castle_15
-      heroId: common_115
-      governor: 0
-    - castleId: castle_16
-      heroId: common_116
-      governor: 0
-    - castleId: castle_17
-      heroId: common_117
-      governor: 0
-    - castleId: castle_18
-      heroId: common_118
-      governor: 0
-    - castleId: castle_19
-      heroId: common_119
-      governor: 0
-    - castleId: castle_20
-      heroId: common_120
-      governor: 0
-    - castleId: castle_21
-      heroId: common_121
-      governor: 0
-    - castleId: castle_22
-      heroId: common_122
-      governor: 0
-    - castleId: castle_23
-      heroId: common_123
-      governor: 0
-    - castleId: castle_24
-      heroId: common_124
-      governor: 0
-    - castleId: castle_25
-      heroId: common_125
-      governor: 0
-    - castleId: castle_26
-      heroId: common_126
-      governor: 0
-    - castleId: castle_27
-      heroId: common_127
-      governor: 0
-    - castleId: castle_28
-      heroId: common_128
-      governor: 0
-    - castleId: castle_29
-      heroId: common_129
-      governor: 0
-    - castleId: castle_30
-      heroId: common_130
-      governor: 0
-    - castleId: castle_31
-      heroId: common_131
-      governor: 0
-    - castleId: castle_32
-      heroId: common_132
-      governor: 0
-    - castleId: castle_33
-      heroId: common_133
-      governor: 0
-    - castleId: castle_34
-      heroId: common_134
-      governor: 0
-    - castleId: castle_35
-      heroId: common_135
-      governor: 0
-    - castleId: castle_36
-      heroId: common_136
-      governor: 0
-    - castleId: castle_37
-      heroId: common_137
-      governor: 0
-    - castleId: castle_38
-      heroId: common_138
-      governor: 0
-    - castleId: castle_39
-      heroId: common_139
-      governor: 0
-    - castleId: castle_40
-      heroId: common_140
-      governor: 0
-    - castleId: castle_41
-      heroId: common_141
-      governor: 0
-    - castleId: castle_42
-      heroId: common_142
-      governor: 0
-    - castleId: castle_43
-      heroId: common_143
-      governor: 0
-    - castleId: castle_44
-      heroId: common_144
-      governor: 0
-    - castleId: castle_45
-      heroId: common_145
-      governor: 0
-    - castleId: castle_46
-      heroId: common_146
-      governor: 0
-    - castleId: castle_47
-      heroId: common_147
-      governor: 0
-    - castleId: castle_48
-      heroId: common_148
-      governor: 0
-    - castleId: castle_49
-      heroId: common_149
-      governor: 0
-    - castleId: castle_50
-      heroId: common_150
+      heroId: common_090
       governor: 0
     castlePlacements: []
   - variant: 2
@@ -35392,16 +35067,18 @@ MonoBehaviour:
     aiPreservationFactionId: 
     valdorAIPreservationCastleCount: 0
     nonPlayerRecruitmentEnabled: 0
+    aiBorderReserveCount: 2
+    aiFrontlineReinforcementTarget: 0
     characterPlacements:
     - castleId: castle_00
       heroId: ares
-      governor: 0
+      governor: 1
     - castleId: castle_00
       heroId: lyria
       governor: 0
     - castleId: castle_00
       heroId: common_alden
-      governor: 1
+      governor: 0
     - castleId: castle_00
       heroId: common_sable
       governor: 0
@@ -35607,541 +35284,241 @@ MonoBehaviour:
       heroId: hero_060
       governor: 1
     - castleId: castle_52
-      heroId: hero_061
+      heroId: common_012
       governor: 1
     - castleId: castle_53
-      heroId: hero_062
+      heroId: common_013
       governor: 1
     - castleId: castle_54
-      heroId: hero_063
+      heroId: common_014
       governor: 1
     - castleId: castle_55
-      heroId: hero_064
+      heroId: common_015
       governor: 1
     - castleId: castle_56
-      heroId: hero_065
+      heroId: common_016
       governor: 1
     - castleId: castle_57
-      heroId: hero_066
+      heroId: common_017
       governor: 1
     - castleId: castle_58
-      heroId: hero_067
+      heroId: common_018
       governor: 1
     - castleId: castle_59
-      heroId: hero_068
+      heroId: common_019
       governor: 1
     - castleId: castle_00
-      heroId: hero_069
-      governor: 0
-    - castleId: castle_01
-      heroId: hero_070
-      governor: 0
-    - castleId: castle_02
-      heroId: hero_071
-      governor: 0
-    - castleId: castle_03
-      heroId: hero_072
-      governor: 0
-    - castleId: castle_04
-      heroId: hero_073
-      governor: 0
-    - castleId: castle_05
-      heroId: hero_074
-      governor: 0
-    - castleId: castle_06
-      heroId: hero_075
-      governor: 0
-    - castleId: castle_07
-      heroId: hero_076
-      governor: 0
-    - castleId: castle_08
-      heroId: hero_077
-      governor: 0
-    - castleId: castle_09
-      heroId: hero_078
-      governor: 0
-    - castleId: castle_10
-      heroId: hero_079
-      governor: 0
-    - castleId: castle_11
-      heroId: hero_080
-      governor: 0
-    - castleId: castle_12
-      heroId: hero_081
-      governor: 0
-    - castleId: castle_13
-      heroId: hero_082
-      governor: 0
-    - castleId: castle_14
-      heroId: hero_083
-      governor: 0
-    - castleId: castle_15
-      heroId: hero_084
-      governor: 0
-    - castleId: castle_16
-      heroId: hero_085
-      governor: 0
-    - castleId: castle_17
-      heroId: hero_086
-      governor: 0
-    - castleId: castle_18
-      heroId: hero_087
-      governor: 0
-    - castleId: castle_19
-      heroId: hero_088
-      governor: 0
-    - castleId: castle_20
-      heroId: hero_089
-      governor: 0
-    - castleId: castle_21
-      heroId: hero_090
-      governor: 0
-    - castleId: castle_22
-      heroId: hero_091
-      governor: 0
-    - castleId: castle_23
-      heroId: hero_092
-      governor: 0
-    - castleId: castle_24
-      heroId: hero_093
-      governor: 0
-    - castleId: castle_25
-      heroId: hero_094
-      governor: 0
-    - castleId: castle_26
-      heroId: hero_095
-      governor: 0
-    - castleId: castle_27
-      heroId: hero_096
-      governor: 0
-    - castleId: castle_28
-      heroId: hero_097
-      governor: 0
-    - castleId: castle_29
-      heroId: hero_098
-      governor: 0
-    - castleId: castle_30
-      heroId: hero_099
-      governor: 0
-    - castleId: castle_31
-      heroId: hero_100
-      governor: 0
-    - castleId: castle_32
-      heroId: common_012
-      governor: 0
-    - castleId: castle_33
-      heroId: common_013
-      governor: 0
-    - castleId: castle_34
-      heroId: common_014
-      governor: 0
-    - castleId: castle_35
-      heroId: common_015
-      governor: 0
-    - castleId: castle_36
-      heroId: common_016
-      governor: 0
-    - castleId: castle_37
-      heroId: common_017
-      governor: 0
-    - castleId: castle_38
-      heroId: common_018
-      governor: 0
-    - castleId: castle_39
-      heroId: common_019
-      governor: 0
-    - castleId: castle_40
       heroId: common_020
       governor: 0
-    - castleId: castle_41
+    - castleId: castle_01
       heroId: common_021
       governor: 0
-    - castleId: castle_42
+    - castleId: castle_02
       heroId: common_022
       governor: 0
-    - castleId: castle_43
+    - castleId: castle_03
       heroId: common_023
       governor: 0
-    - castleId: castle_44
+    - castleId: castle_04
       heroId: common_024
       governor: 0
-    - castleId: castle_45
+    - castleId: castle_05
       heroId: common_025
       governor: 0
-    - castleId: castle_46
+    - castleId: castle_06
       heroId: common_026
       governor: 0
-    - castleId: castle_47
+    - castleId: castle_07
       heroId: common_027
       governor: 0
-    - castleId: castle_48
+    - castleId: castle_08
       heroId: common_028
       governor: 0
-    - castleId: castle_49
+    - castleId: castle_09
       heroId: common_029
       governor: 0
-    - castleId: castle_50
+    - castleId: castle_10
       heroId: common_030
       governor: 0
-    - castleId: castle_51
+    - castleId: castle_11
       heroId: common_031
       governor: 0
-    - castleId: castle_52
+    - castleId: castle_12
       heroId: common_032
       governor: 0
-    - castleId: castle_53
+    - castleId: castle_13
       heroId: common_033
       governor: 0
-    - castleId: castle_54
+    - castleId: castle_14
       heroId: common_034
       governor: 0
-    - castleId: castle_55
+    - castleId: castle_15
       heroId: common_035
       governor: 0
-    - castleId: castle_56
+    - castleId: castle_16
       heroId: common_036
       governor: 0
-    - castleId: castle_57
+    - castleId: castle_17
       heroId: common_037
       governor: 0
-    - castleId: castle_58
+    - castleId: castle_18
       heroId: common_038
       governor: 0
-    - castleId: castle_59
+    - castleId: castle_19
       heroId: common_039
       governor: 0
-    - castleId: castle_00
+    - castleId: castle_20
       heroId: common_040
       governor: 0
-    - castleId: castle_01
+    - castleId: castle_21
       heroId: common_041
       governor: 0
-    - castleId: castle_02
+    - castleId: castle_22
       heroId: common_042
       governor: 0
-    - castleId: castle_03
+    - castleId: castle_23
       heroId: common_043
       governor: 0
-    - castleId: castle_04
+    - castleId: castle_24
       heroId: common_044
       governor: 0
-    - castleId: castle_05
+    - castleId: castle_25
       heroId: common_045
       governor: 0
-    - castleId: castle_06
+    - castleId: castle_26
       heroId: common_046
       governor: 0
-    - castleId: castle_07
+    - castleId: castle_27
       heroId: common_047
       governor: 0
-    - castleId: castle_08
+    - castleId: castle_28
       heroId: common_048
       governor: 0
-    - castleId: castle_09
+    - castleId: castle_29
       heroId: common_049
       governor: 0
-    - castleId: castle_10
+    - castleId: castle_30
       heroId: common_050
       governor: 0
-    - castleId: castle_11
+    - castleId: castle_31
       heroId: common_051
       governor: 0
-    - castleId: castle_12
+    - castleId: castle_32
       heroId: common_052
       governor: 0
-    - castleId: castle_13
+    - castleId: castle_33
       heroId: common_053
       governor: 0
-    - castleId: castle_14
+    - castleId: castle_34
       heroId: common_054
       governor: 0
-    - castleId: castle_15
+    - castleId: castle_35
       heroId: common_055
       governor: 0
-    - castleId: castle_16
+    - castleId: castle_36
       heroId: common_056
       governor: 0
-    - castleId: castle_17
+    - castleId: castle_37
       heroId: common_057
       governor: 0
-    - castleId: castle_18
+    - castleId: castle_38
       heroId: common_058
       governor: 0
-    - castleId: castle_19
+    - castleId: castle_39
       heroId: common_059
       governor: 0
-    - castleId: castle_20
+    - castleId: castle_40
       heroId: common_060
       governor: 0
-    - castleId: castle_21
+    - castleId: castle_41
       heroId: common_061
       governor: 0
-    - castleId: castle_22
+    - castleId: castle_42
       heroId: common_062
       governor: 0
-    - castleId: castle_23
+    - castleId: castle_43
       heroId: common_063
       governor: 0
-    - castleId: castle_24
+    - castleId: castle_44
       heroId: common_064
       governor: 0
-    - castleId: castle_25
+    - castleId: castle_45
       heroId: common_065
       governor: 0
-    - castleId: castle_26
+    - castleId: castle_46
       heroId: common_066
       governor: 0
-    - castleId: castle_27
+    - castleId: castle_47
       heroId: common_067
       governor: 0
-    - castleId: castle_28
+    - castleId: castle_48
       heroId: common_068
       governor: 0
-    - castleId: castle_29
+    - castleId: castle_49
       heroId: common_069
       governor: 0
-    - castleId: castle_30
+    - castleId: castle_50
       heroId: common_070
       governor: 0
-    - castleId: castle_31
+    - castleId: castle_51
       heroId: common_071
       governor: 0
-    - castleId: castle_32
+    - castleId: castle_52
       heroId: common_072
       governor: 0
-    - castleId: castle_33
+    - castleId: castle_53
       heroId: common_073
       governor: 0
-    - castleId: castle_34
+    - castleId: castle_54
       heroId: common_074
       governor: 0
-    - castleId: castle_35
+    - castleId: castle_55
       heroId: common_075
       governor: 0
-    - castleId: castle_36
+    - castleId: castle_56
       heroId: common_076
       governor: 0
-    - castleId: castle_37
+    - castleId: castle_57
       heroId: common_077
       governor: 0
-    - castleId: castle_38
+    - castleId: castle_58
       heroId: common_078
       governor: 0
-    - castleId: castle_39
+    - castleId: castle_59
       heroId: common_079
       governor: 0
-    - castleId: castle_40
+    - castleId: castle_00
       heroId: common_080
       governor: 0
-    - castleId: castle_41
+    - castleId: castle_01
       heroId: common_081
       governor: 0
-    - castleId: castle_42
+    - castleId: castle_02
       heroId: common_082
       governor: 0
-    - castleId: castle_43
+    - castleId: castle_03
       heroId: common_083
       governor: 0
-    - castleId: castle_44
+    - castleId: castle_04
       heroId: common_084
       governor: 0
-    - castleId: castle_45
+    - castleId: castle_05
       heroId: common_085
       governor: 0
-    - castleId: castle_46
+    - castleId: castle_06
       heroId: common_086
       governor: 0
-    - castleId: castle_47
+    - castleId: castle_07
       heroId: common_087
       governor: 0
-    - castleId: castle_48
+    - castleId: castle_08
       heroId: common_088
       governor: 0
-    - castleId: castle_49
+    - castleId: castle_09
       heroId: common_089
       governor: 0
-    - castleId: castle_50
-      heroId: common_090
-      governor: 0
-    - castleId: castle_51
-      heroId: common_091
-      governor: 0
-    - castleId: castle_52
-      heroId: common_092
-      governor: 0
-    - castleId: castle_53
-      heroId: common_093
-      governor: 0
-    - castleId: castle_54
-      heroId: common_094
-      governor: 0
-    - castleId: castle_55
-      heroId: common_095
-      governor: 0
-    - castleId: castle_56
-      heroId: common_096
-      governor: 0
-    - castleId: castle_57
-      heroId: common_097
-      governor: 0
-    - castleId: castle_58
-      heroId: common_098
-      governor: 0
-    - castleId: castle_59
-      heroId: common_099
-      governor: 0
-    - castleId: castle_00
-      heroId: common_100
-      governor: 0
-    - castleId: castle_01
-      heroId: common_101
-      governor: 0
-    - castleId: castle_02
-      heroId: common_102
-      governor: 0
-    - castleId: castle_03
-      heroId: common_103
-      governor: 0
-    - castleId: castle_04
-      heroId: common_104
-      governor: 0
-    - castleId: castle_05
-      heroId: common_105
-      governor: 0
-    - castleId: castle_06
-      heroId: common_106
-      governor: 0
-    - castleId: castle_07
-      heroId: common_107
-      governor: 0
-    - castleId: castle_08
-      heroId: common_108
-      governor: 0
-    - castleId: castle_09
-      heroId: common_109
-      governor: 0
     - castleId: castle_10
-      heroId: common_110
-      governor: 0
-    - castleId: castle_11
-      heroId: common_111
-      governor: 0
-    - castleId: castle_12
-      heroId: common_112
-      governor: 0
-    - castleId: castle_13
-      heroId: common_113
-      governor: 0
-    - castleId: castle_14
-      heroId: common_114
-      governor: 0
-    - castleId: castle_15
-      heroId: common_115
-      governor: 0
-    - castleId: castle_16
-      heroId: common_116
-      governor: 0
-    - castleId: castle_17
-      heroId: common_117
-      governor: 0
-    - castleId: castle_18
-      heroId: common_118
-      governor: 0
-    - castleId: castle_19
-      heroId: common_119
-      governor: 0
-    - castleId: castle_20
-      heroId: common_120
-      governor: 0
-    - castleId: castle_21
-      heroId: common_121
-      governor: 0
-    - castleId: castle_22
-      heroId: common_122
-      governor: 0
-    - castleId: castle_23
-      heroId: common_123
-      governor: 0
-    - castleId: castle_24
-      heroId: common_124
-      governor: 0
-    - castleId: castle_25
-      heroId: common_125
-      governor: 0
-    - castleId: castle_26
-      heroId: common_126
-      governor: 0
-    - castleId: castle_27
-      heroId: common_127
-      governor: 0
-    - castleId: castle_28
-      heroId: common_128
-      governor: 0
-    - castleId: castle_29
-      heroId: common_129
-      governor: 0
-    - castleId: castle_30
-      heroId: common_130
-      governor: 0
-    - castleId: castle_31
-      heroId: common_131
-      governor: 0
-    - castleId: castle_32
-      heroId: common_132
-      governor: 0
-    - castleId: castle_33
-      heroId: common_133
-      governor: 0
-    - castleId: castle_34
-      heroId: common_134
-      governor: 0
-    - castleId: castle_35
-      heroId: common_135
-      governor: 0
-    - castleId: castle_36
-      heroId: common_136
-      governor: 0
-    - castleId: castle_37
-      heroId: common_137
-      governor: 0
-    - castleId: castle_38
-      heroId: common_138
-      governor: 0
-    - castleId: castle_39
-      heroId: common_139
-      governor: 0
-    - castleId: castle_40
-      heroId: common_140
-      governor: 0
-    - castleId: castle_41
-      heroId: common_141
-      governor: 0
-    - castleId: castle_42
-      heroId: common_142
-      governor: 0
-    - castleId: castle_43
-      heroId: common_143
-      governor: 0
-    - castleId: castle_44
-      heroId: common_144
-      governor: 0
-    - castleId: castle_45
-      heroId: common_145
-      governor: 0
-    - castleId: castle_46
-      heroId: common_146
-      governor: 0
-    - castleId: castle_47
-      heroId: common_147
-      governor: 0
-    - castleId: castle_48
-      heroId: common_148
-      governor: 0
-    - castleId: castle_49
-      heroId: common_149
-      governor: 0
-    - castleId: castle_50
-      heroId: common_150
+      heroId: common_090
       governor: 0
     castlePlacements: []
   heroLegacyDefinitions:

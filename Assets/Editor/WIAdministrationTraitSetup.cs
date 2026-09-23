@@ -124,7 +124,7 @@ namespace ProjectWI.EditorTools
             }
             admin.FindPropertyRelative("traitType").intValue = (int)WITraitType.Administration;
             SetText(admin.FindPropertyRelative("displayName"), "TRAIT_ADMINISTRATION", "내정", "Administration");
-            SetText(admin.FindPropertyRelative("description"), "TRAIT_ADMINISTRATION_DESC", "등급과 무관하게 영지관과 성 중점 사업을 담당합니다.", "Allows governance and castle projects regardless of grade.");
+            SetText(admin.FindPropertyRelative("description"), "TRAIT_ADMINISTRATION_DESC", "영웅 등급에서 영지관과 성 중점 사업을 담당합니다. 출정 중에도 업무를 유지합니다.", "Heroes can govern and manage castle projects, including while deployed.");
             admin.FindPropertyRelative("projectTypes").ClearArray();
             admin.FindPropertyRelative("uniqueEffectValue").intValue = 0;
             ConfigureQualificationDefinition(definitions, WITraitType.TalentRecruitment,

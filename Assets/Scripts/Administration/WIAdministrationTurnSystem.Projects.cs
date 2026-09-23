@@ -20,11 +20,17 @@ namespace ProjectWI.Administration
 
             WIHeroDefinition manager = database.GetHero(project.ManagerHeroId);
             if (IsAdministrationCapable(state, project.ManagerHeroId) == false ||
-                castleState.HeroIds.Contains(project.ManagerHeroId) == false)
+                IsHeroInFaction(state, project.ManagerHeroId, castleState.FactionId) == false)
             {
-                castleState.ActiveProject = null;
-                castleState.StandingProject = null;
-                return;
+                if (project.Delegated == false)
+                {
+                    castleState.ActiveProject = null;
+                    castleState.StandingProject = null;
+                    return;
+                }
+                // 영지관이 출전하거나 자격을 잃어도 이미 투자한 기본 내정은 계속합니다.
+                manager = null;
+                project.ManagerHeroId = string.Empty;
             }
             WIFactionRuntimeState factionState = state.GetFactionState(castleState.FactionId);
             WIFactionPolicy policy = factionState == null ? WIFactionPolicy.Prosperity : factionState.Policy;
@@ -65,7 +71,7 @@ namespace ProjectWI.Administration
 
             WICastleDefinition castle = database.GetCastle(castleState.CastleId);
             string managerName = manager == null
-                ? database.GetText("UI_NO_MANAGER")
+                ? database.GetText("UI_ADMIN_BASIC_OPERATION")
                 : manager.DisplayName.Get(database.UseEnglish);
             string resultText = project.ProjectType == WICastleProjectType.Expansion
                 ? $"{castleState.CastleSize} 규모 확장 완료 · 특화 시설 선택 가능"
@@ -104,19 +110,7 @@ namespace ProjectWI.Administration
                 return;
             }
 
-            WIHeroDefinition governor = database.GetHero(castleState.GovernorHeroId);
-            if (governor == null || castleState.HeroIds.Contains(governor.Id) == false ||
-                IsAdministrationCapable(state, governor.Id) == false)
-            {
-                summary.DelegationReports.Add($"{database.GetCastle(castleState.CastleId).DisplayName.Get(database.UseEnglish)} · 영지관 부재 · 주둔 인물을 영지관로 임명하면 다음 달부터 위임 가능");
-                return;
-            }
-
-            if (state.IsCharacterBusy(governor.Id))
-            {
-                summary.DelegationReports.Add($"{database.GetCastle(castleState.CastleId).DisplayName.Get(database.UseEnglish)} · 영지관이 다른 임무 수행 중 · 임무 종료 후 위임 재개");
-                return;
-            }
+            WIHeroDefinition governor = GetAvailableGovernor(database, state, castleState);
 
             int budget = castleState.GovernorMonthlyBudget >= database.ProjectBalance.IntensiveCost
                 ? database.ProjectBalance.IntensiveCost
@@ -127,7 +121,7 @@ namespace ProjectWI.Administration
                 return;
             }
 
-            WICastleProjectType projectType = ChooseGovernorProject(castleState);
+            WICastleProjectType projectType = ChooseDelegatedProject(state, castleState);
             if (HasUsefulProjectWork(state, castleState, projectType) == false)
             {
                 return;
@@ -148,7 +142,7 @@ namespace ProjectWI.Administration
             {
                 ProjectType = projectType,
                 Investment = investment,
-                ManagerHeroId = governor.Id,
+                ManagerHeroId = governor?.Id ?? string.Empty,
                 RemainingMonths = 1,
                 Delegated = true,
                 ExpectedGain = expectedGain,
@@ -269,12 +263,8 @@ namespace ProjectWI.Administration
             WIAdministrationState state,
             WICastleRuntimeState castleState)
         {
-            WIHeroDefinition governor = database.GetHero(castleState.GovernorHeroId);
-            if (governor == null)
-            {
-                return "영지관을 임명해야 위임 계획을 계산할 수 있습니다.";
-            }
-            WICastleProjectType projectType = ChooseGovernorProject(castleState);
+            WIHeroDefinition governor = GetAvailableGovernor(database, state, castleState);
+            WICastleProjectType projectType = ChooseDelegatedProject(state, castleState);
             if (HasUsefulProjectWork(state, castleState, projectType) == false)
             {
                 return database.GetText("UI_ADMIN_MAINTENANCE");
@@ -289,7 +279,31 @@ namespace ProjectWI.Administration
                        GetTitleProjectBonus(database, state, governor) + GetLegacyBonus(castleState, projectType) +
                        GetCastleSpecialtyProjectBonus(database.GetCastle(castleState.CastleId), projectType) +
                        GetFacilityProjectBonus(castleState, projectType);
-            return $"예상 계획 · {projectType} · {GetGovernorReason(database, castleState, projectType, governor)} · 성과 +{gain} · 비용 {cost}G · 1개월";
+            return string.Format(database.GetText("UI_ADMIN_OPERATION_PREVIEW"), projectType,
+                GetGovernorReason(database, castleState, projectType, governor), gain, cost,
+                governor == null ? database.GetText("UI_ADMIN_BASIC_OPERATION") : governor.DisplayName.Get(database.UseEnglish));
+        }
+
+        // 현재 성에서 실제로 업무 가능한 영지관만 추가 성과 담당자로 반환합니다.
+        private static WIHeroDefinition GetAvailableGovernor(WIAdministrationDatabaseSO database,
+            WIAdministrationState state, WICastleRuntimeState castle)
+        {
+            string heroId = castle.GovernorHeroId;
+            if (string.IsNullOrEmpty(heroId) == true || IsHeroInFaction(state, heroId, castle.FactionId) == false ||
+                IsAdministrationCapable(state, heroId) == false || state.IsCharacterBusy(heroId, ignoreArmy: true) == true)
+            {
+                return null;
+            }
+            return database.GetHero(heroId);
+        }
+
+        // 전선 훈련 대상이 출전하면 남은 성 수치 개선으로 기본 운영을 이어갑니다.
+        private static WICastleProjectType ChooseDelegatedProject(WIAdministrationState state,
+            WICastleRuntimeState castle)
+        {
+            WICastleProjectType project = ChooseGovernorProject(castle);
+            return project == WICastleProjectType.Training && HasUsefulProjectWork(state, castle, project) == false
+                ? ChooseLowestProject(castle) : project;
         }
 
         // 진영 방침과 일치하는 사업에 적용할 소규모 성과 보너스를 반환합니다.

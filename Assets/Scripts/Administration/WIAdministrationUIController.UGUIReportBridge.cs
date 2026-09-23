@@ -41,7 +41,8 @@ namespace ProjectWI.Administration
                 if (selectedCastle.OccupationUnrestMonths > 0)
                 {
                     body.AppendLine();
-                    body.AppendLine($"점령 불안 · {selectedCastle.OccupationUnrestMonths}개월 · 영지관과 주둔 전투단 필요");
+                    body.AppendLine(string.Format(database.GetText("UI_ADMIN_OCCUPATION_PROGRESS"),
+                        selectedCastle.OccupationUnrestMonths, database.Automation.OccupationStabilityGain));
                 }
                 foreach (WIHeroLegacyState legacy in selectedCastle.HeroLegacies)
                 {
@@ -204,21 +205,21 @@ namespace ProjectWI.Administration
                 WICampaignRuntimeService.Instance?.StartBattle(id);
                 return;
             }
-            UGUIEventChoiceRequested?.Invoke(type, id);
+            RaiseUGUIScreenRequest<WIAdministrationEventChoiceUGUIController, WIAdministrationReportActionType, string>(() => UGUIEventChoiceRequested, type, id);
         }
 
         // QA에서 아발론 영지와 UGUI 중점 사업 모달을 바로 표시합니다.
         public void OpenFocusProjectUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIFocusProjectRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationFocusProjectUGUIController>(() => UGUIFocusProjectRequested);
         }
 
         // QA에서 아발론 영지와 UGUI 영웅 배치 모달을 바로 표시합니다.
         public void OpenHeroAssignmentUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIHeroAssignmentRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationHeroAssignmentUGUIController>(() => UGUIHeroAssignmentRequested);
         }
 
         // QA에서 아발론 영지와 UGUI 인재 활동 모달을 바로 표시합니다.
@@ -233,42 +234,42 @@ namespace ProjectWI.Administration
         {
             OpenCastlePreviewForQA();
             selectedCastle.PendingSpecialFacilityChoice = true;
-            UGUISpecialFacilityRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationSpecialFacilityUGUIController>(() => UGUISpecialFacilityRequested);
         }
 
         // QA에서 아발론 영지의 기본 시설 UGUI를 바로 표시합니다.
         public void OpenBasicFacilityUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIBasicFacilityRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationBasicFacilityUGUIController>(() => UGUIBasicFacilityRequested);
         }
 
         // QA에서 아발론 영지의 영지관 위임 UGUI를 바로 표시합니다.
         public void OpenDelegationUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIDelegationRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationDelegationUGUIController>(() => UGUIDelegationRequested);
         }
 
         // QA에서 아발론 영지의 원정 UGUI를 바로 표시합니다.
         public void OpenMarchUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIMarchRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationMarchUGUIController>(() => UGUIMarchRequested);
         }
 
         // QA에서 아발론 영지의 성 상세 기록 UGUI를 바로 표시합니다.
         public void OpenCastleRecordUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUICastleRecordRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationCastleRecordUGUIController>(() => UGUICastleRecordRequested);
         }
 
         // QA에서 현재 캠페인 목표 UGUI를 바로 표시합니다.
         public void OpenObjectiveUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIObjectiveRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationObjectiveUGUIController>(() => UGUIObjectiveRequested);
         }
 
         // QA에서 지난달 월간 보고 UGUI를 바로 표시합니다.
@@ -289,7 +290,7 @@ namespace ProjectWI.Administration
                 state.LastMonthlyReport.News.Add("아발론의 시장이 활기를 되찾아 주민들의 왕래가 늘었습니다.");
                 state.LastMonthlyReport.News.Add("북부 국경에서 적 진영의 정찰 움직임이 보고되었습니다.");
             }
-            UGUIMonthlyReportRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationMonthlyReportUGUIController>(() => UGUIMonthlyReportRequested);
         }
 
         // UGUI 하단 명령 버튼을 기존 게임 기능에 연결합니다.
@@ -298,28 +299,28 @@ namespace ProjectWI.Administration
             switch (action)
             {
                 case WIAdministrationShortcutAction.Military:
-                    UGUIMilitaryRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationMilitaryUGUIController>(() => UGUIMilitaryRequested);
                     return;
                 case WIAdministrationShortcutAction.Heroes:
-                    UGUIHeroesRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationHeroesUGUIController>(() => UGUIHeroesRequested);
                     return;
                 case WIAdministrationShortcutAction.Diplomacy:
-                    UGUIDiplomacyRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationDiplomacyUGUIController>(() => UGUIDiplomacyRequested);
                     return;
                 case WIAdministrationShortcutAction.Scheme:
-                    UGUISchemeRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationSchemeUGUIController>(() => UGUISchemeRequested);
                     return;
                 case WIAdministrationShortcutAction.Research:
-                    UGUIResearchRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationResearchUGUIController>(() => UGUIResearchRequested);
                     return;
                 case WIAdministrationShortcutAction.Faction:
-                    UGUIFactionRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationFactionUGUIController>(() => UGUIFactionRequested);
                     return;
                 case WIAdministrationShortcutAction.Council:
-                    UGUICouncilRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationCouncilUGUIController>(() => UGUICouncilRequested);
                     return;
                 case WIAdministrationShortcutAction.MonthlyReport:
-                    UGUIMonthlyReportRequested?.Invoke();
+                    RaiseUGUIScreenRequest<WIAdministrationMonthlyReportUGUIController>(() => UGUIMonthlyReportRequested);
                     return;
                 case WIAdministrationShortcutAction.EndTurn:
                     BeginTurn();

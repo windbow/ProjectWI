@@ -10,7 +10,7 @@ namespace ProjectWI.Administration
         public void OpenMilitaryUGUIForQA()
         {
             OpenGlobalPreviewForQA();
-            UGUIMilitaryRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationMilitaryUGUIController>(() => UGUIMilitaryRequested);
         }
 
         // 군사 UGUI의 현재 단계에 필요한 카드 스냅샷을 구성합니다.
@@ -25,6 +25,10 @@ namespace ProjectWI.Administration
                 return false;
             }
             snapshot = new WIAdministrationMilitarySnapshot();
+            if (mode == "muster-castles" || mode == "muster")
+            {
+                return BuildMusterPanel(mode, context, snapshot, out error);
+            }
             switch (mode)
             {
                 case "overview": BuildMilitaryOverview(snapshot); break;
@@ -49,7 +53,7 @@ namespace ProjectWI.Administration
             var castle = army == null ? null : state.GetCastle(army.CurrentCastleId);
             if (army == null || castle == null || army.FactionId != state.PlayerFactionId || army.IsMoving || army.AwaitingBattle || army.ReorganizationMonths > 0 || selected.Count == 0 ||
                 army.Members.Count + selected.Count > WIAdministrationTurnSystem.GetRecommendedArmySize(database, army) ||
-                selected.Any(id => castle.HeroIds.Contains(id) == false || state.IsCharacterBusy(id) || database.GetHero(id) == null))
+                selected.Any(id => castle.HeroIds.Contains(id) == false || state.IsCharacterBusy(id, ignoreAdministration: true) || database.GetHero(id) == null))
             {
                 return false;
             }
@@ -73,6 +77,10 @@ namespace ProjectWI.Administration
         {
             nextContext = string.Empty;
             error = string.Empty;
+            if (action.StartsWith("muster-", StringComparison.Ordinal) == true)
+            {
+                return ExecuteMusterAction(action, context, id, value, out error);
+            }
             WIArmyState army = state.Armies.FirstOrDefault(item => item.ArmyId == context);
             switch (action)
             {
@@ -100,7 +108,7 @@ namespace ProjectWI.Administration
                     break;
                 case "march":
                     WICastleRuntimeState target = state.GetCastle(id);
-                    if (army == null || WIAdministrationTurnSystem.BeginArmyMarch(database, state, army, id) == false) error = GetArmyMarchFailureMessage(army, target);
+                    if (army == null || MarchUGUIArmies(new[] { context }, id, out error) == false) error = GetArmyMarchFailureMessage(army, target);
                     break;
                 default: error = "지원하지 않는 군사 명령입니다."; break;
             }
@@ -114,6 +122,8 @@ namespace ProjectWI.Administration
             TryGetUGUIMilitarySnapshot(out WIAdministrationMilitarySnapshot source);
             snapshot.Title = "군사 · 전투단";
             snapshot.Summary = source.Summary;
+            snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "muster-castles",
+                Title = database.GetText("UI_MUSTER_TITLE"), Description = database.GetText("UI_MUSTER_HINT") });
             snapshot.Items.AddRange(source.Items);
         }
 
@@ -130,7 +140,8 @@ namespace ProjectWI.Administration
             {
                 Kind = "start-battle", Id = session.SessionId, Title = "전투 시작",
                 Description = $"상태 {session.Status} · 수비 전투단 {session.DefenderArmyIds.Count}개",
-                Interactable = session.PlayerInvolved && session.Status == WIBattleSessionStatus.Pending
+                Interactable = session.PlayerInvolved && session.Status == WIBattleSessionStatus.Pending &&
+                    state.GetCastle(session.CastleId)?.FactionId != session.AttackerFactionId
             });
         }
 
@@ -167,7 +178,7 @@ namespace ProjectWI.Administration
             snapshot.Summary = "새 전투단을 주둔시킬 플레이어 성을 선택하십시오.";
             foreach (WICastleRuntimeState castle in state.Castles.Where(item => database.GetFaction(item.FactionId)?.PlayerFaction == true))
             {
-                snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "castle", Id = castle.CastleId, Title = database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish), Description = $"대기 영웅 {castle.HeroIds.Count(id => state.IsCharacterBusy(id) == false)}명" });
+                snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "castle", Id = castle.CastleId, Title = database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish), Description = $"대기 영웅 {castle.HeroIds.Count(id => state.IsCharacterBusy(id, ignoreAdministration: true) == false)}명" });
             }
         }
 
@@ -177,10 +188,10 @@ namespace ProjectWI.Administration
             WICastleRuntimeState castle = state.GetCastle(castleId);
             snapshot.Title = "전투단 편성 · 대장 선택";
             snapshot.Summary = database.GetCastle(castleId).DisplayName.Get(database.UseEnglish);
-            foreach (string heroId in castle.HeroIds.Where(id => state.IsCharacterBusy(id) == false))
+            foreach (string heroId in castle.HeroIds.OrderBy(id => state.IsCharacterBusy(id, ignoreAdministration: true)))
             {
                 WIHeroDefinition hero = database.GetHero(heroId);
-                snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "create", Id = heroId, Title = hero.DisplayName.Get(database.UseEnglish), Description = $"통솔 {hero.Leadership} · 선택하면 전투단 편성" });
+                snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "create", Id = heroId, Title = hero.DisplayName.Get(database.UseEnglish), Description = $"통솔 {hero.Leadership} · " + GetMilitarySelectionStatus(heroId), Interactable = state.IsCharacterBusy(heroId, ignoreAdministration: true) == false });
             }
         }
 
@@ -192,10 +203,10 @@ namespace ProjectWI.Administration
             snapshot.Title = database.GetText("UI_ARMY_MEMBER_TITLE");
             snapshot.AvailableMemberSlots = Math.Max(0, WIAdministrationTurnSystem.GetRecommendedArmySize(database, army) - army.Members.Count);
             snapshot.Summary = "전투단과 같은 성의 대기 인물을 선택하십시오.";
-            foreach (string heroId in castle.HeroIds.Where(id => state.IsCharacterBusy(id) == false))
+            foreach (string heroId in castle.HeroIds.OrderBy(id => state.IsCharacterBusy(id, ignoreAdministration: true)))
             {
                 WIHeroDefinition hero = database.GetHero(heroId);
-                snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "add-member", Id = heroId, Value = (int)(database.GetHeroClass(hero.HeroClass)?.RecommendedRole ?? WIUnitRole.Melee), Title = hero.DisplayName.Get(database.UseEnglish), Description = $"통솔 {hero.Leadership} · 무력 {hero.Might}" });
+                snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "add-member", Id = heroId, Value = (int)(database.GetHeroClass(hero.HeroClass)?.RecommendedRole ?? WIUnitRole.Melee), Title = hero.DisplayName.Get(database.UseEnglish), Description = $"통솔 {hero.Leadership} · 무력 {hero.Might} · " + GetMilitarySelectionStatus(heroId), Interactable = state.IsCharacterBusy(heroId, ignoreAdministration: true) == false });
             }
         }
 

@@ -427,7 +427,7 @@ namespace ProjectWI.Administration
             }
 
             WICharacterRuntimeState candidate = state.Characters
-                .Where(character => character.Discovered && character.Recruited == false &&
+                .Where(character => character.Discovered && WIAdministrationTurnSystem.IsHeroRecruitmentCandidate(character) == true &&
                                     character.IsDead == false && character.Captured == false &&
                                     string.IsNullOrEmpty(character.JoinedEnemyFactionId))
                 .OrderByDescending(character => character.RecruitmentProgress)
@@ -502,8 +502,7 @@ namespace ProjectWI.Administration
             }
 
             foreach (WICastleRuntimeState castle in state.Castles.Where(item =>
-                         item.FactionId == state.PlayerFactionId &&
-                         string.IsNullOrEmpty(item.GovernorHeroId) == false))
+                         item.FactionId == state.PlayerFactionId))
             {
                 castle.DelegatedToGovernor = true;
                 castle.GovernorMonthlyBudget = policy == WIAutoPlayerPolicy.Aggressive ? 100 : 200;

@@ -12,6 +12,20 @@ namespace ProjectWI.Administration
         [SerializeField] private int restEndFatigue = 20;
         [SerializeField] private int trainingTargetExperience = 500;
         [SerializeField] private int talentOfficeCapacity = 2;
+        // 주둔 인물의 자동 훈련 사용 여부와 월간 경험·피로 증가량입니다.
+        [SerializeField] private bool automaticTrainingEnabled = true;
+        [SerializeField, Min(0)] private int automaticTrainingExperience = 8;
+        [SerializeField, Min(0)] private int automaticTrainingFatigue = 5;
+        public bool AutomaticTrainingEnabled => automaticTrainingEnabled;
+        public int AutomaticTrainingExperience => Mathf.Max(0, automaticTrainingExperience);
+        public int AutomaticTrainingFatigue => Mathf.Max(0, automaticTrainingFatigue);
+        // 점령 직후 불안 기간, 월간 자연 안정량과 승리 후 의무 재편 기간입니다.
+        [SerializeField, Min(0)] private int occupationUnrestMonths = 3;
+        [SerializeField, Min(0)] private int occupationStabilityGain = 5;
+        [SerializeField, Min(0)] private int victoryReorganizationMonths = 0;
+        public int OccupationUnrestMonths => Mathf.Max(0, occupationUnrestMonths);
+        public int OccupationStabilityGain => Mathf.Max(0, occupationStabilityGain);
+        public int VictoryReorganizationMonths => Mathf.Max(0, victoryReorganizationMonths);
         public int RestStartFatigue => restStartFatigue;
         public int RestEndFatigue => restEndFatigue;
         public int TrainingTargetExperience => trainingTargetExperience;
@@ -28,10 +42,13 @@ namespace ProjectWI.Administration
             {
                 if (castle.PendingGovernorAppointment)
                 {
+                    // 구 저장의 임명 대기도 인원 도착을 기다리지 않고 기본 운영으로 전환합니다.
+                    castle.DelegatedToGovernor = true;
+                    castle.PendingGovernorAppointment = false;
+                    castle.GovernorPolicy = WIGovernorPolicy.Frontline;
                     string candidate = castle.HeroIds.Where(id => IsAdministrationCapable(state, id))
-                        .Where(id => state.IsCharacterBusy(id) == false)
-                        .OrderBy(id => state.GetCharacter(id).BaseGrade == WICharacterGrade.Common ? 0 : 1)
-                        .ThenByDescending(id => database.GetHero(id).Politics).FirstOrDefault();
+                        .Where(id => state.IsCharacterBusy(id, ignoreArmy: true) == false)
+                        .OrderByDescending(id => database.GetHero(id).Politics).FirstOrDefault();
                     if (string.IsNullOrEmpty(candidate) == false && AssignGovernor(state, castle.CastleId, candidate))
                     {
                         castle.DelegatedToGovernor = true;
@@ -48,7 +65,7 @@ namespace ProjectWI.Administration
                     continue;
                 }
                 if (order.ProjectType == WICastleProjectType.Expansion ||
-                    castle.HeroIds.Contains(order.ManagerHeroId) == false ||
+                    IsHeroInFaction(state, order.ManagerHeroId, castle.FactionId) == false ||
                     IsAdministrationCapable(state, order.ManagerHeroId) == false ||
                     HasUsefulProjectWork(state, castle, order.ProjectType) == false)
                 {
@@ -56,7 +73,7 @@ namespace ProjectWI.Administration
                     continue;
                 }
                 int cost = GetProjectCost(database, order.ProjectType, order.Investment);
-                if (state.IsCharacterBusy(order.ManagerHeroId) || state.Gold < cost)
+                if (state.IsCharacterBusy(order.ManagerHeroId, ignoreArmy: true) == true || state.Gold < cost)
                 {
                     continue;
                 }

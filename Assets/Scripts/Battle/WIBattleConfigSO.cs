@@ -90,6 +90,9 @@ namespace ProjectWI.Battle
         [SerializeField, Min(0.1f)] private float gridCellHeight = 0.3f;
         [SerializeField, Min(0.001f)] private float gridArrivalDistance = 0.015f;
         [SerializeField] private int baseHealth = 100;
+        // 이동 잔여 한 달을 전투 중 증원 대기 시간으로 환산하는 초입니다.
+        [SerializeField, Min(1f)] private float reinforcementSecondsPerMonth = 15f;
+        public float ReinforcementSecondsPerMonth => Mathf.Max(1f, reinforcementSecondsPerMonth);
         [SerializeField] private int healthPerMight = 3;
         [SerializeField] private int baseMana = 30;
         [SerializeField] private int manaPerIntelligence = 2;

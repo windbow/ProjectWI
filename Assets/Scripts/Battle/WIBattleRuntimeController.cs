@@ -25,6 +25,10 @@ namespace ProjectWI.Battle
         private WIBattleSpriteRendererPool visualEffectPool;
         private WIBattleSpriteRendererPool projectilePool;
         private string selectedHeroId;
+        // 현재 캠페인의 후발 전투단 합류 예약과 캐릭터 데이터 원본입니다.
+        private WIBattleReinforcementSystem reinforcements;
+        private WIAdministrationDatabaseSO battleDatabase;
+        public string ReinforcementStatus => reinforcements?.GetStatus(runtime?.ElapsedSeconds ?? 0f) ?? string.Empty;
 
         public WIBattleRuntimeState Runtime => runtime;
         public WIBattleConfigSO Config => config;
@@ -34,11 +38,13 @@ namespace ProjectWI.Battle
         // 전달받은 전투 세션으로 런타임 상태와 교체 가능한 캐릭터 표시 오브젝트를 생성합니다.
         public void Initialize(
             WIAdministrationDatabaseSO database,
-            WIBattleSessionState session)
+            WIBattleSessionState session, WIAdministrationState campaignState = null)
         {
             PrepareBattlePresentation();
             PreparePresentationPools();
             runtime = WIBattleRuntimeBuilder.Build(config, database, session);
+            battleDatabase = database;
+            reinforcements = campaignState == null ? null : new WIBattleReinforcementSystem(config, database, campaignState, session);
             if (cameraController != null)
             {
                 cameraController.ZoomLevelChanged -= HandleZoomLevelChanged;
@@ -82,6 +88,15 @@ namespace ProjectWI.Battle
                 return;
             }
             WIBattleOutcome outcome = WIBattleSimulation.Step(config, runtime, deltaTime);
+            reinforcements?.Advance(config, runtime);
+            while (views.Count < runtime.Characters.Count)
+            {
+                WIBattleCharacterState character = runtime.Characters[views.Count];
+                WIBattleCharacterView view = Instantiate(characterPrefab, characterRoot == null ? transform : characterRoot);
+                view.Bind(character, config, battleDatabase.GetHero(character.HeroId)?.BattleSprite);
+                view.SetFarOutlineEnabled(cameraController == null || cameraController.CurrentZoomLevel == WIBattleZoomLevel.C);
+                views.Add(view);
+            }
             RefreshViews();
             RefreshVisualEffects();
             RefreshProjectileViews();

@@ -6,6 +6,8 @@ namespace ProjectWI.Administration
 {
     public sealed class WIAdministrationFocusProjectUGUIController : WIAdministrationUGUIPanelController
     {
+        // 모든 후보를 스크롤 행으로 표시하는 공통 목록입니다.
+        [SerializeField] private WICharacterSelectionList selectionList;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private GameObject projectPage;
         [SerializeField] private GameObject managerPage;
@@ -138,6 +140,8 @@ namespace ProjectWI.Administration
             projectPage.SetActive(false);
             managerPage.SetActive(true);
             messageLabel.gameObject.SetActive(false);
+            selectionList.Prepare(currentManagers.Count, AssignManager, administrationController,
+                out managerButtons, out managerLabels, out managerPortraits);
             for (int index = 0; index < managerButtons.Length; index += 1)
             {
                 bool visible = index < currentManagers.Count;
@@ -150,7 +154,7 @@ namespace ProjectWI.Administration
                 WIAdministrationProjectManagerSnapshot manager = currentManagers[index];
                 managerPortraits[index].sprite = manager.Portrait;
                 managerPortraits[index].enabled = manager.Portrait != null;
-                managerLabels[index].text = $"{manager.DisplayName}\n예상 성과 +{manager.ExpectedGain}\n{manager.TraitText}";
+                managerLabels[index].text = $"{manager.DisplayName}\n예상 성과 +{manager.ExpectedGain} · {manager.TraitText}\n" + administrationController.GetSelectionCharacterSummary(manager.HeroId);
             }
         }
 

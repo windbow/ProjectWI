@@ -8,6 +8,8 @@ namespace ProjectWI.Administration
         public string Summary;
         // 현재 전투단에 추가할 수 있는 인원 수입니다.
         public int AvailableMemberSlots;
+        // 선택 화면에서 전투단당 차감되는 출정 영향력입니다.
+        public int MarchInfluencePerArmy;
         public List<WIAdministrationMilitaryItemSnapshot> Items = new();
     }
 

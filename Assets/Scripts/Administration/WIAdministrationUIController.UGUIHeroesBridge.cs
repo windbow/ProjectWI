@@ -8,7 +8,7 @@ namespace ProjectWI.Administration
         public void OpenHeroesUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIHeroesRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationHeroesUGUIController>(() => UGUIHeroesRequested);
         }
 
         // 영웅 목록 또는 선택 영웅의 승격·작위 카드를 구성합니다.
@@ -78,7 +78,7 @@ namespace ProjectWI.Administration
                 });
             }
             foreach (WICharacterRuntimeState character in state.Characters.Where(item => item.Discovered &&
-                         item.Recruited == false && item.IsDead == false && string.IsNullOrEmpty(item.JoinedEnemyFactionId)))
+                         WIAdministrationTurnSystem.IsHeroRecruitmentCandidate(item) == true))
             {
                 WIHeroDefinition hero = database.GetHero(character.HeroId);
                 snapshot.Cards.Add(new WIAdministrationHeroCardSnapshot

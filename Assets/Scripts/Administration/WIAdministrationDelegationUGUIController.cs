@@ -6,6 +6,8 @@ namespace ProjectWI.Administration
 {
     public sealed class WIAdministrationDelegationUGUIController : WIAdministrationUGUIPanelController
     {
+        // 모든 후보를 스크롤 행으로 표시하는 공통 목록입니다.
+        [SerializeField] private WICharacterSelectionList selectionList;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -78,7 +80,9 @@ namespace ProjectWI.Administration
                 return;
             }
             messageLabel.gameObject.SetActive(false);
-            statusLabel.text = snapshot.CastleName + " · 영지관과 자동 운영 조건을 설정하십시오.";
+            statusLabel.text = snapshot.CastleName + " · " + snapshot.OperationHelp;
+            selectionList.Prepare(snapshot.Candidates.Count, AssignGovernor, administrationController,
+                out governorButtons, out governorLabels, out governorPortraits);
             for (int index = 0; index < governorButtons.Length; index += 1)
             {
                 bool visible = index < snapshot.Candidates.Count;
@@ -92,6 +96,7 @@ namespace ProjectWI.Administration
                 governorPortraits[index].enabled = candidate.Portrait != null;
                 governorLabels[index].text = (candidate.HeroId == snapshot.GovernorHeroId ? "● " : string.Empty) +
                     candidate.DisplayName + "\n" + candidate.Summary;
+                governorLabels[index].text += "\n" + administrationController.GetSelectionCharacterSummary(candidate.HeroId);
                 governorButtons[index].interactable = candidate.Interactable;
             }
             string[] policyNames = { "균형", "번영", "연구", "전선", "인재" };
@@ -103,7 +108,7 @@ namespace ProjectWI.Administration
             basicBudgetButton.GetComponentInChildren<TMP_Text>().text = $"기본 예산 · 월 {snapshot.BasicBudget}G";
             intensiveBudgetButton.GetComponentInChildren<TMP_Text>().text = $"집중 예산 · 월 {snapshot.IntensiveBudget}G";
             previewLabel.text = snapshot.Preview;
-            toggleButton.GetComponentInChildren<TMP_Text>().text = snapshot.Delegated ? "직접 관리로 전환" : "영지관에게 위임";
+            toggleButton.GetComponentInChildren<TMP_Text>().text = snapshot.ToggleLabel;
             dismissButton.interactable = string.IsNullOrEmpty(snapshot.GovernorHeroId) == false;
         }
 

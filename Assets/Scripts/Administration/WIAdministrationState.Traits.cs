@@ -20,14 +20,15 @@ namespace ProjectWI.Administration
                 {
                     character.Traits = definition.Traits.ToList();
                 }
+                character.BaseGrade = definition.Grade;
             }
+            NormalizeCharacterDuties();
             foreach (WICastleRuntimeState castle in Castles)
             {
                 if (string.IsNullOrEmpty(castle.GovernorHeroId) == false &&
                     WIAdministrationTurnSystem.IsAdministrationCapable(this, castle.GovernorHeroId) == false)
                 {
                     castle.GovernorHeroId = string.Empty;
-                    castle.DelegatedToGovernor = false;
                 }
             }
         }

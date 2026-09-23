@@ -93,7 +93,7 @@ namespace ProjectWI.Administration
                 CanResearch(state, researcherHeroId) == false ||
                 string.IsNullOrEmpty(faction.ActiveResearchId) == false || faction.CompletedResearchIds.Contains(researchId) ||
                 faction.ManaCrystal < research.ManaCost || IsHeroInFaction(state, researcherHeroId, factionId) == false ||
-                state.IsCharacterBusy(researcherHeroId))
+                state.IsCharacterBusy(researcherHeroId, ignoreArmy: true) == true)
             {
                 return false;
             }
@@ -133,10 +133,16 @@ namespace ProjectWI.Administration
                 if (CanResearch(state, factionState.ResearcherHeroId) == false ||
                     IsHeroInFaction(state, factionState.ResearcherHeroId, factionState.FactionId) == false)
                 {
-                    factionState.ActiveResearchId = string.Empty;
-                    factionState.ResearcherHeroId = string.Empty;
-                    factionState.ResearchRemainingMonths = 0;
-                    continue;
+                    factionState.ResearcherHeroId = state.Characters
+                        .Where(character => character.Recruited == true && CanResearch(state, character.HeroId) == true &&
+                            IsHeroInFaction(state, character.HeroId, factionState.FactionId) == true &&
+                            state.IsCharacterBusy(character.HeroId, ignoreArmy: true) == false)
+                        .OrderByDescending(character => database.GetHero(character.HeroId)?.Intelligence ?? 0)
+                        .Select(character => character.HeroId).FirstOrDefault() ?? string.Empty;
+                    if (string.IsNullOrEmpty(factionState.ResearcherHeroId) == true)
+                    {
+                        continue;
+                    }
                 }
                 factionState.ResearchRemainingMonths -= 1;
                 if (factionState.ResearchRemainingMonths > 0)

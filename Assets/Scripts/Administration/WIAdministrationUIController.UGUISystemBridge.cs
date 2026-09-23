@@ -92,7 +92,7 @@ namespace ProjectWI.Administration
         // 시스템 UGUI를 열도록 구독 화면에 요청합니다.
         public void OpenUGUISystem()
         {
-            UGUISystemRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationSystemUGUIController>(() => UGUISystemRequested);
         }
 
         // 음량을 25퍼센트 단위로 순환시킵니다.

@@ -21,6 +21,26 @@ namespace ProjectWI.Battle
             return runtime;
         }
 
+        // 기존 생존자와 이동 예약 셀을 보존하면서 새 참가자만 진영 후방에 추가합니다.
+        public static void AppendReinforcements(WIBattleConfigSO config, WIAdministrationDatabaseSO database,
+            WIBattleSessionState session, WIBattleRuntimeState runtime)
+        {
+            var existing = new HashSet<string>(runtime.Characters.Select(item => item.HeroId));
+            var occupied = new HashSet<WIGridCoordinate>();
+            foreach (var character in runtime.Characters.Where(item => item.IsAlive == true))
+            {
+                occupied.Add(new WIGridCoordinate(character.GridColumn, character.GridRow));
+                if (character.HasGridDestination == true)
+                {
+                    occupied.Add(new WIGridCoordinate(character.GridDestinationColumn, character.GridDestinationRow));
+                }
+            }
+            AddSide(runtime, config, database, session.AttackerHeroIds.Where(item => existing.Contains(item.HeroId) == false).ToList(),
+                WIBattleSide.Attacker, occupied, true);
+            AddSide(runtime, config, database, session.DefenderHeroIds.Where(item => existing.Contains(item.HeroId) == false).ToList(),
+                WIBattleSide.Defender, occupied, true);
+        }
+
         // 전투 설정의 순환 규칙에 따라 이번 세션의 목표와 제한값을 런타임에 복사합니다.
         private static void ApplyObjective(WIBattleConfigSO config, WIBattleRuntimeState runtime, string sessionId)
         {
@@ -47,7 +67,7 @@ namespace ProjectWI.Battle
             WIAdministrationDatabaseSO database,
             List<WIBattleParticipantState> participants,
             WIBattleSide side,
-            HashSet<WIGridCoordinate> occupied)
+            HashSet<WIGridCoordinate> occupied, bool reinforcement = false)
         {
             List<WIBattleParticipantState> ordered = participants
                 .OrderBy(item => GetRoleColumn(item.Role))
@@ -62,6 +82,10 @@ namespace ProjectWI.Battle
                 rowsByColumn[column] = row + 1;
                 float direction = side == WIBattleSide.Attacker ? 1f : -1f;
                 float x = direction * (-config.ArenaSize.x * 0.35f + column * config.FormationColumnSpacing);
+                if (reinforcement == true)
+                {
+                    x = direction * -config.ArenaSize.x * 0.45f;
+                }
                 float rowSpacing = config.UseHiddenGrid == true
                     ? config.GridCellHeight
                     : config.FormationRowSpacing;

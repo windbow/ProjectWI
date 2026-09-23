@@ -9,7 +9,7 @@ namespace ProjectWI.Administration
         public void OpenFactionUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIFactionRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationFactionUGUIController>(() => UGUIFactionRequested);
         }
 
         // 대륙의 5대 진영 공개 정보를 읽기 전용 카드 스냅샷으로 구성합니다.

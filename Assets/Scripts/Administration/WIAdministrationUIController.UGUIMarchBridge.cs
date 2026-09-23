@@ -42,7 +42,7 @@ namespace ProjectWI.Administration
             snapshot.CastleName = castle.DisplayName.Get(database.UseEnglish);
             foreach (string heroId in selectedCastle.HeroIds)
             {
-                if (state.IsCharacterBusy(heroId)) continue;
+                if (state.IsCharacterBusy(heroId, ignoreAdministration: true)) continue;
                 WIHeroDefinition hero = database.GetHero(heroId);
                 if (hero == null) continue;
                 snapshot.Options.Add(new WIAdministrationMarchOptionSnapshot

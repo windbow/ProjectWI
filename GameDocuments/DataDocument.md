@@ -1,15 +1,61 @@
 # ProjectWI 씬 및 에셋 구조
 
+## 지연 생성 화면 첫 요청 수정 (2026-09-20)
+
+- WIAdministrationUIController.UGUIScreenRequests는 Action 스냅샷 대신 Func<Action> 및 Func<Action<TFirst,TSecond>>로 이벤트를 조회합니다. EnsureScreen이 프리팹 생성·OnEnable 구독을 마친 뒤 최신 이벤트를 가져오므로 첫 메뉴 클릭과 첫 월간 보고가 누락되지 않습니다.
+- 모든 RaiseUGUIScreenRequest 호출부는 이벤트 조회 람다를 전달합니다. WIUGUIMigrationTests의 LazyScreenReceivesFirstRequest 2개 케이스는 실제 지연 인스턴스의 OnEnable 구독과 최초 이벤트·인자 전달을 검사합니다. 관련 UGUI·내정 병행 검사 58/58 통과.
+- Computer Use로 기존 저장 로드, 영지관 아레스 편성·출정·월 진행, 재불러오기, 개인 훈련 버튼 숨김과 자동 훈련 월보를 확인했습니다. 내정 최종 월간 상승 수치와 전투 결과는 실조작 검증하지 않았습니다.
+
+## 공통 인물 선택 행 구현 (2026-09-20)
+
+- WICharacterSelectionRow는 편집 시점에 제작한 버튼·초상·이름·요약 참조를 가진 공통 프리팹입니다. WICharacterSelectionList는 초기 8행을 재사용하며 후보가 늘면 같은 프리팹을 추가 인스턴스화합니다. 런타임 UI 구조 생성은 없습니다.
+- Prepare는 실제 후보 수와 원본 인덱스 콜백을 연결합니다. 검색·정렬은 행의 활성 상태와 표시 순서만 바꾸므로 선택 대상이 바뀌지 않습니다. 목록이 줄면 남은 행을 숨기고 재바인딩 시 이전 클릭 콜백을 제거합니다.
+- HeroAssignment, FocusProject, Delegation, CharacterActivity, Research, Scheme, Military, March UGUI에 적용합니다. 모든 후보를 한 스크롤에 제공하며 기존 페이지 버튼은 숨깁니다. 군사의 selectedMembers는 필터·스크롤과 독립적으로 유지합니다.
+- WICharacterSelectionListSetup은 기존 카드 부모 영역 안에 툴바·ScrollRect·RectMask2D·VerticalLayoutGroup·스크롤바를 에디터에서 저장합니다. 인재 활동의 기존 등급 필터와 영웅 도감은 유지합니다.
+- WICharacterSelectionListTests는 23명 후보의 검색·정렬 후 클릭 매핑, 풀 축소·재사용, 비활성 후보 필터, 8종 화면의 프리팹 참조를 검증합니다. WIGroupMarchTests는 페이지 이동 대신 스크롤 목록의 분리된 행을 함께 출정시키는 흐름을 검사합니다.
+
+
+## 내정·전투 병행과 자동 훈련 (2026-09-20)
+
+- Common은 전투 전용이며 영지관·성 사업·연구·탐색·영입·첩보 담당에서 제외합니다. 영웅으로 승격하면 보유 업무 특성에 따라 담당할 수 있습니다. Common 마스터의 업무 특성은 승격 후 자격용입니다.
+- 영지관·성 사업·연구 담당 영웅은 전투단 대장·단원으로 편성하고 출정할 수 있습니다. 같은 진영의 업무와 영지관 보너스를 유지합니다. 탐색·영입·첩보·개별 이동 등 현장 임무와 포로·사망·중복 편성 제한은 유지합니다.
+- 개인 훈련 버튼은 숨기고 주둔 중 자동 훈련으로 전환합니다. 별도 활동이 없고 이동·전투 대기·재편·합동훈련 중이 아닌 인물은 매월 경험 8·피로 5를 받습니다. 기사단 경험 보너스 5도 적용합니다. 부상 또는 피로 70 이상이면 회복하고 피로 20 이하 및 부상 해소 후 재개합니다. 경험 500에서 종료합니다. 출정 명령을 막지 않으며 합동훈련과 훈련 사업은 유지합니다.
+- WI_AdministrationDatabase.asset의 automation에서 automaticTrainingEnabled, automaticTrainingExperience, automaticTrainingFatigue와 기존 회복·경험 상한을 조정합니다. 경험은 기존 전략 전력 계산에 반영되며 실시간 전투 능력치 연결은 이번 변경에 포함하지 않습니다.
+- 저장 불러오기와 턴 시작 시 NormalizeCharacterDuties가 Common 담당과 개인 훈련 지시를 정리합니다. 지불한 성 사업은 기본 위임 성과로 완료하고 연구는 남은 기간을 보존해 적격 영웅을 재선정합니다. 연구자가 없으면 일시 정지합니다. Common의 진행 중 첩보·영입 선택은 취소합니다.
+- WIConcurrentDutyTests는 실제 편성·출정 UI 경로, 업무 유지, 승격과 저장 호환, 자동 훈련·회복 및 중복 편성 방지를 검증합니다. 관련 회귀 316/316 통과.
+
+
+## 빠른 내정·점령 처리 (2026-09-19)
+
+- `WICastleRuntimeState.DelegatedToGovernor`는 저장 호환을 유지하면서 인물 유무와 독립된 기본 운영 켜짐 상태로 사용합니다. 영지관 출전·해임·재임명·자격 상실 시 방침과 예산을 보존합니다.
+- `AssignDelegatedProject`와 `GetDelegationPreview`는 같은 담당자 판정을 사용합니다. 영지관이 없거나 전투단 외의 배타적 업무 중이면 `ManagerHeroId`가 빈 위임 사업으로 진행하며 인물 능력·특기·작위 보너스는 적용하지 않습니다. 이미 투자한 위임 사업도 담당자 부재 시 기본 성과로 완료합니다. 직접 지정한 인물 사업은 기존 자격 검증을 유지합니다.
+- `ChooseDelegatedProject`는 전선 훈련 대상이 없는 경우 부족한 성 수치 개선으로 전환합니다. 자금 부족·유효한 개선 대상 없음에서는 비용을 지불하지 않습니다.
+- `ResolveArmyVictoryAndOccupation`은 이전 소유자의 진행 사업을 제거하고 플레이어 점령지에 기본 운영을 시작합니다. `PendingGovernorAppointment`를 생성하지 않으며 편성과 역할을 보존합니다. `CompleteSupportingArmyOccupation`도 동일한 `automation.victoryReorganizationMonths`를 적용합니다.
+- `ResolveOccupationStability`는 모든 진영에 동일하게 인원 잔류 없는 월간 안정화를 적용합니다. 불안 기간과 회복량은 `automation.occupationUnrestMonths`, `automation.occupationStabilityGain`에서 편집합니다. 통치 선택별 불안 기간은 기존 `occupationChoices`를 사용합니다.
+- UI는 기존 `WIAdministrationDelegationUGUI.prefab`을 재사용하며 `WIAdministrationDelegationSnapshot.OperationHelp`, `ToggleLabel`에 DB UID 문구를 전달합니다. 새 화면·런타임 UI 생성은 없습니다.
+- `WIFastCampaignFlowTests`는 무인 내정, 출전 후 성장, 담당자 중복 업무 보너스 방지, 지출 중지 조건, 전선 훈련 대체, 기존 UI 전환, 점령 후 즉시 재출정, 설정값 및 저장 호환을 검증합니다. 공동 출정의 지원군 재출정은 `WIGroupMarchTests`에서 확인합니다.
+
+## UGUI 화면 표시 구조
+
+- `MainScene/UGUI Screen Bootstrap`의 `WIUIScreenManager.screenPrefabs`에는 편집 시점에 완성된 UGUI 화면 프리팹이 등록됩니다. 관리자는 같은 프리팹의 중복 등록과 빈 참조를 오류로 보고하고 생성된 인스턴스를 프리팹 기준으로 캐시합니다.
+- 생성된 프리팹의 대표 `WIAdministrationUGUIPanelController`는 실제 컨트롤러 타입을 키로 별도 등록됩니다. `TryGetScreen<TController>`가 타입 안전 조회를 제공하고 `WIUIScreenManager`가 공용 `WIAdministrationUIController`를 각 화면에 바인딩합니다.
+- `WICampaignTitleUGUIController`, `WIAdministrationWorldUGUIController`, `WIAdministrationTerritoryUGUIController`는 상시 화면으로 미리 생성합니다. 그 밖의 등록 화면은 프리팹과 컨트롤러 타입만 색인하고 `EnsureScreen<TController>`의 최초 요청에서 생성합니다.
+- `WIAdministrationUIController.UGUIScreenRequests.cs`의 `RaiseUGUIScreenRequest`는 화면 준비와 기존 표시 이벤트 전달의 단일 진입점입니다. 새로 생성된 컨트롤러가 `OnEnable`에서 이벤트를 구독한 뒤 같은 요청을 수신하므로 최초 클릭도 유실되지 않습니다.
+- `WIUIScreenManager.administrationController`는 MainScene의 `WIAdministrationUIController` 직렬화 참조입니다. 생성된 `WIAdministrationUGUIPanelController`에는 이 참조를 명시적으로 바인딩하며 개별 화면에서 `FindFirstObjectByType`을 호출하지 않습니다.
+- `WIAdministrationModalUGUIController.Show/Hide`는 `WIUIScreenManager`의 모달 스택에 표시 상태를 알립니다. 관리자는 열린 순서대로 Canvas 정렬값을 부여하고 Escape 입력은 스택의 마지막 모달을 닫습니다.
+- UI 구조는 런타임 코드로 조립하지 않습니다. 런타임에 허용되는 생성은 미리 제작된 화면·항목 프리팹의 인스턴스화, 재사용과 풀링이며 화면 컨트롤러는 Snapshot 데이터와 상태만 바인딩합니다.
+- 중앙 화면 관리자가 없는 독립 프리팹 검사 환경에서는 `WIAdministrationModalUGUIController`의 기존 활성 인스턴스·Canvas 순서 폴백을 사용합니다.
+
 ## 업무 특성 및 유지 지시 데이터
 
 - `WITraitType.Administration`, `TalentRecruitment`, `Scholar`, `Espionage`는 각각 성 사업·영지관, 탐색·영입, 연구, 첩보 자격입니다. `WIHeroDefinition.traits`가 마스터 원본이며 `WICharacterRuntimeState.Traits`는 저장 호환을 위한 런타임 사본입니다. 캠페인 생성과 불러오기에서 마스터 특성과 동기화합니다.
-- 현재 `WI_AdministrationDatabase.asset`의 1,200명은 영웅 200명·일반 1,000명으로 구성됩니다. 일반 내정 특성은 정확히 300명이며, 시작 배치 성마다 담당자를 우선 확보한 뒤 종족 비율과 정치·지력 순으로 결정론적으로 배분합니다.
+- 현재 `WI_AdministrationDatabase.asset`의 1,200명은 영웅 200명·일반 1,000명으로 구성됩니다. 일반 내정 특성은 300명에게 저장되어 있으나 승격 전에는 업무 자격을 주지 않습니다. 기존 종족 비율과 정치·지력 기준 배분은 승격 후 특성 원본으로 보존합니다.
 - 영웅은 시작 영지관, 핵심 인물 8명, 정치 65 이상을 기준으로 163명이 내정 특성을 가집니다. 승격은 내정 특성을 자동 부여하지 않습니다.
 - 전문 업무 특성은 능력치와 시작 성의 최소 담당자를 기준으로 결정론적으로 배분합니다. `[인재영입]`은 일반 180명·영웅 71명, `[학자]`는 일반 160명·영웅 75명, `[첩보]`는 일반 140명·영웅 61명입니다.
 - `automation.talentOfficeCapacity`는 성별 선술집 인재실의 탐색·영입 담당자 상한이며 현재 값은 2입니다. 현재 활동과 유지 지시가 탐색 또는 영입인 인물을 같은 슬롯으로 계산합니다.
 - `WICastleRuntimeState.StandingProject`, `RepeatProject`는 다음 달 사업 지시를 저장합니다. `WICharacterRuntimeState.StandingActivity`, `StandingActivityTargetHeroId`, `RepeatActivity`, `AutomaticRecovery`는 반복 활동과 자동 휴식을 저장합니다.
 - `WIAdministrationAutomationDefinition`은 반복 활동의 피로 시작·종료선과 훈련 경험 종료선을 ScriptableObject에서 조정합니다.
-- `PendingGovernorAppointment`는 새 점령지의 자동 영지관 임명을 보류하며, 실제 후보가 생긴 달에만 일반 내정 인물을 우선 임명합니다.
+- `PendingGovernorAppointment`는 구 저장 호환 필드입니다. 다음 턴에 기본 운영을 켜고 대기를 해제하며, 이미 사용 가능한 내정 인물이 있을 때만 자격을 갖춘 영웅을 선택적으로 임명합니다.
 - 관련 고정 문자열은 `UI_ADMIN_TRAIT_REQUIRED`, `UI_CHARACTER_TRAITS`, `UI_ADMIN_MAINTENANCE`, `UI_ADMIN_APPOINTED`, `UI_ORDER_REPEAT_ON/OFF`, `UI_ORDER_HINT`, `UI_ACTIVITY_REPEAT_HINT`, `UI_ADMIN_COMBAT_*` UID를 사용합니다.
 
 - `WICampaignAutoPlayer.RecordArmyStateDurations`는 매월 플레이어 전투단의 상태를 전투 대기→이동→재편 우선순위로 하나만 분류해 중복 없이 누적합니다. `MovingArmyMonths`, `AwaitingBattleArmyMonths`, `ReorganizingArmyMonths`는 총 부대·월이며 각 `Longest...ArmyMonths`는 단일 전투단의 최장 연속 체류입니다.
@@ -415,7 +461,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - `WIAdministrationTerritoryUGUI.prefab`: 상단 HUD, 좌측 성 현황, 중앙 성 전경, 우측 8개 내정 명령, 하단 영웅 4칸·시설 2칸·중점 카드와 대륙 지도/다음 턴 버튼을 고정 배치합니다.
 - 중점 사업 선택 화면은 `WIAdministrationFocusProjectSnapshot`과 담당자 스냅샷을 사용하며, 비용과 예상 성과는 기존 사업 밸런스 데이터 및 계산 시스템에서 즉시 산출합니다.
 - 영웅 배치 화면은 기존 `WICharacterRuntimeState`, 성별 `HeroIds`, 인물 정의를 `WIAdministrationHeroAssignmentSnapshot`으로 변환하며 별도 인물 데이터를 만들지 않습니다.
-- 인재 활동 화면은 기존 `WICharacterRuntimeState.Activity`, `ActivityTargetHeroId`, 피로·부상·명성·발견 상태를 `WIAdministrationCharacterActivitySnapshot`으로 변환합니다. 후보 스냅샷에는 직업 표시명과 영웅·일반 등급이 포함되며, 컨트롤러가 이름 검색·등급 필터·추천순/이름순 정렬 후 4열×2행 고정 카드에 페이지 단위로 표시합니다. `CharacterActivity` 전용 버튼·검색·필터는 소형 9-Slice Sprite를 사용하고, 카드 배경은 내부 구획선 없이 초상과 TMP 정보를 함께 받는 360×270 비변형 단일 Sprite를 사용합니다. 탐색·교류·영입·훈련·휴식 결과 계산은 기존 `WIAdministrationTurnSystem`의 월말 처리를 그대로 사용합니다.
+- 인재 활동 화면은 기존 `WICharacterRuntimeState.Activity`, `ActivityTargetHeroId`, 피로·부상·명성·발견 상태를 `WIAdministrationCharacterActivitySnapshot`으로 변환합니다. 후보 스냅샷에는 직업 표시명과 영웅·일반 등급이 포함되며, 컨트롤러가 이름 검색·등급 필터·추천순/이름순 정렬 후 4열×2행 고정 카드에 페이지 단위로 표시합니다. `CharacterActivity` 전용 버튼·검색·필터는 소형 9-Slice Sprite를 사용하고, 카드 배경은 내부 구획선 없이 초상과 TMP 정보를 함께 받는 360×270 비변형 단일 Sprite를 사용합니다. 탐색·교류·영입·휴식과 자동 훈련 결과 계산은 `WIAdministrationTurnSystem`의 월말 처리를 그대로 사용합니다.
 - `WICharacterSelectionCardPrefabUtility`는 캐릭터 버튼 배열을 가진 행정 UGUI 프리팹 7종에 공용 카드 배경, 우측 정보 구분선과 이전 버튼 배경을 에디터에서 저장합니다. 카드 배경과 이전 버튼은 각각 12px·20px 9-Slice이며, `CharacterInfoDivider`는 각 버튼 아래에 고정된 `raycastTarget=false` Image입니다. 런타임 컨트롤러는 기존 초상·TMP 정보와 클릭 동작만 갱신합니다.
 - 특화 시설 선택 화면은 `WIAdministrationDatabaseSO.SpecialFacilities`, 성의 `SpecialFacilityIds`, `PendingSpecialFacilityChoice`를 `WIAdministrationSpecialFacilitySnapshot`으로 변환하며 UI 전용 시설 데이터는 추가하지 않습니다.
 - 특화 시설의 실제 효과 계산은 `WIAdministrationTurnSystem.Facilities.cs`의 시설 보유·사업·월간 패시브 공통 함수와 경제·연구·영입·외교·첩보 시스템 연결부에서 처리합니다. 저장 데이터는 기존 `WICastleRuntimeState.SpecialFacilityIds`만 사용하므로 추가 마이그레이션 필드가 없습니다.
@@ -490,10 +536,10 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 
 - `WICampaignVariantDefinition.nonPlayerRecruitmentEnabled`: 해당 시나리오에서 비플레이어 세력의 재야 인재 고용 허용 여부입니다.
 - `WICampaignVariantDefinition.characterPlacements`: 런타임 생성이 아닌 ScriptableObject 저장형 시작 인물 배치 목록입니다.
-- 현재 캐릭터 마스터는 태생 영웅 200명과 일반 1000명, 총 1200명이며 시나리오별 시작 배치는 영웅 100명과 일반 150명, 총 250명입니다. 시작 시 재야 풀은 영웅 100명과 일반 850명, 총 950명입니다.
-- 아레스 메인 `castle_28`에는 태생 영웅 4명과 일반 병사 10명, 총 14명이 배치됩니다.
+- 현재 캐릭터 마스터는 태생 영웅 200명과 일반 1000명, 총 1200명이며 시나리오별 시작 배치는 영웅 60명과 일반 90명, 총 150명입니다. 시작 시 재야 풀은 영웅 140명과 일반 910명, 총 1050명입니다.
+- 아레스 메인 `castle_28`에는 태생 영웅 2명과 일반 인물 2명, 총 4명이 배치됩니다.
 - 자동 플레이어의 목표 고용 인원은 `14 + (보유 성 수 - 1) × 8`이며 6성 기준 54명입니다. 목표를 채운 뒤에는 불필요한 무한 영입을 중단합니다.
-- 내정 가능 판정은 태생 영웅 또는 승격 영웅입니다. 일반 등급은 모든 개인 활동과 내정 담당에서 제외되며 전투단 편성·군사 행동·전투단 합동훈련과 대기 회복만 적용됩니다.
+- 내정 가능 판정은 태생 영웅 또는 승격 영웅입니다. 일반 등급은 내정·연구·영입·첩보 담당에서 제외되며 전투단 편성·군사 행동·합동훈련·자동 개인 훈련과 회복을 적용합니다.
 # Campaign Auto Test Lab 상세 데이터
 
 - 결과 행의 `상세` 버튼과 `detail-panel`은 `WICampaignAutoTestLab.uxml`에 9개 행분이 고정 배치되어 있습니다.
@@ -559,7 +605,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - 메인 60개월 비교: 증원 없이 즉시 원정하면 출발976/도착925 대 수비872. 후방 영웅4명을 4개월 이동 후 편입하면 출발1217/도착1147 대 수비872. 기존에는 4명 모두 이동 거절됐다. 이동 중 내정 사용 차단·도착 후 예약 해소·거주 한도 검사를 추가했다.
 - UGUI 회귀47개와 메인 진단2개 합계49개 통과. 추가 검사는 진단용 파일에서 수행한다. 실제 실시간 전투의 승패/손실과 내정 손실량 비교는 남아 있다. 자동 플레이는 아직 이 보충 경로를 사용하도록 변경하지 않았다.
 ## 2026-09-13 메인 자동 보충 및 전투 비교 후속
-- 메인 자동 보충/편입은 일반 한정을 해제해 영웅도 사용하며, 후방 인물은 경유 성이 아닌 최종 보충 성까지 기존 이동 명령으로 보낸다. 이동 예약 인원을 고려한다. 영지관/마지막 내정 인물 보존에 더해 마지막 대기 인재영입 담당자를 보존한다.
+- 메인 자동 보충/편입은 일반 한정을 해제해 영웅도 사용하며, 후방 인물은 경유 성이 아닌 최종 보충 성까지 기존 이동 명령으로 보낸다. 이동 예약 인원을 고려한다. 영지관과 내정 인물의 전투단 편성을 허용하고 마지막 대기 인재영입 담당자를 보존한다.
 - 메인 자동 영입 담당자 선정은 실제 CanRecruitTalent 자격을 사용한다. 프리 시나리오는 검사하지 않았으며 해당 정책 조건은 기존대로 유지했다.
 - 무조작 실시간 전투 로직(30Hz, 최대600초, 스킬/명령 입력 없음) 비교: 즉시 공격 승리63.03초·공격 전투불능7/13, 4개월 증원 후 승리49.03초·전투불능8/17. 전투불능은 영구 사망이 아니다. 결과를 캠페인에 제출한 뒤 부상·사망·포로까지 추적한 검사는 아니다. 증원이 절대 손실을 줄인다고 주장할 수 없다.
 - 자동 보충만 늘린 최초 실험은 영입 담당자를 소진해 신규영입0으로 정체했다. 담당자 보존과 자격 보정 후 메인 균형형 24개월2성/3원정/신규영입2, 60개월7성/11원정/신규영입11, 120개월15성/29원정/신규영입24, 승패15/0. 기존120개월6성/8원정/영입5에서 개선됨. 여러 변경의 결합 효과이며 개별 인과 효과는 분리하지 않았다.
@@ -570,3 +616,72 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 
 
 - 2026-09-13: 영웅 배치 모달을 '미배치 인물 배치'로 명확히 하고 빈 후보/배치 불가 화면에 역할과 다른 성 인물 이동 방법 안내를 추가했다. 인재 활동은 선택한 담당자 이름을 활동/교류 상대/영입 대상 제목에 유지하고 상대 선택 안내를 UID로 제공한다. 활동 선택 중 검색 콜백이 후보 카드 화면을 다시 표시하지 않도록 방어했다. 훈련/휴식은 직접 배정, 교류/영입은 상대 선택이라는 기존 규칙을 유지했다. 신규 고정 UI 생성 없음. WIActivityCopyUtility가 기존 DB uiStrings의 관련6개 UID만 저장한다. 컴파일 오류 없음, UGUI 회귀47개 실행. 실제 클릭 재현 검증은 별도 필요하다.
+
+## 전투단원 다중 선택 편성 (2026-09-13)
+- 전투단원 추가는 역할 선택 없이 인물 목록으로 바로 이동한다. 기존 카드6개와 페이지 이동2개를 재사용하며 페이지를 넘겨도 선택 상태를 보존한다. 선택 인원/추가 가능 인원과 하단 '선택한 N명 편성'을 표시한다.
+- 확정 시 후보 전원의 소속 성·활동 상태·편성 한도를 먼저 검증한다. 잘못된 후보가 있으면 전체를 거절하고 상태를 변경하지 않는다. 역할은 클래스 ScriptableObject의 RecommendedRole로 지정하며 대장 역할은 기존 대장만 유지한다.
+- 신규 UI 동적 생성 없음. 관련 안내는 기존 DB의 UI_ARMY_* UID로 관리한다. WIArmyBatchSelectionTests에서 실제 메인 시작 인물2명의 일괄 편성과 잘못된 후보 포함 시 무변경을 확인했다(2/2). 기존 UGUI 회귀47/47 통과. 실제 화면의 클릭/배치 시각 검증은 이번 추가 검사에 포함하지 않았다.
+- 2026-09-13: 성 화면의 선술집 바로가기는 UGUITavernRequested로 기존 모달의 인재실/월간 의뢰를 직접 연다. 기본 시설 명령은 기존 시설 목록을 유지한다. 기본 시설 내부 선술집과 동일한 OpenQuests를 공유한다. 제목은 UI_TAVERN_DIRECT_TITLE로 관리하며 새 UI 생성 없음. 컴파일 오류 없음, UGUI 회귀 검사 실행.
+## 2026-09-13 카르디아 초기 무혈 승리 진단
+- 범위: AresMain / Standard 새 상태만 사용. 프리 시나리오와 사용자 저장 파일은 검증하지 않음. 마스터 데이터 및 게임 규칙 변경 없음.
+- WICardiaDefenseDiagnosticTests 3개 통과. 실제 턴 처리, 출정 도착, 전투 런타임 생성과 첫 시뮬레이션 스텝을 실행함. UI 수동 플레이 검증은 아님.
+- 즉시 출정: 시작 카르디아(castle_04, valdor) 인물 0명, 방어도 10. 3턴 도착 전투에서 방어 전력 40 / 수비 참가자 0 / 실제 생성 0 / 첫 스텝 Victory 재현.
+- 6개월 대기 후 출정: 9턴 도착 시 수비 9명, 방어 전력 686, 첫 스텝 None(전투 진행).
+- 12개월 대기 후 출정: 15턴 도착 시 수비 20명, 방어 전력 1659, 첫 스텝 None. 장기 대기의 최종 전투 승패는 검사하지 않음.
+- 원인: ApplyCampaignCharacterPlacements가 기존 성 인물을 비우고 시나리오 배치를 적용한 초기 상태에서 카르디아가 비어 있음. GetCastleDefensePower는 방어도/치안 등의 수치를 더하지만 실제 전투 인물은 주둔 전투단과 미편성 잔류 인물로 구성되어 빈 성의 계산상 전력이 전투 저항으로 나타나지 않음.
+- 기획 제안(미구현): 첫 공략 성에는 소규모 시작 수비 인물을 데이터로 명시하고, 내정은 유지·회복·충원 기반, 성 방어는 잔류 수비 인물 보조, 출정은 본거지 방어 감소라는 관계로 설계. 빈 성 처리와 전투 예상 수치의 일치도 별도 정리 필요. 일반 병사 부대 추가는 제안하지 않음.
+- 증거: GameDocuments/DesignAuditEvidence/Cardia-0.txt, Cardia-6.txt, Cardia-12.txt.
+## 2026-09-13 접경 수비 유지 및 무혈 점령 적용
+- 메인 시나리오 카르디아(castle_04)에 기존 hero_072, common_049, common_048을 재배치했다. 새 인물 생성이나 전체 인물 증가 없음. 기존 castle_03/02 배치에서 이동하며 새 게임부터 적용한다. 기존 저장의 시작 인물은 소급 이동하지 않는다.
+- WI/Data/Apply Cardia Defense 메뉴는 Unity SerializedObject로 메인 배치 세 건, 수비 설정, 보고 UID를 저장한다. 시작 배치 재생성 도구에도 카르디아 고정 배치를 추가했다.
+- 시나리오 SO aiBorderReserveCount(기본 2): 전쟁 중인 적과 인접한 성에서 전투단이 떠난 뒤 수비가 이 값 미만이면 AI는 해당 전투단을 방어 임무로 유지한다. 신규 편성도 접경 최소 인원을 남기고 후방에는 한 명을 남긴다. 인물이 부족한 성에 새 인물을 생성하는 규칙은 아니다.
+- 시나리오 SO aiFrontlineReinforcementTarget(메인 6, 기타 0=제한 없음): 일반 전선 집결은 현재 수비와 도착 예약이 기준 이상이면 추가 증원을 멈춘다. 전투단 단위로 보내므로 기준을 일부 초과할 수 있다. 동맹 공동 공격 집결은 별도 기존 규칙을 따른다.
+- 무혈 점령: 세션의 유효한 수비 인물이 없으면 실시간 전투 대기 대신 기존 소유권/점령 사건/영지관 임명/점령 불안 처리를 실행한다. 전투 피해·전투 경험·전투 관계 보상은 실행하지 않는다. 기록은 Resolved / UnopposedOccupation(열거형 끝에 추가) / Victory로 남긴다. 전략 자동 판정 활성 여부와 무관하다.
+- REPORT_UNOPPOSED_OCCUPATION: '무혈 점령 · {0}에 방어 병력이 없어 {1}이 전투 없이 점령했습니다.' 플레이어 관련 결과는 월간 보고 소식 맨 앞에 넣어 기존 두 개 소식 카드에서 확인할 수 있다. 새 UI 생성 없음.
+- 기존 저장의 빈 Pending 전투는 다음 전략 전투 처리 시 정리한다. 이미 진행 중인 실시간 전투를 중단하거나 저장 인물을 강제 재배치하지 않는다.
+- 검증: 접경 수비/무혈 점령 6개, 기존 UGUI 47개, 메인 발도르 초기 공격 주기 1개 총 54개 통과. 최종 추천 역할 적용 검사는 6개 재실행 통과. 컴파일 오류 없음. 프리 시나리오 검증 제외.
+- 첫 공격: 아레스·리리아·hero_009·hero_010 4명(추천 역할) 대 수비 3명, 전력230:228. 무조작 실시간 로직 30Hz에서 22.00초 Victory. 한 편성의 결과이며 모든 조합의 난이도 보장은 아니다.
+- 메인 대기 24개월: 수비 3명으로 시작, 7턴 4명, 8~18턴 6명, 19~25턴 2명. 종전 20명 집결과 달리 제한된 규모를 유지했다. 증거 Cardia-Defense-After.txt / Cardia-Reinforcement-After.txt. 실제 화면 클릭/시각 검증은 이번 검사에 포함하지 않았다.
+## 2026-09-13 전투단 다중 선택 출정
+- 군사 화면의 전투단 상세 → 이동/원정 → 목표 성 → 출정 전투단 선택 → 하단 확정 순서로 연결했다. 같은 성의 출정 가능한 아군 전투단을 여러 개 선택하며 페이지 이동 후에도 선택을 유지한다. 최초 열었던 전투단은 기본 선택된다.
+- BeginArmyGroupMarch는 모든 전투단의 존재/작전 가능/동일 출발 성/소속/인접 목표/교전 관계/총 영향력을 변경 전에 확인한다. 실패 시 일부만 출발하거나 비용을 일부 차감하지 않는다. 적 성은 기존대로 전투단당 영향력20, 아군 성 이동은0이다. UI에는 선택 수와 총 비용을 표시한다.
+- 출정에 성공한 전투단의 StrategicTargetCastleId를 같은 목표로 설정한다. 아레스 메인의 기존 동일 출발 성·동일 목표·전투 생성 시 함께 도착한 전투단 합류 규칙을 사용한다. 나중에 도착하는 전투단이 이미 생성된 전투에 자동 합류하는 기능은 추가하지 않았다.
+- 군사 모달의 기존 카드6개와 페이지 이동2개를 모든 목록에 적용했다. 전투단 상세 인물이 많아 이동/원정 명령이 뒤에서 잘리던 문제와 전투단 목록8개 이후 접근 문제를 함께 해결했다. 신규 UI 동적 생성 없음.
+- 문구 UID: UI_GROUP_MARCH_TITLE / ROUTE / STATUS / CONFIRM / ARMY / INVALID. 기존 WI/UI/Clarify Activity Labels 메뉴로 데이터베이스 uiStrings에 저장했다. 전투단별 대장 통솔에 따른 인원 상한은 변경하지 않았다.
+- 검증: WIGroupMarchTests6개 + 수비/무혈6개 + 인물일괄2개 + UGUI47개 =61개 통과. 두 전투단6명의 실제 전투 런타임 생성, 승리 결과 제출 뒤 두 전투단 주둔, 총비용 부족/재편성/다른 출발 성/누락 식별자 시 전체 상태 무변경을 확인했다. 승리 결과 제출 검사는 이 편성의 실제 승률 검사가 아니다.
+- 기존 군사 프리팹을 사용해 두 페이지에서 선택한 전투단이 함께 출정하는 화면 핸들러도 검증했다. 화면 캡처 기반의 시각 검사는 이번에 수행하지 않았다. 메인 시나리오만 검증, 프리 제외. 저장 구조와 시작 인물 배치 변경 없음.
+## 2026-09-19 후발 전투단 증원 합류
+- 월 이동으로 늦게 도착한 동일 진영 전투단은 기존 미해결 전투에 공격/수비 참가자로 합류한다. 다른 출발 성도 허용하며 중복 참가와 다른 전투에 묶인 전투단은 제외한다.
+- 실시간 전투 개시 시 이미 같은 전장으로 이동 중인 공격/수비 진영 전투단을 증원 예약한다. 월 턴은 진행하지 않으며 남은 이동 1개월당 전투 시간15초로 환산한다. WI_BattleConfig.asset의 reinforcementSecondsPerMonth에서 편집한다.
+- 예약 시각까지 전투가 지속되면 기존 이동 도착 처리(피로/숙련)를 적용하고 해당 진영 후방에 기존 WIBattleCharacter 프리팹으로 합류한다. 기존 캐릭터의 체력/위치/스킬 재사용 시간은 초기화하지 않는다. 전투 종료·후퇴가 먼저 처리되면 미도착 전투단은 이동 상태를 유지한다.
+- 합류 인물은 세션 참가자와 전력에 추가되어 승패·점령·후퇴 처리에 포함된다. 수비 전투단도 전투 중 AwaitingBattle로 묶어 AI 재출정을 막고, 수비 승리 시 해제한다.
+- 기존 HUD 상태 문구에 다음 증원 이름/남은 초 또는 마지막 합류 안내를 표시한다. UID UI_BATTLE_REINFORCEMENT_PENDING, UI_BATTLE_REINFORCEMENT_ARRIVED. 새로운 UI 구조 생성 없음.
+- 편집 메뉴 WI/Data/Apply Battle Reinforcement Timing으로 전투 SO 시간 설정과 문자열을 저장했다. 새 저장 필드 추가 없음. 전투 중 새 출정 명령을 내리는 기능은 포함하지 않는다.
+- 검증: 증원8개 + 합동출정6개 + 접경/무혈6개 + 전투격자4개 + UGUI47개 =71개 통과(job90213266ecad44268485db600a1dafee). 공격/수비 월 도착 및 실시간 합류, 중복 방지, 기존 인물 상태 보존, 양측 승패 처리, 조기 종료 시 이동 보존, 실제 캐릭터 프리팹 표시 생성 확인. 메인 시나리오 검사만 수행했다. 실제 플레이 화면 캡처 및 여러 해상도의 시각 검증은 미수행이다.
+## 2026-09-20 점령 후 두 번째 전투 재시작 수정
+- 원인: 개별 출정으로 같은 달 도착한 전투단은 공동 전략 목표가 없으면 별도 Pending 세션을 만들었다. 첫 전투로 성을 점령한 뒤 다른 세션이 남아 다시 전투에 진입할 수 있었다.
+- CreateBattleSession은 새 전장 생성 직후 이미 도착한 동일 공격/수비 진영 전투단을 기존 JoinBattleReinforcement 규칙으로 합류시킨다. 이동 중·재편성 중·다른 미해결 전투 참가 전투단은 기존 합류 제한을 유지한다. 같은 월 결과 판정 전에 합류하여 점령 및 승패 처리를 함께 받는다.
+- BeginRealTimeBattle과 군사 상세의 전투 시작 버튼은 현재 성 소유자가 공격 진영이면 진입을 차단한다. 이전 저장에 남은 대기 기록은 삭제하거나 보상을 재지급하지 않는다. 저장 구조, SO 설정 및 UI 프리팹 변경 없음.
+- 재현: 수정 전 개별 출정 두 전투단의 카르디아 도착 검사에서 세션 수가 기대 1/실제 2로 실패. 수정 후 하나의 세션, 양측 공격 전투단의 점령 반영, 완료 세션 재진입 차단 및 오래된 대기 세션의 UI/로직 차단 확인.
+- 검증: 첫 수정에서 AI 턴 포함 286/286 통과(job 60a184c676b84ac88ebc13d4fc748913). 최종 UI 차단 및 저장 호환 검사 추가 후 공동출정/증원/접경수비/UGUI 72/72 통과(job e7a09c113ed7455fbbbe269321c83181). Unity 컴파일 오류 없음. 콘솔에는 MCP WebSocket 재연결 경고 1건이 있었으며 재연결 후 검사 결과 조회 완료. 실제 플레이 화면 클릭 재현은 미수행.
+
+## 2026-09-21 초기 인물 축소
+- 각 시나리오의 시작 배치는 영웅 60명·일반 90명, 총 150명으로 축소했다. 전체 마스터 1200명은 유지하며 1050명은 재야 후보로 남는다.
+- 아레스 메인 프로스트혼은 ares, lyria, common_alden, common_sable 4명(영웅 2·일반 2)으로 시작한다. 다른 세력의 핵심 인물과 카르디아 수비 hero_072, common_049, common_048은 유지하고 나머지는 소유 성에 순환 분배한다.
+- WICampaignCharacterPlacementSeeder와 실제 DB의 characterPlacements를 함께 갱신했다. 새 게임에 적용되며 기존 저장 인물을 소급 제거하지 않는다.
+- 초기 배치/재야 수량 검사 1개와 전투단 일괄 편성 검사 2개, 총 3개 통과. Unity 컴파일 오류 없음. 장기 난이도 및 실제 화면 플레이 검증은 수행하지 않았다.
+
+## 2026-09-21 일반 인물 모병
+- 영웅은 인재실의 탐색·설득으로 영입한다. 일반은 이름·클래스·성장 이력을 유지하는 개별 실시간 전투 유닛이며 성의 모병으로 합류한다. 징병은 계획에 포함하지 않는다.
+- 경로: 군사 → 모병 · 일반 인물 충원 → 성 → 역할/합류 대상 선택 → 1명 또는 2명 모집. 전위·근접·원거리·마법·지원은 클래스의 RecommendedRole을 사용한다. 모집 명령은 금화를 즉시 지불하고 다음 월 처리에 합류한다.
+- 성 대기는 거주 공간을, 전투단은 통솔에 따른 빈자리를 사용한다. 처음 아레스 성의 거주 4칸이 찼다면 전투단을 편성한 뒤 모집하거나 합류 전투단을 선택한다. 영웅 담당자·추가 시설·인구 자원은 요구하지 않는다.
+- 자동 충원은 같은 화면에서 대상 전투단·전체 목표 인원·월 예산을 설정한 뒤 시작한다. 출정·재편성·전투·목표 달성·금화/후보/공간 부족에는 기다린다. 중지는 신규 예약만 막고 이미 예약한 건은 모집 취소로 환불한다.
+- 예약 이후 전투단이 떠나면 원래 성에 공간이 있을 때 대기한다. 성 소유권 변경·합류 공간 부족·전투 진입 시 예약을 취소하고 원래 세력에 환불한다. 원정 중 즉시 충원하지 않는다.
+- 신규 SO: Assets/Data/ScriptableObject/Administration/WI_MusterConfig.asset. DB의 musterConfig 참조에서 접근한다. goldPerCharacter=60, smallCastleMonthlyLimit=1, developedCastleMonthlyLimit=2, factionBaseCapacity=8, capacityPerCastle=4, factionMaximumCapacity=80, aiOrdersPerMonth=2, aiRearTarget=3, aiFrontTarget=6.
+- AI 일반 모병은 nonPlayerRecruitmentEnabled와 독립적으로 모든 시나리오에서 동작한다. 세력의 성·전투단·이동·모집 예약을 합산하여 모병 상한을 검사한다. 기존 초과 인원이나 저장의 고용 인원을 강제로 제거하지 않는다.
+- 저장: WICastleRuntimeState.MusterOrder(지불 세력·대상 전투단·예약 HeroIds·비용·예약 턴), MusterPolicy(세력·대상 전투단·역할·사용 여부·목표·예산). 구 저장에는 모병 예약이 없고 자동 충원은 꺼진 상태로 시작한다. 일반 대상의 기존 설득 및 영입 사건은 해제한다.
+- 기존 UI의 완성된 군사 선택 행 프리팹을 재사용한다. 화면 구성은 WIAdministrationUIController.Muster.cs에 분리했다. 모든 신규 고정 문구는 UI_MUSTER_* 및 REPORT_MUSTER_* UID로 관리한다.
+- 편집 메뉴 WI/Data/Apply Muster System은 모병 SO가 없을 때만 생성하고 DB 참조와 문자열을 저장한다. 기존 모병 밸런스 수치는 재실행해도 덮어쓰지 않는다.
+- 2026-09-24 검증: 모병16개·저장복구5개 총21개 통과. JsonUtility가 복원하는 빈 MusterOrder는 불러올 때 제거한다. 구 저장과 현재 저장 모두 예약 없는 성은 즉시 모병 가능하다. 실제 군사 프리팹 카드 핸들러도 자동 검사했고 컴퓨터 유즈/시각 검사는 제외했다.
+
+- 2026-09-24: WIAdministrationTerritoryUGUI의 CommandPanel/Command-4(기본 시설)를 제거하고 commandButtons/commandActions의 해당 항목을 함께 삭제함. 남은 명령 값은 0,1,2,3,5,6,7이며 Command-5~7을 위로 재배치함. 중앙 시설 4개 참조와 BasicFacility enum 값, 선술집 공용 모달은 유지함.

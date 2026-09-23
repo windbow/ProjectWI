@@ -47,6 +47,7 @@ namespace ProjectWI.Administration
             if (administrationController != null)
             {
                 administrationController.UGUIBasicFacilityRequested += Open;
+                administrationController.UGUITavernRequested += OpenTavern;
             }
         }
 
@@ -56,6 +57,7 @@ namespace ProjectWI.Administration
             if (administrationController != null)
             {
                 administrationController.UGUIBasicFacilityRequested -= Open;
+                administrationController.UGUITavernRequested -= OpenTavern;
             }
         }
 
@@ -91,11 +93,18 @@ namespace ProjectWI.Administration
             administrationController.ExecuteUGUITerritoryCommand(WIAdministrationTerritoryCommand.CharacterActivity);
         }
 
+        // 기존 모달을 열고 시설 목록을 거치지 않고 선술집 내용을 표시합니다.
+        private void OpenTavern()
+        {
+            modal.Show(administrationController.GetAdministrationText("UI_TAVERN_DIRECT_TITLE"));
+            OpenQuests();
+        }
+
         // 현재 성의 월간 선술집 의뢰를 카드 목록으로 표시합니다.
         private void OpenQuests()
         {
             pageMode = PageMode.Quest;
-            modal.SetTitle("선술집 월간 의뢰");
+            modal.SetTitle(administrationController.GetAdministrationText("UI_TAVERN_DIRECT_TITLE"));
             facilityRoot.SetActive(false);
             cardRoot.SetActive(true);
             if (administrationController.TryGetUGUITavernQuests(out snapshot, out string error)

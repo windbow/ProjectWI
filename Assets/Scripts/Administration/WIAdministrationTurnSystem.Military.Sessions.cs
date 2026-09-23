@@ -12,6 +12,14 @@ namespace ProjectWI.Administration
             WIAdministrationState state,
             WITurnSummary summary)
         {
+            JoinArrivedBattleReinforcements(database, state);
+            // 이전 저장에서 이미 대기 중인 빈 성 전투도 같은 무혈 점령 규칙으로 정리합니다.
+            foreach (WIBattleSessionState pending in state.BattleSessions.Where(item =>
+                         item.Status == WIBattleSessionStatus.Pending &&
+                         item.DefenderHeroIds.Any(member => database.GetHero(member.HeroId) != null) == false).ToList())
+            {
+                ResolveUnopposedOccupation(database, state, pending, summary);
+            }
             List<WIArmyState> attackers = state.Armies.Where(army => army.AwaitingBattle).ToList();
             foreach (WIArmyState attacker in attackers)
             {
@@ -42,6 +50,11 @@ namespace ProjectWI.Administration
                 {
                     session = CreateBattleSession(database, state, attacker);
                 }
+                if (session != null && session.DefenderHeroIds.Any(item => database.GetHero(item.HeroId) != null) == false)
+                {
+                    ResolveUnopposedOccupation(database, state, session, summary);
+                    continue;
+                }
                 bool useFallback = session != null && state.UseStrategicBattleFallback &&
                                    (session.PlayerInvolved == false || state.UsePlayerRealTimeBattles == false);
                 if (useFallback)
@@ -51,6 +64,42 @@ namespace ProjectWI.Administration
                         : WIBattleOutcome.Defeat;
                     SubmitBattleResult(database, state, session.SessionId, outcome, WIBattleResolutionSource.StrategicFallback, summary);
                 }
+            }
+        }
+
+        // 빈 성은 기존 점령 처리를 재사용하되 전투 피해와 전투 경험 보상을 발생시키지 않습니다.
+        private static void ResolveUnopposedOccupation(
+            WIAdministrationDatabaseSO database, WIAdministrationState state,
+            WIBattleSessionState session, WITurnSummary summary)
+        {
+            WIArmyState attacker = state.Armies.Find(item => item.ArmyId == session.AttackerArmyId);
+            if (ResolveArmyVictoryAndOccupation(database, state, attacker, summary) == false)
+            {
+                return;
+            }
+            WICastleRuntimeState castle = state.GetCastle(session.CastleId);
+            foreach (string armyId in session.AttackerArmyIds)
+            {
+                WIArmyState army = state.Armies.Find(item => item.ArmyId == armyId);
+                if (army != null && army != attacker)
+                {
+                    CompleteSupportingArmyOccupation(database, state, army, castle);
+                }
+            }
+            session.DefenderPowerSnapshot = 0;
+            session.AttackerOutcome = WIBattleOutcome.Victory;
+            session.ResolutionSource = WIBattleResolutionSource.UnopposedOccupation;
+            session.Status = WIBattleSessionStatus.Resolved;
+            string message = string.Format(database.GetText("REPORT_UNOPPOSED_OCCUPATION"),
+                database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish),
+                database.Factions.First(item => item.Id == session.AttackerFactionId).DisplayName.Get(database.UseEnglish));
+            if (session.PlayerInvolved == true)
+            {
+                summary?.News.Insert(0, message);
+            }
+            else
+            {
+                summary?.News.Add(message);
             }
         }
 
@@ -135,6 +184,15 @@ namespace ProjectWI.Administration
                 }));
             state.NextBattleSessionNumber += 1;
             state.BattleSessions.Add(session);
+            foreach (WIArmyState defender in defenders)
+            {
+                defender.AwaitingBattle = true;
+            }
+            // 같은 월에 따로 출정해 도착한 전투단도 결과 판정 전에 같은 전장에 합류합니다.
+            foreach (WIArmyState arrived in state.Armies.Where(army => army.CurrentCastleId == castle.CastleId).ToList())
+            {
+                JoinBattleReinforcement(database, state, session, arrived);
+            }
             return session;
         }
 
@@ -142,7 +200,8 @@ namespace ProjectWI.Administration
         public static bool BeginRealTimeBattle(WIAdministrationState state, string sessionId)
         {
             WIBattleSessionState session = state.BattleSessions.Find(item => item.SessionId == sessionId);
-            if (session == null || session.Status != WIBattleSessionStatus.Pending)
+            if (session == null || session.Status != WIBattleSessionStatus.Pending ||
+                state.GetCastle(session.CastleId)?.FactionId == session.AttackerFactionId)
             {
                 return false;
             }
@@ -205,7 +264,7 @@ namespace ProjectWI.Administration
                 ResolveArmyVictoryAndOccupation(database, state, attacker, summary);
                 foreach (WIArmyState support in attackers.Where(army => army != attacker))
                 {
-                    CompleteSupportingArmyOccupation(state, support, castle);
+                    CompleteSupportingArmyOccupation(database, state, support, castle);
                 }
                 summary?.News.Add($"전투 결과 · {database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish)} 점령 · {attacker.DisplayName} 승리 ({session.AttackerPowerSnapshot}:{session.DefenderPowerSnapshot})");
             }
@@ -221,6 +280,7 @@ namespace ProjectWI.Administration
                 foreach (WIArmyState defender in defenders)
                 {
                     defender.LastBattleOutcome = WIBattleOutcome.Victory;
+                    defender.AwaitingBattle = false;
                     if (defender.ArmyId == session.CounterAttackerArmyId)
                     {
                         defender.AwaitingBattle = false;
@@ -242,6 +302,7 @@ namespace ProjectWI.Administration
 
         // 공동 공격에서 주 공격군이 점령한 뒤 지원 공격군도 같은 성에 정상 주둔시킵니다.
         private static void CompleteSupportingArmyOccupation(
+            WIAdministrationDatabaseSO database,
             WIAdministrationState state,
             WIArmyState army,
             WICastleRuntimeState castle)
@@ -251,7 +312,7 @@ namespace ProjectWI.Administration
             army.TargetCastleId = string.Empty;
             army.Mission = WIArmyMission.Reserve;
             army.StrategicTargetCastleId = string.Empty;
-            army.ReorganizationMonths = Mathf.Max(army.ReorganizationMonths, 1);
+            army.ReorganizationMonths = Mathf.Max(army.ReorganizationMonths, database.Automation.VictoryReorganizationMonths);
             foreach (WIArmyMemberState member in army.Members)
             {
                 if (castle.HeroIds.Contains(member.HeroId) == false)

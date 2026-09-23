@@ -6,7 +6,7 @@ namespace ProjectWI.Administration
         public void OpenCouncilUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUICouncilRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationCouncilUGUIController>(() => UGUICouncilRequested);
         }
 
         // 현재 방침과 선택 가능한 모든 월간 진영 방침을 카드 스냅샷으로 구성합니다.

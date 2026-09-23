@@ -132,8 +132,9 @@ namespace ProjectWI.Administration
                         .OrderByDescending(item => GetCastleThreatScore(database, state, item, faction.Id))
                         .FirstOrDefault(item =>
                         item.FactionId == faction.Id &&
-                        item.HeroIds.Count(heroId => state.IsCharacterBusy(heroId) == false) >= 2);
-                    string commanderId = baseCastle?.HeroIds.FirstOrDefault(heroId => state.IsCharacterBusy(heroId) == false);
+                        item.HeroIds.Count(heroId => state.IsCharacterBusy(heroId, ignoreAdministration: true) == false) >
+                        GetAIResidentReserve(database, state, item));
+                    string commanderId = baseCastle?.HeroIds.FirstOrDefault(heroId => state.IsCharacterBusy(heroId, ignoreAdministration: true) == false);
                     if (baseCastle == null || string.IsNullOrEmpty(commanderId))
                     {
                         break;
@@ -182,6 +183,14 @@ namespace ProjectWI.Administration
                 AddAIReasonReport(summary, faction.Id, faction.DisplayName.Get(database.UseEnglish), "군사", militaryReason);
                 foreach (WIArmyState army in idleArmies)
                 {
+                    WICastleRuntimeState currentCastle = state.GetCastle(army.CurrentCastleId);
+                    if (IsEnemyBorder(state, currentCastle) == true &&
+                        CountAIDefenders(database, state, currentCastle, army, false) < GetAIResidentReserve(database, state, currentCastle))
+                    {
+                        army.Mission = WIArmyMission.Defend;
+                        army.StrategicTargetCastleId = currentCastle.CastleId;
+                        continue;
+                    }
                     if (jointTarget != null && jointStagingCastle != null &&
                         AreFactionsAtWar(state, faction.Id, jointTarget.FactionId))
                     {
@@ -215,6 +224,12 @@ namespace ProjectWI.Administration
                     army.StrategicTargetCastleId = stagingCastle.CastleId;
                     if (army.CurrentCastleId != stagingCastle.CastleId)
                     {
+                        int targetCount = database.GetCampaignVariant(state.CampaignVariant)?.AIFrontlineReinforcementTarget ?? 0;
+                        if (targetCount > 0 && CountAIDefenders(database, state, stagingCastle, null, true) >= targetCount)
+                        {
+                            army.Mission = WIArmyMission.Reserve;
+                            continue;
+                        }
                         string reinforcementStep = GetNextFriendlyStep(database, state, army.CurrentCastleId, stagingCastle.CastleId, faction.Id);
                         if (string.IsNullOrEmpty(reinforcementStep) == false && BeginArmyMarch(database, state, army, reinforcementStep))
                         {
@@ -276,11 +291,12 @@ namespace ProjectWI.Administration
 
             int recommended = GetRecommendedArmySize(database, army);
             int targetSize = strategy == WIAIStrategy.Aggressive ? Mathf.Min(4, recommended) : Mathf.Min(3, recommended);
-            targetSize = Mathf.Min(targetSize, Mathf.Max(1, castle.HeroIds.Count - 1));
+            int available = castle.HeroIds.Count(id => state.IsCharacterBusy(id, ignoreAdministration: true) == false);
+            targetSize = Mathf.Min(targetSize, Mathf.Max(1, army.Members.Count + available - GetAIResidentReserve(database, state, castle)));
             WIUnitRole[] roles = { WIUnitRole.Vanguard, WIUnitRole.Ranged, WIUnitRole.Magic, WIUnitRole.Support };
             int roleIndex = 0;
             foreach (string heroId in castle.HeroIds
-                         .Where(id => state.IsCharacterBusy(id) == false)
+                         .Where(id => state.IsCharacterBusy(id, ignoreAdministration: true) == false)
                          .OrderByDescending(id => database.GetHero(id)?.Might ?? 0)
                          .ToList())
             {
@@ -292,6 +308,37 @@ namespace ProjectWI.Administration
                 AddArmyMember(database, state, army, heroId, roles[roleIndex % roles.Length]);
                 roleIndex += 1;
             }
+        }
+
+        // 적과 연결된 성인지 확인하며 방어도가 높아도 접경 수비 의무를 유지합니다.
+        private static bool IsEnemyBorder(WIAdministrationState state, WICastleRuntimeState castle)
+        {
+            return castle != null && castle.AdjacentCastleIds.Any(id =>
+                state.GetCastle(id) != null && AreFactionsAtWar(state, castle.FactionId, state.GetCastle(id).FactionId));
+        }
+
+        // 접경에서는 시나리오의 최소 수비 인원을, 후방에서는 내정 인물 한 명을 남깁니다.
+        private static int GetAIResidentReserve(WIAdministrationDatabaseSO database, WIAdministrationState state, WICastleRuntimeState castle)
+        {
+            return IsEnemyBorder(state, castle) == true
+                ? database.GetCampaignVariant(state.CampaignVariant)?.AIBorderReserveCount ?? 2 : 1;
+        }
+
+        // 출발 예정 전투단을 제외한 실제 수비 인원과 필요할 경우 도착 예약 인원을 셉니다.
+        private static int CountAIDefenders(WIAdministrationDatabaseSO database, WIAdministrationState state,
+            WICastleRuntimeState castle, WIArmyState departing, bool includeIncoming)
+        {
+            var assigned = new HashSet<string>(state.Armies.SelectMany(item => item.Members.Select(member => member.HeroId)));
+            var ids = new HashSet<string>(castle.HeroIds.Where(id => assigned.Contains(id) == false && database.GetHero(id) != null));
+            foreach (WIArmyState army in state.Armies.Where(item => item != departing && item.FactionId == castle.FactionId))
+            {
+                if ((army.CurrentCastleId == castle.CastleId && army.IsOperational == true) ||
+                    (includeIncoming == true && army.IsMoving == true && army.TargetCastleId == castle.CastleId))
+                {
+                    ids.UnionWith(army.Members.Where(member => database.GetHero(member.HeroId) != null).Select(member => member.HeroId));
+                }
+            }
+            return ids.Count;
         }
 
         // 성의 적 인접 수, 적 전투단 접근과 방어 상태를 조합한 전선 위협도를 반환합니다.

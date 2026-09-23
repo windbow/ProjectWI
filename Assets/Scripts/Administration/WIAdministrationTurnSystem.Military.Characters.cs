@@ -200,7 +200,6 @@ namespace ProjectWI.Administration
                 if (castle.GovernorHeroId == character.HeroId)
                 {
                     castle.GovernorHeroId = string.Empty;
-                    castle.DelegatedToGovernor = false;
                 }
             }
             foreach (WIArmyState existingArmy in state.Armies)

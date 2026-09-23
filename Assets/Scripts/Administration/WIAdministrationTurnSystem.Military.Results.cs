@@ -204,15 +204,22 @@ namespace ProjectWI.Administration
             }
             castle.FactionId = army.FactionId;
             castle.Stability = Mathf.Min(castle.Stability, 20);
-            castle.OccupationUnrestMonths = 3;
+            castle.OccupationUnrestMonths = database.Automation.OccupationUnrestMonths;
             castle.GovernorHeroId = string.Empty;
+            // 이전 소유자의 사업을 인계하지 않고 점령 방침에 따른 기본 운영을 시작합니다.
+            castle.ActiveProject = null;
             castle.StandingProject = null;
             castle.RepeatProject = false;
-            castle.PendingGovernorAppointment = castle.FactionId == state.PlayerFactionId;
-            castle.DelegatedToGovernor = false;
+            castle.PendingGovernorAppointment = false;
+            castle.DelegatedToGovernor = castle.FactionId == state.PlayerFactionId;
+            castle.GovernorPolicy = WIGovernorPolicy.Frontline;
+            castle.GovernorMonthlyBudget = database.ProjectBalance.BasicCost;
             army.AwaitingBattle = false;
             army.OriginCastleId = castle.CastleId;
-            army.ReorganizationMonths = Mathf.Max(army.ReorganizationMonths, 1);
+            army.TargetCastleId = string.Empty;
+            army.Mission = WIArmyMission.Reserve;
+            army.StrategicTargetCastleId = string.Empty;
+            army.ReorganizationMonths = Mathf.Max(army.ReorganizationMonths, database.Automation.VictoryReorganizationMonths);
             foreach (WIArmyMemberState member in army.Members)
             {
                 if (castle.HeroIds.Contains(member.HeroId) == false)
@@ -229,7 +236,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 점령지의 영지관과 주둔 전투단 유무에 따라 월간 질서 안정을 처리합니다.
+        // 인원 재배치 없이 점령 방침의 불안 기간 동안 월간 질서를 회복합니다.
         private static void ResolveOccupationStability(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -242,17 +249,8 @@ namespace ProjectWI.Administration
                     continue;
                 }
 
-                bool hasGovernor = string.IsNullOrEmpty(castle.GovernorHeroId) == false;
-                bool hasGarrison = state.Armies.Exists(army => army.CurrentCastleId == castle.CastleId && army.AwaitingBattle == false);
-                if (hasGovernor && hasGarrison)
-                {
-                    castle.Stability = Mathf.Clamp(castle.Stability + 5, 0, 100);
-                    castle.OccupationUnrestMonths -= 1;
-                }
-                else
-                {
-                    castle.Stability = Mathf.Clamp(castle.Stability - 3, 0, 100);
-                }
+                castle.Stability = Mathf.Clamp(castle.Stability + database.Automation.OccupationStabilityGain, 0, 100);
+                castle.OccupationUnrestMonths -= 1;
 
                 summary.News.Add($"점령지 안정 · {database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish)} · 질서 {castle.Stability} · 불안 {castle.OccupationUnrestMonths}개월");
             }

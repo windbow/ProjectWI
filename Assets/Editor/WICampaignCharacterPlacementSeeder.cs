@@ -10,11 +10,11 @@ namespace ProjectWI.Editor
     {
         private const string DatabasePath =
             "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset";
-        private const int TargetPlacementCount = 250;
-        private const int TargetHeroPlacementCount = 100;
-        private const int TargetCommonPlacementCount = 150;
+        private const int TargetPlacementCount = 150;
+        private const int TargetHeroPlacementCount = 60;
+        private const int TargetCommonPlacementCount = 90;
 
-        // 1200명 중 영웅 100명과 일반 150명만 시나리오 시작 성에 결정적으로 배치합니다.
+        // 1200명 중 영웅 60명과 일반 90명만 시나리오 시작 성에 결정적으로 배치합니다.
         [MenuItem("ProjectWI/Data/Build Scenario Character Placements")]
         public static void BuildScenarioCharacterPlacements()
         {
@@ -40,7 +40,7 @@ namespace ProjectWI.Editor
             serialized.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(database);
             AssetDatabase.SaveAssets();
-            Debug.Log("시나리오 시작 인물 배치 완료 · 각 시나리오 최대 250명");
+            Debug.Log("시나리오 시작 인물 배치 완료 · 각 시나리오 최대 150명");
         }
 
         // 한 시나리오의 핵심 인물을 먼저 고정하고 남은 인물을 소유 성 비율대로 분배합니다.
@@ -61,10 +61,9 @@ namespace ProjectWI.Editor
             List<(string CastleId, string HeroId)> placements = new List<(string, string)>();
             if (definition.Variant == WICampaignVariant.AresMain)
             {
-                AddPinned(placements, "castle_28", "ares", "lyria", "hero_009", "hero_010",
-                    "common_alden", "common_sable", "common_013", "common_014", "common_015",
-                    "common_016", "common_017", "common_018", "common_019", "common_020");
+                AddPinned(placements, "castle_28", "ares", "lyria", "common_alden", "common_sable");
                 AddPinned(placements, "castle_00", "elwyn", "selene", "common_gareth", "common_varek");
+                AddPinned(placements, "castle_04", "hero_072", "common_049", "common_048");
                 AddPinned(placements, "castle_26", "brom", "common_thane", "common_010");
                 AddPinned(placements, "castle_38", "morrigan", "common_nym", "common_011");
                 AddPinned(placements, "castle_50", "theron", "kael", "common_raska", "common_mira", "common_veil");

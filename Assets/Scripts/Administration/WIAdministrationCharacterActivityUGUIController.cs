@@ -12,6 +12,8 @@ namespace ProjectWI.Administration
 
         private enum PageMode { Actor, Activity, Target, Transfer }
         private enum GradeFilter { All, Hero, Common }
+        // 모든 후보를 스크롤 행으로 표시하는 공통 목록입니다.
+        [SerializeField] private WICharacterSelectionList selectionList;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text contextLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -131,6 +133,8 @@ namespace ProjectWI.Administration
             }
             if (talentOfficeOnly)
             {
+                snapshot.Candidates.RemoveAll(candidate => administrationController.CanSelectCharacterActivity(
+                    candidate.HeroId, WICharacterActivityType.Search) == false);
                 foreach (WIAdministrationCharacterActivityCandidateSnapshot candidate in snapshot.Candidates)
                 {
                     candidate.Interactable = administrationController.CanSelectCharacterActivity(
@@ -139,7 +143,7 @@ namespace ProjectWI.Administration
             }
             contextLabel.text = talentOfficeOnly
                 ? snapshot.CastleName + " · " + administrationController.GetAdministrationText("UI_TALENT_OFFICE_CONTEXT")
-                : snapshot.CastleName + " · 이번 달 개인 활동을 수행할 인물을 선택하십시오.";
+                : snapshot.CastleName + " · " + administrationController.GetAdministrationText("UI_AUTOMATIC_TRAINING_HINT");
             messageLabel.gameObject.SetActive(false);
             RefreshToolbar();
             RefreshCards();
@@ -151,8 +155,10 @@ namespace ProjectWI.Administration
             cardRoot.SetActive(true);
             activityRoot.SetActive(false);
             RebuildVisibleCandidateIndices();
+            selectionList.Prepare(visibleCandidateIndices.Count, SelectCard, administrationController,
+                out cardButtons, out cardLabels, out cardPortraits);
             int count = visibleCandidateIndices.Count;
-            int pageCount = Mathf.Max(1, Mathf.CeilToInt(count / (float)PageSize));
+            int pageCount = 1;
             pageIndex = Mathf.Clamp(pageIndex, 0, pageCount - 1);
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
@@ -204,6 +210,7 @@ namespace ProjectWI.Administration
                     bool visible = talentOfficeOnly
                         ? WIAdministrationTurnSystem.IsTalentOfficeActivity(activities[index])
                         : WIAdministrationTurnSystem.IsTalentOfficeActivity(activities[index]) == false;
+                    visible = visible && activities[index] != WICharacterActivityType.Training;
                     activityButtons[index].gameObject.SetActive(visible);
                     activityButtons[index].interactable = administrationController.CanSelectCharacterActivity(selectedHeroId, activities[index]);
                 }

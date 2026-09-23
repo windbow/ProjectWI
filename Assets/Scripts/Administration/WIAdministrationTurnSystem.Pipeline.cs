@@ -6,10 +6,13 @@ namespace ProjectWI.Administration
         public static WITurnSummary ExecuteTurn(WIAdministrationDatabaseSO database, WIAdministrationState state)
         {
             WITurnSummary summary = new WITurnSummary();
+            state.NormalizeCharacterDuties();
+            PlanMusterPolicies(database, state);
+            PlanAIMuster(database, state);
             summary.GoldSpent = state.PendingPlayerGoldSpent;
             state.PendingPlayerGoldSpent = 0;
-
             PrepareStandingOrders(database, state, summary);
+            ResolveAutomaticCharacterTraining(database, state, summary);
             PrepareTurn(database, state, summary);
             ApplyCastleTurns(database, state, summary, out int appliedPlayerGold,
                 out int appliedPlayerMana, out int appliedPlayerInfluence);
@@ -94,6 +97,7 @@ namespace ProjectWI.Administration
             CreateRelationshipEventCandidates(database, state, summary);
             ResolveTavernQuests(database, state, summary);
             ResolveCharacterTransfers(database, state, summary);
+            ResolveMusterOrders(database, state, summary);
             ResolveArmyReorganization(database, state, summary);
             ResolveCapturedCharacters(database, state, summary);
             ResolveCommonCharacterReturns(database, state, summary);

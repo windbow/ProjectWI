@@ -543,6 +543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13cf4bc02cc47184ca3a19d8303061b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Administration.WIUIScreenManager
+  administrationController: {fileID: 7468938739445197248}
   screenPrefabs:
   - {fileID: 2536897111807893608, guid: cf83069829014c542b921300a9c52e5e, type: 3}
   - {fileID: 5069381135453003298, guid: d3c1680cd33114a418b31b3cb94e0f13, type: 3}
@@ -644,6 +645,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8297829816749015682, guid: 81d99fb3f5ac1fe498bf3a28fea416f2, type: 3}
   m_PrefabInstance: {fileID: 7468938739445197246}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7468938739445197248 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3071596530565065537, guid: 81d99fb3f5ac1fe498bf3a28fea416f2, type: 3}
+  m_PrefabInstance: {fileID: 7468938739445197246}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a101826a11fe18f48909e340b9e66425, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Administration.WIAdministrationUIController
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

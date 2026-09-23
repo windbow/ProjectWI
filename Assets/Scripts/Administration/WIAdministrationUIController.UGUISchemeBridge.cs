@@ -10,7 +10,7 @@ namespace ProjectWI.Administration
         public void OpenSchemeUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUISchemeRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationSchemeUGUIController>(() => UGUISchemeRequested);
         }
 
         // 첩보 종류·담당자·대상 성·대상 인물 단계의 카드를 구성합니다.

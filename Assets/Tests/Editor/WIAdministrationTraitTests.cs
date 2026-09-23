@@ -23,7 +23,7 @@ namespace ProjectWI.Tests.Editor
                 "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset"));
             state = WIAdministrationState.Create(database);
             castle = state.GetCastle("castle_00");
-            administrator = database.Heroes.First(hero => hero.Grade == WICharacterGrade.Common &&
+            administrator = database.Heroes.First(hero => hero.Grade == WICharacterGrade.Hero &&
                 hero.HasTrait(WITraitType.Administration) && hero.HasTrait(WITraitType.TalentRecruitment)).Id;
             foreach (var home in state.Castles)
             {
@@ -75,7 +75,7 @@ namespace ProjectWI.Tests.Editor
         public void Eligibility_DependsOnTrait(WICharacterGrade grade, bool hasTrait)
         {
             string id = database.Heroes.First(hero => hero.Grade == grade && hero.HasTrait(WITraitType.Administration) == hasTrait).Id;
-            Assert.AreEqual(hasTrait, WIAdministrationTurnSystem.IsAdministrationCapable(state, id));
+            Assert.AreEqual(grade == WICharacterGrade.Hero && hasTrait, WIAdministrationTurnSystem.IsAdministrationCapable(state, id));
             Assert.IsTrue(WIAdministrationTurnSystem.CanPerformCharacterActivity(state, id, WICharacterActivityType.Training));
             Assert.IsTrue(WIAdministrationTurnSystem.CanPerformCharacterActivity(state, id, WICharacterActivityType.Rest));
             Assert.IsTrue(WIAdministrationTurnSystem.CanPerformCharacterActivity(state, id, WICharacterActivityType.Socialize));
@@ -116,14 +116,14 @@ namespace ProjectWI.Tests.Editor
             Assert.IsFalse(WIAdministrationTurnSystem.CanPerformCharacterActivity(state, administrator, WICharacterActivityType.Rest));
         }
 
-        // 아레스 메인의 시작 영지관이 내정 일반 인물이며 아레스는 전투단을 편성할 수 있습니다.
+        // 아레스가 영지관과 전투단 대장을 겸임하면서 성의 내정을 유지합니다.
         [Test]
         public void AresCanFight_WhileCommonGovernorRunsHome()
         {
             state = WIAdministrationState.Create(database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
             castle = state.Castles.First(home => home.HeroIds.Contains("ares"));
-            Assert.IsNotEmpty(castle.GovernorHeroId);
-            Assert.AreEqual(WICharacterGrade.Common, state.GetCharacter(castle.GovernorHeroId).BaseGrade);
+            Assert.IsTrue(WIAdministrationTurnSystem.AssignGovernor(state, castle.CastleId, "ares"));
+            Assert.AreEqual(WICharacterGrade.Hero, state.GetCharacter(castle.GovernorHeroId).BaseGrade);
             Assert.IsTrue(WIAdministrationTurnSystem.IsAdministrationCapable(state, castle.GovernorHeroId));
             castle.DelegatedToGovernor = true;
             int before = castle.Prosperity;
@@ -136,7 +136,7 @@ namespace ProjectWI.Tests.Editor
 
             Assert.Greater(castle.Prosperity, before);
             Assert.IsNotEmpty(castle.GovernorHeroId);
-            Assert.AreNotEqual("ares", castle.GovernorHeroId);
+            Assert.AreEqual("ares", castle.GovernorHeroId);
             Assert.IsTrue(castle.DelegatedToGovernor);
             Assert.IsTrue(army.Members.Any(member => member.HeroId == "ares"));
             Assert.IsEmpty(state.PendingProjectEvents);
@@ -170,7 +170,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsNull(castle.ActiveProject);
             Assert.IsFalse(state.IsCharacterBusy(administrator));
             int before = castle.Prosperity;
-            state.GetCharacter(administrator).Activity = WICharacterActivityType.Training;
+            state.GetCharacter(administrator).Activity = WICharacterActivityType.Rest;
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
             Assert.AreEqual(before, castle.Prosperity);
         }
@@ -294,7 +294,7 @@ namespace ProjectWI.Tests.Editor
             castle.GovernorHeroId = string.Empty;
             castle.PendingGovernorAppointment = true;
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
-            Assert.AreEqual(WICharacterGrade.Common, state.GetCharacter(castle.GovernorHeroId).BaseGrade);
+            Assert.AreEqual(WICharacterGrade.Hero, state.GetCharacter(castle.GovernorHeroId).BaseGrade);
             Assert.IsTrue(castle.DelegatedToGovernor);
             Assert.IsFalse(castle.PendingGovernorAppointment);
         }

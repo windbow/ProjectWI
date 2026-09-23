@@ -878,8 +878,9 @@ namespace ProjectWI.Tests.Editor
 
             WITurnSummary summary = WIAdministrationTurnSystem.ExecuteTurn(database, state);
 
-            string plan = summary.DelegationReports.Single(item => item.Contains("[위임 계획]"));
-            string result = summary.DelegationReports.Single(item => item.Contains("[위임 결과]"));
+            string castleName = database.GetCastle(castle.CastleId).DisplayName.Get(database.UseEnglish);
+            string plan = summary.DelegationReports.Single(item => item.StartsWith("[위임 계획] " + castleName + " ·"));
+            string result = summary.DelegationReports.Single(item => item.StartsWith("[위임 결과] " + castleName + " ·"));
             StringAssert.Contains("예상 +", plan);
             StringAssert.Contains("예상 +", result);
             StringAssert.Contains("실제 +", result);
@@ -1989,6 +1990,15 @@ namespace ProjectWI.Tests.Editor
             targetCastle.Defense = 0;
             targetCastle.Stability = 0;
             targetCastle.HeroIds.Clear();
+            // 무혈 점령이 아닌 전투 승리 보상을 검증하도록 실제 수비 인물 한 명을 남깁니다.
+            string defenderId = database.Heroes.First(hero => hero.Grade == WICharacterGrade.Common &&
+                army.Members.All(member => member.HeroId != hero.Id)).Id;
+            foreach (WICastleRuntimeState castle in state.Castles)
+            {
+                castle.HeroIds.Remove(defenderId);
+            }
+            targetCastle.HeroIds.Add(defenderId);
+            state.GetCharacter(defenderId).Recruited = true;
             string[] reinforcements = database.Heroes
                 .Where(hero => hero.Grade == WICharacterGrade.Hero && army.Members.All(member => member.HeroId != hero.Id))
                 .Select(hero => hero.Id).Take(3).ToArray();
@@ -2007,7 +2017,8 @@ namespace ProjectWI.Tests.Editor
 
             Assert.AreEqual(WIBattleOutcome.Victory, army.LastBattleOutcome);
             Assert.AreEqual("valdor", state.GetCastle("castle_00").FactionId);
-            Assert.AreEqual(3, state.GetCastle("castle_00").OccupationUnrestMonths);
+            // 점령 턴에도 인원 잔류와 무관하게 월간 안정화가 한 번 진행됩니다.
+            Assert.AreEqual(database.Automation.OccupationUnrestMonths - 1, state.GetCastle("castle_00").OccupationUnrestMonths);
             Assert.Greater(state.GetCharacter(commanderId).Merit, 0);
             WIRelationshipState battleBond = state.GetOrCreateRelationship(commanderId, reinforcements[0]);
             Assert.AreEqual(1, battleBond.SharedBattleVictories);
@@ -2133,7 +2144,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state));
             string controller = System.IO.File.ReadAllText("Assets/Scripts/Administration/WIAdministrationUIController.cs");
             StringAssert.Contains("WIAdministrationTurnSystem.HasUnresolvedPlayerBattles(state)", controller);
-            StringAssert.Contains("UGUIMonthlyReportRequested?.Invoke();", controller);
+            StringAssert.Contains("RaiseUGUIScreenRequest<WIAdministrationMonthlyReportUGUIController>(() => UGUIMonthlyReportRequested);", controller);
         }
 
         // 서로의 출발 성으로 교차 원정한 두 전투단이 한 전투 세션으로 합쳐지는지 검증합니다.
@@ -3371,6 +3382,11 @@ namespace ProjectWI.Tests.Editor
             }
             origin.GovernorHeroId = string.Empty;
             string destinationId = database.GetCastle(origin.CastleId).AdjacentCastleIds.First();
+            // 훈련은 출정으로 대체할 수 있으므로 실제 점유 활동인 휴식으로 중복 명령을 검증합니다.
+            foreach (string heroId in playerCharacterIds)
+            {
+                state.GetCharacter(heroId).Activity = WICharacterActivityType.Rest;
+            }
             state.GetCastle(destinationId).FactionId = state.PlayerFactionId;
             int armyCountBefore = state.Armies.Count;
             int manaBefore = state.ManaCrystal;
@@ -4055,11 +4071,15 @@ namespace ProjectWI.Tests.Editor
 
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
 
-            Assert.AreEqual(experienceBefore + 10 + hero.Leadership / 10 +
-                WIAdministrationTurnSystem.FacilityTrainingExperienceBonus, character.Experience);
-            Assert.AreEqual(75, character.Fatigue);
-            Assert.AreEqual(1, character.InjuryMonths);
+            Assert.AreEqual(experienceBefore, character.Experience);
+            Assert.AreEqual(Mathf.Max(0, 80 - database.CharacterRestFatigueRecovery -
+                WIAdministrationTurnSystem.FacilitySanctuaryRecovery), character.Fatigue);
+            Assert.AreEqual(0, character.InjuryMonths);
             Assert.AreEqual(Mathf.Min(100, stabilityBefore + 1), capital.Stability);
+            character.Fatigue = 0;
+            WIAdministrationTurnSystem.ExecuteTurn(database, state);
+            Assert.AreEqual(experienceBefore + database.Automation.AutomaticTrainingExperience +
+                WIAdministrationTurnSystem.FacilityTrainingExperienceBonus, character.Experience);
         }
 
         // 모험가 길드가 발견 인재의 월간 영입 설득 진척에 고유 보너스를 더하는지 검증합니다.

@@ -211,12 +211,12 @@ namespace ProjectWI.Administration
             return route;
         }
 
-        // 성에 주둔한 유휴 인물을 영지관로 임명하거나 기존 영지관을 교체합니다.
+        // 같은 진영의 내정 영웅을 출전 여부와 무관하게 한 성의 영지관으로 임명합니다.
         public static bool AssignGovernor(WIAdministrationState state, string castleId, string heroId)
         {
             WICastleRuntimeState castle = state.GetCastle(castleId);
-            if (castle == null || castle.HeroIds.Contains(heroId) == false ||
-                state.IsCharacterBusy(heroId) || IsAdministrationCapable(state, heroId) == false)
+            if (castle == null || IsHeroInFaction(state, heroId, castle.FactionId) == false ||
+                state.IsCharacterBusy(heroId, ignoreArmy: true) == true || IsAdministrationCapable(state, heroId) == false)
             {
                 return false;
             }
@@ -224,23 +224,23 @@ namespace ProjectWI.Administration
             foreach (WICastleRuntimeState other in state.Castles.Where(item => item.GovernorHeroId == heroId))
             {
                 other.GovernorHeroId = string.Empty;
-                other.DelegatedToGovernor = false;
             }
             castle.GovernorHeroId = heroId;
             return true;
         }
 
-        // 등급이나 승격 여부와 무관하게 내정 특성과 생존 상태를 확인합니다.
+        // 영웅 또는 승격 인물의 내정 특성과 생존 상태를 확인합니다.
         public static bool IsAdministrationCapable(WIAdministrationState state, string heroId)
         {
             return HasOperationalTrait(state, heroId, WITraitType.Administration);
         }
 
-        // 생존·비포로 인물이 지정한 업무 특성을 보유했는지 확인합니다.
+        // 생존·비포로 영웅만 전문 업무 특성을 사용하며 Common은 전투 전용으로 제한합니다.
         public static bool HasOperationalTrait(WIAdministrationState state, string heroId, WITraitType trait)
         {
             WICharacterRuntimeState character = state?.GetCharacter(heroId);
-            return character != null && character.IsDead == false && character.Captured == false &&
+            return character != null && (character.BaseGrade == WICharacterGrade.Hero || character.PromotedToHero == true) &&
+                   character.IsDead == false && character.Captured == false &&
                    character.Traits != null && character.Traits.Contains(trait);
         }
 
@@ -263,7 +263,7 @@ namespace ProjectWI.Administration
         }
 
         // 인물이 해당 진영의 성이나 전투단에 소속되어 있는지 확인합니다.
-        private static bool IsHeroInFaction(WIAdministrationState state, string heroId, string factionId)
+        public static bool IsHeroInFaction(WIAdministrationState state, string heroId, string factionId)
         {
             return state.Castles.Any(castle => castle.FactionId == factionId && castle.HeroIds.Contains(heroId)) ||
                    state.Armies.Any(army => army.FactionId == factionId && army.Members.Any(member => member.HeroId == heroId));

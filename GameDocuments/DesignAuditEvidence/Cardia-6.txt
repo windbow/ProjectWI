@@ -1,0 +1,29 @@
+턴1 카르디아 valdor: 인물[], 방어10
+턴2 카르디아 valdor: 인물[], 방어10
+턴3 카르디아 valdor: 인물[], 방어10
+턴4 카르디아 valdor: 인물[], 방어10
+턴5 카르디아 valdor: 인물[], 방어10
+army_5 valdor: castle_33->castle_04, 이동True, 작전가능False, 인원3
+턴6 카르디아 valdor: 인물[], 방어10
+army_4 valdor: castle_33->castle_04, 이동True, 작전가능False, 인원3
+army_5 valdor: castle_33->castle_04, 이동True, 작전가능False, 인원3
+턴7 카르디아 valdor: 인물[hero_014,hero_072,common_049], 방어10
+army_3 valdor: castle_33->castle_04, 이동True, 작전가능False, 인원3
+army_4 valdor: castle_33->castle_04, 이동True, 작전가능False, 인원3
+army_5 valdor: castle_04->, 이동False, 작전가능True, 인원3
+원정 castle_28: True
+턴8 카르디아 valdor: 인물[hero_014,hero_072,common_049,hero_013,hero_071,common_048], 방어10
+army_3 valdor: castle_33->castle_04, 이동True, 작전가능False, 인원3
+army_4 valdor: castle_04->, 이동False, 작전가능True, 인원3
+army_5 valdor: castle_04->, 이동False, 작전가능True, 인원3
+army_10 avalon: castle_28->castle_04, 이동True, 작전가능False, 인원1
+턴9 카르디아 valdor: 인물[hero_014,hero_072,common_049,hero_013,hero_071,common_048,hero_012,hero_070,common_047], 방어10
+army_1 valdor: castle_33->castle_04, 이동True, 작전가능False, 인원4
+army_2 valdor: castle_33->castle_04, 이동True, 작전가능False, 인원4
+army_3 valdor: castle_04->, 이동False, 작전가능True, 인원3
+army_4 valdor: castle_04->, 이동False, 작전가능True, 인원3
+army_5 valdor: castle_04->, 이동False, 작전가능True, 인원3
+army_6 valdor: castle_33->castle_04, 이동True, 작전가능False, 인원3
+army_10 avalon: castle_04->, 이동False, 작전가능False, 인원1
+전투 battle_1: 수비전력 686, 참가자 9, 실제생성 9
+첫 스텝 결과 None

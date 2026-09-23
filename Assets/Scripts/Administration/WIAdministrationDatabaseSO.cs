@@ -338,6 +338,9 @@ namespace ProjectWI.Administration
         [SerializeField] private string aiPreservationFactionId = "valdor";
         [SerializeField, Min(0)] private int valdorAIPreservationCastleCount;
         [SerializeField] private bool nonPlayerRecruitmentEnabled;
+        // 적 접경 성에 남길 최소 인원과 평시 증원 집결 인원입니다. 집결 0은 제한 없음입니다.
+        [SerializeField, Min(1)] private int aiBorderReserveCount = 2;
+        [SerializeField, Min(0)] private int aiFrontlineReinforcementTarget;
         [SerializeField] private List<WICampaignCharacterPlacement> characterPlacements = new List<WICampaignCharacterPlacement>();
         [SerializeField] private List<WICampaignCastlePlacement> castlePlacements = new List<WICampaignCastlePlacement>();
 
@@ -353,6 +356,8 @@ namespace ProjectWI.Administration
         public string AIPreservationFactionId => aiPreservationFactionId;
         public int ValdorAIPreservationCastleCount => Mathf.Max(0, valdorAIPreservationCastleCount);
         public bool NonPlayerRecruitmentEnabled => nonPlayerRecruitmentEnabled;
+        public int AIBorderReserveCount => Mathf.Max(1, aiBorderReserveCount);
+        public int AIFrontlineReinforcementTarget => Mathf.Max(0, aiFrontlineReinforcementTarget);
         public IReadOnlyList<WICampaignCharacterPlacement> CharacterPlacements => characterPlacements;
         public IReadOnlyList<WICampaignCastlePlacement> CastlePlacements => castlePlacements;
     }
@@ -919,6 +924,9 @@ namespace ProjectWI.Administration
     [CreateAssetMenu(fileName = "WI_AdministrationDatabase", menuName = "WI/Administration/Database")]
     public class WIAdministrationDatabaseSO : ScriptableObject
     {
+        // 성 단위 일반 모병의 비용, 속도와 세력별 인원 제한 데이터입니다.
+        [SerializeField] private WIMusterConfigSO musterConfig;
+        public WIMusterConfigSO MusterConfig => musterConfig;
         [Header("표시 설정")]
         [SerializeField] private bool useEnglish;
         [SerializeField] private WILocalizedString gameTitle;

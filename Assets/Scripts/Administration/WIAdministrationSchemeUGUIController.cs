@@ -7,6 +7,8 @@ namespace ProjectWI.Administration
 {
     public sealed class WIAdministrationSchemeUGUIController : WIAdministrationUGUIPanelController
     {
+        // 모든 후보를 스크롤 행으로 표시하는 공통 목록입니다.
+        [SerializeField] private WICharacterSelectionList selectionList;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -62,6 +64,7 @@ namespace ProjectWI.Administration
             history.Clear();
             view = new SchemeViewState("schemes", string.Empty, string.Empty, string.Empty);
             page = 0;
+            selectionList.ResetView();
             modal.Show("첩보");
             Refresh();
         }
@@ -76,7 +79,9 @@ namespace ProjectWI.Administration
                 messageLabel.text = error;
                 return;
             }
-            int pageCount = Mathf.Max(1, Mathf.CeilToInt(snapshot.Cards.Count / 8f));
+            selectionList.Prepare(snapshot.Cards.Count, SelectCard, administrationController,
+                out cardButtons, out cardLabels, out cardPortraits);
+            int pageCount = 1;
             page = Mathf.Clamp(page, 0, pageCount - 1);
             modal.SetTitle(snapshot.Title);
             statusLabel.text = snapshot.Summary;
@@ -84,7 +89,7 @@ namespace ProjectWI.Administration
             messageLabel.text = snapshot.Cards.Count == 0 ? "현재 조건에서 선택할 수 있는 대상이 없습니다." : string.Empty;
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
-                int sourceIndex = page * cardButtons.Length + index;
+                int sourceIndex = index;
                 bool visible = sourceIndex < snapshot.Cards.Count;
                 cardButtons[index].gameObject.SetActive(visible);
                 if (visible == false)
@@ -92,7 +97,7 @@ namespace ProjectWI.Administration
                     continue;
                 }
                 WIAdministrationSchemeCardSnapshot card = snapshot.Cards[sourceIndex];
-                cardLabels[index].text = card.Title + "\n" + card.Description;
+                cardLabels[index].text = card.Title + "\n" + card.Description + "\n" + administrationController.GetSelectionCharacterSummary(card.Id);
                 cardPortraits[index].sprite = card.Portrait;
                 cardPortraits[index].enabled = card.Portrait != null;
                 cardButtons[index].interactable = card.Interactable;
@@ -109,7 +114,7 @@ namespace ProjectWI.Administration
         // 첩보 종류·담당자·대상을 다음 단계로 이동하거나 임무를 예약합니다.
         private void SelectCard(int index)
         {
-            int sourceIndex = page * cardButtons.Length + index;
+            int sourceIndex = index;
             if (snapshot == null || sourceIndex >= snapshot.Cards.Count)
             {
                 return;
@@ -142,6 +147,7 @@ namespace ProjectWI.Administration
             history.Clear();
             view = new SchemeViewState("schemes", string.Empty, string.Empty, string.Empty);
             page = 0;
+            selectionList.ResetView();
             Refresh();
         }
 
@@ -151,6 +157,7 @@ namespace ProjectWI.Administration
             history.Push(view);
             view = next;
             page = 0;
+            selectionList.ResetView();
             Refresh();
         }
 
@@ -166,6 +173,7 @@ namespace ProjectWI.Administration
         {
             view = history.Count > 0 ? history.Pop() : new SchemeViewState("schemes", string.Empty, string.Empty, string.Empty);
             page = 0;
+            selectionList.ResetView();
             Refresh();
         }
 

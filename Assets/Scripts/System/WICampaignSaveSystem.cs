@@ -215,6 +215,16 @@ namespace ProjectWI.Systems
             {
                 if (castle == null) continue;
                 castle.HeroIds = castle.HeroIds ?? new System.Collections.Generic.List<string>();
+                castle.MusterPolicy = castle.MusterPolicy ?? new WIMusterPolicy();
+                if (castle.MusterOrder != null)
+                {
+                    castle.MusterOrder.HeroIds = castle.MusterOrder.HeroIds ?? new System.Collections.Generic.List<string>();
+                    // JsonUtility가 null 예약을 빈 객체로 복원한 경우 실제 모집으로 취급하지 않습니다.
+                    if (castle.MusterOrder.HeroIds.Count == 0 || string.IsNullOrEmpty(castle.MusterOrder.FactionId))
+                    {
+                        castle.MusterOrder = null;
+                    }
+                }
                 castle.AdjacentCastleIds = castle.AdjacentCastleIds ?? new System.Collections.Generic.List<string>();
                 castle.SpecialFacilityIds = castle.SpecialFacilityIds ?? new System.Collections.Generic.List<string>();
                 castle.HeroLegacies = castle.HeroLegacies ?? new System.Collections.Generic.List<WIHeroLegacyState>();

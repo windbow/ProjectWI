@@ -36,6 +36,9 @@ namespace ProjectWI.Administration
     [Serializable]
     public class WICastleRuntimeState
     {
+        // 해당 성의 다음 달 모병 예약과 제한된 자동 충원 지시입니다.
+        public WIMusterOrder MusterOrder;
+        public WIMusterPolicy MusterPolicy = new WIMusterPolicy();
         public string CastleId;
         public string FactionId;
         public string GovernorHeroId;
@@ -210,7 +213,9 @@ namespace ProjectWI.Administration
     public enum WIBattleResolutionSource
     {
         StrategicFallback,
-        RealTimeBattle
+        RealTimeBattle,
+        // 방어 인물이 없어 실시간 전투와 전투 피해 없이 점령한 결과입니다.
+        UnopposedOccupation
     }
 
     [Serializable]
@@ -852,8 +857,14 @@ namespace ProjectWI.Administration
                 (item.ActiveProject.ManagerHeroId == heroId || item.ActiveProject.AssistantHeroId == heroId));
         }
 
-        // 인물이 사업, 개인 활동, 의뢰, 전투단, 연구 또는 이동으로 행동 불가 상태인지 확인합니다.
+        // 기존 단일 인자 호출과 조건 함수 전달에는 모든 업무 점유를 확인합니다.
         public bool IsCharacterBusy(string heroId)
+        {
+            return IsCharacterBusy(heroId, false, false);
+        }
+
+        // 업무별 점유를 확인하며 내정과 전투단의 병행 판단에서는 해당 점유만 제외합니다.
+        public bool IsCharacterBusy(string heroId, bool ignoreArmy = false, bool ignoreAdministration = false)
         {
             WICharacterRuntimeState character = GetCharacter(heroId);
             bool assignedToQuest = Castles.Exists(castle => castle.TavernQuests.Exists(quest =>
@@ -862,12 +873,13 @@ namespace ProjectWI.Administration
             bool assignedToResearch = Factions.Exists(faction => faction.ResearcherHeroId == heroId && string.IsNullOrEmpty(faction.ActiveResearchId) == false);
             bool transferring = CharacterTransfers.Exists(transfer => transfer.HeroId == heroId);
             bool assignedToScheme = SchemeMissions != null && SchemeMissions.Exists(mission => mission.AgentHeroId == heroId);
-            return IsHeroAssignedToProject(heroId) ||
+            return (ignoreAdministration == false && IsHeroAssignedToProject(heroId)) ||
                    (character != null && (character.Captured || character.IsDead)) ||
-                   (character != null && character.Activity != WICharacterActivityType.None) ||
+                   (character != null && character.Activity != WICharacterActivityType.None &&
+                       (ignoreAdministration == false || character.Activity != WICharacterActivityType.Training)) ||
                    assignedToQuest ||
-                   assignedToArmy ||
-                   assignedToResearch ||
+                   (ignoreArmy == false && assignedToArmy) ||
+                   (ignoreAdministration == false && assignedToResearch) ||
                    transferring ||
                    assignedToScheme;
         }

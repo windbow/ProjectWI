@@ -259,9 +259,9 @@ namespace ProjectWI.Tests.Editor
                 "공세형 아레스는 첫해 안에 카르디아를 점령해야 합니다.");
         }
 
-        // 아레스는 기존 일행에 일반 10명을 더한 14명으로 시작하고 전체 로스터 절반이 배치되는지 검증합니다.
+        // 아레스 영웅 2명·일반 2명과 축소된 전체 초기 배치 및 재야 인원을 검증합니다.
         [Test]
-        public void ScenarioCharacterPlacements_AssignHalfRosterAndKeepAresNarrativePartySmall()
+        public void ScenarioCharacterPlacements_AssignReducedRosterAndKeepAresNarrativePartySmall()
         {
             WIAdministrationDatabaseSO database =
                 AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
@@ -269,22 +269,22 @@ namespace ProjectWI.Tests.Editor
                 database, WICampaignDifficulty.Standard, WICampaignVariant.AresMain);
 
             Assert.AreEqual(1200, state.Characters.Count);
-            Assert.AreEqual(250, state.Castles.Sum(castle => castle.HeroIds.Count));
-            Assert.AreEqual(100, state.Castles.SelectMany(castle => castle.HeroIds)
+            Assert.AreEqual(150, state.Castles.Sum(castle => castle.HeroIds.Count));
+            Assert.AreEqual(60, state.Castles.SelectMany(castle => castle.HeroIds)
                 .Count(heroId => state.GetCharacter(heroId).BaseGrade == WICharacterGrade.Hero));
-            Assert.AreEqual(150, state.Castles.SelectMany(castle => castle.HeroIds)
+            Assert.AreEqual(90, state.Castles.SelectMany(castle => castle.HeroIds)
                 .Count(heroId => state.GetCharacter(heroId).BaseGrade == WICharacterGrade.Common));
-            Assert.AreEqual(100, state.Characters.Count(character =>
+            Assert.AreEqual(140, state.Characters.Count(character =>
                 character.BaseGrade == WICharacterGrade.Hero && character.Recruited == false));
-            Assert.AreEqual(850, state.Characters.Count(character =>
+            Assert.AreEqual(910, state.Characters.Count(character =>
                 character.BaseGrade == WICharacterGrade.Common && character.Recruited == false));
-            Assert.AreEqual(14, state.Castles.Where(castle => castle.FactionId == state.PlayerFactionId)
+            Assert.AreEqual(4, state.Castles.Where(castle => castle.FactionId == state.PlayerFactionId)
                 .Sum(castle => castle.HeroIds.Count));
-            Assert.AreEqual(10, state.GetCastle("castle_28").HeroIds.Count(heroId =>
+            Assert.AreEqual(2, state.GetCastle("castle_28").HeroIds.Count(heroId =>
                 state.GetCharacter(heroId).BaseGrade == WICharacterGrade.Common));
-            Assert.AreEqual(4, state.GetCastle("castle_28").HeroIds.Count(heroId =>
+            Assert.AreEqual(2, state.GetCastle("castle_28").HeroIds.Count(heroId =>
                 state.GetCharacter(heroId).BaseGrade == WICharacterGrade.Hero));
-            Assert.AreEqual(250, state.Characters.Count(character => character.Recruited));
+            Assert.AreEqual(150, state.Characters.Count(character => character.Recruited));
             Debug.Log("아레스 메인 시작 인물 · " + string.Join(", ", state.Factions.Select(faction =>
                 faction.FactionId + ":" + state.Castles.Where(castle => castle.FactionId == faction.FactionId)
                     .Sum(castle => castle.HeroIds.Count))));

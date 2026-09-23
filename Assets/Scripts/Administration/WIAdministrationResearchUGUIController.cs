@@ -6,6 +6,8 @@ namespace ProjectWI.Administration
 {
     public sealed class WIAdministrationResearchUGUIController : WIAdministrationUGUIPanelController
     {
+        // 모든 후보를 스크롤 행으로 표시하는 공통 목록입니다.
+        [SerializeField] private WICharacterSelectionList selectionList;
         [SerializeField] private WIAdministrationModalUGUIController modal;
         [SerializeField] private TMP_Text statusLabel;
         [SerializeField] private TMP_Text messageLabel;
@@ -61,6 +63,7 @@ namespace ProjectWI.Administration
             mode = "research";
             researchId = string.Empty;
             page = 0;
+            selectionList.ResetView();
             modal.Show("기술·마법 연구");
             Refresh();
         }
@@ -75,7 +78,9 @@ namespace ProjectWI.Administration
                 messageLabel.text = error;
                 return;
             }
-            int pageCount = Mathf.Max(1, Mathf.CeilToInt(snapshot.Cards.Count / 8f));
+            selectionList.Prepare(snapshot.Cards.Count, SelectCard, administrationController,
+                out cardButtons, out cardLabels, out cardPortraits);
+            int pageCount = 1;
             page = Mathf.Clamp(page, 0, pageCount - 1);
             modal.SetTitle(snapshot.Title);
             statusLabel.text = snapshot.Summary;
@@ -83,7 +88,7 @@ namespace ProjectWI.Administration
             messageLabel.text = snapshot.Cards.Count == 0 ? "현재 표시할 연구 또는 담당자가 없습니다." : string.Empty;
             for (int index = 0; index < cardButtons.Length; index += 1)
             {
-                int sourceIndex = page * cardButtons.Length + index;
+                int sourceIndex = index;
                 bool visible = sourceIndex < snapshot.Cards.Count;
                 cardButtons[index].gameObject.SetActive(visible);
                 if (visible == false)
@@ -91,7 +96,7 @@ namespace ProjectWI.Administration
                     continue;
                 }
                 WIAdministrationResearchCardSnapshot card = snapshot.Cards[sourceIndex];
-                cardLabels[index].text = card.Title + "\n" + card.Description;
+                cardLabels[index].text = card.Title + "\n" + card.Description + "\n" + administrationController.GetSelectionCharacterSummary(card.Id);
                 cardPortraits[index].sprite = card.Portrait;
                 cardPortraits[index].enabled = card.Portrait != null;
                 cardButtons[index].interactable = card.Interactable;
@@ -108,7 +113,7 @@ namespace ProjectWI.Administration
         // 연구 선택 시 담당자 단계로 이동하고 담당자 선택 시 연구를 시작합니다.
         private void SelectCard(int index)
         {
-            int sourceIndex = page * cardButtons.Length + index;
+            int sourceIndex = index;
             if (snapshot == null || sourceIndex >= snapshot.Cards.Count)
             {
                 return;
@@ -119,6 +124,7 @@ namespace ProjectWI.Administration
                 mode = "researchers";
                 researchId = card.Id;
                 page = 0;
+            selectionList.ResetView();
                 Refresh();
                 return;
             }
@@ -132,6 +138,7 @@ namespace ProjectWI.Administration
             mode = "research";
             researchId = string.Empty;
             page = 0;
+            selectionList.ResetView();
             Refresh();
         }
 
@@ -148,6 +155,7 @@ namespace ProjectWI.Administration
             mode = "research";
             researchId = string.Empty;
             page = 0;
+            selectionList.ResetView();
             Refresh();
         }
     }

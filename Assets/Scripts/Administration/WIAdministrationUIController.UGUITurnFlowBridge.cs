@@ -31,7 +31,7 @@ namespace ProjectWI.Administration
         private void ShowUGUITurnProcessing()
         {
             uguiTurnFollowupMode = WIAdministrationTurnFollowupMode.Processing;
-            UGUITurnFollowupRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationTurnFollowupUGUIController>(() => UGUITurnFollowupRequested);
         }
 
         // 턴 계산 안내를 닫고 월간 보고 UGUI를 표시합니다.
@@ -39,7 +39,7 @@ namespace ProjectWI.Administration
         {
             UGUITurnFollowupHideRequested?.Invoke();
             uguiTurnFollowupPending = true;
-            UGUIMonthlyReportRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationMonthlyReportUGUIController>(() => UGUIMonthlyReportRequested);
         }
 
         // 월간 보고를 정상적으로 닫았을 때 캠페인 결과 또는 튜토리얼을 이어서 표시합니다.
@@ -50,13 +50,13 @@ namespace ProjectWI.Administration
             if (state.CampaignResult != WICampaignResult.Ongoing && state.CampaignResultAcknowledged == false)
             {
                 uguiTurnFollowupMode = WIAdministrationTurnFollowupMode.CampaignResult;
-                UGUITurnFollowupRequested?.Invoke();
+                RaiseUGUIScreenRequest<WIAdministrationTurnFollowupUGUIController>(() => UGUITurnFollowupRequested);
                 return;
             }
             if (WITutorialSystem.GetPending(database, state) != null)
             {
                 uguiTurnFollowupMode = WIAdministrationTurnFollowupMode.Tutorial;
-                UGUITurnFollowupRequested?.Invoke();
+                RaiseUGUIScreenRequest<WIAdministrationTurnFollowupUGUIController>(() => UGUITurnFollowupRequested);
             }
         }
 
@@ -70,7 +70,7 @@ namespace ProjectWI.Administration
                 ShowUGUIMessage("캠페인 목표", "현재 등록된 다음 캠페인 목표가 없습니다.");
                 return;
             }
-            UGUIObjectiveRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationObjectiveUGUIController>(() => UGUIObjectiveRequested);
         }
 
         // 목표 UGUI를 닫으면 예약된 첫해 튜토리얼을 표시합니다.
@@ -87,12 +87,12 @@ namespace ProjectWI.Administration
             if (state.CampaignResult != WICampaignResult.Ongoing && state.CampaignResultAcknowledged == false)
             {
                 uguiTurnFollowupMode = WIAdministrationTurnFollowupMode.CampaignResult;
-                UGUITurnFollowupRequested?.Invoke();
+                RaiseUGUIScreenRequest<WIAdministrationTurnFollowupUGUIController>(() => UGUITurnFollowupRequested);
                 return;
             }
             if (WITutorialSystem.GetPending(database, state) == null) return;
             uguiTurnFollowupMode = WIAdministrationTurnFollowupMode.Tutorial;
-            UGUITurnFollowupRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationTurnFollowupUGUIController>(() => UGUITurnFollowupRequested);
         }
 
         // 공통 UGUI 프레임으로 캠페인 시작과 불러오기 안내를 표시합니다.
@@ -101,7 +101,7 @@ namespace ProjectWI.Administration
             uguiMessageTitle = title;
             uguiMessageDescription = description;
             uguiTurnFollowupMode = WIAdministrationTurnFollowupMode.Message;
-            UGUITurnFollowupRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationTurnFollowupUGUIController>(() => UGUITurnFollowupRequested);
         }
 
         // 현재 턴 후속 단계의 제목, 설명과 고정 선택지를 구성합니다.

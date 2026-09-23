@@ -9,7 +9,7 @@ namespace ProjectWI.Administration
         public void OpenResearchUGUIForQA()
         {
             OpenCastlePreviewForQA();
-            UGUIResearchRequested?.Invoke();
+            RaiseUGUIScreenRequest<WIAdministrationResearchUGUIController>(() => UGUIResearchRequested);
         }
 
         // 연구 목록 또는 선택 연구의 담당자 카드를 구성합니다.
@@ -96,9 +96,9 @@ namespace ProjectWI.Administration
             snapshot.Summary = $"마나 {research.ManaCost} · 기술 {research.RequiredTechnology} · 기본 {research.DurationMonths}개월\n지력이 높은 대기 인물을 선택하십시오.";
             foreach (WICharacterRuntimeState character in state.Characters)
             {
-                if (character.Recruited == false || state.IsCharacterBusy(character.HeroId) ||
+                if (character.Recruited == false || state.IsCharacterBusy(character.HeroId, ignoreArmy: true) == true ||
                     WIAdministrationTurnSystem.CanResearch(state, character.HeroId) == false) continue;
-                bool inPlayerFaction = state.Castles.Exists(castle => castle.FactionId == state.PlayerFactionId && castle.HeroIds.Contains(character.HeroId));
+                bool inPlayerFaction = WIAdministrationTurnSystem.IsHeroInFaction(state, character.HeroId, state.PlayerFactionId);
                 if (inPlayerFaction == false) continue;
                 WIHeroDefinition hero = database.GetHero(character.HeroId);
                 snapshot.Cards.Add(new WIAdministrationResearchCardSnapshot

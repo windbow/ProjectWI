@@ -188,9 +188,15 @@ namespace ProjectWI.Administration
                 BasicBudget = database.ProjectBalance.BasicCost,
                 IntensiveBudget = database.ProjectBalance.IntensiveCost,
                 Delegated = selectedCastle.DelegatedToGovernor,
-                Preview = WIAdministrationTurnSystem.GetDelegationPreview(database, state, selectedCastle)
+                Preview = WIAdministrationTurnSystem.GetDelegationPreview(database, state, selectedCastle),
+                OperationHelp = database.GetText("UI_ADMIN_OPERATION_HELP"),
+                ToggleLabel = database.GetText(selectedCastle.DelegatedToGovernor
+                    ? "UI_ADMIN_OPERATION_STOP" : "UI_ADMIN_OPERATION_START")
             };
-            foreach (string heroId in selectedCastle.HeroIds)
+            foreach (string heroId in state.Characters.Where(character => character.Recruited == true &&
+                         WIAdministrationTurnSystem.IsAdministrationCapable(state, character.HeroId) == true &&
+                         WIAdministrationTurnSystem.IsHeroInFaction(state, character.HeroId, selectedCastle.FactionId) == true)
+                         .Select(character => character.HeroId))
             {
                 WIHeroDefinition hero = database.GetHero(heroId);
                 if (hero == null) continue;
@@ -199,10 +205,10 @@ namespace ProjectWI.Administration
                 {
                     HeroId = heroId,
                     DisplayName = hero.DisplayName.Get(database.UseEnglish),
-                    Summary = GetTraitDisplayText(hero),
+                    Summary = GetTraitNameText(hero),
                     Portrait = hero.Portrait,
                     Interactable = administrationCapable &&
-                                   (state.IsCharacterBusy(heroId) == false || heroId == selectedCastle.GovernorHeroId)
+                                   (state.IsCharacterBusy(heroId, ignoreArmy: true) == false || heroId == selectedCastle.GovernorHeroId)
                 });
             }
             return true;
@@ -212,8 +218,7 @@ namespace ProjectWI.Administration
         public bool AssignUGUIGovernor(string heroId, out string error)
         {
             error = string.Empty;
-            if (selectedCastle.HeroIds.Contains(heroId) == false ||
-                WIAdministrationTurnSystem.AssignGovernor(state, selectedCastle.CastleId, heroId) == false)
+            if (WIAdministrationTurnSystem.AssignGovernor(state, selectedCastle.CastleId, heroId) == false)
             {
                 error = database.GetText("UI_ADMIN_TRAIT_REQUIRED");
                 return false;
@@ -222,12 +227,11 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 현재 영지관을 해임하고 직접 관리 상태로 되돌립니다.
+        // 현재 영지관을 해임하되 성의 방침과 기본 운영은 유지합니다.
         public bool DismissUGUIGovernor(out string error)
         {
             error = string.Empty;
             selectedCastle.GovernorHeroId = string.Empty;
-            selectedCastle.DelegatedToGovernor = false;
             selectedCastle.PendingGovernorAppointment = false;
             RefreshAll();
             return true;
@@ -252,15 +256,10 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 영지관 임명 여부를 검증하고 위임·직접 관리 상태를 전환합니다.
+        // 영지관 유무와 무관하게 방침·예산에 따른 기본 운영을 켜거나 끕니다.
         public bool ToggleUGUIDelegation(out string error)
         {
             error = string.Empty;
-            if (selectedCastle.DelegatedToGovernor == false && string.IsNullOrEmpty(selectedCastle.GovernorHeroId))
-            {
-                error = "먼저 영지관을 임명해야 합니다.";
-                return false;
-            }
             selectedCastle.DelegatedToGovernor = selectedCastle.DelegatedToGovernor == false;
             selectedCastle.PendingGovernorAppointment = false;
             SelectCastle(selectedCastle.CastleId);

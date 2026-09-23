@@ -50,10 +50,12 @@ namespace ProjectWI.Administration
         {
             managers = new System.Collections.Generic.List<WIAdministrationProjectManagerSnapshot>();
             error = string.Empty;
-            foreach (string heroId in selectedCastle.HeroIds)
+            foreach (string heroId in state.Characters.Where(character => character.Recruited == true &&
+                         WIAdministrationTurnSystem.IsHeroInFaction(state, character.HeroId, selectedCastle.FactionId) == true)
+                         .Select(character => character.HeroId))
             {
                 WIHeroDefinition hero = database.GetHero(heroId);
-                if (hero == null || state.IsCharacterBusy(hero.Id) ||
+                if (hero == null || state.IsCharacterBusy(hero.Id, ignoreArmy: true) == true ||
                     WIAdministrationTurnSystem.IsAdministrationCapable(state, heroId) == false)
                 {
                     continue;
@@ -88,7 +90,8 @@ namespace ProjectWI.Administration
         {
             error = string.Empty;
             WIHeroDefinition hero = database.GetHero(heroId);
-            if (hero == null || selectedCastle.HeroIds.Contains(heroId) == false || state.IsCharacterBusy(heroId) ||
+            if (hero == null || WIAdministrationTurnSystem.IsHeroInFaction(state, heroId, selectedCastle.FactionId) == false ||
+                state.IsCharacterBusy(heroId, ignoreArmy: true) == true ||
                 WIAdministrationTurnSystem.IsAdministrationCapable(state, heroId) == false)
             {
                 error = "선택한 인물을 현재 사업 담당자로 배정할 수 없습니다.";
@@ -267,7 +270,7 @@ namespace ProjectWI.Administration
             {
                 foreach (WICharacterRuntimeState candidate in state.Characters)
                 {
-                    if (candidate.Discovered == false || candidate.Recruited) continue;
+                    if (candidate.Discovered == false || WIAdministrationTurnSystem.IsHeroRecruitmentCandidate(candidate) == false) continue;
                     WIHeroDefinition hero = database.GetHero(candidate.HeroId);
                     if (hero == null) continue;
                     snapshot.Candidates.Add(new WIAdministrationCharacterActivityCandidateSnapshot
@@ -314,7 +317,7 @@ namespace ProjectWI.Administration
             {
                 WICharacterRuntimeState target = state.GetCharacter(targetHeroId);
                 WIHeroDefinition targetHero = database.GetHero(targetHeroId);
-                if (target == null || targetHero == null || target.Discovered == false || target.Recruited ||
+                if (WIAdministrationTurnSystem.IsHeroRecruitmentCandidate(target) == false || targetHero == null || target.Discovered == false ||
                     actor.Reputation < targetHero.RequiredReputation)
                 {
                     error = "현재 조건으로 해당 인재를 영입 대상으로 지정할 수 없습니다.";
