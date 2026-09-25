@@ -158,8 +158,8 @@ MonoBehaviour:
     english: Assign characters without a castle here. Use personal activity transfer
       for characters in another castle.
   - uid: UI_ACTIVITY_ACTOR_TITLE
-    korean: "{0} \xB7 \uD65C\uB3D9 \uC120\uD0DD"
-    english: "{0} \xB7 Choose Activity"
+    korean: "{0} \xB7 \uC778\uC7AC\uC2E4 \uC5C5\uBB34 \uC120\uD0DD"
+    english: "{0} \xB7 Select Talent Office Task"
   - uid: UI_ACTIVITY_SOCIAL_TARGET
     korean: "{0} \xB7 \uAD50\uB958\uD560 \uC0C1\uB300 \uC120\uD0DD"
     english: "{0} \xB7 Choose Social Partner"
@@ -167,9 +167,9 @@ MonoBehaviour:
     korean: "{0} \xB7 \uC601\uC785\uD560 \uC778\uC7AC \uC120\uD0DD"
     english: "{0} \xB7 Choose Recruitment Target"
   - uid: UI_ACTIVITY_TARGET_HINT
-    korean: "\uB2F4\uB2F9\uC790\uB294 {0}\uC785\uB2C8\uB2E4. \uD65C\uB3D9\uC744 \uD568\uAED8\uD560
-      \uC0C1\uB300\uB97C \uC120\uD0DD\uD558\uC138\uC694."
-    english: '{0} is the assigned character. Choose the other participant.'
+    korean: "\uB2F4\uB2F9\uC790\uB294 {0}\uC785\uB2C8\uB2E4. \uC601\uC785\uD560 \uC601\uC6C5\uC744
+      \uC120\uD0DD\uD558\uC138\uC694."
+    english: 'Agent: {0}. Choose the hero to recruit.'
   - uid: UI_ARMY_MEMBER_TITLE
     korean: "\uC804\uD22C\uB2E8\uC6D0 \uC120\uD0DD"
     english: Select Members
@@ -450,12 +450,369 @@ MonoBehaviour:
     korean: "\uBAA8\uC9D1 \uCDE8\uC18C \xB7 {0} \xB7 \uD569\uB958 \uC870\uAC74 \uBCC0\uACBD\uC73C\uB85C
       {1}G \uBC18\uD658"
     english: "Muster cancelled \xB7 {0} \xB7 conditions changed, refunded {1}G"
+  - uid: UI_SCENARIO_TITLE
+    korean: "\uC2DC\uB098\uB9AC\uC624 \uC120\uD0DD"
+    english: Select Scenario
+  - uid: UI_SCENARIO_SUBTITLE
+    korean: "\uB2F9\uC2E0\uC758 \uC774\uC57C\uAE30\uAC00 \uC2DC\uC791\uB420 \uBB34\uB300\uB97C
+      \uC120\uD0DD\uD558\uC138\uC694"
+    english: Choose where your story begins
+  - uid: UI_SCENARIO_LIST
+    korean: "\uC2DC\uB098\uB9AC\uC624"
+    english: Scenarios
+  - uid: UI_SCENARIO_SETTINGS
+    korean: "\uC2DC\uC791 \uC124\uC815"
+    english: Campaign Settings
+  - uid: UI_SCENARIO_SETTINGS_HINT
+    korean: "\uC120\uD0DD\uD55C \uC2DC\uB098\uB9AC\uC624\uC758 \uB09C\uC774\uB3C4\uB97C
+      \uC124\uC815\uD558\uC138\uC694"
+    english: Choose a difficulty for your scenario
+  - uid: UI_SCENARIO_NEXT_HINT
+    korean: "\uC120\uD0DD\uD55C \uC2DC\uB098\uB9AC\uC624\uC758 \uC124\uC815\uC73C\uB85C
+      \uC774\uB3D9\uD569\uB2C8\uB2E4"
+    english: Continue to scenario settings
+  - uid: UI_SCENARIO_START_HINT
+    korean: "\uC120\uD0DD\uD55C \uC2DC\uB098\uB9AC\uC624\uC640 \uB09C\uC774\uB3C4\uB85C
+      \uC0C8 \uCEA0\uD398\uC778\uC744 \uC2DC\uC791\uD569\uB2C8\uB2E4"
+    english: Begin a new campaign with these settings
+  - uid: UI_SCENARIO_NEXT
+    korean: "\uB2E4\uC74C  \u2192"
+    english: "Next  \u2192"
+  - uid: UI_SCENARIO_START
+    korean: "\uAC8C\uC784 \uC2DC\uC791  \u2192"
+    english: "Start Campaign  \u2192"
+  - uid: UI_SCENARIO_CONTINUE
+    korean: "\uC774\uC5B4\uD558\uAE30"
+    english: Continue
+  - uid: UI_SCENARIO_BACK
+    korean: "\u2190  \uC774\uC804"
+    english: "\u2190  Back"
+  - uid: UI_SCENARIO_DIFFICULTY
+    korean: "\uB09C\uC774\uB3C4 \uC120\uD0DD"
+    english: Select Difficulty
+  - uid: UI_SCENARIO_FACTION
+    korean: "\uC2DC\uC791 \uC138\uB825"
+    english: Starting Faction
+  - uid: UI_SCENARIO_PROTAGONIST
+    korean: "\uC8FC\uC778\uACF5"
+    english: Protagonist
+  - uid: UI_SCENARIO_CASTLE
+    korean: "\uC2DC\uC791 \uAC70\uC810"
+    english: Starting Castle
+  - uid: UI_SCENARIO_OBJECTIVE
+    korean: "\uC2B9\uB9AC \uBAA9\uD45C"
+    english: Victory Goal
+  - uid: UI_SCENARIO_ARES_TITLE
+    korean: "\uD669\uD63C\uC758 \uADC0\uD658"
+    english: Return of Twilight
+  - uid: UI_SCENARIO_ARES_SUBTITLE
+    korean: "\uC544\uB808\uC2A4\uC758 \uB9BC\uAC00\uB974\uB4DC \uC7AC\uAC74"
+    english: Ares rebuilds Rimgard
+  - uid: UI_SCENARIO_ARES_STORY
+    korean: "\uBC1C\uB3C4\uB974\uC758 \uC7A5\uAD70\uC73C\uB85C \uC790\uB780 \uC544\uB808\uC2A4.\n\uC783\uC5B4\uBC84\uB9B0
+      \uC774\uB984\uC744 \uB418\uCC3E\uACE0 \uB9BC\uAC00\uB974\uB4DC\uC758 \uC7AC\uAC74\uC744
+      \uC2DC\uC791\uD569\uB2C8\uB2E4."
+    english: 'Raised as a general of Valdor, Ares reclaims his lost name
+
+      and
+      begins the restoration of Rimgard.'
+  - uid: UI_SCENARIO_ARES_OBJECTIVE
+    korean: "\uBC1C\uB3C4\uB974\uC758 \uBAA8\uB4E0 \uC131 \uC810\uB839"
+    english: Capture all castles held by Valdor
+  - uid: UI_SCENARIO_ARES_PROTAGONIST
+    korean: "\uC544\uB808\uC2A4"
+    english: Ares
+  - uid: UI_SCENARIO_FREE_TITLE
+    korean: "\uC790\uC720 \uC815\uBCF5"
+    english: Free Conquest
+  - uid: UI_SCENARIO_FREE_SUBTITLE
+    korean: "\uB098\uB9CC\uC758 \uB300\uB959 \uD1B5\uC77C"
+    english: Unite the continent your way
+  - uid: UI_SCENARIO_FREE_STORY
+    korean: "\uAC01 \uC138\uB825\uC774 \uAE30\uBCF8 \uC131 \uBC30\uCE58\uC5D0\uC11C
+      \uC2DC\uC791\uD569\uB2C8\uB2E4.\n\uB9BC\uAC00\uB974\uB4DC\uC758 \uC601\uC9C0\uB97C
+      \uB113\uD788\uACE0 \uB300\uB959 \uD1B5\uC77C\uC744 \uC774\uB8E8\uC138\uC694."
+    english: 'Each faction begins with its standard territories.
+
+      Expand Rimgard
+      and unite the continent.'
+  - uid: UI_SCENARIO_FREE_OBJECTIVE
+    korean: "\uB300\uB959\uC758 \uBAA8\uB4E0 \uC131 \uC810\uB839"
+    english: Capture every castle on the continent
+  - uid: UI_SCENARIO_FREE_PROTAGONIST
+    korean: "\uB9BC\uAC00\uB974\uB4DC \uC138\uB825"
+    english: Rimgard
+  - uid: UI_TRANSFER_TITLE
+    korean: "\uC778\uBB3C \uC774\uB3D9"
+    english: Character Transfer
+  - uid: UI_TRANSFER_HINT
+    korean: "\uCD9C\uBC1C \uC131 \u2192 \uB300\uAE30 \uC778\uBB3C \u2192 \uBAA9\uC801\uC9C0
+      \uC21C\uC11C\uB85C \uC120\uD0DD\uD569\uB2C8\uB2E4."
+    english: Choose an origin castle, a resident, then a destination.
+  - uid: UI_TRANSFER_ACTOR_HINT
+    korean: "\uC774\uB3D9\uD560 \uB300\uAE30 \uC778\uBB3C\uC744 \uC120\uD0DD\uD558\uC138\uC694.
+      \uC804\uD22C\uB2E8\uC6D0\uC740 \uC804\uD22C\uB2E8 \uC774\uB3D9\uC744 \uC774\uC6A9\uD569\uB2C8\uB2E4."
+    english: Select an idle resident. Army members move with their army.
+  - uid: UI_TRANSFER_DESTINATION_HINT
+    korean: "\uBAA9\uC801\uC9C0\uB97C \uC120\uD0DD\uD558\uC138\uC694. \uC544\uAD70
+      \uC131 \uACBD\uB85C\uB97C \uB530\uB77C \uB9E4\uB2EC \uD55C \uC131\uC529 \uC774\uB3D9\uD569\uB2C8\uB2E4."
+    english: Choose a destination. Travel one friendly castle per month.
+  - uid: UI_TRANSFER_RESIDENTS
+    korean: "\uAC70\uC8FC \uC778\uBB3C {0}\uBA85"
+    english: '{0} residents'
+  - uid: UI_TRANSFER_READY
+    korean: "\uC774\uB3D9 \uAC00\uB2A5 \xB7 \uBAA9\uC801\uC9C0 \uC120\uD0DD"
+    english: "Available \xB7 choose destination"
+  - uid: UI_TRANSFER_BUSY
+    korean: "\uC774\uB3D9 \uBD88\uAC00 \xB7 \uC784\uBB34 \uB610\uB294 \uC601\uC9C0\uAD00\uC9C1
+      \uD574\uC81C \uD544\uC694"
+    english: "Unavailable \xB7 release duty or governor assignment"
+  - uid: UI_TRANSFER_NO_ACTORS
+    korean: "\uC774\uB3D9\uD560 \uAC70\uC8FC \uC778\uBB3C\uC774 \uC5C6\uC2B5\uB2C8\uB2E4.
+      \uC804\uD22C\uB2E8\uC5D0 \uD3B8\uC131\uB41C \uC778\uBB3C\uC740 \uBAA9\uB85D\uC5D0\uC11C
+      \uC81C\uC678\uB429\uB2C8\uB2E4."
+    english: No residents to transfer. Army members are excluded.
+  - uid: UI_TRANSFER_UNAVAILABLE
+    korean: "\uD50C\uB808\uC774\uC5B4 \uC131\uC758 \uC774\uB3D9 \uAC00\uB2A5\uD55C
+      \uC778\uBB3C\uC744 \uC120\uD0DD\uD558\uC138\uC694."
+    english: Choose an available resident of your castle.
+  - uid: UI_AUTO_RECOVERY_TITLE
+    korean: "\uC790\uB3D9 \uD6C8\uB828\xB7\uD68C\uBCF5"
+    english: Automatic Training and Recovery
+  - uid: UI_AUTO_RECOVERY_HINT
+    korean: "\uC8FC\uB454 \uC778\uBB3C\uC740 \uC790\uB3D9\uC73C\uB85C \uD6C8\uB828\uD558\uBA70
+      \uACFC\uB85C\xB7\uBD80\uC0C1 \uC2DC \uC790\uB3D9 \uD68C\uBCF5\uD569\uB2C8\uB2E4.
+      \uBCC4\uB3C4\uC758 \uAD50\uB958\xB7\uD6C8\uB828\xB7\uD734\uC2DD \uC9C0\uC2DC\uB294
+      \uC0AC\uC6A9\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4."
+    english: Residents train automatically and recover when fatigued or injured.
+      Manual socializing, training and rest orders are not used.
+  - uid: UI_TALENT_OFFICE_ACTORS
+    korean: "\uC778\uC7AC\uC2E4 \xB7 \uB2F4\uB2F9\uC790 \uC120\uD0DD"
+    english: "Talent Office \xB7 Select Agent"
+  - uid: UI_TALENT_OFFICE_NO_ACTOR
+    korean: "\uBC30\uC815 \uAC00\uB2A5\uD55C \uB2F4\uB2F9\uC790\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.
+      \uC774 \uC131\uC758 \uB300\uAE30 \uC601\uC6C5 \uC911 [\uC778\uC7AC\uC601\uC785]
+      \uD2B9\uC131\uC744 \uAC00\uC9C4 \uC778\uBB3C\uC774 \uD544\uC694\uD569\uB2C8\uB2E4.
+      \uC804\uD22C\uB2E8\xB7\uB2E4\uB978 \uC784\uBB34 \uBC30\uC815\uACFC \uC778\uC7AC\uC2E4
+      \uC815\uC6D0\uC744 \uD655\uC778\uD558\uC138\uC694."
+    english: No agent is available. An idle hero with Talent Recruitment is required.
+      Check army assignments, other duties and office capacity.
+  - uid: UI_BATTLE_STATUS
+    korean: "{0} \xB7 {1:0.0}\uCD08 \xB7 \uACF5\uACA9 {2} / \uC218\uBE44 {3}"
+    english: "{0} \xB7 {1:0.0}s \xB7 Attackers {2} / Defenders {3}"
+  - uid: UI_BATTLE_OBJECTIVE_ELIMINATION
+    korean: "\uC12C\uBA78"
+    english: Elimination
+  - uid: UI_BATTLE_BUTTON_ADVANCE
+    korean: "\uC804\uC9C4"
+    english: Advance
+  - uid: UI_BATTLE_BUTTON_HOLD
+    korean: "\uC704\uCE58 \uC0AC\uC218"
+    english: Hold
+  - uid: UI_BATTLE_BUTTON_FOCUS
+    korean: "\uC9D1\uC911 \uACF5\uACA9"
+    english: Focus
+  - uid: UI_BATTLE_BUTTON_PROTECT
+    korean: "\uD6C4\uC5F4 \uBCF4\uD638"
+    english: Protect
+  - uid: UI_BATTLE_BUTTON_SPREAD
+    korean: "\uBD84\uC0B0"
+    english: Spread
+  - uid: UI_BATTLE_BUTTON_RALLY
+    korean: "\uC9D1\uACB0"
+    english: Rally
+  - uid: UI_BATTLE_BUTTON_RETREAT
+    korean: "\uD6C4\uD1F4"
+    english: Retreat
+  - uid: UI_BATTLE_COMMAND_HINT
+    korean: "\uBA85\uB839 \uB300\uAE30 \xB7 Z \uC804\uC9C4 X \uC0AC\uC218 C \uC9D1\uC911
+      V \uBCF4\uD638 B \uBD84\uC0B0 N \uC9D1\uACB0 R \uD6C4\uD1F4 \xB7 \uBD84\uB300\uB97C
+      \uACE0\uB974\uBA74 \uADF8 \uBD84\uB300\uC5D0\uB9CC \uBA85\uB839\uD569\uB2C8\uB2E4."
+    english: "Awaiting orders \xB7 Z Advance X Hold C Focus V Protect B Spread N
+      Rally R Retreat \xB7 Orders apply to selected squads only."
+  - uid: UI_BATTLE_SELECTION_HINT
+    korean: "\uC544\uAD70 \uD074\uB9AD\xB7\uB4DC\uB798\uADF8\uB85C \uBD84\uB300 \uC120\uD0DD
+      \xB7 1~9 \uBD84\uB300 \xB7 ` \uC804\uCCB4 \xB7 \uC6B0\uD074\uB9AD/\uBE48 \uACF3
+      \uD074\uB9AD \uC774\uB3D9 \xB7 \uC801 \uD074\uB9AD \uACF5\uACA9 \xB7 F \uC601\uC6C5
+      \uC9C1\uC811 \uC9C0\uD718 \xB7 Q \uC2A4\uD0AC \xB7 Space \uC77C\uC2DC\uC815\uC9C0
+      \xB7 Esc \uD574\uC81C"
+    english: "Click/drag allies to select squads \xB7 1-9 squads \xB7 ` all \xB7
+      Right-click/click ground to move \xB7 Click enemy to attack \xB7 F command
+      hero \xB7 Q skill \xB7 Space pause \xB7 Esc clear"
+  - uid: UI_BATTLE_COMMAND_ADVANCE
+    korean: "\uC804\uC9C4 \uBA85\uB839 \xB7 \uC9C4\uD615 \uD589\uC744 \uC720\uC9C0\uD558\uBA70
+      \uC801\uC5D0\uAC8C \uC811\uADFC\uD569\uB2C8\uB2E4."
+    english: "Advance \xB7 Close in on the enemy while keeping formation rows."
+  - uid: UI_BATTLE_COMMAND_HOLD
+    korean: "\uC704\uCE58 \uC0AC\uC218 \xB7 \uC6D0\uB798 \uC9C4\uD615\uC73C\uB85C
+      \uBCF5\uADC0\uD558\uBA70 \uD53C\uD574\uC640 \uBC00\uCE58\uAE30\uB97C \uC904\uC785\uB2C8\uB2E4."
+    english: "Hold \xB7 Return to formation and reduce damage and knockback."
+  - uid: UI_BATTLE_COMMAND_PROTECT
+    korean: "\uD6C4\uC5F4 \uBCF4\uD638 \xB7 \uC804\uC704\uAC00 \uC6D0\uAC70\uB9AC\xB7\uC9C0\uC6D0
+      \uC778\uBB3C \uC55E\uC744 \uC9C0\uD0A4\uBA70 \uC811\uADFC\uD55C \uC801\uC744
+      \uB9C9\uC2B5\uB2C8\uB2E4."
+    english: "Protect \xB7 Frontliners guard ranged and support allies from approaching
+      enemies."
+  - uid: UI_BATTLE_COMMAND_SPREAD
+    korean: "\uBD84\uC0B0 \xB7 \uC544\uAD70 \uAC04\uACA9\uC744 \uB113\uD600 \uAD11\uC5ED
+      \uD53C\uD574\uB97C \uC904\uC785\uB2C8\uB2E4."
+    english: "Spread \xB7 Widen spacing to reduce area damage."
+  - uid: UI_BATTLE_COMMAND_RALLY
+    korean: "\uC9D1\uACB0 \xB7 \uAD50\uC804\uC744 \uB04A\uACE0 \uB300\uC7A5 \uC8FC\uBCC0\uC73C\uB85C
+      \uBAA8\uC5EC \uC9C4\uD615\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
+    english: "Rally \xB7 Break off and regroup around the commander."
+  - uid: UI_BATTLE_COMMAND_RETREAT
+    korean: "\uD6C4\uD1F4 \xB7 \uC9C4\uC601 \uB05D\uC73C\uB85C \uCCA0\uC218\uD569\uB2C8\uB2E4.
+      \uC804\uC6D0\uC774 \uC774\uD0C8\uD558\uBA74 \uC804\uD22C\uAC00 \uB05D\uB0A9\uB2C8\uB2E4."
+    english: "Retreat \xB7 Withdraw to your edge. The battle ends when everyone escapes."
+  - uid: UI_BATTLE_COMMAND_FOCUS
+    korean: "\uC9D1\uC911 \uACF5\uACA9 \xB7 {0}\uC744 \uC6B0\uC120 \uACF5\uACA9\uD569\uB2C8\uB2E4."
+    english: "Focus \xB7 Prioritize {0}."
+  - uid: UI_BATTLE_COMMAND_FOCUS_NONE
+    korean: "\uC9D1\uC911 \uACF5\uACA9 \xB7 \uC720\uD6A8\uD55C \uD45C\uC801\uC774
+      \uC5C6\uC2B5\uB2C8\uB2E4."
+    english: "Focus \xB7 No valid target."
+  - uid: UI_BATTLE_RETREAT_CONFIRM
+    korean: "\uD6C4\uD1F4\uD558\uBA74 \uC804\uC6D0\uC774 \uC9C4\uC601 \uB05D\uC73C\uB85C
+      \uCCA0\uC218\uD558\uACE0 \uD328\uBC30\uB85C \uCC98\uB9AC\uB429\uB2C8\uB2E4.
+      3\uCD08 \uC548\uC5D0 \uB2E4\uC2DC \uB20C\uB7EC \uD655\uC815\uD558\uC138\uC694."
+    english: Retreating withdraws everyone and counts as a defeat. Press again within
+      3 seconds to confirm.
+  - uid: UI_BATTLE_RETREAT_CANCELLED
+    korean: "\uD6C4\uD1F4 \uD655\uC778\uC774 \uCDE8\uC18C\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+    english: Retreat confirmation cancelled.
+  - uid: UI_BATTLE_CAMERA_RESET
+    korean: "\uCE74\uBA54\uB77C\uB97C \uC804\uC7A5 \uC911\uC559 \uAE30\uBCF8 \uC2DC\uC810\uC73C\uB85C
+      \uBCF5\uC6D0\uD588\uC2B5\uB2C8\uB2E4."
+    english: Camera reset to the battlefield center.
+  - uid: UI_BATTLE_SELECT_NONE
+    korean: "\uC120\uD0DD \uD574\uC81C \xB7 \uC778\uBB3C \uAC00\uAE4C\uC774\uB97C
+      \uD074\uB9AD\uD558\uC138\uC694."
+    english: "Nothing selected \xB7 Click near a character."
+  - uid: UI_BATTLE_SELECT_INFO
+    korean: "[{0}] {1} \xB7 {2} \xB7 HP {3}/{4} \xB7 MP {5}/{6} \xB7 \uBD84\uB300
+      \uC0AC\uAE30 {7:0} \xB7 {8}"
+    english: "[{0}] {1} \xB7 {2} \xB7 HP {3}/{4} \xB7 MP {5}/{6} \xB7 Squad morale
+      {7:0} \xB7 {8}"
+  - uid: UI_BATTLE_SKILL_TOOLTIP
+    korean: "{0}\n{1}\n\uB9C8\uB098 {2} \xB7 \uBC94\uC704 {3:0.#} \xB7 \uC7AC\uC0AC\uC6A9
+      {4:0.#}\uCD08"
+    english: "{0}\n{1}\nMana {2} \xB7 Range {3:0.#} \xB7 Cooldown {4:0.#}s"
+  - uid: UI_BATTLE_SKILL_BUTTON
+    korean: '{0}
+
+      {1}'
+    english: '{0}
+
+      {1}'
+  - uid: UI_BATTLE_SKILL_READY
+    korean: MP {0}
+    english: MP {0}
+  - uid: UI_BATTLE_SKILL_NOT_ON_FIELD
+    korean: "\uC804\uC7A5\uC5D0 \uC5C6\uB294 \uC601\uC6C5"
+    english: Not on the battlefield
+  - uid: UI_BATTLE_SKILL_NONE
+    korean: "\uBC30\uC815\uB41C \uC2A4\uD0AC \uC5C6\uC74C"
+    english: No skill assigned
+  - uid: UI_BATTLE_SKILL_INCAPACITATED
+    korean: "\uC804\uD22C \uBD88\uB2A5"
+    english: Incapacitated
+  - uid: UI_BATTLE_SKILL_COOLDOWN
+    korean: "\uC7AC\uC0AC\uC6A9 {0:0.0}\uCD08"
+    english: Cooldown {0:0.0}s
+  - uid: UI_BATTLE_SKILL_MANA
+    korean: "\uB9C8\uB098 \uBD80\uC871 {0}/{1}"
+    english: Not enough mana {0}/{1}
+  - uid: UI_BATTLE_ORDER_NEED_SELECTION
+    korean: "\uBA3C\uC800 \uBD84\uB300\uB97C \uC120\uD0DD\uD558\uC138\uC694."
+    english: Select a squad first.
+  - uid: UI_BATTLE_ORDER_MOVE
+    korean: "\uC774\uB3D9 \uBA85\uB839 \xB7 \uBD84\uB300 {0}\uAC1C\uAC00 \uC9C0\uC815
+      \uC704\uCE58\uB85C \uC774\uB3D9\uD574 \uC790\uB9AC\uB97C \uC9C0\uD0B5\uB2C8\uB2E4."
+    english: "Move \xB7 {0} squads move and hold the position."
+  - uid: UI_BATTLE_ORDER_ATTACK
+    korean: "\uACF5\uACA9 \uBA85\uB839 \xB7 \uBD84\uB300 {1}\uAC1C\uAC00 {0}\uC744
+      \uC9D1\uC911 \uACF5\uACA9\uD569\uB2C8\uB2E4."
+    english: "Attack \xB7 {1} squads focus {0}."
+  - uid: UI_BATTLE_SQUAD_SELECTED
+    korean: "\uBD84\uB300 {0}\uAC1C \uC120\uD0DD \xB7 {1}\uBA85 \xB7 \uD3C9\uADE0
+      \uC0AC\uAE30 {2:0}"
+    english: "{0} squads selected \xB7 {1} members \xB7 Avg morale {2:0}"
+  - uid: UI_BATTLE_SELECTION_CLEARED
+    korean: "\uBD84\uB300 \uC120\uD0DD \uD574\uC81C \xB7 \uBA85\uB839\uC740 \uC9C4\uC601
+      \uC804\uCCB4\uC5D0 \uC801\uC6A9\uB429\uB2C8\uB2E4."
+    english: "Selection cleared \xB7 Orders apply to the whole side."
+  - uid: UI_BATTLE_PAUSED
+    korean: "\uC77C\uC2DC\uC815\uC9C0 \xB7 Space\uB85C \uC7AC\uAC1C"
+    english: "Paused \xB7 Space to resume"
+  - uid: UI_BATTLE_COMMAND_SQUADS
+    korean: "{0} (\uBD84\uB300 {1}\uAC1C)"
+    english: '{0} ({1} squads)'
+  - uid: UI_BATTLE_SKILL_TARGETING
+    korean: "{0} \xB7 \uC2DC\uC804\uD560 \uC704\uCE58\uB97C \uD074\uB9AD\uD558\uC138\uC694.
+      \uC6B0\uD074\uB9AD/Esc \uCDE8\uC18C"
+    english: "{0} \xB7 Click a target location. Right-click/Esc to cancel"
+  - uid: UI_BATTLE_SKILL_TARGETING_CANCELLED
+    korean: "\uC2A4\uD0AC \uC2DC\uC804\uC744 \uCDE8\uC18C\uD588\uC2B5\uB2C8\uB2E4."
+    english: Skill cast cancelled.
+  - uid: UI_BATTLE_SKILL_CAST
+    korean: "{0} \uC2DC\uC804"
+    english: '{0} cast'
+  - uid: UI_BATTLE_SQUAD_ROUTING
+    korean: "{0} \uBD84\uB300\uC758 \uC0AC\uAE30\uAC00 \uBB34\uB108\uC838 \uD1F4\uAC01\uD569\uB2C8\uB2E4!"
+    english: '{0}''s squad breaks and flees!'
+  - uid: UI_BATTLE_SQUAD_RALLIED
+    korean: "{0} \uBD84\uB300\uAC00 \uC804\uC5F4\uC5D0 \uBCF5\uADC0\uD588\uC2B5\uB2C8\uB2E4."
+    english: '{0}''s squad has rallied.'
+  - uid: UI_BATTLE_TERRAIN_NONE
+    korean: "\uD3C9\uC9C0"
+    english: Open ground
+  - uid: UI_BATTLE_TERRAIN_HIGH_GROUND
+    korean: "\uACE0\uC9C0 \xB7 \uC6D0\uAC70\uB9AC \uC0AC\uAC70\uB9AC\xB7\uD53C\uD574
+      \uC99D\uAC00"
+    english: "High ground \xB7 ranged range and damage up"
+  - uid: UI_BATTLE_TERRAIN_FOREST
+    korean: "\uC232 \xB7 \uD22C\uC0AC\uCCB4 \uD53C\uD574 \uAC10\uC18C, \uC774\uB3D9
+      \uAC10\uC18C"
+    english: "Forest \xB7 less projectile damage, slower"
+  - uid: UI_BATTLE_TERRAIN_NARROW
+    korean: "\uC881\uC740 \uAE38 \xB7 \uB3D9\uC2DC \uADFC\uC811 \uACF5\uACA9 \uC218
+      \uC81C\uD55C"
+    english: "Narrow pass \xB7 fewer melee attackers"
+  - uid: UI_BATTLE_DEPLOY_START
+    korean: "\uC804\uD22C \uC2DC\uC791"
+    english: Start Battle
+  - uid: UI_BATTLE_DEPLOY_HINT
+    korean: "\uBC30\uCE58 \uB2E8\uACC4 \xB7 \uBD84\uB300\uB97C \uC120\uD0DD\uD558\uACE0
+      \uD30C\uB780 \uBC30\uCE58 \uAD6C\uC5ED \uC548\uC744 \uD074\uB9AD\uD574 \uC62E\uAE30\uC138\uC694.
+      Enter \uB610\uB294 \uC804\uD22C \uC2DC\uC791\uC73C\uB85C \uAC1C\uC2DC\uD569\uB2C8\uB2E4."
+    english: "Deployment \xB7 Select squads and click inside the blue zone to place
+      them. Press Enter or Start Battle to begin."
+  - uid: UI_BATTLE_DEPLOY_MOVED
+    korean: "\uBD84\uB300 {0}\uAC1C \uBC30\uCE58"
+    english: '{0} squads placed'
+  - uid: UI_BATTLE_DEPLOY_STARTED
+    korean: "\uC804\uD22C \uAC1C\uC2DC!"
+    english: Battle begins!
+  - uid: UI_BATTLE_CONTROL_ON
+    korean: "{0} \uC9C1\uC811 \uC9C0\uD718 \xB7 \uD074\uB9AD\uD55C \uACF3\uC73C\uB85C
+      \uC774\uB3D9, \uBD84\uB300\uC6D0\uC774 \uB530\uB77C\uAC11\uB2C8\uB2E4. Q \uC2A4\uD0AC
+      \xB7 F \uD574\uC81C"
+    english: "Commanding {0} \xB7 Click to move; the squad follows. Q skill \xB7
+      F release"
+  - uid: UI_BATTLE_CONTROL_OFF
+    korean: "\uC9C1\uC811 \uC9C0\uD718 \uD574\uC81C \xB7 \uBD84\uB300\uAC00 \uD604\uC7AC
+      \uC704\uCE58\uB97C \uC9C0\uD0B5\uB2C8\uB2E4."
+    english: "Direct control released \xB7 The squad holds its position."
+  - uid: UI_BATTLE_CONTROL_NEED_SQUAD
+    korean: "\uC9C1\uC811 \uC9C0\uD718\uD560 \uBD84\uB300\uB97C \uBA3C\uC800 \uC120\uD0DD\uD558\uC138\uC694."
+    english: Select a squad to command directly first.
   factions:
-  - id: avalon
+  - id: rimgard
     displayName:
-      uid: FACTION_AVALON
-      korean: "\uC544\uBC1C\uB860 \uBC31\uC791\uAD6D"
-      english: Avalon County
+      uid: FACTION_RIMGARD
+      korean: "\uB9BC\uAC00\uB974\uB4DC \uBC31\uC791\uAD6D"
+      english: Rimgard County
     color: {r: 0.17, g: 0.48, b: 0.76, a: 1}
     emblem: {fileID: 21300000, guid: a1111111111111111111111111111111, type: 3}
     playerFaction: 1
@@ -515,10 +872,10 @@ MonoBehaviour:
   - id: castle_00
     displayName:
       uid: CASTLE_00
-      korean: "\uC544\uBC1C\uB860"
-      english: Avalon
+      korean: "\uB9BC\uAC00\uB974\uB4DC"
+      english: Rimgard
     castleSize: 1
-    factionId: avalon
+    factionId: rimgard
     terrainTrait:
       uid: CASTLE_00_TERRAIN
       korean: "\uC11C\uBD80 \uBCC4\uBE5B \uD638\uBC18 \xB7 \uC218\uB3C4"
@@ -32898,11 +33255,11 @@ MonoBehaviour:
       english: Castle Administration
     description:
       uid: tutorial_castle_description
-      korean: "\uC9C0\uB3C4\uC5D0\uC11C \uC544\uBC1C\uB860\uC758 \uC131\uC744 \uC120\uD0DD\uD558\uBA74
-        \uC131 \uD654\uBA74\uC73C\uB85C \uC804\uD658\uB429\uB2C8\uB2E4. \uC131 \uC218\uCE58,
-        \uD0DC\uC218\uC640 \uC8FC\uB454 \uC778\uBB3C\uC744 \uD655\uC778\uD55C \uB4A4
-        \uB300\uB959 \uC9C0\uB3C4\uB85C \uB3CC\uC544\uC62C \uC218 \uC788\uC2B5\uB2C8\uB2E4."
-      english: Select an Avalon castle on the map to enter its administration view.
+      korean: "\uC9C0\uB3C4\uC5D0\uC11C \uB9BC\uAC00\uB974\uB4DC\uC758 \uC131\uC744
+        \uC120\uD0DD\uD558\uBA74 \uC131 \uD654\uBA74\uC73C\uB85C \uC804\uD658\uB429\uB2C8\uB2E4.
+        \uC131 \uC218\uCE58, \uD0DC\uC218\uC640 \uC8FC\uB454 \uC778\uBB3C\uC744 \uD655\uC778\uD55C
+        \uB4A4 \uB300\uB959 \uC9C0\uB3C4\uB85C \uB3CC\uC544\uC62C \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+      english: Select a Rimgard castle on the map to enter its administration view.
         Review its values, governor and stationed characters, then return to the
         continent.
   - id: tutorial_project
@@ -32956,46 +33313,46 @@ MonoBehaviour:
       english: Continental Unification
     victoryDescription:
       uid: campaign_victory_description
-      korean: "\uC544\uBC1C\uB860\uC774 \uB300\uB959\uC758 \uBAA8\uB4E0 \uC131\uC744
+      korean: "\uB9BC\uAC00\uB974\uB4DC\uAC00 \uB300\uB959\uC758 \uBAA8\uB4E0 \uC131\uC744
         \uD1B5\uC77C\uD588\uC2B5\uB2C8\uB2E4. \uD669\uD63C\uC758 \uADC0\uD658 \uCEA0\uD398\uC778\uC758
         \uCD5C\uC18C \uC2B9\uB9AC \uC870\uAC74\uC744 \uB2EC\uC131\uD588\uC2B5\uB2C8\uB2E4."
-      english: Avalon controls every castle on the continent and has achieved the
+      english: Rimgard controls every castle on the continent and has achieved the
         campaign's minimum victory condition.
     defeatTitle:
       uid: campaign_defeat_title
-      korean: "\uC544\uBC1C\uB860 \uBA78\uB9DD"
-      english: Fall of Avalon
+      korean: "\uB9BC\uAC00\uB974\uB4DC \uBA78\uB9DD"
+      english: Fall of Rimgard
     defeatDescription:
       uid: campaign_defeat_description
-      korean: "\uC544\uBC1C\uB860\uC774 \uC9C0\uBC30\uD558\uB294 \uC131\uC774 \uD558\uB098\uB3C4
-        \uB0A8\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4. \uC138\uB825\uC744 \uC7AC\uAC74\uD560
-        \uAE30\uBC18\uC744 \uC783\uC5C8\uC2B5\uB2C8\uB2E4."
-      english: Avalon controls no castles and has lost the foundation needed to rebuild
-        the faction.
+      korean: "\uB9BC\uAC00\uB974\uB4DC\uAC00 \uC9C0\uBC30\uD558\uB294 \uC131\uC774
+        \uD558\uB098\uB3C4 \uB0A8\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4. \uC138\uB825\uC744
+        \uC7AC\uAC74\uD560 \uAE30\uBC18\uC744 \uC783\uC5C8\uC2B5\uB2C8\uB2E4."
+      english: Rimgard controls no castles and has lost the foundation needed to
+        rebuild the faction.
   campaignObjectives:
-  - id: avalon_restore_capital
+  - id: rimgard_restore_capital
     title:
-      uid: OBJECTIVE_AVALON_RESTORE_TITLE
+      uid: OBJECTIVE_RIMGARD_RESTORE_TITLE
       korean: "\uBCC4\uBE5B \uC218\uB3C4\uC758 \uC7AC\uAC74"
       english: Restore the Starlit Capital
     situation:
-      uid: OBJECTIVE_AVALON_RESTORE_SITUATION
-      korean: "\uD669\uD63C\uC758 \uADC0\uD658 \uC774\uD6C4 \uC544\uBC1C\uB860\uC758
+      uid: OBJECTIVE_RIMGARD_RESTORE_SITUATION
+      korean: "\uD669\uD63C\uC758 \uADC0\uD658 \uC774\uD6C4 \uB9BC\uAC00\uB974\uB4DC\uC758
         \uAD6D\uACBD\uC740 \uAC08\uB77C\uC84C\uACE0 \uBC1C\uB3C4\uB974\uC758 \uC555\uBC15\uC774
         \uB3D9\uBD80 \uAD00\uBB38\uAE4C\uC9C0 \uB2E4\uAC00\uC654\uC2B5\uB2C8\uB2E4.
         \uC6D0\uC815\uC744 \uC11C\uB450\uB974\uAE30 \uC804\uC5D0 \uC218\uB3C4\uC758
         \uBBFC\uC0DD\uACFC \uC138\uC785 \uAE30\uBC18\uC744 \uD68C\uBCF5\uD574\uC57C
         \uD569\uB2C8\uB2E4."
-      english: After the Twilight Return Avalon's borders are fractured and Valdor
+      english: After the Twilight Return Rimgard's borders are fractured and Valdor
         presses toward the eastern gate. Restore the capital before committing to
         war.
     description:
-      uid: OBJECTIVE_AVALON_RESTORE_DESC
-      korean: "\uC544\uBC1C\uB860 \uC131\uC758 \uBC88\uC601\uC744 50 \uC774\uC0C1\uC73C\uB85C
+      uid: OBJECTIVE_RIMGARD_RESTORE_DESC
+      korean: "\uB9BC\uAC00\uB974\uB4DC \uC131\uC758 \uBC88\uC601\uC744 50 \uC774\uC0C1\uC73C\uB85C
         \uC62C\uB9AC\uC2ED\uC2DC\uC624. \uC218\uB3C4\uC5D0\uC11C \uBC88\uC601 \uC0AC\uC5C5\uC744
         \uC9C0\uC815\uD558\uACE0 \uB2E4\uC74C \uD134\uC744 \uC9C4\uD589\uD558\uBA74
         \uBAA9\uD45C\uB97C \uB2EC\uC131\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
-      english: Raise Avalon Castle prosperity to at least 50. Assign a prosperity
+      english: Raise Rimgard Castle prosperity to at least 50. Assign a prosperity
         project in the capital and advance the turn.
     objectiveType: 0
     targetCastleId: castle_00
@@ -33004,22 +33361,22 @@ MonoBehaviour:
     rewardGold: 200
     rewardMana: 50
     rewardInfluence: 20
-  - id: avalon_secure_border
+  - id: rimgard_secure_border
     title:
-      uid: OBJECTIVE_AVALON_BORDER_TITLE
+      uid: OBJECTIVE_RIMGARD_BORDER_TITLE
       korean: "\uC11C\uBD80 \uAD6D\uACBD\uC120 \uD655\uBCF4"
       english: Secure the Western Border
     situation:
-      uid: OBJECTIVE_AVALON_BORDER_SITUATION
+      uid: OBJECTIVE_RIMGARD_BORDER_SITUATION
       korean: "\uC218\uB3C4\uB294 \uC548\uC815\uC744 \uB418\uCC3E\uC558\uC9C0\uB9CC
-        \uC544\uBC1C\uB860\uC740 \uACE0\uB9BD\uB41C \uD55C \uAC1C \uC131\uC5D0 \uBA38\uBB3C\uB7EC
-        \uC788\uC2B5\uB2C8\uB2E4."
-      english: The capital is stable but Avalon remains isolated in a single castle.
+        \uB9BC\uAC00\uB974\uB4DC\uB294 \uACE0\uB9BD\uB41C \uD55C \uAC1C \uC131\uC5D0
+        \uBA38\uBB3C\uB7EC \uC788\uC2B5\uB2C8\uB2E4."
+      english: The capital is stable but Rimgard remains isolated in a single castle.
     description:
-      uid: OBJECTIVE_AVALON_BORDER_DESC
-      korean: "\uC544\uBC1C\uB860\uC774 \uC18C\uC720\uD55C \uC131\uC744 3\uAC1C \uC774\uC0C1\uC73C\uB85C
-        \uB298\uB9AC\uC2ED\uC2DC\uC624."
-      english: Expand Avalon to at least three castles.
+      uid: OBJECTIVE_RIMGARD_BORDER_DESC
+      korean: "\uB9BC\uAC00\uB974\uB4DC\uAC00 \uC18C\uC720\uD55C \uC131\uC744 3\uAC1C
+        \uC774\uC0C1\uC73C\uB85C \uB298\uB9AC\uC2ED\uC2DC\uC624."
+      english: Expand Rimgard to at least three castles.
     objectiveType: 1
     targetCastleId: 
     targetFactionId: 
@@ -33027,19 +33384,19 @@ MonoBehaviour:
     rewardGold: 350
     rewardMana: 80
     rewardInfluence: 40
-  - id: avalon_break_valdor
+  - id: rimgard_break_valdor
     title:
-      uid: OBJECTIVE_AVALON_VALDOR_TITLE
+      uid: OBJECTIVE_RIMGARD_VALDOR_TITLE
       korean: "\uBD89\uC740 \uC81C\uAD6D\uC758 \uCC3D\uC744 \uAEBE\uB2E4"
       english: Break the Red Empire
     situation:
-      uid: OBJECTIVE_AVALON_VALDOR_SITUATION
+      uid: OBJECTIVE_RIMGARD_VALDOR_SITUATION
       korean: "\uAD6D\uACBD\uC740 \uB113\uC5B4\uC84C\uC9C0\uB9CC \uBC1C\uB3C4\uB974
-        \uC81C\uAD6D\uC774 \uC544\uBC1C\uB860\uC758 \uC7AC\uAC74\uC744 \uACC4\uC18D
+        \uC81C\uAD6D\uC774 \uB9BC\uAC00\uB974\uB4DC\uC758 \uC7AC\uAC74\uC744 \uACC4\uC18D
         \uC704\uD611\uD569\uB2C8\uB2E4."
-      english: The border has widened but Valdor still threatens Avalon's restoration.
+      english: The border has widened but Valdor still threatens Rimgard's restoration.
     description:
-      uid: OBJECTIVE_AVALON_VALDOR_DESC
+      uid: OBJECTIVE_RIMGARD_VALDOR_DESC
       korean: "\uBC1C\uB3C4\uB974 \uC81C\uAD6D\uC758 \uBAA8\uB4E0 \uC131\uC744 \uC810\uB839\uD574
         \uC138\uB825\uC744 \uBA78\uB9DD\uC2DC\uD0A4\uC2ED\uC2DC\uC624."
       english: Capture every Valdor castle and eliminate the faction.
@@ -33050,23 +33407,23 @@ MonoBehaviour:
     rewardGold: 600
     rewardMana: 150
     rewardInfluence: 80
-  - id: avalon_unify_continent
+  - id: rimgard_unify_continent
     title:
-      uid: OBJECTIVE_AVALON_UNIFY_TITLE
+      uid: OBJECTIVE_RIMGARD_UNIFY_TITLE
       korean: "\uD669\uD63C\uC758 \uB300\uB959 \uD1B5\uC77C"
       english: Unify the Twilight Continent
     situation:
-      uid: OBJECTIVE_AVALON_UNIFY_SITUATION
+      uid: OBJECTIVE_RIMGARD_UNIFY_SITUATION
       korean: "\uBC1C\uB3C4\uB974\uC758 \uBAB0\uB77D\uC73C\uB85C \uC138\uB825 \uADE0\uD615\uC774
         \uBB34\uB108\uC84C\uC2B5\uB2C8\uB2E4. \uC774\uC81C \uB300\uB959\uC758 \uC804\uC7C1\uC744
         \uB05D\uB0BC \uB54C\uC785\uB2C8\uB2E4."
       english: Valdor's fall has broken the balance of power. It is time to end the
         continental war.
     description:
-      uid: OBJECTIVE_AVALON_UNIFY_DESC
-      korean: "\uB300\uB959\uC758 60\uAC1C \uC131\uC744 \uBAA8\uB450 \uC544\uBC1C\uB860\uC758
+      uid: OBJECTIVE_RIMGARD_UNIFY_DESC
+      korean: "\uB300\uB959\uC758 60\uAC1C \uC131\uC744 \uBAA8\uB450 \uB9BC\uAC00\uB974\uB4DC\uC758
         \uC9C0\uBC30 \uC544\uB798 \uB450\uC2ED\uC2DC\uC624."
-      english: Bring all sixty castles under Avalon rule.
+      english: Bring all sixty castles under Rimgard rule.
     objectiveType: 3
     targetCastleId: 
     targetFactionId: 
@@ -33305,12 +33662,12 @@ MonoBehaviour:
       meritDelta: 8
       fatigueDelta: 5
   startingRelationships:
-  - factionId: avalon
+  - factionId: rimgard
     firstHeroId: ares
     secondHeroId: common_alden
     level: 2
     context:
-      uid: REL_START_AVALON
+      uid: REL_START_RIMGARD
       korean: "\uC544\uB808\uC2A4\uB294 \uC218\uB3C4 \uC7AC\uAC74\uC744 \uB9E1\uAE34
         \uC54C\uB374\uC758 \uC2E4\uBB34 \uB2A5\uB825\uC744 \uAE4A\uC774 \uC2E0\uB8B0\uD569\uB2C8\uB2E4."
       english: Ares deeply trusts Alden with the capital's restoration.
@@ -33320,9 +33677,9 @@ MonoBehaviour:
     level: 0
     context:
       uid: REL_START_VALDOR
-      korean: "\uC5D8\uC708\uACFC \uAC00\uB808\uC2A4\uB294 \uC544\uBC1C\uB860 \uC804\uC120\uC758
-        \uACF5\uC138 \uC18D\uB3C4\uB97C \uB450\uACE0 \uB300\uB9BD\uD569\uB2C8\uB2E4."
-      english: Elwyn and Gareth clash over the pace of the Avalon offensive.
+      korean: "\uC5D8\uC708\uACFC \uAC00\uB808\uC2A4\uB294 \uB9BC\uAC00\uB974\uB4DC
+        \uC804\uC120\uC758 \uACF5\uC138 \uC18D\uB3C4\uB97C \uB450\uACE0 \uB300\uB9BD\uD569\uB2C8\uB2E4."
+      english: Elwyn and Gareth clash over the pace of the Rimgard offensive.
   - factionId: ironheart
     firstHeroId: brom
     secondHeroId: common_thane
@@ -33354,26 +33711,26 @@ MonoBehaviour:
         \uACBD\uACC4\uD569\uB2C8\uB2E4."
       english: Theron fears Veil's forbidden research will undermine Necropolis order.
   regionalEventDefinitions:
-  - id: region_avalon_lake
-    originFactionId: avalon
+  - id: region_rimgard_lake
+    originFactionId: rimgard
     targetCastleId: castle_00
     minimumTurn: 1
     title:
-      uid: REGION_AVALON_TITLE
+      uid: REGION_RIMGARD_TITLE
       korean: "\uBCC4\uBE5B \uD638\uC218\uC758 \uBC94\uB78C"
       english: Flood of the Starlit Lake
     description:
-      uid: REGION_AVALON_DESC
+      uid: REGION_RIMGARD_DESC
       korean: "\uC218\uB3C4\uC758 \uC218\uB85C\uAC00 \uB118\uCCD0 \uC2DC\uC7A5\uACFC
         \uB18D\uC9C0\uAC00 \uB3D9\uC2DC\uC5D0 \uC704\uD611\uBC1B\uC2B5\uB2C8\uB2E4."
       english: Overflowing waterways threaten both the capital market and its farms.
     choices:
     - label:
-        uid: REGION_AVALON_A
+        uid: REGION_RIMGARD_A
         korean: "\uC81C\uBC29\uC744 \uAE34\uAE09 \uBCF4\uC218\uD55C\uB2E4"
         english: Repair the embankment
       resultDescription:
-        uid: REGION_AVALON_A_RESULT
+        uid: REGION_RIMGARD_A_RESULT
         korean: "\uAE08\uD654 -120 \xB7 \uBC88\uC601 +6 \xB7 \uCE58\uC548 +2"
         english: Gold -120, prosperity +6, stability +2
       goldDelta: -120
@@ -33384,11 +33741,11 @@ MonoBehaviour:
       stabilityDelta: 2
       defenseDelta: 0
     - label:
-        uid: REGION_AVALON_B
+        uid: REGION_RIMGARD_B
         korean: "\uB9C8\uBC95 \uC218\uB85C\uB97C \uC5F0\uB2E4"
         english: Open arcane channels
       resultDescription:
-        uid: REGION_AVALON_B_RESULT
+        uid: REGION_RIMGARD_B_RESULT
         korean: "\uB9C8\uB098 -60 \xB7 \uAE30\uC220 +5 \xB7 \uBC88\uC601 +3"
         english: Mana -60, technology +5, prosperity +3
       goldDelta: 0
@@ -33621,13 +33978,13 @@ MonoBehaviour:
     prosperityDelta: -3
     unrestMonths: 2
   factionEliminationNarratives:
-  - factionId: avalon
+  - factionId: rimgard
     title:
-      uid: FALL_AVALON_TITLE
+      uid: FALL_RIMGARD_TITLE
       korean: "\uBCC4\uBE5B \uC655\uAD00\uC758 \uCD94\uB77D"
       english: Fall of the Starlit Crown
     description:
-      uid: FALL_AVALON_DESC
+      uid: FALL_RIMGARD_DESC
       korean: "\uC655\uAD6D\uC758 \uAE43\uBC1C\uC774 \uB9C8\uC9C0\uB9C9 \uC131\uBCBD\uC5D0\uC11C
         \uB0B4\uB824\uC654\uC2B5\uB2C8\uB2E4."
       english: The royal banner falls from its final wall.
@@ -33679,12 +34036,12 @@ MonoBehaviour:
       english: Concord Beneath the Starlight
     description:
       uid: ENDING_CONCORD_DESC
-      korean: "\uC544\uBC1C\uB860\uC740 \uC815\uBCF5\uD55C \uB545\uC758 \uC8FC\uBBFC\uACFC
+      korean: "\uB9BC\uAC00\uB974\uB4DC\uB294 \uC815\uBCF5\uD55C \uB545\uC758 \uC8FC\uBBFC\uACFC
         \uC804\uD1B5\uC744 \uBC1B\uC544\uB4E4\uC774\uBA70 \uB300\uB959\uC744 \uD558\uB098\uC758
         \uC5F0\uB9F9\uC73C\uB85C \uBB36\uC5C8\uC2B5\uB2C8\uB2E4. \uC804\uC7C1\uC740
         \uB05D\uB0AC\uACE0 \uAC01 \uC9C0\uC5ED\uC758 \uBAA9\uC18C\uB9AC\uAC00 \uC0C8
         \uC655\uAD6D\uC758 \uD3C9\uC815\uC5D0 \uCC38\uC5EC\uD569\uB2C8\uB2E4."
-      english: Avalon embraced the peoples and traditions of conquered lands and
+      english: Rimgard embraced the peoples and traditions of conquered lands and
         united the continent as a concord. The war is over and every region has a
         voice in the new realm.
   - endingType: 2
@@ -33694,14 +34051,21 @@ MonoBehaviour:
       english: Beneath the Iron Crown
     description:
       uid: ENDING_DOMINION_DESC
-      korean: "\uC544\uBC1C\uB860\uC740 \uAD70\uC815\uACFC \uC131\uBCBD\uC758 \uC9C8\uC11C\uB85C
-        \uB300\uB959\uC744 \uD1B5\uC77C\uD588\uC2B5\uB2C8\uB2E4. \uC804\uC7C1\uC740
-        \uB05D\uB0AC\uC9C0\uB9CC \uC0C8 \uC655\uAD6D\uC758 \uD3C9\uD654\uB294 \uAC15\uD55C
-        \uAD70\uB2E8\uACFC \uC655\uBA85\uC758 \uBB34\uAC8C \uC704\uC5D0 \uC11C \uC788\uC2B5\uB2C8\uB2E4."
-      english: Avalon unified the continent through martial rule and fortified order.
+      korean: "\uB9BC\uAC00\uB974\uB4DC\uB294 \uAD70\uC815\uACFC \uC131\uBCBD\uC758
+        \uC9C8\uC11C\uB85C \uB300\uB959\uC744 \uD1B5\uC77C\uD588\uC2B5\uB2C8\uB2E4.
+        \uC804\uC7C1\uC740 \uB05D\uB0AC\uC9C0\uB9CC \uC0C8 \uC655\uAD6D\uC758 \uD3C9\uD654\uB294
+        \uAC15\uD55C \uAD70\uB2E8\uACFC \uC655\uBA85\uC758 \uBB34\uAC8C \uC704\uC5D0
+        \uC11C \uC788\uC2B5\uB2C8\uB2E4."
+      english: Rimgard unified the continent through martial rule and fortified order.
         The war is over but peace now rests upon powerful legions and royal command.
   campaignVariants:
-  - variant: 0
+  - selectionArtwork: {fileID: 21300000, guid: 1c22081b6c4c2834fa33aeb1ccaaac24, type: 3}
+    selectionTitleUid: UI_SCENARIO_ARES_TITLE
+    selectionSubtitleUid: UI_SCENARIO_ARES_SUBTITLE
+    selectionStoryUid: UI_SCENARIO_ARES_STORY
+    selectionObjectiveUid: UI_SCENARIO_ARES_OBJECTIVE
+    selectionProtagonistUid: UI_SCENARIO_ARES_PROTAGONIST
+    variant: 0
     displayName:
       uid: VARIANT_ARES_MAIN_NAME
       korean: "\uC544\uB808\uC2A4 \uBA54\uC778"
@@ -34249,7 +34613,7 @@ MonoBehaviour:
       initialDefense: 0
       recruitableHeroIds: []
     - castleId: castle_28
-      factionId: avalon
+      factionId: rimgard
       overrideMapPosition: 1
       normalizedMapPosition: {x: 0.54, y: 0.18}
       overrideConnections: 1
@@ -34575,7 +34939,13 @@ MonoBehaviour:
       initialStability: 0
       initialDefense: 0
       recruitableHeroIds: []
-  - variant: 1
+  - selectionArtwork: {fileID: 21300000, guid: 7f6efcb05bab23c46a84706edb364437, type: 3}
+    selectionTitleUid: UI_SCENARIO_FREE_TITLE
+    selectionSubtitleUid: UI_SCENARIO_FREE_SUBTITLE
+    selectionStoryUid: UI_SCENARIO_FREE_STORY
+    selectionObjectiveUid: UI_SCENARIO_FREE_OBJECTIVE
+    selectionProtagonistUid: UI_SCENARIO_FREE_PROTAGONIST
+    variant: 1
     displayName:
       uid: VARIANT_FREE_NAME
       korean: "\uD504\uB9AC \uC2DC\uB098\uB9AC\uC624"
@@ -35048,7 +35418,13 @@ MonoBehaviour:
       heroId: common_090
       governor: 0
     castlePlacements: []
-  - variant: 2
+  - selectionArtwork: {fileID: 0}
+    selectionTitleUid: 
+    selectionSubtitleUid: 
+    selectionStoryUid: 
+    selectionObjectiveUid: 
+    selectionProtagonistUid: 
+    variant: 2
     displayName:
       uid: VARIANT_RESERVED_NAME
       korean: "\uCD94\uD6C4 \uCD94\uAC00"

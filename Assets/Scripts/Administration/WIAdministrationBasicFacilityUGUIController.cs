@@ -86,11 +86,11 @@ namespace ProjectWI.Administration
             administrationController.ExecuteUGUITerritoryCommand(WIAdministrationTerritoryCommand.CastleRecord);
         }
 
-        // 훈련소에서 개인 훈련을 포함한 주둔 인물 활동 화면으로 이동합니다.
+        // 훈련소는 자동 훈련을 유지하며 편성·이동을 처리하는 군사 메뉴로 연결합니다.
         private void OpenTrainingGround()
         {
             modal.Hide();
-            administrationController.ExecuteUGUITerritoryCommand(WIAdministrationTerritoryCommand.CharacterActivity);
+            administrationController.ExecuteUGUITerritoryCommand(WIAdministrationTerritoryCommand.Military);
         }
 
         // 기존 모달을 열고 시설 목록을 거치지 않고 선술집 내용을 표시합니다.

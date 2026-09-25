@@ -368,7 +368,7 @@
 .castle-node-name { position:absolute; left:0; right:0; bottom:1px; height:22px; padding:3px 4px; background-color:rgba(5,9,13,.94); color:#f2f4f5; border-width:1px; border-color:#7f8b94; font-size:9px; -unity-font-style:bold; -unity-text-align:middle-center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .castle-node:hover .castle-node-marker { -unity-background-image-tint-color:#d9eaff; }
 .castle-node:hover .castle-node-name { background-color:#dce5eb; color:#10161b; border-color:#ffffff; }
-.castle-node-avalon .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_avalon.png"); }
+.castle-node-rimgard .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_avalon.png"); }
 .castle-node-valdor .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_valdor.png"); }
 .castle-node-ironheart .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_ironheart.png"); }
 .castle-node-sylvanroad .castle-node-marker { background-image:url("project://database/Assets/Resources/UI/Generated/map_castle_sylvanroad.png"); }

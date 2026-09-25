@@ -10,10 +10,10 @@
                 <ui:Label name="turn-description" text="명령을 내릴 성을 선택하십시오." class="screen-subtitle"/>
             </ui:VisualElement>
             <ui:VisualElement class="map-side-panel castle-summary-panel concept-side-panel">
-                <ui:Label text="아발론 영지" class="side-panel-kicker"/>
+                <ui:Label text="림가르드 영지" class="side-panel-kicker"/>
                 <ui:Label name="global-castle-name" text="별빛 수도" class="side-panel-title"/>
                 <ui:VisualElement name="global-castle-image" class="global-castle-image image-placeholder"/>
-                <ui:Label name="global-castle-owner" text="수도 · 아발론 왕국" class="side-panel-subtitle"/>
+                <ui:Label name="global-castle-owner" text="수도 · 림가르드 왕국" class="side-panel-subtitle"/>
                 <ui:Label name="global-castle-stats" text="번영 45  ·  기술 40\n질서 55  ·  방어 60" class="side-panel-stats"/>
                 <ui:Label name="global-castle-heroes" text="주둔 영웅 4명  ·  주둔 전투단 1개" class="side-panel-copy"/>
                 <ui:VisualElement name="global-castle-hero-cards" class="global-castle-hero-cards">
@@ -295,7 +295,7 @@
             </ui:VisualElement>
             <ui:VisualElement class="faction-legend frame-dark">
                 <ui:Label text="진영 구도" class="legend-title"/>
-                <ui:Label name="faction-legend-copy" text="[AV] 아발론   [VD] 발도르\n[IH] 아이언하트   [SY] 실바니아   [NC] 네크로폴리스\n— 이동 경로   × 적대 전선   ◎ 선택 성 연결" class="legend-copy"/>
+                <ui:Label name="faction-legend-copy" text="[RG] 림가르드   [VD] 발도르\n[IH] 아이언하트   [SY] 실바니아   [NC] 네크로폴리스\n— 이동 경로   × 적대 전선   ◎ 선택 성 연결" class="legend-copy"/>
             </ui:VisualElement>
             <ui:VisualElement class="map-tools">
                 <ui:Label text="배율 100%" class="zoom-label"/>

@@ -1,5 +1,11 @@
 # ProjectWI 씬 및 에셋 구조
 
+## 플레이어 진영 명칭 변경 (2026-09-24)
+
+- `WI_AdministrationDatabase.asset`의 플레이어 진영과 옛 수도, 시나리오 문구, 캠페인 목표, 지역 사건, 관계 시작 문구, 멸망·결말 문구를 `림가르드 / Rimgard`로 변경했습니다. 진영 ID는 `rimgard`이며 관련 ID와 문자열 UID도 `RIMGARD`/`rimgard`로 통일했습니다.
+- `WICampaignTitleUGUI`, `WIAdministrationTopHUDUGUI`, `WIAdministrationTerritoryUGUI`, `WIAdministrationWorldUGUI` 프리팹의 기본 문구와 월드맵 표식 직렬화 필드 `rimgardMarker`를 변경했습니다. USS 노드 클래스는 `castle-node-rimgard`이며 이미지 경로는 기존 `map_castle_avalon.png`를 그대로 참조합니다.
+- 테스트의 진영 ID, 목표 ID와 헬퍼 이름(`PrepareValdorAttackOnRimgard`)을 함께 변경했습니다.
+
 ## 지연 생성 화면 첫 요청 수정 (2026-09-20)
 
 - WIAdministrationUIController.UGUIScreenRequests는 Action 스냅샷 대신 Func<Action> 및 Func<Action<TFirst,TSecond>>로 이벤트를 조회합니다. EnsureScreen이 프리팹 생성·OnEnable 구독을 마친 뒤 최신 이벤트를 가져오므로 첫 메뉴 클릭과 첫 월간 보고가 누락되지 않습니다.
@@ -14,6 +20,34 @@
 - WICharacterSelectionListSetup은 기존 카드 부모 영역 안에 툴바·ScrollRect·RectMask2D·VerticalLayoutGroup·스크롤바를 에디터에서 저장합니다. 인재 활동의 기존 등급 필터와 영웅 도감은 유지합니다.
 - WICharacterSelectionListTests는 23명 후보의 검색·정렬 후 클릭 매핑, 풀 축소·재사용, 비활성 후보 필터, 8종 화면의 프리팹 참조를 검증합니다. WIGroupMarchTests는 페이지 이동 대신 스크롤 목록의 분리된 행을 함께 출정시키는 흐름을 검사합니다.
 
+
+## 실시간 전투 연속 이동·교전 슬롯 (2026-09-25)
+
+- 분대: `WIBattleSquadState`(SquadId·Side·LeaderHeroId·HasCommandOverride·Command·FocusHeroId)를 `WIBattleRuntimeState.Squads`에 두고 인물은 `SquadId`를 가집니다. `WIBattleSimulation.AssignSquads`가 빌드·증원 후 미배정 인물을 진영+전투단별로 영웅마다 분대화합니다. 명령 해석은 `GetCommand(runtime, character)`가 분대 전용 명령 > 진영 명령 순으로 하며 진영 후퇴가 최우선입니다. `SetSideCommand`는 진영 분대의 전용 명령을 해제합니다. `OrderSquadsMove`는 선택 인물 중심 대비 상대 위치를 유지해 `FormationPosition`을 목적지로 옮기고 `MoveTo` 명령(도착 전 비교전 이동, 도착 후 사수와 같은 동작)을 줍니다. `OrderSquadsAttack`은 분대 `Focus`와 표적을 지정합니다. 집결은 분대 전용이면 분대장, 진영 전체면 진영 대장 기준입니다.
+- 측면: `GetFlankMultiplier`가 대상 `FacingRight` 방향과 공격자 방향의 내적으로 정면/측면/후방을 판정해 근접 피해에만 곱합니다.
+- HUD 입력은 `WIBattleHUDController.Selection.cs`(포인터·범위 선택·분대 선택·명령 대상·일시정지)로 분리했습니다. `WIBattleRuntimeController.IsPaused`가 참이면 시뮬레이션을 멈추고 표시만 갱신합니다.
+- 사기: `WIBattleSimulation.Morale.cs`의 `ApplyDamage`가 근접·투사체·스킬 피해를 모두 처리하며 측면/후방 배율과 전투 불능에 따라 분대 사기를 깎습니다. `UpdateMorale`이 매 틱 회복·붕괴·복귀를 판정하고 인물 `IsRouting`을 동기화합니다. 붕괴 분대는 `GetCommand`가 `Retreat`를 반환해 후퇴 이동·이탈을 재사용합니다.
+- 스킬 지정: `TryActivateHeroSkill(config, runtime, heroId, Vector2? targetPoint)`. 범위 피해는 지정 시 `ClampSkillTarget`으로 시전 거리 안으로 보정한 중심에 `AreaRadius` 반경을 적용합니다. HUD `WIBattleHUDController.Targeting.cs`가 지정 모드·미리보기(`WIBattleRuntimeController.ShowSkillPreview/HideSkillPreview`, 효과 프리팹 풀 재사용)·붕괴 안내를 담당합니다.
+- 진영 표시: `WIBattleCharacterView`가 프리팹 자식 `SideMarker` SpriteRenderer를 찾아 진영 색을 적용하며 없으면 오류를 기록합니다(코드로 생성하지 않음).
+- 배치 단계: `WIBattleRuntimeState.IsDeploying`이 참이면 `Step`이 시간을 진행하지 않습니다. `WIBattleRuntimeController.Initialize`가 `UseDeploymentPhase`로 설정하고 `StartBattle`이 해제합니다. `WIBattleSimulation.DeploySquads`는 모양을 유지해 `GetDeploymentRangeX` 구역 안으로 위치·진형 위치를 즉시 옮깁니다.
+- 지형: `WIBattleSimulation.Terrain.cs`가 구역 판정(`IsInTerrain`, `TryGetTerrainAt`)과 효과(`GetEffectiveAttackRange`, `GetMoveSpeedMultiplier`, `GetMeleeSlotCountFor`, `GetProjectileTerrainMultiplier`)를 제공합니다. 교전 슬롯 수는 목표별로 계산하고, 투사체 피해는 명중 시 발사자·피격자 위치 지형으로 보정합니다.
+- 직접 지휘: 명령 `Follow`, 인물 `FollowOffset`, 런타임 `ControlledHeroId`. `StartHeroControl`이 분대원 상대 위치를 저장하고 분대에 `Follow`를 지정, `OrderControlledHeroMove`가 영웅 `FormationPosition`을 바꾸며 `StopHeroControl`이 현 위치 `Hold`로 전환합니다. HUD는 `WIBattleHUDController.Deployment.cs`(배치·지휘·지형 이름)로 분리했습니다.
+- 방향 반전: `WIBattleCharacterState.FacingRight`를 `WIBattleSimulation.UpdateFacing`이 매 틱 갱신합니다(가로 이동 > 0.02면 이동 방향, 아니면 표적과 가로 거리 > 0.05일 때 표적 쪽). `WIBattleCharacterView.Refresh`가 `flipX = FacingRight != BattleSpriteFacesRight`로 적용합니다.
+- 격자 모드 제거: `Step`은 항상 연속 이동·교전 슬롯으로 진행하며 `Advance`는 항상 고정 틱을 사용합니다. 후퇴는 모든 전투에서 진영 끝 이탈 방식입니다.
+- HUD 문구: `WIBattleHUDController.Text(uid, args)`가 `WIBattleRuntimeController.Database.GetText`로 `UI_BATTLE_*` 문구를 조회해 `string.Format`으로 채웁니다. 명령 버튼 이름표와 기본 안내는 런타임이 준비된 첫 프레임에 한 번 교체합니다. 등급 표시는 기존 `UI_SELECTION_HERO`/`UI_SELECTION_COMMON`을 재사용합니다. UID 목록은 `Assets/Editor/WIBattleHUDStringsUtility.cs`(메뉴 `WI/UI/Apply Battle HUD Strings`)가 기록하며, 테스트 `BattleHUD_AllStringUidsExistInDatabase`가 코드에서 참조하는 UID 누락을 검사합니다.
+- `WIBattleRuntimeBuilder.ApplyObjective`는 목표 데이터가 없을 때 `UI_BATTLE_OBJECTIVE_ELIMINATION` 문구를 사용합니다.
+- 진형 행 간격 `formationRowSpacing`을 1.2에서 0.8로 줄였습니다.
+
+- 전투단 명령 `WIBattleCommand`에 `Protect`(후열 보호), `Spread`(분산), `Rally`(집결)를 추가했습니다(기존 값 뒤에 추가해 직렬화 번호 유지). HUD는 `WIBattleHUD.uxml`의 버튼 7개(4+3 두 줄)와 키 1~6·R로 명령합니다.
+- 후퇴(연속 모드): 즉시 패배 대신 진영 끝으로 이동하고 `RetreatEscapeMargin` 안에 들어오면 `WIBattleCharacterState.Escaped`로 이탈합니다. `IsAlive`는 이탈 인물을 제외하며, 한 진영의 전투 가능 인원이 없으면 기존 승패 판정으로 종료합니다. 기존처럼 결과 반영 시 후퇴 명령 진영은 질서 있는 후퇴로 처리됩니다. 격자 모드는 기존 즉시 종료를 유지합니다.
+- 후열 보호: 근접 인물은 원거리·지원 아군 `ProtectThreatRadius` 안의 적을 우선 공격하고, 위협이 없으면 가장 가까운 원거리 아군 앞 `ProtectGuardDistance`에 섭니다. 분산: 같은 진영 충돌 간격에 `SpreadSpacingMultiplier`를 곱합니다. 집결: 대장(없으면 영웅, 없으면 첫 생존자) 위치 + 원래 진형 오프셋 × `RallyFormationScale`로 교전을 끊고 이동한 뒤 사거리 안의 적만 공격합니다.
+- 충돌 해소는 셀 크기 `MinimumUnitSpacing × SpreadSpacingMultiplier`의 공간 해시로 주변 셀만 비교합니다. 60명 600스텝 약 224ms.
+- `WIBattleClassSkillDefinition`, `ClassSkills`, `GetClassSkill`, `GetCharacterSkill`을 제거하고 스킬 조회는 `GetHeroSkill(heroId)`만 사용합니다.
+- `WIBattleSimulation.Engagement.cs`: 연속 모드(`UseHiddenGrid == false`)의 표적 선택, 근접 교전 슬롯 배정, 역할별 이동·공격을 담당합니다. 틱마다 살아 있는 인물 색인을 만들고 목표별로 가까운 근접 인물부터 `MeleeSlotCount`개 슬롯을 배정합니다. 슬롯이 없는 인물은 목표 앞 아군 쪽 대기 위치로 이동하며 다음 재평가 때 슬롯 여유가 있는 적을 우선합니다.
+- `WIBattleCharacterState`에 `TargetHeroId`, `RetargetRemaining`, `EngagementSlot`, `WIBattleRuntimeState`에 `TickAccumulator`를 추가했습니다.
+- `WIBattleSimulation.Advance`는 프레임 시간을 `FixedTickSeconds` 고정 틱으로 나누어 `Step`을 호출합니다(프레임당 최대 8틱). `WIBattleRuntimeController`는 `Advance`를 사용하고 테스트·벤치마크는 기존 `Step`을 직접 호출합니다.
+- 충돌 해소는 교전 중 인물에 `EngagedCollisionMass`를 적용해 전열이 뒤에서 미는 인물에게 밀리지 않게 합니다. 쿨다운은 표적 유무와 무관하게 감소합니다.
+- 초기 진형은 전장 높이를 넘는 열을 반 칸 뒤 보조 열로 나눠 배치합니다.
 
 ## 내정·전투 병행과 자동 훈련 (2026-09-20)
 
@@ -101,8 +135,8 @@
 - `WICampaignAutoPlayer.Military`의 `RefreshStrategicAssemblyCastle`은 유지 중인 목표의 유효 집결지를 갱신하고, `FindNearestReinforcementCastle`은 손실 전투단이 일반 등급 대기 인물을 편입할 수 있는 가장 가까운 아군 성을 찾습니다. `FillArmy`는 지휘관 외 보충 인원을 일반 등급으로 제한하며 성 배치 인원 수를 전투단 최대 인원으로 오인하지 않습니다.
 - `WICampaignAutoPlayer.Prisoners.cs`의 `ResolvePrisonerPolicy`는 플레이어 출신 포로 중 유효 영웅·잔여 억류 기간 순으로 한 명을 골라 `ExchangePrisoners` 또는 `RansomPrisoner`를 호출합니다. 일반 포로 몸값 비축선은 내정/균형/공세 순으로 금화 1000/500/250, 마나 300/150/75입니다.
 - `WIAutoCampaignMetrics`의 `PrisonerExchanges`, `PrisonerRansoms`, `PrisonersRecovered`, `PrisonerRansomGoldSpent`, `PrisonerRansomManaSpent`는 포로 대응의 횟수·귀환·자원 지출을 분리해 저장합니다.
-- 전투 물리 회귀 테스트는 `CreateBattleConfigWithHiddenGrid(false)`로 원본 `WI_BattleConfig.asset`의 복제본을 만들고 연속 좌표 모드만 격리해 검증합니다. 실제 게임의 기본 숨은 격자 설정은 유지됩니다.
-- `WIAdministrationAITurnTests`의 전투 결과 픽스처는 `PrepareValdorAttackOnAvalon`에서 발도르 전투단과 2개월 원정을 명시적으로 구성합니다. AI 공격 대상 선택 검증과 전투 세션·결과 검증은 서로 독립된 테스트 계약입니다.
+- 전투 물리 회귀 테스트는 `CreateBattleConfigCopy()`로 원본 `WI_BattleConfig.asset`의 복제본을 만들어 검증합니다.
+- `WIAdministrationAITurnTests`의 전투 결과 픽스처는 `PrepareValdorAttackOnRimgard`에서 발도르 전투단과 2개월 원정을 명시적으로 구성합니다. AI 공격 대상 선택 검증과 전투 세션·결과 검증은 서로 독립된 테스트 계약입니다.
 
 ## 전투 캐릭터 표시 프리팹
 
@@ -142,7 +176,7 @@
 - `WICampaignVariantDefinition.castlePlacements`가 선택 시나리오의 성 소유 세력·정규화 좌표·인접 성을 덮어씁니다.
 - 런타임의 `WICastleRuntimeState`에 확정된 배치를 저장하고, `WIAdministrationWorldSnapshot.MapNodes`와 `MapConnections`를 통해 공용 프리팹에 표시합니다.
 - 프리 시나리오처럼 덮어쓰기가 없는 항목은 `WICastleDefinition`의 기본 소유 세력·좌표·연결을 유지합니다.
-- 아레스 메인의 `aiPreservationFactionId=valdor`, `valdorAIPreservationCastleCount=36`은 제3세력 AI의 발도르 침식만 제한하는 시나리오 데이터입니다. 아발론의 정복 진행과 발도르 자체 경제·방어 수치에는 보너스를 주지 않습니다.
+- 아레스 메인의 `aiPreservationFactionId=valdor`, `valdorAIPreservationCastleCount=36`은 제3세력 AI의 발도르 침식만 제한하는 시나리오 데이터입니다. 림가르드의 정복 진행과 발도르 자체 경제·방어 수치에는 보너스를 주지 않습니다.
 - `WIAdministrationTurnSystem.Pipeline.cs`는 월간 처리를 준비, 성별 처리, 후속 시스템, 턴 완료의 네 단계로 조율합니다. 개별 경제·인물·군사·AI 계산은 `WIAdministrationTurnSystem`의 도메인 함수가 담당합니다.
 - `WICampaignAutoPlayer.cs`는 자동 캠페인 월간 실행, 내정 방침·영입 준비와 결과 지표 집계를 담당합니다. `WICampaignAutoPlayer.Decisions.cs`는 사업·관계·지역·점령·영입·유산 선택 해결, 정책별 선택 점수와 미결 선택 집계를 담당합니다.
 - `WICampaignAutoPlayer.Military.cs`는 자동 플레이어의 전투단 생성·훈련·집결, 아군 영토 경로 탐색, 공격 가능 판정과 플레이어 참가 대기 전투 자동 해결을 담당합니다. 실제 군사 상태 변경은 `WIAdministrationTurnSystem` 공개 API에 위임합니다.
@@ -207,7 +241,7 @@
 
 전투씬 캐릭터·지면·환경물·머티리얼·라이팅의 현재 설정과 제작 절차는 `GameDocuments/BattleSceneAssetSettingsGuide.md`를 단일 기준 문서로 사용합니다.
 
-- `WIHiddenBattleGrid`: 전투 배경과 분리된 숨은 사각 좌표 유틸리티입니다. 현재 Cell Width 0.6, Cell Height 0.3이며 상하좌우와 네 대각선의 8방향 이웃을 제공합니다. 좌표는 캐릭터 발 위치와 이동 목적지 예약에만 사용하고 격자 선은 생성하지 않습니다.
+- `WIHiddenBattleGrid`와 격자 관련 설정(`useHiddenGrid`, `gridCell*`, `gridArrivalDistance`)·인물 상태(`Grid*`)는 2026-09-25에 제거했습니다.
 - `WIBattleCharacterState.GridColumn/GridRow`: 현재 점유 셀입니다. `GridDestinationColumn/GridDestinationRow`와 `HasGridDestination`은 이동 중 목적지 셀을 예약해 다른 캐릭터가 같은 셀을 선택하지 못하게 합니다.
 - 근접 공격 접근은 목표 주변 여덟 셀 중 빈 셀을 사용하며 실제 명중은 기존 월드 거리 판정입니다. 투사체와 광역 스킬도 월드 좌표 판정을 유지합니다.
 
@@ -490,7 +524,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - 공통 `ShowMessage`는 `WIAdministrationDatabaseSO.GetText`로 UID를 번역한 뒤 `WIAdministrationTurnFollowupMode.Message`와 제목·본문 문자열로 변환합니다. 기존 호출부의 오류·성공 결과 데이터는 변경하지 않고 UI Toolkit 모달 생성만 제거했습니다.
 - 전투 HUD 이미지 연결은 `WIBattleHUD.uss`의 `battle-top-status-frame`, `battle-character-info-frame`, `battle-command-frame`, `battle-skill-frame` 클래스에 고정되어 있습니다. `battle-status`, `selection-info`, `command-feedback`, `skill-buttons` 및 네 명령 버튼의 이름은 런타임 컨트롤러 계약이므로 유지합니다.
 - `WIBattleConfigSO.battleSpriteScale`: 전투용 캐릭터 Sprite의 공통 Transform 배율입니다. 현재 `1`이며 전투 이미지가 없는 플레이스홀더에는 적용되지 않습니다. 실제 캐릭터 크기는 전투 Sprite의 PPU 규격으로 관리합니다.
-- `WIBattleSimulation.cs`: 프레임 전투 진행, 승패 목표와 일반 공격을 담당합니다. `WIBattleSimulation.Movement.cs`는 근접 밀치기, 연속 좌표 충돌, 숨은 격자 이동·점유 셀·근접 접근 위치와 전장 경계를 담당합니다. `WIBattleSimulation.Projectiles.cs`는 원거리 역할 판정, 발사체 생성·추적·수명·선분 충돌과 선택적 아군 오발을 담당합니다. `WIBattleSimulation.Skills.cs`는 영웅 스킬 조건 검사, 마나·재사용 대기시간, 범위 피해·회복·지휘 효과와 스킬 시각 효과 상태 생성을 담당합니다.
+- `WIBattleSimulation.cs`: 프레임 전투 진행, 승패 목표와 일반 공격을 담당합니다. `WIBattleSimulation.Movement.cs`는 근접 밀치기, 공간 해시 충돌 해소와 전장 경계를, `WIBattleSimulation.Engagement.cs`는 고정 틱 진행, 표적 선택, 교전 슬롯과 명령별 이동을 담당합니다. `WIBattleSimulation.Projectiles.cs`는 원거리 역할 판정, 발사체 생성·추적·수명·선분 충돌과 선택적 아군 오발을 담당합니다. `WIBattleSimulation.Skills.cs`는 영웅 스킬 조건 검사(`GetHeroSkillBlockReason`이 `WIBattleSkillBlockReason`을 반환하고 HUD가 UID 문구로 변환), 마나·재사용 대기시간, 범위 피해·회복·지휘 효과와 스킬 시각 효과 상태 생성을 담당합니다.
 - `WIBattleConfigSO.arenaBackgroundSize`: 배경 Sprite 전용 월드 표시 크기입니다. 현재 `57.024×32.076`이며 `arenaSize` 18×10의 이동·진형·충돌 판정에는 영향을 주지 않습니다.
 - `WIBattleConfigSO.cameraMinimumZoom`, `cameraMiddleZoom`, `cameraMaximumZoom`: A/B/C 고정 줌의 직교 크기이며 현재 각각 `6`, `8`, `10`입니다.
 - `WI_BattleConfig.arenaBackground`: 현재 `Battle_FortressField_V4_4K` Sprite를 참조합니다. V1~V3는 비교와 복구용으로 유지합니다.
@@ -508,7 +542,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - `button_normal`: 공통 일반 UGUI 버튼 Sprite입니다. Single Sprite Border는 `{left: 28, bottom: 28, right: 28, top: 28}`이며 연결 Image는 Sliced를 사용합니다.
 - `button_primary`: 공통 주요 UGUI 버튼 Sprite입니다. Border는 `{left: 28, bottom: 24, right: 28, top: 24}`이며 연결 Image는 Sliced를 사용합니다.
 - `WIAdministrationWorldUGUI.prefab`: 전략 화면의 시안 기반 5영역 레이아웃과 60개 성 버튼을 저장한 고정 UGUI 프리팹입니다. 디자인은 Prefab Mode에서 직접 편집하며 런타임에는 새 UI를 동적으로 만들지 않습니다.
-- `strategy_avalon_crest_v1`: `Assets/Resources/UI/Generated`에 저장된 아발론 문장 Sprite입니다. 상단 진영 및 선택 성 패널에서 재사용하며 투명 배경, 중립 청회색 금속 색조를 사용합니다.
+- `strategy_avalon_crest_v1`: `Assets/Resources/UI/Generated`에 저장된 림가르드 문장 Sprite입니다. 상단 진영 및 선택 성 패널에서 재사용하며 투명 배경, 중립 청회색 금속 색조를 사용합니다.
 - `WIAdministrationWorldSnapshot.CastleHeroCards`: 선택 성의 주둔 영웅 중 최대 네 명의 표시 이름, 경험 기반 레벨 문자열, 초상 Sprite를 전달하는 읽기 전용 목록입니다.
 - `WIAdministrationUIController.UGUIWorldSnapshot.cs`: 월드 HUD·선택 성 상세·영웅 카드·지도 노드·연결선 데이터를 `WIAdministrationWorldSnapshot`으로 조립합니다. 화면 표시 상태와 전환 이벤트는 `WIAdministrationUIController.UGUIBridge.cs`가 담당합니다.
 - `WIAdministrationWorldSnapshot.MapConnections`: 인접 성 두 곳의 정규화 좌표, 표시색, 적대 전선 여부와 선택 경로 여부를 전달합니다. `WIAdministrationMapConnectionGraphic`이 이 목록을 하나의 UGUI 메시로 렌더링합니다.
@@ -685,3 +719,54 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - 2026-09-24 검증: 모병16개·저장복구5개 총21개 통과. JsonUtility가 복원하는 빈 MusterOrder는 불러올 때 제거한다. 구 저장과 현재 저장 모두 예약 없는 성은 즉시 모병 가능하다. 실제 군사 프리팹 카드 핸들러도 자동 검사했고 컴퓨터 유즈/시각 검사는 제외했다.
 
 - 2026-09-24: WIAdministrationTerritoryUGUI의 CommandPanel/Command-4(기본 시설)를 제거하고 commandButtons/commandActions의 해당 항목을 함께 삭제함. 남은 명령 값은 0,1,2,3,5,6,7이며 Command-5~7을 위로 재배치함. 중앙 시설 4개 참조와 BasicFacility enum 값, 선술집 공용 모달은 유지함.
+
+
+## 시나리오 선택 화면 시안 (2026-09-24)
+- GameDocuments/UIConcepts/ScenarioSelection_UI_Concept_V1.png 및 동명 설명 문서를 추가했습니다. 메인 캠페인·프리 시나리오 목록과 이야기·시작 조건·승리 목표를 분리한 검토용 시안입니다. 게임 구현과 마스터 데이터 변경은 없습니다.
+
+## 시나리오 선택 UI 구조 (2026-09-24)
+- WICampaignTitleUGUIController.Selection.cs는 기존 컨트롤러의 partial로 표시 참조 검증, 고정 문자열 UID 바인딩, 선택 상세 갱신, 두 페이지 전환을 담당한다. AdvanceSelection은 첫 단계에서 설정만 열고 두 번째 단계에서 기존 StartNewCampaign을 호출한다.
+- WICampaignVariantDefinition에 selectionArtwork 및 표시용 UID 5종을 추가했다. 밸런스·저장 상태 필드는 변경하지 않았다. 시나리오 제목은 별도 UID를 사용하므로 기존 DisplayName은 배지로 유지한다. 시작 성 이름은 실제 PlayerStartingCastleId를 조회한다.
+- WIScenarioSelectionPrefabUtility는 편집 전용 프리팹 제작 및 문자열 시딩 도구다. 런타임에서는 기존 요소의 텍스트·Sprite·색·활성 상태만 변경한다. 참조 누락 시 오류를 보고하고 대체 UI를 만들지 않는다.
+- WIScenarioSelectionTests 3건은 시나리오/난이도 선택 유지, 상세·삽화·목표·시작 성 전환, Reserved 차단, 참조/문구/레이캐스트를 검증한다. 기존 WIUGUIMigrationTests와 합계 53/53 통과했고 시각 보정 후 관련 3/3 재통과했다.
+- WIScenarioSelectionQA 메뉴는 플레이 모드 검증용 버튼 이벤트와 캡처를 제공한다. Show는 검증 중 다른 모달 위에 보이도록 해당 런타임 Canvas 순서만 올린다. 검증 종료 시 플레이 모드를 종료하여 원래 프리팹 값을 유지한다.
+
+## 일반 인재 활동 제거 및 군사 인물 이동 통합 (2026-09-24)
+- 영지의 인재 활동 명령을 프리팹에서 제거했다. 명령 버튼은 6개이며 훈련소 바로가기는 군사 메뉴를 연다. 성소는 자동 훈련·회복 안내를 표시한다.
+- 군사 → 인물 이동 → 출발 성 → 대기 인물 → 목적지 흐름을 기존 군사 목록 프리팹으로 제공한다. 신규 런타임 UI 조립 없음. 전투단원은 제외하고 영지관·임무 담당자는 비활성 표시한다. 이동은 기존 아군 경로·거주 공간·예약·월간 이동 규칙을 사용한다. 다른 세력 인물의 이동 명령은 거절한다.
+- 기존 WIAdministrationCharacterActivityUGUI 프리팹/클래스 이름은 참조 호환을 위해 유지하되 인재실 탐색·영입 전용으로 정리했다. 교류·훈련·휴식·이동 버튼과 이동 화면 코드를 제거했다. 인재실 후보가 자격 필터 후 0명이면 필요 특성·전투단/임무·정원 안내를 표시한다.
+- AssignUGUICharacterActivity는 탐색·영입만 허용한다. NormalizeCharacterDuties는 구 저장의 교류·수동 휴식·개인 훈련과 반복 지시를 해제한다. 자동 훈련·회복 및 인재실 반복 업무 중 자동 휴식은 유지한다. 저장 enum 값과 기존 관계 데이터는 호환성을 위해 보존한다.
+- WIActivityRetirementSetup의 WI/UI/Retire Character Activities 메뉴가 프리팹 및 UI_TRANSFER_*, UI_AUTO_RECOVERY_*, 인재실 안내 문자열 UID를 저장한다. WIAdministrationUIController.UGUICharacterTransferMenu.cs가 군사 이동 목록을 담당한다.
+- WIActivityRetirementTests 신규 5건과 UGUI·내정 병행·특성·모병 회귀 합계 99/99 통과(job abd33435d988446db6e10b0379387bee). 실제 군사 프리팹 카드 핸들러로 이동 예약, 권한·업무 제한, 저장 정규화, 자동 회복 및 폐지 메뉴 제거를 검증했다. 이전 버튼 개수와 수동 휴식으로 업무를 막던 기대값 2건은 새 규칙에 맞게 수정했다.
+- Unity 컴파일 오류 없음. 최종 콘솔에는 기존 지도 편집기의 CS0108 경고와 TMP 말줄임표 글리프 누락 경고가 확인됐다. 실제 화면 캡처는 배경만 반환하여 시각 검증 미완료로 구분한다. 군사 이동의 실제 프리팹 카드 핸들러는 자동 검사로 검증했다. 검증 후 플레이 모드 종료. 커밋·푸시 없음.
+- 최종 재로딩 중 WICharacterSelectionList.LateUpdate의 후보 수/행 캐시 불일치 예외를 발견하여 기존 자식 행 캐시 복구와 유효 범위 검사를 추가했다. UI 동적 구조 생성은 하지 않는다.
+
+## 군사 목록 UI 표시 모드 (2026-09-24)
+- WICharacterSelectionList.SetCharacterToolsEnabled(bool): 기존 검색·필터·정렬·인원 표시의 활성 상태를 전환한다. 숨김 상태에서는 필터/정렬을 무시하며 모드 전환 시 이전 조건을 초기화한다.
+- WIAdministrationMilitaryUGUIController는 commanders/members/transfer-actors 단계에서만 인물 도구를 활성화한다. 모병 명령 항목 수를 인원으로 표시하지 않는다. 저장/마스터 데이터 구조 변경 없음.
+
+## 인사 소속 판정 (2026-09-24)
+- UGUIHeroesBridge.IsPlayerPersonnel: 영입/생존 확인 후 전향 소속, 포로 이전 소속, 전투단 소속, 이동 출발 성 소속, 현재 성 소속 순으로 플레이어 인물을 판정한다. BuildHeroListCards는 동일 목록으로 카드와 인원 수를 구성한다. 마스터/저장 스키마 변경 없음.
+
+## 글꼴 스타일 에셋 (2026-09-24)
+- WITypographyStyleSetup(에디터 전용): 기존 프리팹의 Title 및 짧은 단일 버튼 Label/Text를 갱신한다. WI-Serif-Ivory.mat은 NotoSerifCJKkr-Dynamic atlas를 공유하며 FaceDilate 0.025, OutlineWidth 0.065, UnderlayOffsetY -0.35, UnderlaySoftness 0.18을 사용한다. 저장/게임 데이터 변경 없음.
+
+### 명조체 소형 버튼 보정 (2026-09-24)
+- 사용자 화면에서 작은 글자의 획이 뭉개져 보여 1차 스타일을 보정했다. 맵의 짧은 명령은 최소 26 크기, 버튼 자간 0.5/제목 2로 적용한다. 가로 압축은 기존에도 없었다.
+- WI-Serif-Ivory의 FaceDilate 0, OutlineWidth 0.02, OutlineSoftness 0, Underlay 알파 0.3/OffsetX 0/OffsetY -0.15/Softness 0.1로 변경한다. 위의 1차 수치보다 이 값을 우선한다. 실제 화면 개선 여부는 별도 시각 확인이 필요하다.
+
+### 글꼴 스타일 실험 원복 (2026-09-24)
+- 사용자 요청으로 32개 문구의 글꼴·크기·색·스타일·자간·패딩·머티리얼을 실험 이전 값으로 복원했다. 중첩 턴 종료 버튼의 스타일 오버라이드도 제거했다. 인재 활동 삭제·아군 목록·모병 UI 등 기존 기능 변경은 유지한다.
+- WI-Serif-Ivory.mat과 WITypographyStyleSetup.cs 및 메타를 제거했다. 앞선 스타일 적용/보정 설명은 폐기된 실험 기록이며 현재 설정이 아니다. 추가 효과 적용 없이 가이드만 제공한다.
+
+## 전투 테스트 씬 진입 복구 (2026-09-25)
+- StartTestBattle은 별도 임시 상태에서 대상 성 소속을 세션의 방어 세력과 맞춘다. 기본 프리 시나리오의 castle_00/rimgard 소속 때문에 아군 성 공격 금지 조건에 걸리던 문제를 해결했다. 일반 캠페인의 전투 제한은 유지한다.
+- 유효한 전장/서로 다른 세력/대기 세션/전투 씬 등록을 확인하고 실패 이유를 콘솔에 기록한다. 테스트 랩은 시작 시도 후 예약을 소비하며 성공·실패·서비스 대기 시간 초과를 알린다.
+- UnityMCP로 30대30 메뉴 실행 후 BattleScene 로드 및 아군 30명/적군 30명 시작 로그 확인. 콘솔 오류 없음. Battle Test Lab 창의 수동 버튼은 별도 클릭하지 않았으며 동일 TryLaunchPendingBattle 경로를 공유한다. 검증 후 플레이 종료. 저장 데이터/마스터/씬 수정 없음.
+
+## 임시 전투 이펙트 에셋 구조 (2026-09-25)
+- Assets/Prefabs/Battle/Effects/Temporary/WI_Temp_{Slash,Arrow,Magic,Hit}.prefab: 루트는 무방출 ParticleSystem, 자식은 메시 파티클. 각각 자식 3/3/4/10개, 각 자식 Max Particles 1, 단발 Burst 1, Loop false, Local simulation, Hierarchy scaling. 정렬 순서는 임시 확인용 Default 레이어 3001 이상이다. 실제 전투 깊이 정렬은 추후 연결 때 조절한다.
+- Assets/Art/Battle/Effects/Temporary: 검격 원호·화살·구체·링·파편 메시 및 공용 무조명 알파 블렌드 셰이더/머티리얼. 메시 정점 색상은 파티클 호환용 Color32 흰색, 정점 스트림은 Position/Color, GPU Instancing은 비활성화한다.
+- WITemporaryBattleEffectsBuilder는 Assets/Editor 전용이다. Create는 기존 4종 프리팹이 있으면 덮어쓰기를 거절하며, Apply Temporary Effect Visuals는 임시 효과의 머티리얼/화살 메시/정점 색상/렌더러 설정을 기본값으로 복원한다. 수동 편집 후에는 복원 메뉴를 실행하지 않는다. Verify는 임시 PreviewScene을 만들고 finally에서 정리하며 기존 게임 씬을 저장하지 않는다.
+- 검증은 실제 파티클 수로 표시/소멸을 검사한다. 편집기 Simulate 이후 IsAlive는 파티클 수가 0이어도 일시정지된 시스템을 활성 상태로 보고할 수 있어 종료 기준으로 사용하지 않는다.
+- 런타임 코드, SO 마스터, 저장 구조, 문자열 UID 및 기존 전투 이벤트 변경 없음. 생성·회수·목표 추적·명중 이벤트 연결은 후속 작업이다.

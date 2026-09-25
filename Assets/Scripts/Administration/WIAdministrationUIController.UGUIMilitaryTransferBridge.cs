@@ -48,7 +48,7 @@ namespace ProjectWI.Administration
             error = string.Empty;
             WICharacterRuntimeState actor = state.GetCharacter(actorHeroId);
             WICastleRuntimeState originState = state.Castles.FirstOrDefault(castle => castle.HeroIds.Contains(actorHeroId));
-            if (actor == null || originState == null || state.IsCharacterBusy(actorHeroId))
+            if (actor == null || originState == null || originState.FactionId != state.PlayerFactionId || state.IsCharacterBusy(actorHeroId))
             {
                 error = "이동할 인물을 다시 선택하십시오.";
                 return false;
@@ -82,13 +82,22 @@ namespace ProjectWI.Administration
         public bool StartUGUICharacterTransfer(string actorHeroId, string targetCastleId, out string message)
         {
             message = string.Empty;
+            var origin = state.Castles.FirstOrDefault(castle => castle.HeroIds.Contains(actorHeroId));
+            if (origin == null || origin.FactionId != state.PlayerFactionId)
+            {
+                message = database.GetText("UI_TRANSFER_UNAVAILABLE");
+                return false;
+            }
             if (WIAdministrationTurnSystem.StartCharacterTransfer(database, state, actorHeroId, targetCastleId) == false)
             {
                 message = "이동할 수 없습니다. 임무, 영지관직, 아군 경로와 목적지 슬롯을 확인하십시오.";
                 return false;
             }
             WICastleDefinition target = database.GetCastle(targetCastleId);
-            SelectCastle(selectedCastle.CastleId);
+            if (selectedCastle != null)
+            {
+                SelectCastle(selectedCastle.CastleId);
+            }
             RefreshAll();
             WICharacterTransferState transfer = state.CharacterTransfers.FirstOrDefault(item => item.HeroId == actorHeroId);
             int months = transfer?.RemainingMonths ?? 1;

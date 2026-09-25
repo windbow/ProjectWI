@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace ProjectWI.Administration
 {
-    public class WICampaignTitleUGUIController : WIAdministrationUGUIPanelController
+    public partial class WICampaignTitleUGUIController : WIAdministrationUGUIPanelController
     {
         [SerializeField] private WIAdministrationDatabaseSO database;
         [SerializeField] private Button[] difficultyButtons;
@@ -62,9 +62,15 @@ namespace ProjectWI.Administration
             administrationController.UGUIWorldChanged -= HideWhenCampaignStarted;
             administrationController.UGUIWorldChanged += HideWhenCampaignStarted;
 
+            if (ValidateSelectionView() == false)
+            {
+                enabled = false;
+                return;
+            }
+            BindSelectionView();
             BindDifficultyCards();
             BindVariantCards();
-            newCampaignButton.onClick.AddListener(StartNewCampaign);
+            newCampaignButton.onClick.AddListener(AdvanceSelection);
             continueCampaignButton.onClick.AddListener(ContinueCampaign);
             normalCardSprite = continueCampaignButton.image.sprite;
             selectedCardSprite = newCampaignButton.image.sprite;
@@ -73,6 +79,7 @@ namespace ProjectWI.Administration
             continueCampaignButton.interactable = service != null && service.HasSave(0);
             SelectDifficulty(WICampaignDifficulty.Standard);
             SelectVariant(WICampaignVariant.AresMain);
+            ShowSettings(false);
 
             bool campaignStarted = service != null && service.HasCampaignStarted;
             administrationController.SetUGUICampaignTitleVisibility(campaignStarted == false);
@@ -107,7 +114,11 @@ namespace ProjectWI.Administration
             {
                 int capturedIndex = index;
                 WICampaignVariantDefinition definition = variantDefinitions[index];
-                variantLabels[index].text = $"{definition.DisplayName.Get(database.UseEnglish)}\n{FormatDescription(definition.Description.Get(database.UseEnglish))}";
+                variantButtons[index].gameObject.SetActive(definition.Variant != WICampaignVariant.Reserved);
+                variantLabels[index].text = database.GetText(definition.SelectionTitleUid);
+                variantArtwork[index].sprite = definition.SelectionArtwork;
+                variantSubtitles[index].text = database.GetText(definition.SelectionSubtitleUid);
+                variantBadges[index].text = definition.DisplayName.Get(database.UseEnglish);
                 variantButtons[index].onClick.AddListener(() => SelectVariant(variantDefinitions[capturedIndex].Variant));
             }
         }
@@ -132,12 +143,18 @@ namespace ProjectWI.Administration
         // 선택 시작 조건과 카드 강조 상태를 변경합니다.
         private void SelectVariant(WICampaignVariant variant)
         {
+            if (variant == WICampaignVariant.Reserved)
+            {
+                return;
+            }
             selectedVariant = variant;
             for (int index = 0; index < variantButtons.Length; index += 1)
             {
                 bool selected = index < variantDefinitions.Count && variantDefinitions[index].Variant == variant;
-                ApplyCardState(variantButtons[index], variantLabels[index], selected);
+                variantButtons[index].image.color = selected ? new Color32(99, 199, 247, 255) : new Color32(111, 129, 146, 255);
+                variantLabels[index].color = normalTextColor;
             }
+            RefreshSelectionDetails();
         }
 
         // 선택 여부에 맞춰 카드 배경과 글자색을 적용합니다.
@@ -189,6 +206,8 @@ namespace ProjectWI.Administration
             }
 
             gameObject.SetActive(true);
+            continueCampaignButton.interactable = WICampaignRuntimeService.Instance != null && WICampaignRuntimeService.Instance.HasSave(0);
+            ShowSettings(false);
         }
     }
 }

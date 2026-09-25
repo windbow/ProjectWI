@@ -17561,7 +17561,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC544\uBC1C\uB860"
+  m_text: "\uB9BC\uAC00\uB974\uB4DC"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6c948318bea91d84684a4219dcc76f41, type: 2}
   m_sharedMaterial: {fileID: 3596507471698299224, guid: 6c948318bea91d84684a4219dcc76f41, type: 2}
@@ -25322,7 +25322,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC218\uB3C4 \xB7 \uC544\uBC1C\uB860 \uC655\uAD6D"
+  m_text: "\uC218\uB3C4 \xB7 \uB9BC\uAC00\uB974\uB4DC \uC655\uAD6D"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8b89f733eb7ae934a9db64ef8e3b1b6c, type: 2}
   m_sharedMaterial: {fileID: 424139623409303589, guid: 8b89f733eb7ae934a9db64ef8e3b1b6c, type: 2}
@@ -28447,7 +28447,7 @@ MonoBehaviour:
   - castle_58
   - castle_59
   connectionGraphic: {fileID: 277951405124790010}
-  avalonMarker: {fileID: 8402770341708960278, guid: 1442095e0a7920744a40502ebcf2cad7, type: 3}
+  rimgardMarker: {fileID: 8402770341708960278, guid: 1442095e0a7920744a40502ebcf2cad7, type: 3}
   valdorMarker: {fileID: 5086777674840233132, guid: 648e263f974c3074aaa0373c8e8edd8f, type: 3}
   ironheartMarker: {fileID: 7764279995505570108, guid: e5bcd2ca2ba2490469e9cf36aa431fbf, type: 3}
   sylvanroadMarker: {fileID: 9143111698853416393, guid: 8d295a6da90dec34ab16efda5d19ff86, type: 3}

@@ -48,6 +48,7 @@ namespace ProjectWI.Administration
         BasicFacility,
         Delegation,
         March,
-        CastleRecord
+        CastleRecord,
+        Military
     }
 }

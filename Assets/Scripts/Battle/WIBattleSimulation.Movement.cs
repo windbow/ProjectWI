@@ -5,6 +5,13 @@ namespace ProjectWI.Battle
 {
     public static partial class WIBattleSimulation
     {
+        // 충돌 해소 대상 생존 인물 목록을 틱마다 재사용합니다.
+        private static readonly List<WIBattleCharacterState> collisionCharacters = new List<WIBattleCharacterState>();
+        // 공간 해시 셀 키별 인물 색인 목록입니다.
+        private static readonly Dictionary<long, List<int>> collisionBuckets = new Dictionary<long, List<int>>();
+        // 공간 해시 셀 목록 객체를 재사용하기 위한 풀입니다.
+        private static readonly Stack<List<int>> collisionBucketPool = new Stack<List<int>>();
+
         // 근접 공격에 맞은 대상을 공격자 반대 방향으로 밀어내며 사수 진형은 밀치기를 완화합니다.
         private static void ApplyMeleeKnockback(
             WIBattleConfigSO config,
@@ -21,204 +28,107 @@ namespace ProjectWI.Battle
             {
                 direction = actor.Side == WIBattleSide.Attacker ? Vector2.right : Vector2.left;
             }
-            float resistance = GetCommand(runtime, target.Side) == WIBattleCommand.Hold
+            float resistance = GetCommand(runtime, target) == WIBattleCommand.Hold
                 ? config.HoldKnockbackResistance
                 : 0f;
             target.Position += direction.normalized * config.MeleeKnockbackDistance * (1f - resistance);
             ClampToArena(config, target);
-            if (config.UseHiddenGrid == true)
-            {
-                HashSet<WIGridCoordinate> occupied = CollectOccupiedCells(runtime, target);
-                WIGridCoordinate coordinate = WIHiddenBattleGrid.FindNearestAvailable(
-                    target.Position,
-                    config.ArenaSize,
-                    config.GridCellWidth,
-                    config.GridCellHeight,
-                    occupied);
-                target.GridColumn = coordinate.Column;
-                target.GridRow = coordinate.Row;
-                target.GridDestinationColumn = coordinate.Column;
-                target.GridDestinationRow = coordinate.Row;
-                target.HasGridDestination = false;
-                target.Position = WIHiddenBattleGrid.GridToWorld(coordinate, config.GridCellWidth, config.GridCellHeight);
-            }
         }
 
         // 살아 있는 모든 인물의 겹침을 해소해 아군 진형과 적 전선이 한 점에 포개지지 않게 합니다.
         private static void ResolveCharacterCollisions(WIBattleConfigSO config, WIBattleRuntimeState runtime)
         {
-            if (config.UseHiddenGrid == true)
-            {
-                return;
-            }
-            List<WIBattleCharacterState> characters = new List<WIBattleCharacterState>(runtime.Characters.Count);
+            collisionCharacters.Clear();
             foreach (WIBattleCharacterState character in runtime.Characters)
             {
-                if (character.IsAlive) characters.Add(character);
-            }
-            for (int leftIndex = 0; leftIndex < characters.Count; leftIndex += 1)
-            {
-                for (int rightIndex = leftIndex + 1; rightIndex < characters.Count; rightIndex += 1)
+                if (character.IsAlive == true)
                 {
-                    WIBattleCharacterState left = characters[leftIndex];
-                    WIBattleCharacterState right = characters[rightIndex];
-                    Vector2 delta = right.Position - left.Position;
-                    float distance = delta.magnitude;
-                    if (distance >= config.MinimumUnitSpacing)
+                    collisionCharacters.Add(character);
+                }
+            }
+            float cellSize = config.MinimumUnitSpacing * config.SpreadSpacingMultiplier;
+            BuildCollisionBuckets(cellSize);
+            for (int leftIndex = 0; leftIndex < collisionCharacters.Count; leftIndex += 1)
+            {
+                WIBattleCharacterState left = collisionCharacters[leftIndex];
+                int cellX = Mathf.FloorToInt(left.Position.x / cellSize);
+                int cellY = Mathf.FloorToInt(left.Position.y / cellSize);
+                for (int offsetX = -1; offsetX <= 1; offsetX += 1)
+                {
+                    for (int offsetY = -1; offsetY <= 1; offsetY += 1)
                     {
-                        continue;
+                        if (collisionBuckets.TryGetValue(GetCellKey(cellX + offsetX, cellY + offsetY), out List<int> bucket) == false)
+                        {
+                            continue;
+                        }
+                        foreach (int rightIndex in bucket)
+                        {
+                            if (rightIndex > leftIndex)
+                            {
+                                SeparatePair(config, runtime, leftIndex, rightIndex);
+                            }
+                        }
                     }
-                    Vector2 direction = distance > 0.0001f
-                        ? delta / distance
-                        : GetFallbackSeparationDirection(left, right, leftIndex, rightIndex);
-                    float correction = (config.MinimumUnitSpacing - distance) * config.CollisionResolveStrength * 0.5f;
-                    left.Position -= direction * correction;
-                    right.Position += direction * correction;
-                    ClampToArena(config, left);
-                    ClampToArena(config, right);
                 }
             }
         }
 
-        // 전투 방식에 따라 연속 좌표 이동 또는 숨은 육각 셀 이동을 시작합니다.
-        private static void MoveCharacter(
-            WIBattleConfigSO config,
-            WIBattleRuntimeState runtime,
-            WIBattleCharacterState actor,
-            Vector2 desiredPosition,
-            float speed,
-            float deltaTime)
+        // 두 인물이 최소 간격보다 가까우면 질량 비율에 따라 서로 밀어냅니다. 분산 중인 같은 진영은 간격을 넓힙니다.
+        private static void SeparatePair(WIBattleConfigSO config, WIBattleRuntimeState runtime, int leftIndex, int rightIndex)
         {
-            if (config.UseHiddenGrid == false)
+            WIBattleCharacterState left = collisionCharacters[leftIndex];
+            WIBattleCharacterState right = collisionCharacters[rightIndex];
+            float spacing = config.MinimumUnitSpacing;
+            if (left.Side == right.Side &&
+                (GetCommand(runtime, left) == WIBattleCommand.Spread || GetCommand(runtime, right) == WIBattleCommand.Spread))
             {
-                actor.Position = Vector2.MoveTowards(actor.Position, desiredPosition, speed * deltaTime);
-                return;
+                spacing *= config.SpreadSpacingMultiplier;
             }
-
-            WIGridCoordinate current = new WIGridCoordinate(actor.GridColumn, actor.GridRow);
-            HashSet<WIGridCoordinate> occupied = CollectOccupiedCells(runtime, actor);
-            WIGridCoordinate best = current;
-            float bestDistance = Vector2.SqrMagnitude(actor.Position - desiredPosition);
-            IReadOnlyList<WIGridCoordinate> neighbors = WIHiddenBattleGrid.GetNeighbors(current);
-            for (int index = 0; index < neighbors.Count; index += 1)
-            {
-                WIGridCoordinate candidate = neighbors[index];
-                if (occupied.Contains(candidate))
-                {
-                    continue;
-                }
-                Vector2 candidatePosition = WIHiddenBattleGrid.GridToWorld(
-                    candidate,
-                    config.GridCellWidth,
-                    config.GridCellHeight);
-                if (WIHiddenBattleGrid.IsInsideArena(candidatePosition, config.ArenaSize) == false)
-                {
-                    continue;
-                }
-                float distance = Vector2.SqrMagnitude(candidatePosition - desiredPosition);
-                if (distance < bestDistance)
-                {
-                    best = candidate;
-                    bestDistance = distance;
-                }
-            }
-            if (best.Equals(current))
+            Vector2 delta = right.Position - left.Position;
+            float distance = delta.magnitude;
+            if (distance >= spacing)
             {
                 return;
             }
-            actor.GridDestinationColumn = best.Column;
-            actor.GridDestinationRow = best.Row;
-            actor.HasGridDestination = true;
-            ContinueGridMovement(config, actor, speed, deltaTime);
+            Vector2 direction = distance > 0.0001f
+                ? delta / distance
+                : GetFallbackSeparationDirection(left, right, leftIndex, rightIndex);
+            float correction = (spacing - distance) * config.CollisionResolveStrength;
+            float leftMass = GetCollisionMass(config, left);
+            float rightMass = GetCollisionMass(config, right);
+            float totalMass = leftMass + rightMass;
+            left.Position -= direction * correction * (rightMass / totalMass);
+            right.Position += direction * correction * (leftMass / totalMass);
+            ClampToArena(config, left);
+            ClampToArena(config, right);
         }
 
-        // 예약한 인접 육각 셀 중심까지 캐릭터를 부드럽게 이동시키고 도착 좌표를 확정합니다.
-        private static void ContinueGridMovement(
-            WIBattleConfigSO config,
-            WIBattleCharacterState actor,
-            float speed,
-            float deltaTime)
+        // 충돌 검사 대상 인물을 셀 크기 기준 공간 해시에 넣어 주변 셀만 비교하게 합니다.
+        private static void BuildCollisionBuckets(float cellSize)
         {
-            WIGridCoordinate destination = new WIGridCoordinate(
-                actor.GridDestinationColumn,
-                actor.GridDestinationRow);
-            Vector2 destinationPosition = WIHiddenBattleGrid.GridToWorld(
-                destination,
-                config.GridCellWidth,
-                config.GridCellHeight);
-            actor.Position = Vector2.MoveTowards(actor.Position, destinationPosition, speed * deltaTime);
-            if (Vector2.Distance(actor.Position, destinationPosition) > config.GridArrivalDistance)
+            foreach (List<int> bucket in collisionBuckets.Values)
             {
-                return;
+                bucket.Clear();
+                collisionBucketPool.Push(bucket);
             }
-            actor.Position = destinationPosition;
-            actor.GridColumn = destination.Column;
-            actor.GridRow = destination.Row;
-            actor.HasGridDestination = false;
+            collisionBuckets.Clear();
+            for (int index = 0; index < collisionCharacters.Count; index += 1)
+            {
+                Vector2 position = collisionCharacters[index].Position;
+                long key = GetCellKey(Mathf.FloorToInt(position.x / cellSize), Mathf.FloorToInt(position.y / cellSize));
+                if (collisionBuckets.TryGetValue(key, out List<int> bucket) == false)
+                {
+                    bucket = collisionBucketPool.Count > 0 ? collisionBucketPool.Pop() : new List<int>();
+                    collisionBuckets[key] = bucket;
+                }
+                bucket.Add(index);
+            }
         }
 
-        // 현재 캐릭터를 제외하고 살아 있는 인물의 점유 셀과 이동 예약 셀을 수집합니다.
-        private static HashSet<WIGridCoordinate> CollectOccupiedCells(
-            WIBattleRuntimeState runtime,
-            WIBattleCharacterState excluded)
+        // 두 정수 셀 좌표를 공간 해시 키 하나로 합칩니다.
+        private static long GetCellKey(int cellX, int cellY)
         {
-            HashSet<WIGridCoordinate> occupied = new HashSet<WIGridCoordinate>();
-            foreach (WIBattleCharacterState character in runtime.Characters)
-            {
-                if (character == excluded || character.IsAlive == false)
-                {
-                    continue;
-                }
-                occupied.Add(new WIGridCoordinate(character.GridColumn, character.GridRow));
-                if (character.HasGridDestination == true)
-                {
-                    occupied.Add(new WIGridCoordinate(
-                        character.GridDestinationColumn,
-                        character.GridDestinationRow));
-                }
-            }
-            return occupied;
-        }
-
-        // 근접 공격자가 목표 주변 여덟 셀 가운데 현재 위치에서 가장 가까운 빈 공격 위치를 선택합니다.
-        private static Vector2 FindMeleeAttackPosition(
-            WIBattleConfigSO config,
-            WIBattleRuntimeState runtime,
-            WIBattleCharacterState actor,
-            WIBattleCharacterState target)
-        {
-            if (config.UseHiddenGrid == false)
-            {
-                return target.Position;
-            }
-            WIGridCoordinate targetCoordinate = new WIGridCoordinate(target.GridColumn, target.GridRow);
-            HashSet<WIGridCoordinate> occupied = CollectOccupiedCells(runtime, actor);
-            IReadOnlyList<WIGridCoordinate> neighbors = WIHiddenBattleGrid.GetNeighbors(targetCoordinate);
-            Vector2 bestPosition = actor.Position;
-            float bestDistance = float.MaxValue;
-            for (int index = 0; index < neighbors.Count; index += 1)
-            {
-                WIGridCoordinate candidate = neighbors[index];
-                if (occupied.Contains(candidate))
-                {
-                    continue;
-                }
-                Vector2 position = WIHiddenBattleGrid.GridToWorld(
-                    candidate,
-                    config.GridCellWidth,
-                    config.GridCellHeight);
-                if (WIHiddenBattleGrid.IsInsideArena(position, config.ArenaSize) == false)
-                {
-                    continue;
-                }
-                float distance = Vector2.SqrMagnitude(position - actor.Position);
-                if (distance < bestDistance)
-                {
-                    bestPosition = position;
-                    bestDistance = distance;
-                }
-            }
-            return bestPosition;
+            return ((long)cellX << 32) ^ (uint)cellY;
         }
 
         // 완전히 같은 위치에 있는 두 인물도 결정적으로 분리할 방향을 반환합니다.

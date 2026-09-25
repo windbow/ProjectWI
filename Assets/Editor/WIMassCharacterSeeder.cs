@@ -250,8 +250,8 @@ namespace ProjectWI.Editor
                 relationship.FindPropertyRelative("firstHeroId").stringValue = "elwyn";
                 relationship.FindPropertyRelative("secondHeroId").stringValue = "common_gareth";
                 SerializedProperty context = relationship.FindPropertyRelative("context");
-                context.FindPropertyRelative("korean").stringValue = "엘윈과 가레스는 아발론 전선의 공세 속도를 두고 대립합니다.";
-                context.FindPropertyRelative("english").stringValue = "Elwyn and Gareth clash over the pace of the Avalon offensive.";
+                context.FindPropertyRelative("korean").stringValue = "엘윈과 가레스는 림가르드 전선의 공세 속도를 두고 대립합니다.";
+                context.FindPropertyRelative("english").stringValue = "Elwyn and Gareth clash over the pace of the Rimgard offensive.";
             }
         }
 

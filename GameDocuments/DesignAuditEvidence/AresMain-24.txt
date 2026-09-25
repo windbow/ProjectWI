@@ -1,37 +1,31 @@
-경제 시작: 금화 137, 번영합 110
-AresMain Balanced 24: 성 2, 원정 3, 승/패 2/0, 선택 19, 결과 Ongoing, 발도르 잔여 46, 신규영입 2
-대기 common_049: 등급 Common, 내정 False, 영입 False, 탐색가능 False
+경제 시작: 금화 210, 번영합 98
+AresMain Balanced 24: 성 2, 원정 2, 승/패 1/1, 선택 2, 결과 Ongoing, 발도르 잔여 46, 신규영입 0
 대기 ares: 등급 Hero, 내정 True, 영입 True, 탐색가능 True
-대기 common_alden: 등급 Common, 내정 True, 영입 False, 탐색가능 False
-대기 hero_103: 등급 Hero, 내정 False, 영입 False, 탐색가능 False
-대기 hero_108: 등급 Hero, 내정 False, 영입 False, 탐색가능 False
-목표 castle_33, 집결 0, 필요 419, 전체전력 0, 영향력 124, 전쟁 True
-전투단 army_1@castle_04 -> castle_33, 임무 Attack, 인원 6, 전력 416, 이동 True, 재편 0
-전투단 army_2@castle_04 -> castle_33, 임무 Attack, 인원 6, 전력 393, 이동 True, 재편 0
-13: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-13: RECRUITMENT_SEARCH castle_33 영입 후보를 찾기 위해 재야 인재를 탐색합니다.
-14: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-14: RECRUITMENT_SEARCH castle_33 영입 후보를 찾기 위해 재야 인재를 탐색합니다.
-15: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-15: RECRUITMENT_SEARCH castle_33 영입 후보를 찾기 위해 재야 인재를 탐색합니다.
-16: NO_ATTACKABLE_TARGET castle_33 접경·전쟁·피로·예상 전력 조건을 만족하는 목표가 없습니다.
-16: RECRUITMENT_PROGRESS castle_33 hero_103 영입 설득을 진행합니다.
-17: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-17: RECRUITMENT_PROGRESS castle_33 hero_103 영입 설득을 진행합니다.
-18: HERO_REST castle_33 ares의 피로 75 회복을 우선합니다.
-18: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-18: RECRUITMENT_NO_ACTOR castle_33 인재 활동이 가능한 대기 영웅이 없습니다.
-19: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-19: RECRUITMENT_PROGRESS castle_33 hero_103 영입 설득을 진행합니다.
-20: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-20: RECRUITMENT_PROGRESS castle_33 hero_108 영입 설득을 진행합니다.
-21: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-21: RECRUITMENT_PROGRESS castle_33 hero_108 영입 설득을 진행합니다.
+목표 castle_33, 집결 342, 필요 341, 전체전력 342, 영향력 124, 전쟁 True
+전투단 army_1@castle_04 -> , 임무 Reserve, 인원 3, 전력 342, 이동 False, 재편 0
+13: PREPARATION_INTERVAL castle_04 다음 원정 검토 주기 3개월을 준비합니다.
+13: RECRUITMENT_NO_ACTOR castle_04 인재 활동이 가능한 대기 영웅이 없습니다.
+14: HERO_REST castle_04 ares의 피로 70 회복을 우선합니다.
+14: PREPARATION_INTERVAL castle_04 다음 원정 검토 주기 3개월을 준비합니다.
+14: RECRUITMENT_NO_ACTOR castle_04 인재 활동이 가능한 대기 영웅이 없습니다.
+15: NO_ATTACKABLE_TARGET castle_04 접경·전쟁·피로·예상 전력 조건을 만족하는 목표가 없습니다.
+15: RECRUITMENT_NO_ACTOR castle_04 인재 활동이 가능한 대기 영웅이 없습니다.
+16: PREPARATION_INTERVAL castle_04 다음 원정 검토 주기 3개월을 준비합니다.
+16: RECRUITMENT_NO_ACTOR castle_04 인재 활동이 가능한 대기 영웅이 없습니다.
+17: PREPARATION_INTERVAL castle_04 다음 원정 검토 주기 3개월을 준비합니다.
+17: RECRUITMENT_NO_ACTOR castle_04 인재 활동이 가능한 대기 영웅이 없습니다.
+18: NO_ATTACKABLE_TARGET castle_04 접경·전쟁·피로·예상 전력 조건을 만족하는 목표가 없습니다.
+18: RECRUITMENT_NO_ACTOR castle_04 인재 활동이 가능한 대기 영웅이 없습니다.
+19: PREPARATION_INTERVAL castle_04 다음 원정 검토 주기 3개월을 준비합니다.
+19: RECRUITMENT_NO_ACTOR castle_04 인재 활동이 가능한 대기 영웅이 없습니다.
+20: PREPARATION_INTERVAL castle_04 다음 원정 검토 주기 3개월을 준비합니다.
+20: RECRUITMENT_NO_ACTOR castle_04 인재 활동이 가능한 대기 영웅이 없습니다.
+21: MARCH_STARTED castle_04 castle_28에서 castle_04(으)로 원정을 시작합니다.
+21: RECRUITMENT_NO_ACTOR castle_04 인재 활동이 가능한 대기 영웅이 없습니다.
+22: GOAL_SELECTED castle_33 장기 공략 목표를 castle_33(으)로 정했습니다.
 22: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-22: RECRUITMENT_PROGRESS castle_33 hero_108 영입 설득을 진행합니다.
+22: RECRUITMENT_NO_ACTOR castle_33 인재 활동이 가능한 대기 영웅이 없습니다.
 23: PREPARATION_INTERVAL castle_33 다음 원정 검토 주기 8개월을 준비합니다.
-23: RECRUITMENT_PROGRESS castle_33 hero_109 영입 설득을 진행합니다.
-24: HERO_REST castle_33 ares의 피로 75 회복을 우선합니다.
-24: MARCH_STARTED castle_33 castle_04에서 castle_33(으)로 원정을 시작합니다.
-24: MARCH_STARTED castle_33 castle_04에서 castle_33(으)로 원정을 시작합니다.
+23: RECRUITMENT_NO_ACTOR castle_33 인재 활동이 가능한 대기 영웅이 없습니다.
+24: NO_ATTACKABLE_TARGET castle_33 접경·전쟁·피로·예상 전력 조건을 만족하는 목표가 없습니다.
 24: RECRUITMENT_NO_ACTOR castle_33 인재 활동이 가능한 대기 영웅이 없습니다.

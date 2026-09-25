@@ -9,6 +9,8 @@ namespace ProjectWI.Battle
     public class WIBattleCameraController : MonoBehaviour
     {
         private Camera battleCamera;
+        // 범위 선택의 월드→패널 좌표 변환에 사용하는 전투 카메라입니다.
+        public Camera BattleCamera => battleCamera;
         private WIBattleConfigSO config;
         private float framedOrthographicSize;
         private WIBattleZoomLevel framedZoomLevel = WIBattleZoomLevel.C;

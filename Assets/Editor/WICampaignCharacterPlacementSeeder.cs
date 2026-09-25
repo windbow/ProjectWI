@@ -79,7 +79,7 @@ namespace ProjectWI.Editor
             HashSet<string> used = new HashSet<string>(placements.Select(item => item.HeroId));
             List<string> eligibleCastles = owners
                 .Where(pair => definition.Variant != WICampaignVariant.AresMain ||
-                               (pair.Value != "avalon" && pair.Key != "castle_04"))
+                               (pair.Value != "rimgard" && pair.Key != "castle_04"))
                 .Select(pair => pair.Key)
                 .OrderBy(id => id)
                 .ToList();

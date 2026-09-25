@@ -298,6 +298,11 @@ namespace ProjectWI.Administration
             string targetHeroId, out string error)
         {
             error = string.Empty;
+            if (WIAdministrationTurnSystem.IsTalentOfficeActivity(activity) == false)
+            {
+                error = database.GetText("UI_AUTO_RECOVERY_HINT");
+                return false;
+            }
             WICharacterRuntimeState actor = state.GetCharacter(actorHeroId);
             if (actor == null || selectedCastle.HeroIds.Contains(actorHeroId) == false ||
                 state.IsCharacterBusy(actorHeroId) || (actor.InjuryMonths > 0 && activity != WICharacterActivityType.Rest) ||

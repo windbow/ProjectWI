@@ -20,7 +20,7 @@ namespace ProjectWI.Editor
         [MenuItem("WI/QA/Preview/Global Map")]
         private static void OpenGlobalPreview() => FindController()?.OpenGlobalPreviewForQA();
 
-        [MenuItem("WI/QA/Preview/Avalon Castle")]
+        [MenuItem("WI/QA/Preview/Rimgard Castle")]
         private static void OpenCastlePreview() => FindController()?.OpenCastlePreviewForQA();
 
         [MenuItem("WI/QA/Preview/Focus Project UGUI")]

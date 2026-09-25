@@ -1,6 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <ui:Style src="project://database/Assets/UI/Battle/WIBattleHUD.uss" />
     <ui:VisualElement name="battle-hud" class="battle-hud">
+        <ui:VisualElement name="selection-box" class="selection-box" picking-mode="Ignore" />
+        <ui:Button name="deploy-start" text="전투 시작" class="deploy-start" />
+        <ui:Label name="pause-indicator" text="일시정지 · Space로 재개" class="pause-indicator" picking-mode="Ignore" />
         <ui:VisualElement class="battle-top-status-frame">
             <ui:Label name="battle-status" text="전투 세션 대기 중" class="battle-status" />
         </ui:VisualElement>
@@ -10,11 +13,14 @@
                 <ui:Label name="selection-info" text="인물 클릭 · WASD/방향키 이동 · 휠 확대 · Home 복귀" class="selection-info" />
             </ui:VisualElement>
             <ui:VisualElement class="battle-command-frame">
-                <ui:Label name="command-feedback" text="명령 대기 · 1 전진 / 2 사수 / 3 집중 / R 후퇴" class="command-feedback" />
+                <ui:Label name="command-feedback" text="명령 대기 · Z 전진 X 사수 C 집중 V 보호 B 분산 N 집결 R 후퇴" class="command-feedback" />
                 <ui:VisualElement class="command-group">
                     <ui:Button name="advance-command" text="전진" class="command-button" />
                     <ui:Button name="hold-command" text="위치 사수" class="command-button" />
                     <ui:Button name="focus-command" text="집중 공격" class="command-button" />
+                    <ui:Button name="protect-command" text="후열 보호" class="command-button" />
+                    <ui:Button name="spread-command" text="분산" class="command-button" />
+                    <ui:Button name="rally-command" text="집결" class="command-button" />
                     <ui:Button name="retreat-command" text="후퇴" class="command-button retreat" />
                 </ui:VisualElement>
             </ui:VisualElement>

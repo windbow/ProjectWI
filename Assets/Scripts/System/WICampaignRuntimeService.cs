@@ -75,9 +75,22 @@ namespace ProjectWI.Systems
         {
             if (database == null || session == null || session.AttackerHeroIds.Count == 0 || session.DefenderHeroIds.Count == 0)
             {
+                Debug.LogError("테스트 전투 시작 실패: 데이터베이스 또는 양측 편성이 없습니다.");
                 return false;
             }
-            State = WIAdministrationState.Create(database);
+            // 테스트 전장 소속은 기본 시나리오 배치와 분리하고 일반 전투의 아군 공격 금지 규칙은 유지합니다.
+            WIAdministrationState testState = WIAdministrationState.Create(database);
+            WICastleRuntimeState battlefield = testState.GetCastle(session.CastleId);
+            if (battlefield == null || database.GetFaction(session.AttackerFactionId) == null ||
+                database.GetFaction(session.DefenderFactionId) == null ||
+                session.AttackerFactionId == session.DefenderFactionId || session.Status != WIBattleSessionStatus.Pending ||
+                Application.CanStreamedLevelBeLoaded(battleSceneName) == false)
+            {
+                Debug.LogError("테스트 전투 시작 실패: 전장·양측 세력·대기 상태 또는 BattleScene 빌드 등록을 확인하세요.");
+                return false;
+            }
+            battlefield.FactionId = session.DefenderFactionId;
+            State = testState;
             State.BattleSessions.Add(session);
             HasCampaignStarted = false;
             IsTestBattle = true;

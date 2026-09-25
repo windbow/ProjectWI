@@ -135,7 +135,7 @@ namespace ProjectWI.Administration
         {
             switch (factionId)
             {
-                case "avalon": return "AV";
+                case "rimgard": return "RG";
                 case "valdor": return "VD";
                 case "ironheart": return "IH";
                 case "sylvanroad": return "SY";

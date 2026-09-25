@@ -370,3 +370,14 @@
 .skill-pager Label { color:rgb(237,243,246); font-size:15px; }
 .battle-top-status-frame .battle-status { width:90%; -unity-text-align:middle-left; color:rgb(238,242,245); }
 .battle-character-info-frame .selection-info { align-self:flex-start; margin-top:36px; height:74px; font-size:14px; }
+
+/* 명령 7종을 네 칸씩 두 줄로 배치합니다. */
+.battle-command-frame .command-group { flex-direction:row; flex-wrap:wrap; justify-content:flex-start; align-content:space-between; }
+.battle-command-frame .command-button { width:25%; height:48%; font-size:13px; }
+
+/* 드래그 범위 선택 사각형과 전술 일시정지 표시입니다. 코드에서는 위치·크기·표시 여부만 바꿉니다. */
+.selection-box { position:absolute; display:none; border-width:1px; border-color:rgb(232, 196, 96); background-color:rgba(232, 196, 96, 0.12); }
+.pause-indicator { position:absolute; display:none; top:90px; left:0; right:0; -unity-text-align:middle-center; font-size:22px; color:rgb(240, 222, 160); -unity-font-style:bold; }
+
+/* 배치 단계 전투 시작 버튼입니다. 배치 단계에서만 표시합니다. */
+.deploy-start { position:absolute; display:none; top:120px; left:50%; width:220px; height:64px; margin-left:-110px; font-size:22px; -unity-font-style:bold; color:rgb(255, 240, 200); background-color:rgba(120, 70, 20, 0.92); border-width:2px; border-color:rgb(232, 196, 96); border-radius:6px; }

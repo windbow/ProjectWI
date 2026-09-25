@@ -208,7 +208,8 @@ namespace ProjectWI.Administration
                     RaiseUGUIScreenRequest<WIAdministrationHeroAssignmentUGUIController>(() => UGUIHeroAssignmentRequested);
                     return;
                 case WIAdministrationTerritoryCommand.CharacterActivity:
-                    OpenUGUICharacterActivity(false);
+                case WIAdministrationTerritoryCommand.Military:
+                    RaiseUGUIScreenRequest<WIAdministrationMilitaryUGUIController>(() => UGUIMilitaryRequested);
                     return;
                 case WIAdministrationTerritoryCommand.ChooseSpecialFacility:
                     RaiseUGUIScreenRequest<WIAdministrationSpecialFacilityUGUIController>(() => UGUISpecialFacilityRequested);
@@ -274,7 +275,7 @@ namespace ProjectWI.Administration
                     RaiseUGUIScreenRequest<WIAdministrationBasicFacilityUGUIController>(() => UGUIBasicFacilityRequested);
                     break;
                 case "sanctuary":
-                    OpenUGUICharacterActivity(false);
+                    ShowUGUIMessage(database.GetText("UI_AUTO_RECOVERY_TITLE"), database.GetText("UI_AUTO_RECOVERY_HINT"));
                     break;
                 case "spy_outpost":
                     RaiseUGUIScreenRequest<WIAdministrationSchemeUGUIController>(() => UGUISchemeRequested);
@@ -292,9 +293,14 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 인재 활동 화면을 일반 활동 또는 선술집 인재실 전용 모드로 엽니다.
+        // 인재실만 열며 폐지된 일반 활동 요청은 군사 메뉴로 연결합니다.
         public void OpenUGUICharacterActivity(bool talentOfficeOnly)
         {
+            if (talentOfficeOnly == false)
+            {
+                RaiseUGUIScreenRequest<WIAdministrationMilitaryUGUIController>(() => UGUIMilitaryRequested);
+                return;
+            }
             uguiTalentOfficeOnly = talentOfficeOnly;
             RaiseUGUIScreenRequest<WIAdministrationCharacterActivityUGUIController>(() => UGUICharacterActivityRequested);
         }

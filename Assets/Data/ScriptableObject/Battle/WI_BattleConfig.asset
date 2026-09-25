@@ -12,15 +12,70 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0008f2112f4ace3448c02fc7d9879bda, type: 3}
   m_Name: WI_BattleConfig
   m_EditorClassIdentifier: Assembly-CSharp::ProjectWI.Battle.WIBattleConfigSO
+  slashEffectPrefab: {fileID: 1089236269058460646, guid: 2d39cd2884c1144428ca805075bbdf37, type: 3}
+  arrowEffectPrefab: {fileID: 2810513228143847407, guid: 3d44d42deb5bddc46a6d66881d4def93, type: 3}
+  magicEffectPrefab: {fileID: 6147177865822503437, guid: 3c3c8420a7175424b823b5bfa1f431e7, type: 3}
+  hitEffectPrefab: {fileID: 2800373204211436277, guid: 11398353d176b104692c9cafc0d0d4d1, type: 3}
+  slashEffectScale: 0.9
+  projectileEffectScale: 0.8
+  hitEffectScale: 0.7
+  effectHeight: 0.45
+  slashEffectDuration: 0.285
+  hitEffectDuration: 0.32
   arenaSize: {x: 18, y: 10}
   arenaBackgroundSize: {x: 36, y: 20.25}
   formationColumnSpacing: 1.4
-  formationRowSpacing: 1.2
-  useHiddenGrid: 1
-  gridCellWidth: 0.6
-  gridCellHeight: 0.3
-  gridArrivalDistance: 0.015
+  formationRowSpacing: 0.8
+  fixedTickSeconds: 0.05
+  meleeSlotCount: 4
+  meleeSlotDistanceRatio: 0.8
+  meleeSlotAngleStep: 45
+  retargetInterval: 0.5
+  fullSlotTargetPenalty: 3
+  rangedPreferredRangeRatio: 0.85
+  rangedRetreatDistance: 1.6
+  engagedCollisionMass: 3
+  protectThreatRadius: 3
+  protectGuardDistance: 1.2
+  spreadSpacingMultiplier: 2
+  rallyFormationScale: 0.5
+  retreatEscapeMargin: 0.3
+  flankDamageMultiplier: 1.25
+  rearDamageMultiplier: 1.5
+  flankFrontDot: 0.5
+  moveOrderArrivalDistance: 0.3
+  moraleLossPerAllyDown: 10
+  moraleLossLeaderDown: 35
+  moraleLossSideOnLeaderDown: 8
+  moraleLossFlankHit: 1
+  moraleLossRearHit: 2.5
+  moraleRegenPerSecond: 1
+  routRecoveryPerSecond: 4
+  routRecoverThreshold: 40
+  useDeploymentPhase: 1
+  deploymentZoneDepthRatio: 0.4
+  followSlackDistance: 1.2
+  terrainZones:
+  - terrainType: 0
+    center: {x: 0, y: 3.2}
+    radius: 1.8
+  - terrainType: 1
+    center: {x: -2.5, y: -3}
+    radius: 1.8
+  - terrainType: 2
+    center: {x: 3, y: -3}
+    radius: 1.5
+  highGroundRangeMultiplier: 1.25
+  highGroundDamageMultiplier: 1.1
+  forestProjectileDamageMultiplier: 0.6
+  forestMoveSpeedMultiplier: 0.8
+  narrowMeleeSlotCount: 2
+  highGroundZoneColor: {r: 0.95, g: 0.8, b: 0.35, a: 0.35}
+  forestZoneColor: {r: 0.25, g: 0.75, b: 0.3, a: 0.35}
+  narrowZoneColor: {r: 0.6, g: 0.6, b: 0.65, a: 0.35}
+  deploymentZoneColor: {r: 0.4, g: 0.7, b: 1, a: 0.18}
   baseHealth: 100
+  reinforcementSecondsPerMonth: 15
   healthPerMight: 3
   baseMana: 30
   manaPerIntelligence: 2
@@ -40,6 +95,11 @@ MonoBehaviour:
   placeholderCharacterSize: 0.65
   battleSpriteScale: 1
   showCharacterHealthBars: 0
+  battleSpriteFacesRight: 0
+  sideMarkerAlpha: 0.95
+  routingTint: {r: 0.6, g: 0.6, b: 0.6, a: 0.85}
+  skillRangePreviewColor: {r: 1, g: 1, b: 1, a: 0.12}
+  skillAreaPreviewColor: {r: 0.95, g: 0.3, b: 0.15, a: 0.35}
   showCharacterLabels: 0
   placeholderProjectileSize: 0.18
   placeholderAttackEffectDuration: 0.22
@@ -66,6 +126,7 @@ MonoBehaviour:
     power: 45
     range: 5
     cooldown: 10
+    areaRadius: 2
   - heroId: lyria
     displayName: "\uC804\uC7A5\uC758 \uACA9\uB824"
     description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
@@ -75,6 +136,7 @@ MonoBehaviour:
     power: 45
     range: 6
     cooldown: 12
+    areaRadius: 2
   - heroId: brom
     displayName: "\uBD88\uAD74\uC758 \uD568\uC131"
     description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
@@ -84,6 +146,7 @@ MonoBehaviour:
     power: 55
     range: 4.5
     cooldown: 13
+    areaRadius: 2
   - heroId: selene
     displayName: "\uC740\uC6D4\uC758 \uCE58\uC720"
     description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
@@ -92,6 +155,7 @@ MonoBehaviour:
     power: 48
     range: 5.5
     cooldown: 12
+    areaRadius: 2
   - heroId: kael
     displayName: "\uADF8\uB9BC\uC790 \uB09C\uBB34"
     description: "\uC8FC\uBCC0 \uC801\uC5D0\uAC8C \uC5F0\uC18D \uCC38\uACA9 \uD53C\uD574\uB97C
@@ -101,6 +165,7 @@ MonoBehaviour:
     power: 52
     range: 3.8
     cooldown: 11
+    areaRadius: 2
   - heroId: morrigan
     displayName: "\uD669\uD63C \uD3ED\uBC1C"
     description: "\uB113\uC740 \uBC94\uC704\uC758 \uC801\uC5D0\uAC8C \uB9C8\uB825
@@ -110,6 +175,7 @@ MonoBehaviour:
     power: 58
     range: 6
     cooldown: 14
+    areaRadius: 2
   - heroId: theron
     displayName: "\uC131\uC804\uC758 \uB9F9\uC138"
     description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
@@ -119,6 +185,7 @@ MonoBehaviour:
     power: 60
     range: 5
     cooldown: 14
+    areaRadius: 2
   - heroId: elwyn
     displayName: "\uACE0\uB300 \uC232\uC758 \uC228\uACB0"
     description: "\uB113\uC740 \uBC94\uC704\uC758 \uC544\uAD70 \uCCB4\uB825\uC744
@@ -128,136 +195,7 @@ MonoBehaviour:
     power: 55
     range: 6.5
     cooldown: 15
-  classSkills:
-  - heroClass: 0
-    skill:
-      heroId: class_magic_swordsman
-      displayName: "\uB9C8\uB825 \uCC38\uACA9"
-      description: "\uC8FC\uBCC0 \uC801\uC5D0\uAC8C \uB9C8\uB825 \uD53C\uD574\uB97C
-        \uC90D\uB2C8\uB2E4."
-      skillType: 0
-      manaCost: 32
-      power: 32
-      range: 3.5
-      cooldown: 11
-  - heroClass: 1
-    skill:
-      heroId: class_guardian
-      displayName: "\uC218\uD638\uC758 \uD568\uC131"
-      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
-        \uC904\uC785\uB2C8\uB2E4."
-      skillType: 2
-      manaCost: 25
-      power: 30
-      range: 4
-      cooldown: 13
-  - heroClass: 2
-    skill:
-      heroId: class_crusader
-      displayName: "\uC2E0\uC131\uD55C \uC9C4\uAD70"
-      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
-        \uC904\uC785\uB2C8\uB2E4."
-      skillType: 2
-      manaCost: 30
-      power: 38
-      range: 5
-      cooldown: 13
-  - heroClass: 3
-    skill:
-      heroId: class_sword_master
-      displayName: "\uC77C\uC12C"
-      description: "\uAC00\uAE4C\uC6B4 \uC801\uC5D0\uAC8C \uAC15\uD55C \uD53C\uD574\uB97C
-        \uC90D\uB2C8\uB2E4."
-      skillType: 0
-      manaCost: 30
-      power: 38
-      range: 2.8
-      cooldown: 10
-  - heroClass: 4
-    skill:
-      heroId: class_archer
-      displayName: "\uD654\uC0B4\uBE44"
-      description: "\uC0AC\uAC70\uB9AC \uC548\uC758 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C
-        \uC90D\uB2C8\uB2E4."
-      skillType: 0
-      manaCost: 32
-      power: 30
-      range: 5.5
-      cooldown: 11
-  - heroClass: 5
-    skill:
-      heroId: class_assassin
-      displayName: "\uAE09\uC18C \uC2B5\uACA9"
-      description: "\uAC00\uAE4C\uC6B4 \uC801\uC5D0\uAC8C \uAE30\uC2B5 \uD53C\uD574\uB97C
-        \uC90D\uB2C8\uB2E4."
-      skillType: 0
-      manaCost: 28
-      power: 42
-      range: 2.5
-      cooldown: 12
-  - heroClass: 6
-    skill:
-      heroId: class_archmage
-      displayName: "\uB9C8\uB825 \uD3ED\uD48D"
-      description: "\uB113\uC740 \uBC94\uC704\uC758 \uC801\uC5D0\uAC8C \uD53C\uD574\uB97C
-        \uC90D\uB2C8\uB2E4."
-      skillType: 0
-      manaCost: 42
-      power: 40
-      range: 6
-      cooldown: 14
-  - heroClass: 7
-    skill:
-      heroId: class_priest
-      displayName: "\uCE58\uC720\uC758 \uBE5B"
-      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
-      skillType: 1
-      manaCost: 32
-      power: 36
-      range: 5
-      cooldown: 12
-  - heroClass: 8
-    skill:
-      heroId: class_druid
-      displayName: "\uC0DD\uBA85\uC758 \uC228\uACB0"
-      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
-      skillType: 1
-      manaCost: 34
-      power: 32
-      range: 5.5
-      cooldown: 12
-  - heroClass: 9
-    skill:
-      heroId: class_strategist
-      displayName: "\uC804\uC220 \uC9C0\uD718"
-      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uACF5\uACA9 \uB300\uAE30\uC2DC\uAC04\uC744
-        \uC904\uC785\uB2C8\uB2E4."
-      skillType: 2
-      manaCost: 28
-      power: 42
-      range: 6
-      cooldown: 13
-  - heroClass: 10
-    skill:
-      heroId: class_alchemist
-      displayName: "\uD68C\uBCF5 \uC601\uC57D"
-      description: "\uC8FC\uBCC0 \uC544\uAD70\uC758 \uCCB4\uB825\uC744 \uD68C\uBCF5\uD569\uB2C8\uB2E4."
-      skillType: 1
-      manaCost: 30
-      power: 34
-      range: 4.5
-      cooldown: 11
-  - heroClass: 11
-    skill:
-      heroId: class_warlock
-      displayName: "\uC554\uD751 \uD30C\uB3D9"
-      description: "\uC8FC\uBCC0 \uC801\uC5D0\uAC8C \uC554\uD751 \uD53C\uD574\uB97C
-        \uC90D\uB2C8\uB2E4."
-      skillType: 0
-      manaCost: 38
-      power: 43
-      range: 5
-      cooldown: 13
+    areaRadius: 2
   battleObjectives:
   - id: objective_elimination
     displayName:

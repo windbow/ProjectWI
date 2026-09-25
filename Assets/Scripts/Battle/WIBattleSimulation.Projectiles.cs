@@ -23,6 +23,7 @@ namespace ProjectWI.Battle
             {
                 ProjectileId = runtime.NextProjectileId,
                 ShooterHeroId = actor.HeroId,
+                ShooterRole = actor.Role,
                 TargetHeroId = target.HeroId,
                 Side = actor.Side,
                 Position = actor.Position,
@@ -57,7 +58,10 @@ namespace ProjectWI.Battle
                     config, runtime, projectile, previousPosition, projectile.Position);
                 if (hit != null)
                 {
-                    hit.Health = Mathf.Max(0, hit.Health - Mathf.Max(1, projectile.Damage));
+                    WIBattleCharacterState shooter = runtime.Characters.Find(item => item.HeroId == projectile.ShooterHeroId);
+                    int damage = Mathf.RoundToInt(projectile.Damage * GetProjectileTerrainMultiplier(config, shooter, hit));
+                    ApplyDamage(config, runtime, hit, damage, 1f);
+                    AddHitVisual(config, runtime, hit);
                     runtime.Projectiles.RemoveAt(projectileIndex);
                     continue;
                 }

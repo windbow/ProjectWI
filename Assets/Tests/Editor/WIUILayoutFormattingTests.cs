@@ -283,7 +283,7 @@ namespace ProjectWI.Tests.Editor
             StringAssert.Contains("global-castle-hero-cards", layout);
             StringAssert.Contains("objective-progress-fill", layout);
             StringAssert.Contains("castle-overview-panel", layout);
-            StringAssert.Contains(".castle-node-avalon .castle-node-marker", stylesheet);
+            StringAssert.Contains(".castle-node-rimgard .castle-node-marker", stylesheet);
             StringAssert.Contains("UI/Generated/map_castle_necropolis.png", stylesheet);
             StringAssert.Contains(".castle-overview-panel .governor-full", stylesheet);
             Assert.That(worldPrefab.GetComponent<WIAdministrationWorldUGUIController>(), Is.Not.Null);
@@ -495,7 +495,7 @@ namespace ProjectWI.Tests.Editor
         {
             string[] codes =
             {
-                WIAdministrationUIController.GetFactionAccessibilityCode("avalon"),
+                WIAdministrationUIController.GetFactionAccessibilityCode("rimgard"),
                 WIAdministrationUIController.GetFactionAccessibilityCode("valdor"),
                 WIAdministrationUIController.GetFactionAccessibilityCode("ironheart"),
                 WIAdministrationUIController.GetFactionAccessibilityCode("sylvanroad"),
@@ -504,7 +504,7 @@ namespace ProjectWI.Tests.Editor
 
             CollectionAssert.AllItemsAreUnique(codes);
             CollectionAssert.DoesNotContain(codes, "??");
-            Assert.AreEqual("AV", codes[0]);
+            Assert.AreEqual("RG", codes[0]);
             Assert.AreEqual("NC", codes[4]);
         }
 

@@ -639,7 +639,7 @@ namespace ProjectWI.Tests.Editor
             Assert.That(serialized.FindProperty("heroSlots").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("facilitySlots").arraySize, Is.EqualTo(2));
             Assert.That(serialized.FindProperty("facilitySlotButtons").arraySize, Is.EqualTo(2));
-            Assert.That(serialized.FindProperty("commandButtons").arraySize, Is.EqualTo(7));
+            Assert.That(serialized.FindProperty("commandButtons").arraySize, Is.EqualTo(6));
             Assert.That(serialized.FindProperty("basicFacilityButtons").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("basicFacilityActions").arraySize, Is.EqualTo(4));
             Assert.That(serialized.FindProperty("topHUD").objectReferenceValue, Is.Not.Null);
@@ -786,7 +786,7 @@ namespace ProjectWI.Tests.Editor
             Assert.That(prefab.GetComponentsInChildren<EventSystem>(true), Is.Empty);
             Assert.That(serialized.FindProperty("cardButtons").arraySize, Is.EqualTo(8));
             Assert.That(serialized.FindProperty("cardPortraits").arraySize, Is.EqualTo(8));
-            Assert.That(serialized.FindProperty("activityButtons").arraySize, Is.EqualTo(6));
+            Assert.That(serialized.FindProperty("activityButtons").arraySize, Is.EqualTo(2));
             Assert.That(serialized.FindProperty("toolbarRoot").objectReferenceValue, Is.Not.Null);
             Assert.That(serialized.FindProperty("searchInput").objectReferenceValue, Is.Not.Null);
             Assert.That(serialized.FindProperty("filterButtons").arraySize, Is.EqualTo(3));

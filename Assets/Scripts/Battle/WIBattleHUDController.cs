@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
+using ProjectWI.Administration;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace ProjectWI.Battle
 {
     [RequireComponent(typeof(UIDocument))]
-    public class WIBattleHUDController : MonoBehaviour
+    public partial class WIBattleHUDController : MonoBehaviour
     {
         [SerializeField] private WIBattleRuntimeController battleController;
         [SerializeField] private WIBattleSide playerSide = WIBattleSide.Attacker;
@@ -23,6 +24,29 @@ namespace ProjectWI.Battle
         private readonly Dictionary<string, Button> skillButtonByHeroId = new Dictionary<string, Button>();
         private readonly Dictionary<WIBattleCommand, Button> commandButtons = new Dictionary<WIBattleCommand, Button>();
         private float retreatConfirmUntil;
+        // 명령 버튼 이름표에 사용하는 문자열 UID입니다.
+        private static readonly Dictionary<WIBattleCommand, string> CommandLabelUids = new Dictionary<WIBattleCommand, string>
+        {
+            { WIBattleCommand.Advance, "UI_BATTLE_BUTTON_ADVANCE" },
+            { WIBattleCommand.Hold, "UI_BATTLE_BUTTON_HOLD" },
+            { WIBattleCommand.Focus, "UI_BATTLE_BUTTON_FOCUS" },
+            { WIBattleCommand.Protect, "UI_BATTLE_BUTTON_PROTECT" },
+            { WIBattleCommand.Spread, "UI_BATTLE_BUTTON_SPREAD" },
+            { WIBattleCommand.Rally, "UI_BATTLE_BUTTON_RALLY" },
+            { WIBattleCommand.Retreat, "UI_BATTLE_BUTTON_RETREAT" }
+        };
+        // 명령 선택 안내에 사용하는 문자열 UID입니다.
+        private static readonly Dictionary<WIBattleCommand, string> CommandFeedbackUids = new Dictionary<WIBattleCommand, string>
+        {
+            { WIBattleCommand.Advance, "UI_BATTLE_COMMAND_ADVANCE" },
+            { WIBattleCommand.Hold, "UI_BATTLE_COMMAND_HOLD" },
+            { WIBattleCommand.Protect, "UI_BATTLE_COMMAND_PROTECT" },
+            { WIBattleCommand.Spread, "UI_BATTLE_COMMAND_SPREAD" },
+            { WIBattleCommand.Rally, "UI_BATTLE_COMMAND_RALLY" },
+            { WIBattleCommand.Retreat, "UI_BATTLE_COMMAND_RETREAT" }
+        };
+        // 데이터베이스 문구를 고정 라벨에 한 번 적용했는지 여부입니다.
+        private bool staticTextsApplied;
 
         // 전투 세션에서 확인한 플레이어 진영을 HUD 명령 대상으로 지정합니다.
         public void SetPlayerSide(WIBattleSide side)
@@ -50,19 +74,23 @@ namespace ProjectWI.Battle
                 {
                     if (slot.userData is string heroId)
                     {
-                        battleController.TryActivateHeroSkill(heroId);
+                        HandleSkillButton(heroId);
                     }
                 };
             }
             RegisterCommandButton(root, "advance-command", WIBattleCommand.Advance);
             RegisterCommandButton(root, "hold-command", WIBattleCommand.Hold);
             RegisterCommandButton(root, "focus-command", WIBattleCommand.Focus);
+            RegisterCommandButton(root, "protect-command", WIBattleCommand.Protect);
+            RegisterCommandButton(root, "spread-command", WIBattleCommand.Spread);
+            RegisterCommandButton(root, "rally-command", WIBattleCommand.Rally);
             RegisterCommandButton(root, "retreat-command", WIBattleCommand.Retreat);
             root.focusable = true;
             root.RegisterCallback<KeyDownEvent>(HandleKeyboardCommand, TrickleDown.TrickleDown);
             root.RegisterCallback<KeyUpEvent>(HandleKeyboardRelease, TrickleDown.TrickleDown);
             root.RegisterCallback<WheelEvent>(HandleMouseWheel, TrickleDown.TrickleDown);
-            root.RegisterCallback<PointerDownEvent>(HandleBattlefieldClick, TrickleDown.TrickleDown);
+            BindSelectionInput(root);
+            BindDeploymentInput(root);
             root.Focus();
         }
 
@@ -76,18 +104,21 @@ namespace ProjectWI.Battle
             WIBattleRuntimeState runtime = battleController == null ? null : battleController.Runtime;
             if (runtime == null)
             {
-                statusLabel.text = "전투 세션 대기 중";
                 return;
             }
+            ApplyStaticTexts();
+            RefreshDeploymentState();
             int attackers = runtime.Characters.Count(item => item.Side == WIBattleSide.Attacker && item.IsAlive);
             int defenders = runtime.Characters.Count(item => item.Side == WIBattleSide.Defender && item.IsAlive);
-            statusLabel.text = $"{runtime.ObjectiveName} · {runtime.ElapsedSeconds:0.0}초 · 공격 {attackers} / 수비 {defenders}";
+            statusLabel.text = Text("UI_BATTLE_STATUS", runtime.ObjectiveName, runtime.ElapsedSeconds, attackers, defenders);
             if (string.IsNullOrEmpty(battleController.ReinforcementStatus) == false)
             {
                 statusLabel.text += "\n" + battleController.ReinforcementStatus;
             }
             BuildSkillButtons(runtime);
             RefreshSkillButtons(runtime);
+            RefreshSkillTargeting();
+            RefreshRoutingNotices(runtime);
             RefreshCommandFeedback(runtime);
         }
 
@@ -100,17 +131,28 @@ namespace ProjectWI.Battle
                 if (Time.unscaledTime > retreatConfirmUntil)
                 {
                     retreatConfirmUntil = Time.unscaledTime + 3f;
-                    commandFeedbackLabel.text = "후퇴하면 즉시 패배합니다. 3초 안에 다시 눌러 확정하세요.";
+                    commandFeedbackLabel.text = Text("UI_BATTLE_RETREAT_CONFIRM");
                     commandButtons[WIBattleCommand.Retreat].AddToClassList("retreat-armed");
                     return;
                 }
             }
 
             string focusHeroId = command == WIBattleCommand.Focus ? SelectFocusTarget(battleController.Runtime) : string.Empty;
-            battleController.SetCommand(playerSide, command, focusHeroId);
+            bool squadOnly = HasSquadSelection == true && command != WIBattleCommand.Retreat;
+            if (squadOnly == true)
+            {
+                battleController.SetSquadCommand(selectedSquadIds, command, focusHeroId);
+            }
+            else
+            {
+                battleController.SetCommand(playerSide, command, focusHeroId);
+            }
             retreatConfirmUntil = 0f;
             commandButtons[WIBattleCommand.Retreat].RemoveFromClassList("retreat-armed");
-            commandFeedbackLabel.text = GetCommandFeedback(command, focusHeroId, battleController.Runtime);
+            string feedback = GetCommandFeedback(command, focusHeroId, battleController.Runtime);
+            commandFeedbackLabel.text = squadOnly == true
+                ? Text("UI_BATTLE_COMMAND_SQUADS", feedback, selectedSquadIds.Count)
+                : feedback;
         }
 
         // UXML의 명령 버튼을 명령 사전에 등록하고 공통 클릭 처리를 연결합니다.
@@ -124,7 +166,8 @@ namespace ProjectWI.Battle
         // 플레이어 진영 중앙에서 가장 가까운 생존 적을 집중 공격 대상으로 선택합니다.
         private string SelectFocusTarget(WIBattleRuntimeState runtime)
         {
-            List<WIBattleCharacterState> allies = runtime.Characters.Where(item => item.Side == playerSide && item.IsAlive).ToList();
+            List<WIBattleCharacterState> allies = runtime.Characters.Where(item => item.Side == playerSide && item.IsAlive &&
+                (HasSquadSelection == false || selectedSquadIds.Contains(item.SquadId) == true)).ToList();
             if (allies.Count == 0) return string.Empty;
             Vector2 center = allies.Aggregate(Vector2.zero, (sum, item) => sum + item.Position) / allies.Count;
             WIBattleCharacterState target = runtime.Characters
@@ -136,19 +179,56 @@ namespace ProjectWI.Battle
         }
 
         // 현재 선택한 명령과 집중 표적을 플레이어가 이해할 수 있는 안내로 반환합니다.
-        private static string GetCommandFeedback(WIBattleCommand command, string focusHeroId, WIBattleRuntimeState runtime)
+        private string GetCommandFeedback(WIBattleCommand command, string focusHeroId, WIBattleRuntimeState runtime)
         {
-            if (command == WIBattleCommand.Advance) return "전진 명령 · 진형 행을 유지하며 적에게 접근합니다.";
-            if (command == WIBattleCommand.Hold) return "위치 사수 · 원래 진형으로 복귀하며 피해와 밀치기를 줄입니다.";
-            if (command == WIBattleCommand.Retreat) return "후퇴 확정 · 전투 패배를 받아들이고 철수합니다.";
+            if (CommandFeedbackUids.TryGetValue(command, out string uid) == true)
+            {
+                return Text(uid);
+            }
             WIBattleCharacterState target = runtime.Characters.Find(item => item.HeroId == focusHeroId);
-            return target == null ? "집중 공격 · 유효한 표적이 없습니다." : $"집중 공격 · {target.DisplayName}을 우선 공격합니다.";
+            return target == null ? Text("UI_BATTLE_COMMAND_FOCUS_NONE") : Text("UI_BATTLE_COMMAND_FOCUS", target.DisplayName);
+        }
+
+        // 데이터베이스 UID 문구를 현재 인자로 채워 반환하며 데이터베이스가 없으면 UID를 그대로 반환합니다.
+        private string Text(string uid, params object[] args)
+        {
+            WIAdministrationDatabaseSO database = battleController == null ? null : battleController.Database;
+            if (database == null)
+            {
+                return uid;
+            }
+            string format = database.GetText(uid);
+            return args.Length == 0 ? format : string.Format(format, args);
+        }
+
+        // UXML 기본 문구를 데이터베이스의 명령 버튼·안내 UID 문구로 한 번 교체합니다.
+        private void ApplyStaticTexts()
+        {
+            if (staticTextsApplied == true || battleController.Database == null)
+            {
+                return;
+            }
+            staticTextsApplied = true;
+            foreach (KeyValuePair<WIBattleCommand, Button> pair in commandButtons)
+            {
+                pair.Value.text = Text(CommandLabelUids[pair.Key]);
+            }
+            commandFeedbackLabel.text = Text("UI_BATTLE_COMMAND_HINT");
+            selectionInfoLabel.text = Text("UI_BATTLE_SELECTION_HINT");
         }
 
         // 현재 명령 버튼을 금색으로 강조하고 후퇴 확인 제한 시간이 지나면 경고 상태를 해제합니다.
         private void RefreshCommandFeedback(WIBattleRuntimeState runtime)
         {
             WIBattleCommand current = playerSide == WIBattleSide.Attacker ? runtime.AttackerCommand : runtime.DefenderCommand;
+            if (HasSquadSelection == true && current != WIBattleCommand.Retreat)
+            {
+                WIBattleSquadState squad = WIBattleSimulation.FindSquad(runtime, selectedSquadIds.Min());
+                if (squad != null && squad.HasCommandOverride == true)
+                {
+                    current = squad.Command;
+                }
+            }
             foreach (KeyValuePair<WIBattleCommand, Button> pair in commandButtons)
             {
                 pair.Value.EnableInClassList("active-command", pair.Key == current);
@@ -157,25 +237,38 @@ namespace ProjectWI.Battle
             {
                 retreatConfirmUntil = 0f;
                 commandButtons[WIBattleCommand.Retreat].RemoveFromClassList("retreat-armed");
-                commandFeedbackLabel.text = "후퇴 확인이 취소되었습니다.";
+                commandFeedbackLabel.text = Text("UI_BATTLE_RETREAT_CANCELLED");
             }
         }
 
-        // PC 키보드의 숫자 1·2·3과 R 키를 전투 명령에 연결합니다.
+        // PC 키보드의 명령키(Z~N·R), 분대 선택(1~9·`·Esc), 일시정지(Space)와 카메라 키를 연결합니다.
         private void HandleKeyboardCommand(KeyDownEvent keyboardEvent)
         {
-            if (keyboardEvent.keyCode == KeyCode.Alpha1) SetCommand(WIBattleCommand.Advance);
-            else if (keyboardEvent.keyCode == KeyCode.Alpha2) SetCommand(WIBattleCommand.Hold);
-            else if (keyboardEvent.keyCode == KeyCode.Alpha3) SetCommand(WIBattleCommand.Focus);
-            else if (keyboardEvent.keyCode == KeyCode.R) SetCommand(WIBattleCommand.Retreat);
-            else if (keyboardEvent.keyCode == KeyCode.Home)
+            KeyCode key = keyboardEvent.keyCode;
+            bool additive = keyboardEvent.shiftKey == true;
+            if (key == KeyCode.Z) SetCommand(WIBattleCommand.Advance);
+            else if (key == KeyCode.X) SetCommand(WIBattleCommand.Hold);
+            else if (key == KeyCode.C) SetCommand(WIBattleCommand.Focus);
+            else if (key == KeyCode.V) SetCommand(WIBattleCommand.Protect);
+            else if (key == KeyCode.B) SetCommand(WIBattleCommand.Spread);
+            else if (key == KeyCode.N) SetCommand(WIBattleCommand.Rally);
+            else if (key == KeyCode.R) SetCommand(WIBattleCommand.Retreat);
+            else if (key >= KeyCode.Alpha1 && key <= KeyCode.Alpha9) SelectSquadByIndex(key - KeyCode.Alpha1, additive);
+            else if (key == KeyCode.BackQuote) SelectAllSquads();
+            else if (key == KeyCode.Escape && IsTargetingSkill == true) CancelSkillTargeting();
+            else if (key == KeyCode.Escape) ClearSquadSelection();
+            else if (key == KeyCode.Space) TogglePause();
+            else if (key == KeyCode.Return || key == KeyCode.KeypadEnter) StartBattleFromDeployment();
+            else if (key == KeyCode.F) ToggleHeroControl();
+            else if (key == KeyCode.Q) CastControlledHeroSkill();
+            else if (key == KeyCode.Home)
             {
                 battleController?.CameraController?.ResetView();
-                selectionInfoLabel.text = "카메라를 전장 중앙 기본 시점으로 복원했습니다.";
+                selectionInfoLabel.text = Text("UI_BATTLE_CAMERA_RESET");
             }
-            else if (IsCameraMoveKey(keyboardEvent.keyCode))
+            else if (IsCameraMoveKey(key))
             {
-                battleController?.CameraController?.SetMoveKey(keyboardEvent.keyCode, true);
+                battleController?.CameraController?.SetMoveKey(key, true);
             }
             else return;
             keyboardEvent.StopPropagation();
@@ -196,21 +289,6 @@ namespace ProjectWI.Battle
             wheelEvent.StopPropagation();
         }
 
-        // HUD 버튼 영역이 아닌 전장을 클릭하면 가장 가까운 캐릭터의 정보를 표시합니다.
-        private void HandleBattlefieldClick(PointerDownEvent pointerEvent)
-        {
-            if (pointerEvent.button != 0 || battleController?.CameraController == null) return;
-            VisualElement clickedElement = pointerEvent.target as VisualElement;
-            if (clickedElement is Button || clickedElement?.GetFirstAncestorOfType<Button>() != null) return;
-            Vector2 screenPosition = new Vector2(pointerEvent.position.x, Screen.height - pointerEvent.position.y);
-            Vector2 worldPosition = battleController.CameraController.ScreenToBattlePosition(screenPosition);
-            WIBattleCharacterState selected = battleController.SelectCharacterAt(worldPosition);
-            selectionInfoLabel.text = selected == null
-                ? "선택 해제 · 인물 가까이를 클릭하세요."
-                : $"[{(selected.Grade == ProjectWI.Administration.WICharacterGrade.Hero ? "영웅" : "일반")}] {selected.DisplayName} · " +
-                  $"{selected.Role} · HP {selected.Health}/{selected.MaxHealth} · MP {selected.Mana}/{selected.MaxMana}";
-        }
-
         // 전달된 키가 PC 카메라 이동에 사용하는 WASD 또는 방향키인지 반환합니다.
         private static bool IsCameraMoveKey(KeyCode keyCode)
         {
@@ -223,7 +301,7 @@ namespace ProjectWI.Battle
         private void BuildSkillButtons(WIBattleRuntimeState runtime)
         {
             List<WIBattleCharacterState> characters = runtime.Characters
-                .Where(item => item.Side == playerSide && battleController.Config.GetCharacterSkill(item.HeroId, item.HeroClass) != null)
+                .Where(item => item.Side == playerSide && battleController.Config.GetHeroSkill(item.HeroId) != null)
                 .GroupBy(item => item.HeroId).Select(group => group.First()).ToList();
             int pageCount = Mathf.Max(1, Mathf.CeilToInt(characters.Count / (float)skillSlots.Length));
             skillPage = Mathf.Clamp(skillPage, 0, pageCount - 1);
@@ -242,11 +320,22 @@ namespace ProjectWI.Battle
                     continue;
                 }
                 WIBattleCharacterState character = characters[source];
-                WIBattleSkillDefinition skill = battleController.Config.GetCharacterSkill(character.HeroId, character.HeroClass);
+                WIBattleSkillDefinition skill = battleController.Config.GetHeroSkill(character.HeroId);
                 button.userData = character.HeroId;
-                button.tooltip = $"{character.DisplayName}\n{skill.Description}\n마나 {skill.ManaCost} · 범위 {skill.Range:0.#} · 재사용 {skill.Cooldown:0.#}초";
+                button.tooltip = Text("UI_BATTLE_SKILL_TOOLTIP", character.DisplayName, skill.Description, skill.ManaCost, skill.Range, skill.Cooldown);
                 skillButtonByHeroId[character.HeroId] = button;
             }
+        }
+
+        // 스킬 사용 가능 여부 사유를 버튼 하단 문구로 변환합니다.
+        private string GetSkillStateText(WIBattleSkillBlockReason reason, WIBattleCharacterState caster, WIBattleSkillDefinition skill)
+        {
+            if (reason == WIBattleSkillBlockReason.None) return Text("UI_BATTLE_SKILL_READY", skill.ManaCost);
+            if (reason == WIBattleSkillBlockReason.NotOnField) return Text("UI_BATTLE_SKILL_NOT_ON_FIELD");
+            if (reason == WIBattleSkillBlockReason.NoSkill) return Text("UI_BATTLE_SKILL_NONE");
+            if (reason == WIBattleSkillBlockReason.Incapacitated) return Text("UI_BATTLE_SKILL_INCAPACITATED");
+            if (reason == WIBattleSkillBlockReason.Cooldown) return Text("UI_BATTLE_SKILL_COOLDOWN", caster.SkillCooldownRemaining);
+            return Text("UI_BATTLE_SKILL_MANA", caster.Mana, skill.ManaCost);
         }
 
         // 매 프레임 스킬 비용·대기시간과 사용 불가 이유를 버튼에 갱신합니다.
@@ -255,13 +344,13 @@ namespace ProjectWI.Battle
             foreach (KeyValuePair<string, Button> pair in skillButtonByHeroId)
             {
                 WIBattleCharacterState character = runtime.Characters.Find(item => item.HeroId == pair.Key);
-                WIBattleSkillDefinition skill = character == null ? null : battleController.Config.GetCharacterSkill(pair.Key, character.HeroClass);
-                string reason = WIBattleSimulation.GetHeroSkillUnavailableReason(
-                    battleController.Config, runtime, pair.Key, out _, out _);
-                pair.Value.SetEnabled(string.IsNullOrEmpty(reason));
-                pair.Value.text = string.IsNullOrEmpty(reason)
-                    ? $"{skill.DisplayName}\nMP {skill.ManaCost}"
-                    : $"{skill.DisplayName}\n{reason}";
+                WIBattleSkillDefinition skill = character == null ? null : battleController.Config.GetHeroSkill(pair.Key);
+                WIBattleSkillBlockReason reason = WIBattleSimulation.GetHeroSkillBlockReason(
+                    battleController.Config, runtime, pair.Key, out WIBattleCharacterState caster, out _);
+                pair.Value.SetEnabled(reason == WIBattleSkillBlockReason.None);
+                pair.Value.text = skill == null
+                    ? Text("UI_BATTLE_SKILL_NONE")
+                    : Text("UI_BATTLE_SKILL_BUTTON", skill.DisplayName, GetSkillStateText(reason, caster, skill));
             }
         }
     }

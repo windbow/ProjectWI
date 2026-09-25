@@ -326,6 +326,19 @@ namespace ProjectWI.Administration
     [Serializable]
     public class WICampaignVariantDefinition
     {
+        // 시나리오 선택 화면의 삽화와 문자열 UID입니다. 게임 규칙과 독립적으로 편집합니다.
+        [SerializeField] private Sprite selectionArtwork;
+        [SerializeField] private string selectionTitleUid;
+        [SerializeField] private string selectionSubtitleUid;
+        [SerializeField] private string selectionStoryUid;
+        [SerializeField] private string selectionObjectiveUid;
+        [SerializeField] private string selectionProtagonistUid;
+        public Sprite SelectionArtwork => selectionArtwork;
+        public string SelectionTitleUid => selectionTitleUid;
+        public string SelectionSubtitleUid => selectionSubtitleUid;
+        public string SelectionStoryUid => selectionStoryUid;
+        public string SelectionObjectiveUid => selectionObjectiveUid;
+        public string SelectionProtagonistUid => selectionProtagonistUid;
         [SerializeField] private WICampaignVariant variant;
         [SerializeField] private WILocalizedString displayName;
         [SerializeField] private WILocalizedString description;

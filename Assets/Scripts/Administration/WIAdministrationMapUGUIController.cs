@@ -12,7 +12,7 @@ namespace ProjectWI.Administration
         [SerializeField] private TMP_Text[] castleLabels;
         [SerializeField] private string[] castleIds;
         [SerializeField] private WIAdministrationMapConnectionGraphic connectionGraphic;
-        [SerializeField] private Sprite avalonMarker;
+        [SerializeField] private Sprite rimgardMarker;
         [SerializeField] private Sprite valdorMarker;
         [SerializeField] private Sprite ironheartMarker;
         [SerializeField] private Sprite sylvanroadMarker;
@@ -171,7 +171,7 @@ namespace ProjectWI.Administration
         {
             switch (factionId)
             {
-                case "avalon": return avalonMarker;
+                case "rimgard": return rimgardMarker;
                 case "valdor": return valdorMarker;
                 case "sylvanroad": return sylvanroadMarker;
                 case "necropolis": return necropolisMarker;

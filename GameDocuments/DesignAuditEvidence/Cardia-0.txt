@@ -1,8 +1,10 @@
-턴1 카르디아 valdor: 인물[], 방어10
+턴1 카르디아 valdor: 인물[hero_072,common_049,common_048], 방어10
 원정 castle_28: True
-턴2 카르디아 valdor: 인물[], 방어10
-army_1 avalon: castle_28->castle_04, 이동True, 작전가능False, 인원1
-턴3 카르디아 valdor: 인물[], 방어10
-army_1 avalon: castle_04->, 이동False, 작전가능False, 인원1
-전투 battle_1: 수비전력 40, 참가자 0, 실제생성 0
-첫 스텝 결과 Victory
+턴2 카르디아 valdor: 인물[hero_072,common_049,common_048], 방어10
+army_1 rimgard: castle_28->castle_04, 이동True, 작전가능False, 인원1
+army_2 valdor: castle_04->, 이동False, 작전가능True, 인원1
+턴3 카르디아 valdor: 인물[hero_072,common_049,common_048], 방어10
+army_1 rimgard: castle_04->, 이동False, 작전가능False, 인원1
+army_2 valdor: castle_04->, 이동False, 작전가능False, 인원1
+전투 battle_1: 수비전력 226, 참가자 3, 실제생성 3
+첫 스텝 결과 None

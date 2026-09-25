@@ -159,7 +159,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(WICharacterActivityType.Search, loaded.GetCharacter(administrator).StandingActivity);
         }
 
-        // 유지 사업이 자동 실행된 뒤 다음 달 원정·수동 활동을 막지 않는지 검증합니다.
+        // 유지 사업이 담당자를 영구 점유하지 않고 폐지된 수동 휴식 지시에도 계속되는지 검증합니다.
         [Test]
         public void StandingProject_RepeatsWithoutPermanentlyOccupyingActor()
         {
@@ -172,7 +172,8 @@ namespace ProjectWI.Tests.Editor
             int before = castle.Prosperity;
             state.GetCharacter(administrator).Activity = WICharacterActivityType.Rest;
             WIAdministrationTurnSystem.ExecuteTurn(database, state);
-            Assert.AreEqual(before, castle.Prosperity);
+            Assert.Greater(castle.Prosperity, before);
+            Assert.AreEqual(WICharacterActivityType.None, state.GetCharacter(administrator).Activity);
         }
 
         // 자금 부족과 목표 달성 시 유지 사업이 비용을 쓰지 않는지 검증합니다.

@@ -808,8 +808,8 @@ namespace ProjectWI.Administration
                     {
                         FirstFactionId = firstId,
                         SecondFactionId = secondId,
-                        Status = (firstId == "avalon" && secondId == "valdor") ||
-                                 (firstId == "valdor" && secondId == "avalon")
+                        Status = (firstId == "rimgard" && secondId == "valdor") ||
+                                 (firstId == "valdor" && secondId == "rimgard")
                             ? WIDiplomaticStatus.War
                             : WIDiplomaticStatus.Neutral
                     });

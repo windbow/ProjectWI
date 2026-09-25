@@ -82,6 +82,8 @@ namespace ProjectWI.Administration
                 return;
             }
             modal.SetTitle(snapshot.Title);
+            selectionList.SetCharacterToolsEnabled(view.Mode == "commanders" || view.Mode == "members" ||
+                view.Mode == "transfer-actors");
             selectionList.Prepare(snapshot.Items.Count, OpenItem, administrationController,
                 out itemButtons, out itemLabels, out itemPortraits);
             memberPage = 0;
@@ -98,7 +100,9 @@ namespace ProjectWI.Administration
             }
             createButton.interactable = true;
             messageLabel.gameObject.SetActive(snapshot.Items.Count == 0);
-            messageLabel.text = snapshot.Items.Count == 0 ? "진행 중인 전투와 편성된 전투단이 없습니다." : string.Empty;
+            messageLabel.text = snapshot.Items.Count == 0
+                ? (view.Mode.StartsWith("transfer-") ? administrationController.GetAdministrationText("UI_TRANSFER_NO_ACTORS") : "진행 중인 전투와 편성된 전투단이 없습니다.")
+                : string.Empty;
             statusLabel.text = snapshot.Summary;
             int pageSize = itemButtons.Length;
             int pages = Mathf.Max(1, Mathf.CeilToInt(snapshot.Items.Count / (float)pageSize));
@@ -120,7 +124,9 @@ namespace ProjectWI.Administration
                     continue;
                 }
                 WIAdministrationMilitaryItemSnapshot item = snapshot.Items[candidate];
-                itemLabels[index].text = item.Title + "\n" + item.Description + "\n" + administrationController.GetSelectionCharacterSummary(item.Id);
+                string characterSummary = administrationController.GetSelectionCharacterSummary(item.Id);
+                itemLabels[index].text = item.Title + "\n" + item.Description +
+                    (string.IsNullOrEmpty(characterSummary) == true ? string.Empty : "\n" + characterSummary);
                 itemButtons[index].interactable = item.Interactable;
             }
             createButton.GetComponentInChildren<TMP_Text>().text = view.Mode == "overview" ? "새 전투단 편성" : "이전";
@@ -171,6 +177,21 @@ namespace ProjectWI.Administration
             }
             switch (item.Kind)
             {
+                case "transfer-castles": Push("transfer-castles", string.Empty, 0); return;
+                case "transfer-castle": Push("transfer-actors", item.Id, 0); return;
+                case "transfer-actor": Push("transfer-targets", item.Id, 0); return;
+                case "transfer-target":
+                    if (administrationController.StartUGUICharacterTransfer(view.Context, item.Id, out string transferMessage) == false)
+                    {
+                        messageLabel.gameObject.SetActive(true);
+                        messageLabel.text = transferMessage;
+                        return;
+                    }
+                    view = history.Count > 0 ? history.Pop() : new MilitaryViewState("overview", string.Empty, 0);
+                    Refresh();
+                    messageLabel.gameObject.SetActive(true);
+                    messageLabel.text = transferMessage;
+                    return;
                 case "muster-castles": Push("muster-castles", string.Empty, 0); return;
                 case "muster-castle": Push("muster", item.Id, 0); return;
                 case "battle": Push("battle", item.Id, 0); return;

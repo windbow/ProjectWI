@@ -17,17 +17,33 @@ namespace ProjectWI.Battle
         [SerializeField] private GameObject visualEffectPrefab;
         [SerializeField] private GameObject projectilePrefab;
         [SerializeField] private WIBattleCameraController cameraController;
+        // 지형 구역·배치 구역·스킬 범위 미리보기에 쓰는 흰색 원 프리팹입니다.
+        [SerializeField] private SpriteRenderer zoneMarkerPrefab;
 
         private WIBattleRuntimeState runtime;
         private readonly List<WIBattleCharacterView> views = new List<WIBattleCharacterView>();
         private readonly Dictionary<int, SpriteRenderer> visualEffects = new Dictionary<int, SpriteRenderer>();
-        private readonly Dictionary<int, SpriteRenderer> projectileViews = new Dictionary<int, SpriteRenderer>();
+        // 검격·투사체·실제 피격 파티클의 수명과 재사용을 담당합니다.
+        private WIBattleEffectPresenter effectPresenter;
         private WIBattleSpriteRendererPool visualEffectPool;
-        private WIBattleSpriteRendererPool projectilePool;
+
         private string selectedHeroId;
+        // HUD에서 선택한 플레이어 분대 번호 목록입니다.
+        private readonly HashSet<int> selectedSquadIds = new HashSet<int>();
+        // 스킬 위치 지정 중 표시하는 시전 거리·효과 범위 원입니다.
+        private SpriteRenderer skillRangePreview;
+        private SpriteRenderer skillAreaPreview;
+        // 배치 단계 동안 표시하는 플레이어 배치 가능 구역입니다.
+        private SpriteRenderer deploymentZoneMarker;
+
+        // 전술 일시정지 중이면 시뮬레이션을 멈추고 표시만 갱신합니다.
+        public bool IsPaused { get; set; }
         // 현재 캠페인의 후발 전투단 합류 예약과 캐릭터 데이터 원본입니다.
         private WIBattleReinforcementSystem reinforcements;
         private WIAdministrationDatabaseSO battleDatabase;
+
+        // HUD 문자열 UID 조회에 사용하는 전투 데이터베이스입니다.
+        public WIAdministrationDatabaseSO Database => battleDatabase;
         public string ReinforcementStatus => reinforcements?.GetStatus(runtime?.ElapsedSeconds ?? 0f) ?? string.Empty;
 
         public WIBattleRuntimeState Runtime => runtime;
@@ -43,6 +59,8 @@ namespace ProjectWI.Battle
             PrepareBattlePresentation();
             PreparePresentationPools();
             runtime = WIBattleRuntimeBuilder.Build(config, database, session);
+            runtime.IsDeploying = config.UseDeploymentPhase;
+            CreateZoneMarkers();
             battleDatabase = database;
             reinforcements = campaignState == null ? null : new WIBattleReinforcementSystem(config, database, campaignState, session);
             if (cameraController != null)
@@ -74,6 +92,7 @@ namespace ProjectWI.Battle
         // 카메라 단계 변경 이벤트 연결을 해제합니다.
         private void OnDestroy()
         {
+            effectPresenter?.Dispose();
             if (cameraController != null)
             {
                 cameraController.ZoomLevelChanged -= HandleZoomLevelChanged;
@@ -83,11 +102,20 @@ namespace ProjectWI.Battle
         // 프레임 시간만큼 표적 탐색, 이동, 공격과 승패 판정을 진행합니다.
         public void SimulateStep(float deltaTime)
         {
-            if (runtime == null || runtime.Finished)
+            if (runtime == null || runtime.Finished == true)
             {
+                if (runtime != null)
+                {
+                    effectPresenter?.Refresh(runtime, deltaTime);
+                }
                 return;
             }
-            WIBattleOutcome outcome = WIBattleSimulation.Step(config, runtime, deltaTime);
+            if (IsPaused == true)
+            {
+                RefreshViews();
+                return;
+            }
+            WIBattleOutcome outcome = WIBattleSimulation.Advance(config, runtime, deltaTime);
             reinforcements?.Advance(config, runtime);
             while (views.Count < runtime.Characters.Count)
             {
@@ -99,7 +127,7 @@ namespace ProjectWI.Battle
             }
             RefreshViews();
             RefreshVisualEffects();
-            RefreshProjectileViews();
+            effectPresenter?.Refresh(runtime, deltaTime);
             if (outcome != WIBattleOutcome.None)
             {
                 BattleFinished?.Invoke(outcome);
@@ -113,22 +141,189 @@ namespace ProjectWI.Battle
             {
                 return;
             }
-            if (side == WIBattleSide.Attacker)
+            WIBattleSimulation.SetSideCommand(runtime, side, command, focusHeroId);
+        }
+
+        // 선택한 분대에만 전투단 명령을 내립니다.
+        public void SetSquadCommand(ICollection<int> squadIds, WIBattleCommand command, string focusHeroId = "")
+        {
+            if (runtime == null || runtime.Finished == true)
             {
-                runtime.AttackerCommand = command;
-                runtime.AttackerFocusHeroId = focusHeroId;
+                return;
             }
-            else
+            WIBattleSimulation.SetSquadCommand(runtime, squadIds, command, focusHeroId);
+        }
+
+        // 선택한 분대를 지정한 전장 좌표로 이동시킵니다.
+        public void OrderSquadsMove(ICollection<int> squadIds, Vector2 destination)
+        {
+            if (runtime == null || runtime.Finished == true)
             {
-                runtime.DefenderCommand = command;
-                runtime.DefenderFocusHeroId = focusHeroId;
+                return;
+            }
+            WIBattleSimulation.OrderSquadsMove(config, runtime, squadIds, destination);
+        }
+
+        // 선택한 분대가 지정한 적을 집중 공격하게 합니다.
+        public void OrderSquadsAttack(ICollection<int> squadIds, string enemyHeroId)
+        {
+            if (runtime == null || runtime.Finished == true)
+            {
+                return;
+            }
+            WIBattleSimulation.OrderSquadsAttack(runtime, squadIds, enemyHeroId);
+        }
+
+        // 선택 표시할 분대 번호 목록을 교체합니다.
+        public void SetSelectedSquads(IEnumerable<int> squadIds)
+        {
+            selectedSquadIds.Clear();
+            foreach (int squadId in squadIds)
+            {
+                selectedSquadIds.Add(squadId);
+            }
+            if (runtime != null)
+            {
+                RefreshViews();
             }
         }
 
-        // 선택한 영웅의 ScriptableObject 액티브 스킬 사용을 시도합니다.
-        public bool TryActivateHeroSkill(string heroId)
+        // 전장 좌표에서 가장 가까운 생존 인물을 선택 상태 변경 없이 반환합니다.
+        public WIBattleCharacterState FindCharacterAt(Vector2 worldPosition)
         {
-            return WIBattleSimulation.TryActivateHeroSkill(config, runtime, heroId);
+            return runtime?.Characters
+                .Where(item => item.IsAlive && Vector2.Distance(item.Position, worldPosition) <= config.CharacterSelectionRadius)
+                .OrderBy(item => Vector2.SqrMagnitude(item.Position - worldPosition))
+                .FirstOrDefault();
+        }
+
+        // 선택한 영웅의 ScriptableObject 액티브 스킬 사용을 시도합니다.
+        public bool TryActivateHeroSkill(string heroId, Vector2? targetPoint = null)
+        {
+            return WIBattleSimulation.TryActivateHeroSkill(config, runtime, heroId, targetPoint);
+        }
+
+        // 스킬 위치 지정 중 시전 가능 거리와 효과 범위를 구역 표시 프리팹 원으로 미리 보여 줍니다.
+        public void ShowSkillPreview(Vector2 casterPosition, float castRange, Vector2 center, float radius)
+        {
+            if (skillRangePreview == null || skillAreaPreview == null)
+            {
+                return;
+            }
+            skillRangePreview.gameObject.SetActive(true);
+            skillAreaPreview.gameObject.SetActive(true);
+            skillRangePreview.color = config.SkillRangePreviewColor;
+            skillRangePreview.transform.position = casterPosition;
+            skillRangePreview.transform.localScale = Vector3.one * castRange * 2f;
+            skillAreaPreview.color = config.SkillAreaPreviewColor;
+            skillAreaPreview.transform.position = WIBattleSimulation.ClampSkillTarget(casterPosition, center, castRange);
+            skillAreaPreview.transform.localScale = Vector3.one * radius * 2f;
+        }
+
+        // 스킬 범위 미리보기를 숨깁니다.
+        public void HideSkillPreview()
+        {
+            skillRangePreview?.gameObject.SetActive(false);
+            skillAreaPreview?.gameObject.SetActive(false);
+        }
+
+        // 전투 설정의 지형 구역, 배치 구역과 스킬 미리보기 원을 구역 표시 프리팹으로 생성합니다.
+        private void CreateZoneMarkers()
+        {
+            if (zoneMarkerPrefab == null)
+            {
+                Debug.LogError("구역 표시 프리팹(zoneMarkerPrefab)이 BattleRuntime에 연결되지 않았습니다.", this);
+                return;
+            }
+            Transform parent = visualEffectRoot == null ? transform : visualEffectRoot;
+            foreach (WIBattleTerrainZoneDefinition zone in config.TerrainZones)
+            {
+                SpriteRenderer marker = Instantiate(zoneMarkerPrefab, parent);
+                marker.name = "TerrainZone_" + zone.TerrainType;
+                marker.color = config.GetTerrainZoneColor(zone.TerrainType);
+                marker.transform.position = zone.Center;
+                marker.transform.localScale = Vector3.one * zone.Radius * 2f;
+            }
+            skillRangePreview = Instantiate(zoneMarkerPrefab, parent);
+            skillRangePreview.name = "SkillRangePreview";
+            skillRangePreview.sortingOrder = 1600;
+            skillAreaPreview = Instantiate(zoneMarkerPrefab, parent);
+            skillAreaPreview.name = "SkillAreaPreview";
+            skillAreaPreview.sortingOrder = 1601;
+            HideSkillPreview();
+            deploymentZoneMarker = Instantiate(zoneMarkerPrefab, parent);
+            deploymentZoneMarker.name = "DeploymentZone";
+            deploymentZoneMarker.color = config.DeploymentZoneColor;
+            deploymentZoneMarker.gameObject.SetActive(false);
+        }
+
+        // 플레이어 진영의 배치 구역 표시를 켜거나 끕니다.
+        public void ShowDeploymentZone(WIBattleSide side, bool visible)
+        {
+            if (deploymentZoneMarker == null)
+            {
+                return;
+            }
+            deploymentZoneMarker.gameObject.SetActive(visible);
+            if (visible == false)
+            {
+                return;
+            }
+            Vector2 rangeX = WIBattleSimulation.GetDeploymentRangeX(config, side);
+            deploymentZoneMarker.transform.position = new Vector2((rangeX.x + rangeX.y) * 0.5f, 0f);
+            deploymentZoneMarker.transform.localScale = new Vector3(rangeX.y - rangeX.x, config.ArenaSize.y, 1f);
+        }
+
+        // 배치 단계인지 여부입니다.
+        public bool IsDeploying => runtime != null && runtime.IsDeploying == true;
+
+        // 배치 단계에서 선택 분대를 배치 구역 안으로 옮깁니다.
+        public void DeploySquads(ICollection<int> squadIds, Vector2 destination)
+        {
+            if (IsDeploying == false)
+            {
+                return;
+            }
+            WIBattleSimulation.DeploySquads(config, runtime, squadIds, destination);
+            RefreshViews();
+        }
+
+        // 배치 단계를 끝내고 전투를 시작합니다.
+        public void StartBattle()
+        {
+            if (runtime == null)
+            {
+                return;
+            }
+            runtime.IsDeploying = false;
+            ShowDeploymentZone(WIBattleSide.Attacker, false);
+        }
+
+        // 직접 지휘 중인 영웅 ID이며 없으면 빈 문자열입니다.
+        public string ControlledHeroId => runtime?.ControlledHeroId ?? string.Empty;
+
+        // 분대장을 직접 지휘하기 시작합니다.
+        public bool StartHeroControl(int squadId)
+        {
+            return runtime != null && runtime.Finished == false && WIBattleSimulation.StartHeroControl(runtime, squadId);
+        }
+
+        // 직접 지휘 중인 영웅을 지정 위치로 이동시킵니다.
+        public void OrderControlledHeroMove(Vector2 destination)
+        {
+            if (runtime != null)
+            {
+                WIBattleSimulation.OrderControlledHeroMove(config, runtime, destination);
+            }
+        }
+
+        // 직접 지휘를 끝냅니다.
+        public void StopHeroControl()
+        {
+            if (runtime != null)
+            {
+                WIBattleSimulation.StopHeroControl(runtime);
+            }
         }
 
         // 매 프레임 전투 시뮬레이션을 진행합니다.
@@ -142,10 +337,10 @@ namespace ProjectWI.Battle
         {
             foreach (WIBattleCharacterView view in views)
             {
-                view.Refresh();
+                view.Refresh(runtime.InterpolationAlpha);
                 bool focused = runtime.AttackerFocusHeroId == view.HeroId || runtime.DefenderFocusHeroId == view.HeroId;
                 view.SetFocused(focused);
-                view.SetSelected(selectedHeroId == view.HeroId);
+                view.SetSelected(selectedHeroId == view.HeroId || selectedSquadIds.Contains(view.SquadId) == true);
             }
         }
 
@@ -193,20 +388,19 @@ namespace ProjectWI.Battle
                 visualEffectPool = null;
             }
 
-            Transform projectileParent = projectileRoot == null ? transform : projectileRoot;
-            projectilePool = new WIBattleSpriteRendererPool(projectilePrefab, projectileParent);
-            if (projectilePool.IsValid == false)
-            {
-                Debug.LogError("전투 투사체 프리팹과 SpriteRenderer 연결을 확인해야 합니다.", this);
-                projectilePool = null;
-            }
+            effectPresenter?.Dispose();
+            effectPresenter = new WIBattleEffectPresenter(config, effectParent);
         }
 
-        // 시뮬레이션이 예약한 근접 섬광과 원거리 발사체 도형을 생성하고 이동시킵니다.
+        // 기존 스킬의 범위 안내 표시를 갱신하며 공격 파티클은 별도 표시기로 전달합니다.
         private void RefreshVisualEffects()
         {
             foreach (WIBattleVisualEffectState effect in runtime.VisualEffects)
             {
+                if (effect.EffectType == WIBattleVisualEffectType.MeleeHit || effect.EffectType == WIBattleVisualEffectType.Hit)
+                {
+                    continue;
+                }
                 if (visualEffects.ContainsKey(effect.EffectId) == false)
                 {
                     if (visualEffectPool == null)
@@ -244,35 +438,6 @@ namespace ProjectWI.Battle
             return effect.Side == WIBattleSide.Attacker
                 ? config.AttackerPlaceholderColor
                 : config.DefenderPlaceholderColor;
-        }
-
-        // 실제 충돌 판정을 수행하는 원거리 발사체 상태를 작은 사각형으로 표시합니다.
-        private void RefreshProjectileViews()
-        {
-            foreach (WIBattleProjectileState projectile in runtime.Projectiles)
-            {
-                if (projectileViews.ContainsKey(projectile.ProjectileId) == false)
-                {
-                    if (projectilePool == null)
-                    {
-                        return;
-                    }
-                    SpriteRenderer renderer = projectilePool.Acquire();
-                    renderer.name = "Projectile";
-                    renderer.color = projectile.Side == WIBattleSide.Attacker
-                        ? config.AttackerPlaceholderColor
-                        : config.DefenderPlaceholderColor;
-                    renderer.sortingOrder = 20;
-                    renderer.transform.localScale = Vector3.one * config.PlaceholderProjectileSize;
-                    projectileViews[projectile.ProjectileId] = renderer;
-                }
-                projectileViews[projectile.ProjectileId].transform.position = projectile.Position;
-            }
-            foreach (int projectileId in projectileViews.Keys.Where(id => runtime.Projectiles.All(item => item.ProjectileId != id)).ToList())
-            {
-                projectilePool?.Release(projectileViews[projectileId]);
-                projectileViews.Remove(projectileId);
-            }
         }
 
     }

@@ -255,7 +255,7 @@ namespace ProjectWI.Tests.Editor
 
             Debug.Log($"카르디아 1년 진단 · 성 {metrics.FinalPlayerCastleCount} · " +
                 $"원정 {metrics.MarchesStarted} · 전투 {sessions}");
-            Assert.AreEqual("avalon", state.GetCastle("castle_04").FactionId,
+            Assert.AreEqual("rimgard", state.GetCastle("castle_04").FactionId,
                 "공세형 아레스는 첫해 안에 카르디아를 점령해야 합니다.");
         }
 

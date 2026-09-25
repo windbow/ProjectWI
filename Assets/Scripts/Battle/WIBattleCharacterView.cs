@@ -9,7 +9,15 @@ namespace ProjectWI.Battle
         private const float CharacterSortingPrecision = 100f;
         private WIBattleCharacterState state;
         private SpriteRenderer spriteRenderer;
+        // 원본 Sprite가 오른쪽을 바라보는지 여부로 반전 기준을 정합니다.
+        private bool spriteFacesRight;
         private SpriteRenderer groundShadowRenderer;
+        // 진영 색으로 칠하는 발밑 표시입니다.
+        private SpriteRenderer sideMarkerRenderer;
+        // 바인딩 시 정한 인물 이미지 기본 색입니다.
+        private Color baseColor = Color.white;
+        // 퇴각 중 이미지에 곱하는 색입니다.
+        private Color routingTint = Color.white;
         private Material defaultMaterial;
         private Material farOutlineMaterial;
         private Transform healthFill;
@@ -20,6 +28,8 @@ namespace ProjectWI.Battle
         private TextMesh characterLabel;
 
         public string HeroId => state?.HeroId;
+        // 표시 중인 인물의 분대 번호입니다.
+        public int SquadId => state == null ? 0 : state.SquadId;
 
         // 전투 캐릭터 상태를 표시 오브젝트와 연결하고 임시 진영 색상을 적용합니다.
         public void Bind(WIBattleCharacterState characterState, WIBattleConfigSO config, Sprite battleSprite)
@@ -27,6 +37,7 @@ namespace ProjectWI.Battle
             state = characterState;
             spriteRenderer = GetComponent<SpriteRenderer>();
             BindGroundShadow();
+            spriteFacesRight = config.BattleSpriteFacesRight;
             defaultMaterial = config.CharacterDefaultMaterial;
             farOutlineMaterial = config.CharacterFarOutlineMaterial;
             spriteRenderer.sprite = battleSprite != null
@@ -36,11 +47,25 @@ namespace ProjectWI.Battle
             {
                 Debug.LogError("전투 캐릭터 대체 Sprite가 BattleConfig에 연결되지 않았습니다.", config);
             }
-            spriteRenderer.color = battleSprite != null
+            baseColor = battleSprite != null
                 ? Color.white
                 : state.Side == WIBattleSide.Attacker
                     ? config.AttackerPlaceholderColor
                     : config.DefenderPlaceholderColor;
+            spriteRenderer.color = baseColor;
+            routingTint = config.RoutingTint;
+            if (sideMarkerRenderer != null)
+            {
+                Color sideColor = state.Side == WIBattleSide.Attacker
+                    ? config.AttackerPlaceholderColor
+                    : config.DefenderPlaceholderColor;
+                sideColor.a = config.SideMarkerAlpha;
+                sideMarkerRenderer.color = sideColor;
+            }
+            else
+            {
+                Debug.LogError("전투 캐릭터 프리팹에 SideMarker SpriteRenderer가 없습니다.", this);
+            }
             spriteRenderer.sortingOrder = 10;
             transform.localScale = battleSprite == null
                 ? Vector3.one * config.PlaceholderCharacterSize
@@ -56,6 +81,10 @@ namespace ProjectWI.Battle
             groundShadowRenderer = shadowTransform == null
                 ? null
                 : shadowTransform.GetComponent<SpriteRenderer>();
+            Transform markerTransform = transform.Find("SideMarker");
+            sideMarkerRenderer = markerTransform == null
+                ? null
+                : markerTransform.GetComponent<SpriteRenderer>();
         }
 
         // 원거리 C 단계에서만 외곽선 머티리얼을 공유 적용합니다.
@@ -165,18 +194,25 @@ namespace ProjectWI.Battle
             }
         }
 
-        // 런타임 좌표와 생존 상태를 Transform과 렌더러에 반영합니다.
-        public void Refresh()
+        // 틱 사이 보간 비율을 적용한 런타임 좌표와 생존 상태를 Transform과 렌더러에 반영합니다.
+        public void Refresh(float interpolationAlpha = 1f)
         {
             if (state == null)
             {
                 return;
             }
-            transform.position = new Vector3(state.Position.x, state.Position.y, 0f);
-            spriteRenderer.sortingOrder = CharacterSortingBase - Mathf.RoundToInt(state.Position.y * CharacterSortingPrecision);
+            Vector2 displayPosition = state.GetDisplayPosition(interpolationAlpha);
+            transform.position = new Vector3(displayPosition.x, displayPosition.y, 0f);
+            spriteRenderer.flipX = state.FacingRight != spriteFacesRight;
+            spriteRenderer.color = state.IsRouting == true ? baseColor * routingTint : baseColor;
+            spriteRenderer.sortingOrder = CharacterSortingBase - Mathf.RoundToInt(displayPosition.y * CharacterSortingPrecision);
             if (groundShadowRenderer != null)
             {
-                groundShadowRenderer.sortingOrder = spriteRenderer.sortingOrder - 1;
+                groundShadowRenderer.sortingOrder = spriteRenderer.sortingOrder - 2;
+            }
+            if (sideMarkerRenderer != null)
+            {
+                sideMarkerRenderer.sortingOrder = spriteRenderer.sortingOrder - 1;
             }
             if (healthFill != null)
             {

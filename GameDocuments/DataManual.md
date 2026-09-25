@@ -1,5 +1,12 @@
 # ProjectWI 데이터 편집 매뉴얼
 
+## 플레이어 진영 명칭 림가르드 (2026-09-24)
+
+- 플레이어 진영 ID는 `rimgard`, 표시명은 `림가르드 백작국 / Rimgard County`입니다. 옛 수도 `castle_00`의 이름도 `림가르드 / Rimgard`입니다. 명칭의 뜻과 설정은 `NarrativeSetting.md`를 따릅니다.
+- 관련 문자열 UID는 `FACTION_RIMGARD`, `OBJECTIVE_RIMGARD_*`, `REGION_RIMGARD_*`, `REL_START_RIMGARD`, `FALL_RIMGARD_*`입니다. 캠페인 목표 ID는 `rimgard_restore_capital`, `rimgard_secure_border`, `rimgard_break_valdor`, `rimgard_unify_continent`, 지역 사건 ID는 `region_rimgard_lake`입니다.
+- 지도 범례와 노드의 진영 약칭은 `RG`입니다. 지도 표식 필드는 `WIAdministrationMapUGUIController.rimgardMarker`입니다.
+- 이미지 파일명(`Emblem_Avalon_V1.png`, `Castle_Avalon_V1.png`, `map_castle_avalon.png`, `strategy_avalon_crest_v1.png`)은 기존 이름을 유지합니다. 진영 ID 변경으로 이전에 만든 개발용 저장 파일은 새 캠페인으로 다시 시작해야 합니다.
+
 ## 실제 조작 검증 메모 (2026-09-20)
 
 - 기존 자동 저장에서 아레스 영지관 배정 → 새 전투단 대장 편성 → 카르디아 출정 → 월 진행·재불러오기를 실제 클릭으로 확인했습니다. 출정 뒤에도 영지관과 예상 성과 +8이 유지됩니다.
@@ -128,12 +135,12 @@
 - 현재 턴 시스템은 본체를 포함한 21개 소스 파일로 구성됩니다. 새 기능은 기존 책임에 맞는 partial에 추가하고, 하나의 파일이 서로 다른 책임을 함께 크게 포함하게 되면 하위 partial로 분리합니다.
 
 - AI는 양수 위협 점수의 성이 없어도 전쟁 중인 적과 맞닿은 접경 성으로 집결합니다. 공격 전력 비율은 개별 전투단이 아니라 같은 접경 성에 있는 작전 가능 아군 전투단의 합산 전력과 목표 성 방어력을 비교합니다.
-- 전투 설정의 `Use Hidden Grid`가 활성화된 상태에서는 인물 위치가 격자 셀 중심으로 보정됩니다. 연속 좌표 물리 자체를 검증할 때는 원본 에셋을 수정하지 말고 복제 설정에서만 이 값을 끕니다.
+- 전투 물리를 검증할 때는 원본 에셋을 수정하지 말고 테스트의 `CreateBattleConfigCopy()` 복제 설정을 사용합니다.
 - 전투 결과 단위 테스트는 AI가 공격 대상을 선택할 것이라고 가정하지 않고, 테스트 픽스처에서 공격 전투단과 이동 일정을 직접 구성합니다. AI 공격 성향·전력 임계값을 변경해도 전략 승패와 실시간 전투 결과 검증이 함께 흔들리지 않도록 유지합니다.
 
 ## 전투 캐릭터 표시 요소 편집
 
-- 전투 프레임 진행·목표·일반 공격은 `WIBattleSimulation.cs`, 근접 밀치기·연속 좌표 충돌·숨은 격자 이동과 점유 셀은 `WIBattleSimulation.Movement.cs`에서 편집합니다. 원거리 역할·발사체 이동·충돌·아군 오발은 `WIBattleSimulation.Projectiles.cs`, 영웅 스킬 조건·효과·범위 시각 효과는 `WIBattleSimulation.Skills.cs`에서 편집하며 공개 API는 partial 공용 클래스에 유지합니다.
+- 전투 프레임 진행·목표·일반 공격은 `WIBattleSimulation.cs`, 근접 밀치기·공간 해시 충돌 해소는 `WIBattleSimulation.Movement.cs`, 표적 선택·교전 슬롯·명령별 이동은 `WIBattleSimulation.Engagement.cs`에서 편집합니다. 원거리 역할·발사체 이동·충돌·아군 오발은 `WIBattleSimulation.Projectiles.cs`, 영웅 스킬 조건·효과·범위 시각 효과는 `WIBattleSimulation.Skills.cs`에서 편집하며 공개 API는 partial 공용 클래스에 유지합니다.
 - `Assets/Prefabs/Battle/WIBattleCharacter.prefab`에서 접지 그림자, 선택·집중 마커, 체력 바와 인물 라벨을 편집합니다.
 - 캐릭터 대체 표시와 마커·체력 바의 Sprite는 프리팹 및 `WI_BattleConfig.placeholderSprite`에 실제 에셋으로 연결합니다. 런타임 Texture나 Sprite 생성 헬퍼를 다시 추가하지 않습니다.
 - 전투 범위 효과와 투사체 기본 표시는 각각 `Assets/Prefabs/Battle/WIBattleVisualEffect.prefab`, `Assets/Prefabs/Battle/WIBattleProjectile.prefab`에서 편집합니다. `BattleScene/BattleRuntime`의 해당 프리팹과 `VisualEffectRoot`, `ProjectileRoot` 참조를 유지합니다.
@@ -197,8 +204,7 @@
 
 전투씬 에셋의 설정값과 제작·검증 절차는 `GameDocuments/BattleSceneAssetSettingsGuide.md`를 우선 기준으로 사용합니다. 아래 과거 하이브리드 청크 항목은 비교·복구용 기록이며 현재 전장 기준이 아닙니다.
 
-- 숨은 8방향 사각 좌표망은 `WI_BattleConfig`의 `Use Hidden Grid`로 전환합니다. 현재 `Grid Cell Width=0.6`, `Grid Cell Height=0.3`, `Grid Arrival Distance=0.015`이며 기본 전투 화면에는 선을 표시하지 않습니다.
-- 캐릭터 밀도를 조절할 때 Sprite Scale을 변경하지 말고 먼저 `Grid Cell Width`와 `Grid Cell Height`를 조정합니다. Cell Height를 낮추면 행 간격이 줄어 몸체 겹침이 커집니다.
+- 숨은 격자 이동은 2026-09-25에 제거했습니다. 캐릭터 밀도를 조절할 때 Sprite Scale을 변경하지 말고 `Formation Row Spacing`(현재 0.8)과 `Minimum Unit Spacing`(현재 0.75)을 조정합니다.
 
 - A 근거리 기준 아레스 전투 Sprite는 `Ares_Battle_1WU_A_OutlineBake_V1.png`입니다. 외곽선을 포함한 가시 실루엣 높이 256px, PPU 256, Transform Scale 1을 한 세트로 유지해야 정확히 1월드 유닛입니다. 파일에 투명 여백이나 외곽선을 추가하면 최종 가시 높이를 다시 256px로 정규화합니다.
 
@@ -265,7 +271,7 @@
 - `CampaignEndings`: 점령 통치 이력으로 판정하는 화합·군정 통일 결말의 제목과 설명
 - `CampaignVariants`: 시작 영토 또는 핵심 관계만 변경하는 반복 플레이 시작 조건
 
-시작 변형은 `Classic`, `BorderGarrison`, `DividedCourt` 세 종류입니다. 국경 수비대는 `castle_01`을 아발론 소유로 바꾸며, 분열된 궁정은 아레스·알덴의 친애를 갈등으로 덮어씁니다. 난이도와 시작 자원은 변형과 무관합니다.
+시작 변형은 `Classic`, `BorderGarrison`, `DividedCourt` 세 종류입니다. 국경 수비대는 `castle_01`을 림가르드 소유로 바꾸며, 분열된 궁정은 아레스·알덴의 친애를 갈등으로 덮어씁니다. 난이도와 시작 자원은 변형과 무관합니다.
 
 캠페인 시작 화면은 940px 폭과 최소 650px 높이의 고정 패널을 사용합니다. 캠페인 소개는 제목 장식 아래에서 난이도 제목 바로 위에 배치하고, 난이도·시작 조건 카드의 설명은 여러 문장일 때 마침표 뒤에서 줄을 바꿉니다. 난이도 안내 문구는 하단 프레임 안쪽 여백을 확보합니다.
 
@@ -273,13 +279,13 @@
 
 플레이어가 적 성을 점령하면 구 소유 진영을 기억하는 점령 통치 사건이 생성됩니다. 선택 전 기본 상태는 질서 최대 20·불안 3개월이며 선택에 따라 비용과 안정화 방향이 달라집니다. AI 점령은 선택 사건 없이 기본 규칙을 사용합니다.
 
-지역 사건은 아발론·발도르·아이언하트·실바니아·네크로폴리스의 대표 수도에 하나씩 있습니다. 플레이어가 해당 성을 소유하고 최소 턴을 넘기면 미발생 사건 한 건이 월간 보고에 등록되며, 완료 ID를 저장해 반복 발생을 막습니다. 자원 비용을 감당할 수 없는 선택지는 비활성화됩니다.
+지역 사건은 림가르드·발도르·아이언하트·실바니아·네크로폴리스의 대표 수도에 하나씩 있습니다. 플레이어가 해당 성을 소유하고 최소 턴을 넘기면 미발생 사건 한 건이 월간 보고에 등록되며, 완료 ID를 저장해 반복 발생을 막습니다. 자원 비용을 감당할 수 없는 선택지는 비활성화됩니다.
 
 새 캠페인은 5개 진영에 핵심 관계 한 쌍씩을 생성합니다. 아레스·알덴과 브롬·테인은 친애, 리리아·가레스·모리건·님·테론·베일은 갈등으로 시작합니다. 두 인물이 플레이어 소유의 같은 성에 있으면 관계 단계에 맞는 선택 사건 후보가 생성됩니다.
 
-첫 목표 `avalon_restore_capital`은 아발론 성의 번영을 시작값 45에서 50 이상으로 높이는 조건입니다. 완료 시 금화 200, 마나 50, 영향력 20을 지급하며 완료 ID는 저장 데이터에 유지됩니다.
+첫 목표 `rimgard_restore_capital`은 림가르드 성의 번영을 시작값 45에서 50 이상으로 높이는 조건입니다. 완료 시 금화 200, 마나 50, 영향력 20을 지급하며 완료 ID는 저장 데이터에 유지됩니다.
 
-목표는 데이터 배열 순서대로 수도 재건, 아발론 영토 3성 확보, 발도르 멸망, 60성 대륙 통일로 진행됩니다. 각 단계는 `CastleProsperity`, `PlayerCastleCount`, `FactionEliminated`, `ContinentalUnification` 조건을 사용하며 선행 달성 상태도 현재 단계가 되면 판정합니다.
+목표는 데이터 배열 순서대로 수도 재건, 림가르드 영토 3성 확보, 발도르 멸망, 60성 대륙 통일로 진행됩니다. 각 단계는 `CastleProsperity`, `PlayerCastleCount`, `FactionEliminated`, `ContinentalUnification` 조건을 사용하며 선행 달성 상태도 현재 단계가 되면 판정합니다.
 - `Starting Heroes`: 시작 성, 영웅과 영지관 여부
 - `Special Facilities`: 확장 시 선택하는 특화 시설 이름, 설명과 교체용 아이콘
 - `UI Strings`: UID별 한국어·영어 문구
@@ -322,14 +328,25 @@ AI 성향은 부국, 개발, 수비, 공세와 모략입니다. 전선 판단에
 
 에셋: `Assets/Data/ScriptableObject/Battle/WI_BattleConfig.asset`
 
-- 전장 크기와 진형 열·행 간격
+- 전장 크기와 진형 열·행 간격(`Formation Row Spacing` 0.8: 30명 규모에서 전열이 전장 위아래 끝까지 붙지 않도록 조정)
 - 기본 체력·마나와 무력·지력 환산값
 - 이동 속도, 근접·원거리 사거리, 공격 간격과 기본 피해
 - 전진 속도 배율, 위치 사수 피해 감소율, 집중 공격 피해 배율
 - 인물 최소 간격과 충돌 해소 강도
 - 근접 밀치기 거리와 위치 사수 밀치기 저항
 - 진형 이탈 후 복귀 속도
-- `Hero Skills`: 영웅 ID, 표시명, 범위 피해·아군 회복·지휘 강화 유형, 마나 비용, 위력, 범위와 재사용 대기시간
+- `Battle Sprite Faces Right`: 전투 캐릭터 원본 그림이 오른쪽을 보면 켭니다. 현재 아트(예: 아레스)는 왼쪽을 보므로 꺼져 있습니다. 전투 중 이미지는 이동 방향 또는 표적 쪽으로 자동 반전됩니다.
+- 분대·측면: `Flank Damage Multiplier`(측면 근접 피해 1.25), `Rear Damage Multiplier`(후방 근접 피해 1.5), `Flank Front Dot`(정면 판정 기준 0.5), `Move Order Arrival Distance`(이동 명령 도착 판정 0.3). 분대는 전투 시작 시 전투단의 영웅마다 자동 편성됩니다.
+- 사기: `Morale Loss Per Ally Down`(10), `Morale Loss Leader Down`(35), `Morale Loss Side On Leader Down`(8), `Morale Loss Flank Hit`(1), `Morale Loss Rear Hit`(2.5), `Morale Regen Per Second`(1), `Rout Recovery Per Second`(4), `Rout Recover Threshold`(40). 사기 상한은 100 고정입니다.
+- 표시: `Side Marker Alpha`(진영 발밑 링 불투명도 0.95, 색은 진영 임시 색상), `Routing Tint`(퇴각 인물 색), `Skill Range Preview Color`·`Skill Area Preview Color`(스킬 지정 미리보기 색). 발밑 링 이미지는 `WIBattleCharacter.prefab`의 `SideMarker` 자식에서 교체합니다.
+- 영웅 스킬의 `Area Radius`: 범위 피해 스킬을 지정 위치에 쓸 때의 효과 반경이며 `Range`는 시전 가능 거리입니다. 위치를 지정하지 않고 호출하면(테스트 등) 기존처럼 시전자 주변 `Range` 반경에 적용됩니다.
+- 배치: `Use Deployment Phase`(배치 단계 사용), `Deployment Zone Depth Ratio`(자기 진영 가장자리에서 배치 가능한 전장 가로 비율 0.4), `Deployment Zone Color`.
+- 지형: `Terrain Zones`에 종류(HighGround·Forest·Narrow), 중심, 반경을 추가·편집합니다. 전장 아트의 언덕·숲·길 위치에 맞춰 조정하세요. 효과 수치는 `High Ground Range Multiplier`(1.25), `High Ground Damage Multiplier`(1.1), `Forest Projectile Damage Multiplier`(0.6), `Forest Move Speed Multiplier`(0.8), `Narrow Melee Slot Count`(2), 표시 색은 `High Ground/Forest/Narrow Zone Color`입니다.
+- 직접 지휘: `Follow Slack Distance`(1.2) 이상 영웅 곁 자리에서 벌어진 분대원은 교전을 끊고 따라갑니다.
+- 구역·스킬 범위 원 이미지는 `Assets/Prefabs/Battle/WIBattleZoneMarker.prefab`(Sprite `WI_ZoneCircle_V1`)에서 교체하며 BattleScene `BattleRuntime`의 `Zone Marker Prefab`에 연결되어 있어야 합니다.
+- 이동·교전: `Fixed Tick Seconds`(고정 틱, 0.05), `Melee Slot Count`(한 인물을 동시에 근접 공격할 수 있는 수, 4), `Melee Slot Distance Ratio`(근접 사거리 대비 슬롯 거리, 0.8), `Melee Slot Angle Step`(슬롯 부채꼴 간격, 45°), `Retarget Interval`(표적 재평가 주기, 0.5초), `Full Slot Target Penalty`(슬롯이 가득 찬 적 회피 거리 가중, 3), `Ranged Preferred Range Ratio`(원거리 정지 사거리 비율, 0.85), `Ranged Retreat Distance`(재장전 중 후퇴 시작 거리, 1.6), `Engaged Collision Mass`(교전 중 인물의 충돌 질량 배수, 3)
+- 명령 설정: `Protect Threat Radius`(후열 보호가 위협으로 보는 원거리·지원 아군 주변 거리, 3), `Protect Guard Distance`(보호 대상 앞에 서는 거리, 1.2), `Spread Spacing Multiplier`(분산 시 아군 간격 배율, 2), `Rally Formation Scale`(집결 시 대장 주변 진형 축소 비율, 0.5), `Retreat Escape Margin`(후퇴 이탈 판정 가장자리 거리, 0.3)
+- `Hero Skills`(영웅 전용, 직업 공용 기술 없음): 영웅 ID, 표시명, 범위 피해·아군 회복·지휘 강화 유형, 마나 비용, 위력, 범위와 재사용 대기시간
 - `Placeholder Sprite`: 실제 캐릭터 이미지가 준비되면 교체하는 빈 슬롯
 - 임시 캐릭터·발사체 크기, 공격 효과 지속 시간과 양 진영 임시 색상
 - 실제 발사체 속도·수명·충돌 반경, 아군 오발 사용 여부와 발사자 주변 안전 거리
@@ -408,7 +425,7 @@ AI 진영은 장기 캠페인에서 영지관과 전투단 대장이 같은 한 
 
 진영의 `Emblem`, 인물의 `Portrait`, 성의 `Castle Image`, 특화 시설의 `Icon`도 같은 데이터베이스에서 관리합니다. Sprite가 지정되면 전역 HUD 문장, 성 전경, 영지관 영역, 주둔 인물 슬롯과 시설 슬롯에 자동 적용됩니다. 값이 비어 있으면 기존 빈 이미지 슬롯이 유지됩니다.
 
-현재 5개 진영의 `Emblem`에는 `Assets/Art/Factions` 아래 투명 PNG 문장이 연결되어 있습니다. 아발론은 왕관을 쓴 백사자와 마나 결정, 발도르는 검을 쥔 흑수리, 아이언하트는 산맥과 전쟁망치, 실반로드는 초승달 세계수, 네크로폴리스는 일식과 영혼불꽃 해골을 상징으로 사용합니다.
+현재 5개 진영의 `Emblem`에는 `Assets/Art/Factions` 아래 투명 PNG 문장이 연결되어 있습니다. 림가르드는 왕관을 쓴 백사자와 마나 결정, 발도르는 검을 쥔 흑수리, 아이언하트는 산맥과 전쟁망치, 실반로드는 초승달 세계수, 네크로폴리스는 일식과 영혼불꽃 해골을 상징으로 사용합니다.
 
 5대 진영 수도 `castle_00`, `castle_01`, `castle_26`, `castle_38`, `castle_50`의 `Castle Image`에는 `Assets/Art/Castles` 아래 전용 전경이 연결되어 있습니다. 이후 제작하는 일반 성 전경도 같은 필드에 단일 Sprite로 지정합니다.
 
@@ -416,11 +433,11 @@ AI 진영은 장기 캠페인에서 영지관과 전투단 대장이 같은 한 
 
 현재 `WIHeroClass`는 마검사·수호자·성기사·검성·궁수·암살자·대마법사·사제·드루이드·전략가·연금술사·흑마도사의 12종입니다. 현재 데이터베이스에는 고유 등급 200명과 일반 등급 1000명, 총 1200명이 정의되어 있습니다. 시나리오 시작 배치는 영웅 60명과 일반 90명으로 제한하므로 나머지 영웅 140명과 일반 910명은 재야 탐색·영입 풀에 남습니다. 이 수량은 자동 검증과 대규모 로스터 편집을 위한 기계적 확장 상태이며, 서사·관계·특기 차별화와 초상화는 별도 수동 큐레이션 대상입니다.
 
-각 클래스는 `HeroClassDefinitions`에서 주 능력치, 보조 능력치와 권장 전투 역할을 조정합니다. 전투 데이터의 `ClassSkills`에는 피해·회복·지휘 계열 공용 기술 12종이 있으며 일반 인물은 해당 기술을, 고유 영웅은 `HeroSkills`의 전용 기술을 우선 사용합니다.
+각 클래스는 `HeroClassDefinitions`에서 주 능력치, 보조 능력치와 권장 전투 역할을 조정합니다. 직업 공용 전투 기술(`ClassSkills`)은 2026-09-25에 제거했습니다. 액티브 스킬은 `WI_BattleConfig.HeroSkills`에 등록한 영웅 ID에만 부여하며 일반 인물은 스킬 버튼을 갖지 않습니다.
 
 ## 15. 외교 상태
 
-캠페인의 `Diplomatic Relations`는 모든 진영 쌍에 대해 전쟁, 중립, 우호, 불가침, 동맹 중 하나의 상태를 저장합니다. 신규 캠페인은 아발론과 발도르만 전쟁 상태로 시작하고 나머지 관계는 중립으로 시작합니다. 구버전 저장 파일은 불러올 때 누락된 진영 관계를 자동으로 보충합니다.
+캠페인의 `Diplomatic Relations`는 모든 진영 쌍에 대해 전쟁, 중립, 우호, 불가침, 동맹 중 하나의 상태를 저장합니다. 신규 캠페인은 림가르드와 발도르만 전쟁 상태로 시작하고 나머지 관계는 중립으로 시작합니다. 구버전 저장 파일은 불러올 때 누락된 진영 관계를 자동으로 보충합니다.
 
 ## 16. 첩보 데이터
 
@@ -633,7 +650,7 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - `strategy_top_settings_v1`은 전략 상단 설정 버튼 전용 투명 톱니 Sprite입니다. 나머지 세 상단 기능은 `icon_flat_report`, `icon_flat_faction`, `icon_flat_research`를 재사용하며 각 아이콘 위의 투명 Button이 기존 기능을 호출합니다.
 - 전략 하단 명령 바는 좌측 1.8%부터 군사·인사·외교·계략·연구·평정·월보 7개 버튼을 배치합니다. 버튼은 화면 폭 9.8%, 간격 10.5%이며 아이콘과 명조 계열 문구를 분리해 표시합니다. 다음 턴은 화면 78~98.2%에 독립 배치하고 하단 설정 버튼은 사용하지 않습니다.
 - 전략 좌측 선택 성 패널은 상단 문장·성명·소속, 가로형 성 이미지, 영지관·번영·기술·질서·방어·주둔 전투단 6행, 영웅 카드 4개, 성 관리 버튼 순서로 구성합니다. 현재 데이터 모델에 없는 인구·식량·행복도는 표시를 위해 임의 계산하지 않습니다.
-- 하단 일반 명령은 `strategy_command_button_v2`를 좌우 34px·상하 24px Border의 Sliced Image로 사용합니다. 다음 턴은 비대칭 `strategy_next_turn_button_v3`를 좌 88px·우 42px·상하 24px Border로 사용하며 아발론 문장, 문구, 우측 화살표는 별도 자식 요소입니다.
+- 하단 일반 명령은 `strategy_command_button_v2`를 좌우 34px·상하 24px Border의 Sliced Image로 사용합니다. 다음 턴은 비대칭 `strategy_next_turn_button_v3`를 좌 88px·우 42px·상하 24px Border로 사용하며 림가르드 문장, 문구, 우측 화살표는 별도 자식 요소입니다.
 - `strategy_avalon_crest_v1`은 전략 화면의 상단 진영 표식과 좌측 선택 성 표식에 공용으로 사용하는 투명 Sprite입니다. 이미지에 문구나 수치는 포함하지 않습니다.
 - 전략 화면 전용 `strategy_side_panel_v1`, `strategy_command_button_v1`, `strategy_next_turn_button_v1`, `strategy_hero_card_v1`은 문구가 없는 투명 PNG입니다. TMP 텍스트와 실제 영웅 초상은 프리팹 자식 요소로 별도 배치합니다.
 - 선택 성 영웅 카드는 `WICastleRuntimeState.HeroIds`의 앞쪽 최대 4명을 표시합니다. 이름과 초상은 `WIHeroDefinition`, 표시 레벨은 `WICharacterRuntimeState.Experience`를 100 경험치당 1단계로 환산해 사용합니다.
@@ -664,7 +681,7 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 편집 경로는 Project 창의 `Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset` → Inspector의 `Campaign Variants` → `Ares Main` → `Castle Placements`입니다.
 - 성 위치는 `Override Map Position`을 체크하고 `Normalized Map Position`을 수정합니다. X는 0이 왼쪽·1이 오른쪽이며, Y는 0이 위쪽·1이 아래쪽입니다.
 - 성 연결은 두 성 모두 `Override Connections`를 체크하고 서로의 `Castle Id`를 `Adjacent Castle Ids`에 추가합니다. 한쪽만 입력하면 표시나 이동 판정이 비대칭이 될 수 있습니다.
-- 초기 소유권은 해당 배치 행의 `Faction Id`를 `avalon`, `valdor`, `ironheart`, `sylvanroad`, `necropolis` 중 하나로 입력합니다.
+- 초기 소유권은 해당 배치 행의 `Faction Id`를 `rimgard`, `valdor`, `ironheart`, `sylvanroad`, `necropolis` 중 하나로 입력합니다.
 - 프리 시나리오까지 공통으로 바꾸려면 위 시나리오 덮어쓰기가 아니라 같은 에셋의 기본 `Castles` 목록에서 성을 찾아 위치·연결·세력을 수정합니다.
 # 시나리오 인물 배치와 AI 영입
 
@@ -829,3 +846,62 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 2026-09-24 검증: 모병16개·저장복구5개 총21개 통과. JsonUtility가 복원하는 빈 MusterOrder는 불러올 때 제거한다. 구 저장과 현재 저장 모두 예약 없는 성은 즉시 모병 가능하다. 실제 군사 프리팹 카드 핸들러도 자동 검사했고 컴퓨터 유즈/시각 검사는 제외했다.
 
 - 2026-09-24: 성 우측의 기본 시설 메뉴를 제거함. 성관·시장·훈련소·선술집은 성 중앙의 기존 바로가기로 이용함. WIAdministrationTerritoryUGUI 프리팹의 commandButtons/commandActions는 7개, basicFacilityButtons/basicFacilityActions는 4개를 유지하며 시설 마스터 데이터 변경은 없음.
+
+
+## 시나리오 선택 화면 시안 (2026-09-24)
+- GameDocuments/UIConcepts/ScenarioSelection_UI_Concept_V1.png 및 동명 설명 문서를 추가했습니다. 메인 캠페인·프리 시나리오 목록과 이야기·시작 조건·승리 목표를 분리한 검토용 시안입니다. 게임 구현과 마스터 데이터 변경은 없습니다.
+
+## 시나리오 선택 화면 편집 (2026-09-24)
+- 프리팹: Assets/Prefabs/Administration/WICampaignTitleUGUI.prefab. CampaignPanel/ScenarioPage는 선택 목록과 상세 화면, SettingsPage는 난이도 화면이다. 두 페이지 모두 실행 전에 저장되어 있다.
+- WI_AdministrationDatabase.asset의 campaignVariants에서 selectionArtwork와 selectionTitleUid, selectionSubtitleUid, selectionStoryUid, selectionObjectiveUid, selectionProtagonistUid를 편집한다. 문구는 uiStrings의 UI_SCENARIO_* UID에서 한글/영문을 수정한다. 시작 거점은 기존 playerStartingCastleId, 시작 세력은 PlayerFaction 데이터를 읽는다.
+- 삽화는 Assets/Art/UI/ScenarioSelection의 개별 Sprite 2종이다. 교체 시 해당 시나리오의 selectionArtwork를 연결한다. 대형 삽화는 원본 비율을 유지하여 RectMask2D 영역으로 자른다.
+- WI/UI/Rebuild Scenario Selection 메뉴는 기본 문구·삽화 참조를 시드하고 화면 프리팹을 재구성하므로 수동 편집값을 유지하려면 재실행 전에 제작 도구의 기본값도 수정한다. 플레이 모드에서는 실행하지 않는다.
+- 처음에는 두 시나리오만 표시하며 Reserved 슬롯은 숨긴다. 다음에서 난이도를 선택하고 게임 시작으로 확정한다. 이전은 선택을 보존하며 첫 단계에는 기존 이어하기를 표시한다.
+
+## 일반 인재 활동 제거 및 군사 인물 이동 통합 (2026-09-24)
+- 영지의 인재 활동 명령을 프리팹에서 제거했다. 명령 버튼은 6개이며 훈련소 바로가기는 군사 메뉴를 연다. 성소는 자동 훈련·회복 안내를 표시한다.
+- 군사 → 인물 이동 → 출발 성 → 대기 인물 → 목적지 흐름을 기존 군사 목록 프리팹으로 제공한다. 신규 런타임 UI 조립 없음. 전투단원은 제외하고 영지관·임무 담당자는 비활성 표시한다. 이동은 기존 아군 경로·거주 공간·예약·월간 이동 규칙을 사용한다. 다른 세력 인물의 이동 명령은 거절한다.
+- 기존 WIAdministrationCharacterActivityUGUI 프리팹/클래스 이름은 참조 호환을 위해 유지하되 인재실 탐색·영입 전용으로 정리했다. 교류·훈련·휴식·이동 버튼과 이동 화면 코드를 제거했다. 인재실 후보가 자격 필터 후 0명이면 필요 특성·전투단/임무·정원 안내를 표시한다.
+- AssignUGUICharacterActivity는 탐색·영입만 허용한다. NormalizeCharacterDuties는 구 저장의 교류·수동 휴식·개인 훈련과 반복 지시를 해제한다. 자동 훈련·회복 및 인재실 반복 업무 중 자동 휴식은 유지한다. 저장 enum 값과 기존 관계 데이터는 호환성을 위해 보존한다.
+- WIActivityRetirementSetup의 WI/UI/Retire Character Activities 메뉴가 프리팹 및 UI_TRANSFER_*, UI_AUTO_RECOVERY_*, 인재실 안내 문자열 UID를 저장한다. WIAdministrationUIController.UGUICharacterTransferMenu.cs가 군사 이동 목록을 담당한다.
+- WIActivityRetirementTests 신규 5건과 UGUI·내정 병행·특성·모병 회귀 합계 99/99 통과(job abd33435d988446db6e10b0379387bee). 실제 군사 프리팹 카드 핸들러로 이동 예약, 권한·업무 제한, 저장 정규화, 자동 회복 및 폐지 메뉴 제거를 검증했다. 이전 버튼 개수와 수동 휴식으로 업무를 막던 기대값 2건은 새 규칙에 맞게 수정했다.
+- Unity 컴파일 오류 없음. 최종 콘솔에는 기존 지도 편집기의 CS0108 경고와 TMP 말줄임표 글리프 누락 경고가 확인됐다. 실제 화면 캡처는 배경만 반환하여 시각 검증 미완료로 구분한다. 군사 이동의 실제 프리팹 카드 핸들러는 자동 검사로 검증했다. 검증 후 플레이 모드 종료. 커밋·푸시 없음.
+- 최종 재로딩 중 WICharacterSelectionList.LateUpdate의 후보 수/행 캐시 불일치 예외를 발견하여 기존 자식 행 캐시 복구와 유효 범위 검사를 추가했다. UI 동적 구조 생성은 하지 않는다.
+
+## 군사 목록 표시 규칙 (2026-09-24)
+- 모병 역할·합류 대상·명령 목록에는 이름 검색/인원 수 도구를 표시하지 않는다. 실제 지휘관·전투단원·이동 인물 선택 단계에서만 인물 도구를 사용한다. 모병 비용과 세력 정원은 기존 상태 요약을 유지한다. 데이터 편집 항목 추가 없음.
+
+## 인사 목록 대상 (2026-09-24)
+- 맵 인사는 살아 있는 영입 아군만 표시하며 상단 인원 수도 같은 대상이다. 적군·사망자·미영입 발견 인재는 제외하고 이동 중 또는 적에게 포로가 된 아군은 포함한다.
+
+## 제목·버튼 글꼴 효과 (2026-09-24)
+- Assets/Fonts/TMP/WI-Serif-Ivory.mat에서 외곽선과 그림자를 조절한다. 원본 폰트 머티리얼과 분리되어 있다. 글자색은 프리팹 TMP의 #E7E5DE, 자간은 제목 3/버튼 2다.
+- WI/UI/Apply Ivory Typography는 맵·영지·군사·인사 화면에 1차 스타일을 재적용한다. 재실행 시 해당 스타일 수치를 기본값으로 덮어쓴다.
+
+### 명조체 소형 버튼 보정 (2026-09-24)
+- 사용자 화면에서 작은 글자의 획이 뭉개져 보여 1차 스타일을 보정했다. 맵의 짧은 명령은 최소 26 크기, 버튼 자간 0.5/제목 2로 적용한다. 가로 압축은 기존에도 없었다.
+- WI-Serif-Ivory의 FaceDilate 0, OutlineWidth 0.02, OutlineSoftness 0, Underlay 알파 0.3/OffsetX 0/OffsetY -0.15/Softness 0.1로 변경한다. 위의 1차 수치보다 이 값을 우선한다. 실제 화면 개선 여부는 별도 시각 확인이 필요하다.
+
+### 글꼴 스타일 실험 원복 (2026-09-24)
+- 사용자 요청으로 32개 문구의 글꼴·크기·색·스타일·자간·패딩·머티리얼을 실험 이전 값으로 복원했다. 중첩 턴 종료 버튼의 스타일 오버라이드도 제거했다. 인재 활동 삭제·아군 목록·모병 UI 등 기존 기능 변경은 유지한다.
+- WI-Serif-Ivory.mat과 WITypographyStyleSetup.cs 및 메타를 제거했다. 앞선 스타일 적용/보정 설명은 폐기된 실험 기록이며 현재 설정이 아니다. 추가 효과 적용 없이 가이드만 제공한다.
+
+## 전투 테스트 씬 진입 복구 (2026-09-25)
+- StartTestBattle은 별도 임시 상태에서 대상 성 소속을 세션의 방어 세력과 맞춘다. 기본 프리 시나리오의 castle_00/rimgard 소속 때문에 아군 성 공격 금지 조건에 걸리던 문제를 해결했다. 일반 캠페인의 전투 제한은 유지한다.
+- 유효한 전장/서로 다른 세력/대기 세션/전투 씬 등록을 확인하고 실패 이유를 콘솔에 기록한다. 테스트 랩은 시작 시도 후 예약을 소비하며 성공·실패·서비스 대기 시간 초과를 알린다.
+- UnityMCP로 30대30 메뉴 실행 후 BattleScene 로드 및 아군 30명/적군 30명 시작 로그 확인. 콘솔 오류 없음. Battle Test Lab 창의 수동 버튼은 별도 클릭하지 않았으며 동일 TryLaunchPendingBattle 경로를 공유한다. 검증 후 플레이 종료. 저장 데이터/마스터/씬 수정 없음.
+
+## 전투 HUD 문구
+
+- 전투 HUD의 명령 버튼 이름표, 명령 안내, 상태줄, 인물 선택 정보, 스킬 버튼·툴팁·사용 불가 사유는 `WI_AdministrationDatabase`의 `UI Strings`에 있는 `UI_BATTLE_*` UID로 관리합니다. 섬멸 목표 기본 이름은 `UI_BATTLE_OBJECTIVE_ELIMINATION`입니다.
+- 문구를 바꿀 때는 데이터베이스 에셋의 해당 UID를 직접 편집합니다. `WI/UI/Apply Battle HUD Strings` 메뉴는 기본 문구를 다시 기록하므로 직접 편집한 뒤에는 실행하지 않습니다.
+- `WIBattleHUD.uxml`의 기본 텍스트는 편집 화면 미리보기용이며 전투 시작 시 UID 문구로 교체됩니다.
+
+## 임시 전투 이펙트 프리팹 사용 (2026-09-25)
+- 위치: Assets/Prefabs/Battle/Effects/Temporary. WI_Temp_Slash(검격), WI_Temp_Arrow(화살), WI_Temp_Magic(마법탄), WI_Temp_Hit(피격).
+- 프리팹을 열어 루트 Particle System을 선택하고 Scene 뷰의 Particle Effect 재생 기능으로 확인한다. 효과 모양/색상은 자식 Particle System의 Start Color, Start Size, Color/Size over Lifetime에서 편집한다. 전체 크기는 루트 Transform의 균일 Scale로 조절한다.
+- XY 평면, 기본 방향은 로컬 +X. 방향 변경은 루트 Z 회전을 사용한다. 검격은 최대 0.285초, 피격은 0.32초, 화살/마법은 0.65초 표시된다. 루트 Duration은 0.9초이며 모든 시스템은 Loop 해제, Play On Awake 설정이다.
+- 화살은 로컬 +X로 초당 3유닛, 마법탄은 2.5유닛 이동하는 독립 미리보기다. 추후 전투에서 루트를 투사체 위치로 이동시킬 경우 자식 Velocity over Lifetime의 X/Y를 0으로 설정하여 이동을 중복 적용하지 않는다.
+- 효과 종료 후 오브젝트를 자동 삭제/비활성화하지 않는다(Stop Action None). 전투 연결 시 생성·재생·풀 반환 정책을 별도로 구현한다. 현재 전투/데이터베이스 연결과 사운드·피해 판정은 없다.
+- 지원 에셋: Assets/Art/Battle/Effects/Temporary의 메시 5개, WI_TempEffect_Unlit.mat, WITemporaryEffect.shader. 프리팹만 다른 프로젝트로 옮길 때는 의존 에셋도 함께 포함한다.
+- WI/Effects/Verify Temporary Battle Prefabs 메뉴는 독립 편집기 미리보기 씬에서 검증 이미지/기록을 갱신한다. 이미지의 열은 검격/화살/마법/피격, 행은 0.08/0.20/0.45초다.

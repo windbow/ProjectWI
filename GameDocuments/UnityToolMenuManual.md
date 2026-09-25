@@ -36,7 +36,7 @@ Unity 상단의 프로젝트 전용 메뉴는 두 루트로 나뉩니다.
 | `ProjectWI/Data/Assign Shared Visual Assets` | 여러 이미지와 500명 데이터를 일괄 덮어쓰는 복구용 코드였습니다. | 이미지 Import 설정과 데이터 참조를 개별 관리합니다. |
 | `ProjectWI/Data/Assign Visual Assets` | 5대 수도 전경 연결이 완료된 일회성 도구입니다. | 성 데이터의 이미지 필드를 직접 관리합니다. |
 | `ProjectWI/Verification/Start Standard Campaign` | `WI/QA/Preview/New Campaign Onboarding UGUI`와 기능이 겹칩니다. | QA Onboarding 메뉴를 사용합니다. |
-| `ProjectWI/Verification/Open Common Castle Preview` | `WI/QA/Preview/Avalon Castle` 및 다른 화면별 Preview와 중복됩니다. | WI/QA Preview 메뉴를 사용합니다. |
+| `ProjectWI/Verification/Open Common Castle Preview` | `WI/QA/Preview/Rimgard Castle` 및 다른 화면별 Preview와 중복됩니다. | WI/QA Preview 메뉴를 사용합니다. |
 | `WI/Battle/Configure Ares Battle Sprite Defaults` | 현재 Ares Sprite의 Import 설정이 확정됐으며 재실행 메뉴가 필요하지 않습니다. | Texture Importer와 `BattleSceneAssetSettingsGuide.md`를 기준으로 관리합니다. |
 
 ## 3. ProjectWI 메뉴
@@ -177,7 +177,7 @@ Unity 상단의 프로젝트 전용 메뉴는 두 루트로 나뉩니다.
 | 메뉴 | 준비·표시하는 상태 | 상태 변경 주의 |
 |---|---|---|
 | `WI/QA/Preview/Global Map` | 기본 캠페인 상태와 전역 지도 | QA 런타임 상태만 변경 |
-| `WI/QA/Preview/Avalon Castle` | Avalon 성 선택과 영지 상세 | 선택 성과 화면 상태 변경 |
+| `WI/QA/Preview/Rimgard Castle` | Rimgard 성 선택과 영지 상세 | 선택 성과 화면 상태 변경 |
 | `WI/QA/Preview/Focus Project UGUI` | 중점 사업 및 담당자 후보 | QA용 성·후보 상태 준비 |
 | `WI/QA/Preview/Hero Assignment UGUI` | 영웅 배치 후보와 페이지 | QA용 후보 상태 준비 |
 | `WI/QA/Preview/Character Activity UGUI` | 인물 활동 및 대상 선택 | QA용 후보 상태 준비 |

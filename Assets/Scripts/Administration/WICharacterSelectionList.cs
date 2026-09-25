@@ -23,6 +23,8 @@ namespace ProjectWI.Administration
         private bool availableOnly;
         private bool sortByName;
         private bool pending;
+        // 인물이 아닌 명령 목록에서는 검색·정렬·인원 표시를 사용하지 않습니다.
+        private bool characterToolsEnabled = true;
         private Action<int> select;
         private WIAdministrationUIController controller;
 
@@ -46,6 +48,20 @@ namespace ProjectWI.Administration
             sortByName = false;
             pending = true;
             scroll.verticalNormalizedPosition = 1f;
+        }
+
+        // 기존 도구막대의 표시만 전환하고 숨겨진 검색 조건이 명령을 가리지 않도록 초기화합니다.
+        public void SetCharacterToolsEnabled(bool enabled)
+        {
+            if (characterToolsEnabled != enabled)
+            {
+                ResetView();
+            }
+            characterToolsEnabled = enabled;
+            search.gameObject.SetActive(enabled);
+            availableButton.gameObject.SetActive(enabled);
+            sortButton.gameObject.SetActive(enabled);
+            countLabel.gameObject.SetActive(enabled);
         }
 
         // 후보 수에 맞게 기존 행을 재사용하고 부족한 행만 완성 프리팹에서 복제합니다.
@@ -98,6 +114,13 @@ namespace ProjectWI.Administration
         {
             if (pending == true)
             {
+                // 도메인 재로딩 후 비직렬화 행 캐시를 기존 자식에서 복구합니다.
+                if (rows.Count < count && content != null)
+                {
+                    rows.Clear();
+                    rows.AddRange(content.GetComponentsInChildren<WICharacterSelectionRow>(true));
+                }
+                count = Mathf.Min(count, rows.Count);
                 pending = false;
                 for (int index = 0; index < count; index++)
                 {
@@ -110,9 +133,9 @@ namespace ProjectWI.Administration
         // 필터와 정렬은 원본 후보 인덱스를 바꾸지 않아 다중 선택을 보존합니다.
         public void ApplyView(bool resetScroll)
         {
-            string query = search.text.Trim();
+            string query = characterToolsEnabled == true ? search.text.Trim() : string.Empty;
             IEnumerable<int> indices = Enumerable.Range(0, count);
-            if (sortByName == true)
+            if (characterToolsEnabled == true && sortByName == true)
             {
                 indices = indices.OrderBy(index => rows[index].SortName, StringComparer.CurrentCulture);
             }
@@ -120,7 +143,7 @@ namespace ProjectWI.Administration
             foreach (int index in indices)
             {
                 var row = rows[index];
-                bool matches = (availableOnly == false || row.Button.interactable == true) &&
+                bool matches = (characterToolsEnabled == false || availableOnly == false || row.Button.interactable == true) &&
                     row.SearchText.IndexOf(query, StringComparison.CurrentCultureIgnoreCase) >= 0;
                 row.gameObject.SetActive(matches);
                 row.transform.SetAsLastSibling();

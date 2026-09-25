@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "kind": "sprite-gen-request",
+  "engine": "component-row",
+  "character": {
+    "id": "warrior-greatsword-v1",
+    "description": "갈색 단발과 얼굴 흉터, 회청색 판금 갑옷, 짙은 청록 망토, 대검을 든 ProjectWI 전투용 남성 전사"
+  },
+  "style": "ProjectWI 아레스 실제 전투 스프라이트와 같은 약 7등신 세미 애니메이션풍, 축소 판독용 검은 외곽선, 중립적인 대낮 색감",
+  "cell": {
+    "shape": "rect",
+    "width": 190,
+    "height": 256,
+    "safe_margin_x": 8,
+    "safe_margin_y": 8
+  },
+  "chroma_key": {
+    "name": "green",
+    "hex": "#00FF00",
+    "rgb": [0, 255, 0]
+  },
+  "fit": {
+    "resample": "kcentroid",
+    "align_x": "foot-centroid",
+    "align_y": "bottom"
+  },
+  "states": {
+    "idle": {
+      "frames": 1,
+      "fps": 1,
+      "loop": true,
+      "action": "대검을 아래로 비스듬히 내린 정면 3/4 방향의 정적인 전투 대기 자세"
+    }
+  }
+}

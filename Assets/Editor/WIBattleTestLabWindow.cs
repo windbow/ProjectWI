@@ -261,17 +261,20 @@ namespace ProjectWI.Editor
         // 플레이 모드에서 임시 편성을 캠페인 서비스의 테스트 세션으로 변환합니다.
         internal static bool TryLaunchPendingBattle()
         {
-            if (EditorPrefs.HasKey(LaunchDataKey) == false || WICampaignRuntimeService.Instance == null)
+            if (EditorPrefs.HasKey(LaunchDataKey) == false)
+            {
+                return true;
+            }
+            if (WICampaignRuntimeService.Instance == null || WICampaignRuntimeService.Instance.Database == null)
             {
                 return false;
             }
             LaunchData data = JsonUtility.FromJson<LaunchData>(EditorPrefs.GetString(LaunchDataKey));
-            EditorPrefs.DeleteKey(LaunchDataKey);
             WIBattleSessionState session = new WIBattleSessionState
             {
                 SessionId = "editor_battle_test",
                 CastleId = "castle_00",
-                AttackerFactionId = "avalon",
+                AttackerFactionId = "rimgard",
                 DefenderFactionId = "valdor",
                 PlayerInvolved = true,
                 Status = WIBattleSessionStatus.Pending
@@ -284,7 +287,17 @@ namespace ProjectWI.Editor
             {
                 HeroId = item.heroId, ArmyId = "test_enemies", Role = item.role
             }));
-            return WICampaignRuntimeService.Instance.StartTestBattle(session);
+            bool started = WICampaignRuntimeService.Instance.StartTestBattle(session);
+            EditorPrefs.DeleteKey(LaunchDataKey);
+            if (started == false)
+            {
+                Debug.LogError("전투 테스트 랩 실행 실패: 위의 시작 실패 원인을 확인한 뒤 다시 실행하세요.");
+            }
+            else
+            {
+                Debug.Log($"전투 테스트 랩 진입: 아군 {data.allies.Count}명 / 적군 {data.enemies.Count}명");
+            }
+            return true;
         }
     }
 
@@ -322,9 +335,14 @@ namespace ProjectWI.Editor
         private static void TryLaunch()
         {
             remainingFrames -= 1;
-            if (WIBattleTestLabWindow.TryLaunchPendingBattle() || remainingFrames <= 0)
+            if (WIBattleTestLabWindow.TryLaunchPendingBattle() == true)
             {
                 EditorApplication.update -= TryLaunch;
+            }
+            else if (remainingFrames <= 0)
+            {
+                EditorApplication.update -= TryLaunch;
+                Debug.LogError("전투 테스트 랩 대기 시간 초과: 캠페인 서비스 또는 데이터베이스가 준비되지 않았습니다.");
             }
         }
     }

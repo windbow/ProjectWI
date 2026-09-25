@@ -135,7 +135,7 @@ namespace ProjectWI.Systems
             {
                 SessionId = "windows_integration_smoke",
                 CastleId = "castle_00",
-                AttackerFactionId = "avalon",
+                AttackerFactionId = "rimgard",
                 DefenderFactionId = "valdor",
                 PlayerInvolved = true,
                 Status = WIBattleSessionStatus.Pending

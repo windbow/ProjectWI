@@ -52,17 +52,13 @@ namespace ProjectWI.Administration
             return succeeded;
         }
 
-        // 영입 영웅과 발견 인재를 전체 목록 카드로 변환합니다.
+        // 플레이어 소속 인물만 목록 카드와 인원 수에 반영합니다.
         private void BuildHeroListCards(WIAdministrationHeroesSnapshot snapshot)
         {
-            int recruitedCount = state.Characters.Count(item => item.Recruited && item.IsDead == false &&
-                string.IsNullOrEmpty(item.JoinedEnemyFactionId));
-            int discoveredCount = state.Characters.Count(item => item.Discovered && item.Recruited == false &&
-                item.IsDead == false && string.IsNullOrEmpty(item.JoinedEnemyFactionId));
+            var allies = state.Characters.Where(IsPlayerPersonnel).ToList();
             snapshot.Title = database.GetText("UI_ALL_HEROES");
-            snapshot.Summary = $"영입 영웅 {recruitedCount}명 · 발견 인재 {discoveredCount}명 · 영웅을 선택하면 승격과 작위를 관리합니다.";
-            foreach (WICharacterRuntimeState character in state.Characters.Where(item => item.Recruited &&
-                         item.IsDead == false && string.IsNullOrEmpty(item.JoinedEnemyFactionId)))
+            snapshot.Summary = $"영입 영웅 {allies.Count}명 · 영웅을 선택하면 승격과 작위를 관리합니다.";
+            foreach (WICharacterRuntimeState character in allies)
             {
                 WIHeroDefinition hero = database.GetHero(character.HeroId);
                 WICharacterGrade grade = character.PromotedToHero ? WICharacterGrade.Hero : character.BaseGrade;
@@ -77,17 +73,34 @@ namespace ProjectWI.Administration
                     Portrait = hero.Portrait
                 });
             }
-            foreach (WICharacterRuntimeState character in state.Characters.Where(item => item.Discovered &&
-                         WIAdministrationTurnSystem.IsHeroRecruitmentCandidate(item) == true))
+        }
+
+        // 성·전투단·이동 및 포로 이전 소속으로 살아 있는 아군 인사 대상을 판정합니다.
+        private bool IsPlayerPersonnel(WICharacterRuntimeState character)
+        {
+            if (character == null || character.Recruited == false || character.IsDead == true)
             {
-                WIHeroDefinition hero = database.GetHero(character.HeroId);
-                snapshot.Cards.Add(new WIAdministrationHeroCardSnapshot
-                {
-                    Action = "discovered", Id = character.HeroId,
-                    Title = "[발견 인재] " + hero.DisplayName.Get(database.UseEnglish),
-                    Description = $"영입 설득 {character.RecruitmentProgress}%", Portrait = hero.Portrait, Interactable = false
-                });
+                return false;
             }
+            if (string.IsNullOrEmpty(character.JoinedEnemyFactionId) == false)
+            {
+                return character.JoinedEnemyFactionId == state.PlayerFactionId;
+            }
+            if (character.Captured == true)
+            {
+                return character.CapturedFromFactionId == state.PlayerFactionId;
+            }
+            var army = state.Armies.FirstOrDefault(item => item.Members.Any(member => member.HeroId == character.HeroId));
+            if (army != null)
+            {
+                return army.FactionId == state.PlayerFactionId;
+            }
+            var transfer = state.CharacterTransfers.Find(item => item.HeroId == character.HeroId);
+            if (transfer != null)
+            {
+                return state.GetCastle(transfer.OriginCastleId)?.FactionId == state.PlayerFactionId;
+            }
+            return state.Castles.Any(item => item.FactionId == state.PlayerFactionId && item.HeroIds.Contains(character.HeroId));
         }
 
         // 선택 영웅의 상태와 이용 가능한 승격·작위 카드를 구성합니다.

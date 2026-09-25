@@ -7,6 +7,11 @@ namespace ProjectWI.Battle
 {
     public static partial class WIBattleSimulation
     {
+        // 거의 수직 이동이나 정면 위아래 표적 때 방향이 떨리지 않도록 무시하는 가로 거리입니다.
+        private const float FacingDeadZone = 0.05f;
+        // 한 틱의 가로 이동이 이 값보다 크면 이동 방향을 바라봅니다.
+        private const float FacingMoveThreshold = 0.02f;
+
         // 한 프레임의 표적 탐색, 이동, 공격과 승패 판정을 처리합니다.
         public static WIBattleOutcome Step(WIBattleConfigSO config, WIBattleRuntimeState runtime, float deltaTime)
         {
@@ -14,13 +19,9 @@ namespace ProjectWI.Battle
             {
                 return runtime == null ? WIBattleOutcome.None : runtime.AttackerOutcome;
             }
-            if (runtime.AttackerCommand == WIBattleCommand.Retreat || runtime.DefenderCommand == WIBattleCommand.Retreat)
+            if (runtime.IsDeploying == true)
             {
-                runtime.Finished = true;
-                runtime.AttackerOutcome = runtime.AttackerCommand == WIBattleCommand.Retreat
-                    ? WIBattleOutcome.Defeat
-                    : WIBattleOutcome.Victory;
-                return runtime.AttackerOutcome;
+                return WIBattleOutcome.None;
             }
             runtime.ElapsedSeconds += deltaTime;
             WIBattleOutcome objectiveOutcome = EvaluateObjective(runtime, deltaTime);
@@ -32,71 +33,19 @@ namespace ProjectWI.Battle
             }
             runtime.VisualEffects.RemoveAll(item => runtime.ElapsedSeconds - item.StartedAt >= item.Duration);
             AdvanceProjectiles(config, runtime, deltaTime);
-            List<WIBattleCharacterState> activeActors = new List<WIBattleCharacterState>(runtime.Characters.Count);
-            foreach (WIBattleCharacterState character in runtime.Characters)
+            PrepareEngagements(config, runtime, deltaTime);
+            UpdateMorale(config, runtime, deltaTime);
+            foreach (WIBattleCharacterState actor in runtime.Characters)
             {
-                if (character.IsAlive) activeActors.Add(character);
-            }
-            foreach (WIBattleCharacterState actor in activeActors)
-            {
-                WIBattleCharacterState target = FindTarget(runtime, actor);
-                if (target == null) continue;
-                actor.CooldownRemaining = Mathf.Max(0f, actor.CooldownRemaining - deltaTime);
-                actor.SkillCooldownRemaining = Mathf.Max(0f, actor.SkillCooldownRemaining - deltaTime);
-                if (config.UseHiddenGrid == true && actor.HasGridDestination == true)
+                if (actor.IsAlive == false)
                 {
-                    ContinueGridMovement(config, actor, actor.MoveSpeed, deltaTime);
                     continue;
                 }
-                float distance = Vector2.Distance(actor.Position, target.Position);
-                bool canAttack = CanAttackFromCurrentCell(config, actor, target, distance);
-                if (canAttack == false)
-                {
-                    WIBattleCommand command = GetCommand(runtime, actor.Side);
-                    if (command == WIBattleCommand.Hold)
-                    {
-                        MoveCharacter(
-                            config,
-                            runtime,
-                            actor,
-                            actor.FormationPosition,
-                            config.FormationReturnSpeed,
-                            deltaTime);
-                    }
-                    else
-                    {
-                        float speed = command == WIBattleCommand.Advance
-                            ? actor.MoveSpeed * config.AdvanceSpeedMultiplier
-                            : actor.MoveSpeed;
-                        Vector2 attackApproach = UsesProjectile(actor)
-                            ? new Vector2(target.Position.x, actor.FormationPosition.y)
-                            : FindMeleeAttackPosition(config, runtime, actor, target);
-                        MoveCharacter(config, runtime, actor, attackApproach, speed, deltaTime);
-                    }
-                }
-                else if (actor.CooldownRemaining <= 0f)
-                {
-                    int damage = actor.AttackDamage;
-                    if (GetCommand(runtime, actor.Side) == WIBattleCommand.Focus)
-                    {
-                        damage = Mathf.RoundToInt(damage * config.FocusDamageMultiplier);
-                    }
-                    if (GetCommand(runtime, target.Side) == WIBattleCommand.Hold)
-                    {
-                        damage = Mathf.RoundToInt(damage * (1f - config.HoldDamageReduction));
-                    }
-                    if (UsesProjectile(actor))
-                    {
-                        LaunchProjectile(config, runtime, actor, target, Mathf.Max(1, damage));
-                    }
-                    else
-                    {
-                        AddMeleeAttackVisual(config, runtime, actor, target);
-                        target.Health = Mathf.Max(0, target.Health - Mathf.Max(1, damage));
-                        ApplyMeleeKnockback(config, runtime, actor, target);
-                    }
-                    actor.CooldownRemaining = config.AttackCooldown;
-                }
+                actor.CooldownRemaining = Mathf.Max(0f, actor.CooldownRemaining - deltaTime);
+                actor.SkillCooldownRemaining = Mathf.Max(0f, actor.SkillCooldownRemaining - deltaTime);
+                float previousX = actor.Position.x;
+                ActContinuous(config, runtime, actor, deltaTime);
+                UpdateFacing(actor, previousX);
             }
             ResolveCharacterCollisions(config, runtime);
             bool attackersAlive = false;
@@ -155,26 +104,6 @@ namespace ProjectWI.Battle
             return WIBattleOutcome.None;
         }
 
-        // 근접 캐릭터는 목표 주변 여덟 셀과 월드 사거리를 모두 만족할 때만 공격할 수 있습니다.
-        private static bool CanAttackFromCurrentCell(
-            WIBattleConfigSO config,
-            WIBattleCharacterState actor,
-            WIBattleCharacterState target,
-            float worldDistance)
-        {
-            if (worldDistance > actor.AttackRange)
-            {
-                return false;
-            }
-            if (config.UseHiddenGrid == false || UsesProjectile(actor) == true)
-            {
-                return true;
-            }
-            int columnDistance = Mathf.Abs(actor.GridColumn - target.GridColumn);
-            int rowDistance = Mathf.Abs(actor.GridRow - target.GridRow);
-            return Mathf.Max(columnDistance, rowDistance) == 1;
-        }
-
         // 근접 공격 명중 위치에 짧은 임시 섬광 표시를 예약합니다.
         private static void AddMeleeAttackVisual(
             WIBattleConfigSO config,
@@ -190,39 +119,91 @@ namespace ProjectWI.Battle
                 StartPosition = actor.Position,
                 EndPosition = target.Position,
                 StartedAt = runtime.ElapsedSeconds,
-                Duration = config.PlaceholderAttackEffectDuration
+                Duration = config.SlashEffectDuration
             });
             runtime.NextVisualEffectId += 1;
         }
 
-        // 집중 목표가 유효하면 우선하고 없으면 가장 가까운 적을 반환합니다.
-        private static WIBattleCharacterState FindTarget(WIBattleRuntimeState runtime, WIBattleCharacterState actor)
+        // 실제 피해가 적용된 대상의 위치를 단발 피격 표시로 기록합니다.
+        private static void AddHitVisual(WIBattleConfigSO config, WIBattleRuntimeState runtime, WIBattleCharacterState target)
         {
-            string focusHeroId = actor.Side == WIBattleSide.Attacker
-                ? runtime.AttackerFocusHeroId
-                : runtime.DefenderFocusHeroId;
-            if (GetCommand(runtime, actor.Side) == WIBattleCommand.Focus && string.IsNullOrEmpty(focusHeroId) == false)
+            runtime.VisualEffects.Add(new WIBattleVisualEffectState
             {
-                WIBattleCharacterState focus = runtime.Characters.Find(item => item.HeroId == focusHeroId && item.IsAlive && item.Side != actor.Side);
-                if (focus != null) return focus;
-            }
-            WIBattleCharacterState nearest = null;
-            float nearestDistance = float.MaxValue;
-            foreach (WIBattleCharacterState candidate in runtime.Characters)
-            {
-                if (candidate.IsAlive == false || candidate.Side == actor.Side) continue;
-                float distance = Vector2.SqrMagnitude(candidate.Position - actor.Position);
-                if (distance >= nearestDistance) continue;
-                nearestDistance = distance;
-                nearest = candidate;
-            }
-            return nearest;
+                EffectId = runtime.NextVisualEffectId++,
+                EffectType = WIBattleVisualEffectType.Hit,
+                Side = target.Side,
+                StartPosition = target.Position,
+                EndPosition = target.Position,
+                StartedAt = runtime.ElapsedSeconds,
+                Duration = config.HitEffectDuration
+            });
         }
 
-        // 진영에 현재 지정된 전투단 명령을 반환합니다.
+        // 이번 틱에 가로로 움직였으면 이동 방향을, 제자리면 표적 쪽을 바라보게 하고 둘 다 없으면 방향을 유지합니다.
+        private static void UpdateFacing(WIBattleCharacterState actor, float previousX)
+        {
+            float deltaX = actor.Position.x - previousX;
+            if (Mathf.Abs(deltaX) > FacingMoveThreshold)
+            {
+                actor.FacingRight = deltaX > 0f;
+                return;
+            }
+            if (string.IsNullOrEmpty(actor.TargetHeroId) == false &&
+                charactersById.TryGetValue(actor.TargetHeroId, out WIBattleCharacterState target) == true &&
+                Mathf.Abs(target.Position.x - actor.Position.x) > FacingDeadZone)
+            {
+                actor.FacingRight = target.Position.x > actor.Position.x;
+            }
+        }
+
+        // 진영에 현재 지정된 공통 전투단 명령을 반환합니다.
         private static WIBattleCommand GetCommand(WIBattleRuntimeState runtime, WIBattleSide side)
         {
             return side == WIBattleSide.Attacker ? runtime.AttackerCommand : runtime.DefenderCommand;
+        }
+
+        // 인물 분대의 전용 명령을 우선하고 없으면 진영 공통 명령을 반환합니다. 후퇴는 진영 전체에 우선합니다.
+        private static WIBattleCommand GetCommand(WIBattleRuntimeState runtime, WIBattleCharacterState character)
+        {
+            WIBattleCommand sideCommand = GetCommand(runtime, character.Side);
+            if (sideCommand == WIBattleCommand.Retreat)
+            {
+                return sideCommand;
+            }
+            WIBattleSquadState squad = FindSquad(runtime, character.SquadId);
+            if (squad != null && squad.IsRouting == true)
+            {
+                return WIBattleCommand.Retreat;
+            }
+            return squad != null && squad.HasCommandOverride == true ? squad.Command : sideCommand;
+        }
+
+        // 인물 분대의 전용 집중 표적을 우선하고 없으면 진영 공통 집중 표적을 반환합니다.
+        private static string GetFocusHeroId(WIBattleRuntimeState runtime, WIBattleCharacterState character)
+        {
+            WIBattleSquadState squad = FindSquad(runtime, character.SquadId);
+            if (squad != null && squad.HasCommandOverride == true)
+            {
+                return squad.FocusHeroId;
+            }
+            return character.Side == WIBattleSide.Attacker ? runtime.AttackerFocusHeroId : runtime.DefenderFocusHeroId;
+        }
+
+        // 분대 번호로 분대 상태를 찾습니다.
+        public static WIBattleSquadState FindSquad(WIBattleRuntimeState runtime, int squadId)
+        {
+            if (squadId <= 0)
+            {
+                return null;
+            }
+            foreach (WIBattleSquadState squad in runtime.Squads)
+            {
+                if (squad.SquadId == squadId)
+                {
+                    return squad;
+                }
+            }
+            return null;
         }
     }
 }

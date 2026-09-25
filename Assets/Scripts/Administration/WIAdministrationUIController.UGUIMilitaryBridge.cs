@@ -25,6 +25,10 @@ namespace ProjectWI.Administration
                 return false;
             }
             snapshot = new WIAdministrationMilitarySnapshot();
+            if (mode == "transfer-castles" || mode == "transfer-actors" || mode == "transfer-targets")
+            {
+                return BuildCharacterTransferPanel(mode, context, snapshot, out error);
+            }
             if (mode == "muster-castles" || mode == "muster")
             {
                 return BuildMusterPanel(mode, context, snapshot, out error);
@@ -125,6 +129,8 @@ namespace ProjectWI.Administration
             snapshot.Items.Add(new WIAdministrationMilitaryItemSnapshot { Kind = "muster-castles",
                 Title = database.GetText("UI_MUSTER_TITLE"), Description = database.GetText("UI_MUSTER_HINT") });
             snapshot.Items.AddRange(source.Items);
+            snapshot.Items.Insert(1, new WIAdministrationMilitaryItemSnapshot { Kind = "transfer-castles",
+                Title = database.GetText("UI_TRANSFER_TITLE"), Description = database.GetText("UI_TRANSFER_HINT") });
         }
 
         // 선택한 전투 세션의 참가 진영과 전력을 표시합니다.

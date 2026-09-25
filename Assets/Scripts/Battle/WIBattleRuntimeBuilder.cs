@@ -14,10 +14,10 @@ namespace ProjectWI.Battle
             WIBattleSessionState session)
         {
             WIBattleRuntimeState runtime = new WIBattleRuntimeState { SessionId = session.SessionId };
-            HashSet<WIGridCoordinate> occupied = new HashSet<WIGridCoordinate>();
-            ApplyObjective(config, runtime, session.SessionId);
-            AddSide(runtime, config, database, session.AttackerHeroIds, WIBattleSide.Attacker, occupied);
-            AddSide(runtime, config, database, session.DefenderHeroIds, WIBattleSide.Defender, occupied);
+            ApplyObjective(config, database, runtime, session.SessionId);
+            AddSide(runtime, config, database, session.AttackerHeroIds, WIBattleSide.Attacker);
+            AddSide(runtime, config, database, session.DefenderHeroIds, WIBattleSide.Defender);
+            WIBattleSimulation.AssignSquads(runtime);
             return runtime;
         }
 
@@ -26,29 +26,21 @@ namespace ProjectWI.Battle
             WIBattleSessionState session, WIBattleRuntimeState runtime)
         {
             var existing = new HashSet<string>(runtime.Characters.Select(item => item.HeroId));
-            var occupied = new HashSet<WIGridCoordinate>();
-            foreach (var character in runtime.Characters.Where(item => item.IsAlive == true))
-            {
-                occupied.Add(new WIGridCoordinate(character.GridColumn, character.GridRow));
-                if (character.HasGridDestination == true)
-                {
-                    occupied.Add(new WIGridCoordinate(character.GridDestinationColumn, character.GridDestinationRow));
-                }
-            }
             AddSide(runtime, config, database, session.AttackerHeroIds.Where(item => existing.Contains(item.HeroId) == false).ToList(),
-                WIBattleSide.Attacker, occupied, true);
+                WIBattleSide.Attacker, true);
             AddSide(runtime, config, database, session.DefenderHeroIds.Where(item => existing.Contains(item.HeroId) == false).ToList(),
-                WIBattleSide.Defender, occupied, true);
+                WIBattleSide.Defender, true);
+            WIBattleSimulation.AssignSquads(runtime);
         }
 
         // 전투 설정의 순환 규칙에 따라 이번 세션의 목표와 제한값을 런타임에 복사합니다.
-        private static void ApplyObjective(WIBattleConfigSO config, WIBattleRuntimeState runtime, string sessionId)
+        private static void ApplyObjective(WIBattleConfigSO config, WIAdministrationDatabaseSO database, WIBattleRuntimeState runtime, string sessionId)
         {
             WIBattleObjectiveDefinition objective = config.SelectBattleObjective(sessionId);
             if (objective == null)
             {
                 runtime.ObjectiveType = WIBattleObjectiveType.Elimination;
-                runtime.ObjectiveName = "섬멸";
+                runtime.ObjectiveName = database.GetText("UI_BATTLE_OBJECTIVE_ELIMINATION");
                 return;
             }
 
@@ -67,7 +59,7 @@ namespace ProjectWI.Battle
             WIAdministrationDatabaseSO database,
             List<WIBattleParticipantState> participants,
             WIBattleSide side,
-            HashSet<WIGridCoordinate> occupied, bool reinforcement = false)
+            bool reinforcement = false)
         {
             List<WIBattleParticipantState> ordered = participants
                 .OrderBy(item => GetRoleColumn(item.Role))
@@ -86,43 +78,29 @@ namespace ProjectWI.Battle
                 {
                     x = direction * -config.ArenaSize.x * 0.45f;
                 }
-                float rowSpacing = config.UseHiddenGrid == true
-                    ? config.GridCellHeight
-                    : config.FormationRowSpacing;
-                float y = GetCenteredRow(row, ordered.Count(item => GetRoleColumn(item.Role) == column), rowSpacing);
+                float rowSpacing = config.FormationRowSpacing;
+                int columnCount = ordered.Count(item => GetRoleColumn(item.Role) == column);
+                int capacity = Mathf.Max(1, Mathf.FloorToInt(config.ArenaSize.y * 0.9f / rowSpacing) + 1);
+                int subColumn = row / capacity;
+                int subRow = row % capacity;
+                int subCount = Mathf.Min(capacity, columnCount - subColumn * capacity);
+                x -= direction * subColumn * config.FormationColumnSpacing * 0.5f;
+                float y = GetCenteredRow(subRow, subCount, rowSpacing);
                 bool ranged = participant.Role == WIUnitRole.Ranged || participant.Role == WIUnitRole.Magic || participant.Role == WIUnitRole.Support;
                 int maxHealth = config.BaseHealth + hero.Might * config.HealthPerMight;
                 Vector2 formationPosition = new Vector2(x, y);
-                WIGridCoordinate gridCoordinate = default;
-                if (config.UseHiddenGrid == true)
-                {
-                    gridCoordinate = WIHiddenBattleGrid.FindNearestAvailable(
-                        formationPosition,
-                        config.ArenaSize,
-                        config.GridCellWidth,
-                        config.GridCellHeight,
-                        occupied);
-                    occupied.Add(gridCoordinate);
-                    formationPosition = WIHiddenBattleGrid.GridToWorld(
-                        gridCoordinate,
-                        config.GridCellWidth,
-                        config.GridCellHeight);
-                }
                 runtime.Characters.Add(new WIBattleCharacterState
                 {
                     HeroId = hero.Id,
                     ArmyId = participant.ArmyId,
                     Side = side,
+                    FacingRight = side == WIBattleSide.Attacker,
                     Role = participant.Role,
                     Grade = hero.Grade,
                     HeroClass = hero.HeroClass,
                     DisplayName = hero.DisplayName.Korean,
                     Position = formationPosition,
                     FormationPosition = formationPosition,
-                    GridColumn = gridCoordinate.Column,
-                    GridRow = gridCoordinate.Row,
-                    GridDestinationColumn = gridCoordinate.Column,
-                    GridDestinationRow = gridCoordinate.Row,
                     MaxHealth = maxHealth,
                     Health = maxHealth,
                     MaxMana = config.BaseMana + hero.Intelligence * config.ManaPerIntelligence,

@@ -10,7 +10,7 @@ namespace ProjectWI.Administration
     {
         private const int PageSize = 8;
 
-        private enum PageMode { Actor, Activity, Target, Transfer }
+        private enum PageMode { Actor, Activity, Target }
         private enum GradeFilter { All, Hero, Common }
         // 모든 후보를 스크롤 행으로 표시하는 공통 목록입니다.
         [SerializeField] private WICharacterSelectionList selectionList;
@@ -48,9 +48,9 @@ namespace ProjectWI.Administration
         private GradeFilter gradeFilter;
         private bool sortByName;
         private readonly List<int> visibleCandidateIndices = new List<int>();
-        private bool talentOfficeOnly;
 
-        // 고정 카드와 활동 버튼을 인재 활동 단계에 연결합니다.
+
+        // 고정 카드와 활동 버튼을 인재실 단계에 연결합니다.
         private void Awake()
         {
             ResolveAdministrationController();
@@ -59,17 +59,13 @@ namespace ProjectWI.Administration
                 int captured = index;
                 cardButtons[index].onClick.AddListener(() => SelectCard(captured));
             }
-            WICharacterActivityType[] activities = { WICharacterActivityType.Search, WICharacterActivityType.Socialize,
-                WICharacterActivityType.Recruit, WICharacterActivityType.Training, WICharacterActivityType.Rest };
+            WICharacterActivityType[] activities = { WICharacterActivityType.Search, WICharacterActivityType.Recruit };
             for (int index = 0; index < activityButtons.Length && index < activities.Length; index += 1)
             {
                 WICharacterActivityType captured = activities[index];
                 activityButtons[index].onClick.AddListener(() => SelectActivity(captured));
             }
-            if (activityButtons.Length > activities.Length)
-            {
-                activityButtons[activities.Length].onClick.AddListener(SelectTransfer);
-            }
+
             if (repeatButton != null)
             {
                 repeatButton.onClick.AddListener(ToggleRepeatActivity);
@@ -91,7 +87,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 인재 활동 UGUI 열기 요청을 구독합니다.
+        // 인재실 UGUI 열기 요청을 구독합니다.
         private void OnEnable()
         {
             ResolveAdministrationController();
@@ -101,7 +97,7 @@ namespace ProjectWI.Administration
             }
         }
 
-        // 인재 활동 UGUI 열기 요청 구독을 해제합니다.
+        // 인재실 UGUI 열기 요청 구독을 해제합니다.
         private void OnDisable()
         {
             if (administrationController != null)
@@ -113,10 +109,7 @@ namespace ProjectWI.Administration
         // 현재 성에서 활동 가능한 인물 선택 화면을 엽니다.
         private void Open()
         {
-            talentOfficeOnly = administrationController.IsUGUITalentOfficeMode();
-            modal.Show(talentOfficeOnly
-                ? administrationController.GetAdministrationText("UI_TALENT_OFFICE") + " · 담당자 선택"
-                : "인재 활동 · 인물 선택");
+            modal.Show(administrationController.GetAdministrationText("UI_TALENT_OFFICE_ACTORS"));
             pageMode = PageMode.Actor;
             pageIndex = 0;
             gradeFilter = GradeFilter.All;
@@ -131,19 +124,14 @@ namespace ProjectWI.Administration
                 ShowError(error);
                 return;
             }
-            if (talentOfficeOnly)
+            snapshot.Candidates.RemoveAll(candidate => administrationController.CanSelectCharacterActivity(
+                candidate.HeroId, WICharacterActivityType.Search) == false);
+            if (snapshot.Candidates.Count == 0)
             {
-                snapshot.Candidates.RemoveAll(candidate => administrationController.CanSelectCharacterActivity(
-                    candidate.HeroId, WICharacterActivityType.Search) == false);
-                foreach (WIAdministrationCharacterActivityCandidateSnapshot candidate in snapshot.Candidates)
-                {
-                    candidate.Interactable = administrationController.CanSelectCharacterActivity(
-                        candidate.HeroId, WICharacterActivityType.Search);
-                }
+                ShowError(administrationController.GetAdministrationText("UI_TALENT_OFFICE_NO_ACTOR"));
+                return;
             }
-            contextLabel.text = talentOfficeOnly
-                ? snapshot.CastleName + " · " + administrationController.GetAdministrationText("UI_TALENT_OFFICE_CONTEXT")
-                : snapshot.CastleName + " · " + administrationController.GetAdministrationText("UI_AUTOMATIC_TRAINING_HINT");
+            contextLabel.text = snapshot.CastleName + " · " + administrationController.GetAdministrationText("UI_TALENT_OFFICE_CONTEXT");
             messageLabel.gameObject.SetActive(false);
             RefreshToolbar();
             RefreshCards();
@@ -203,21 +191,14 @@ namespace ProjectWI.Administration
                 pageMode = PageMode.Activity;
                 modal.SetTitle(string.Format(administrationController.GetAdministrationText("UI_ACTIVITY_ACTOR_TITLE"), selectedHeroName));
                 contextLabel.text = administrationController.GetAdministrationText("UI_ACTIVITY_REPEAT_HINT");
-                WICharacterActivityType[] activities = { WICharacterActivityType.Search, WICharacterActivityType.Socialize,
-                    WICharacterActivityType.Recruit, WICharacterActivityType.Training, WICharacterActivityType.Rest };
+                WICharacterActivityType[] activities = { WICharacterActivityType.Search, WICharacterActivityType.Recruit };
                 for (int index = 0; index < activities.Length && index < activityButtons.Length; index += 1)
                 {
-                    bool visible = talentOfficeOnly
-                        ? WIAdministrationTurnSystem.IsTalentOfficeActivity(activities[index])
-                        : WIAdministrationTurnSystem.IsTalentOfficeActivity(activities[index]) == false;
-                    visible = visible && activities[index] != WICharacterActivityType.Training;
+                    bool visible = true;
                     activityButtons[index].gameObject.SetActive(visible);
                     activityButtons[index].interactable = administrationController.CanSelectCharacterActivity(selectedHeroId, activities[index]);
                 }
-                if (activityButtons.Length > activities.Length)
-                {
-                    activityButtons[activities.Length].gameObject.SetActive(talentOfficeOnly == false);
-                }
+
                 RefreshRepeatActivity();
                 cardRoot.SetActive(false);
                 activityRoot.SetActive(true);
@@ -231,11 +212,7 @@ namespace ProjectWI.Administration
                 pageLabel.text = string.Empty;
                 return;
             }
-            if (pageMode == PageMode.Transfer)
-            {
-                StartTransfer(candidate.HeroId);
-                return;
-            }
+
             Assign(pendingActivity, candidate.HeroId);
         }
 
@@ -277,10 +254,10 @@ namespace ProjectWI.Administration
             nextButton.gameObject.SetActive(false);
         }
 
-        // 대상 없는 활동은 즉시 배정하고, 교류와 영입은 대상 선택으로 전환합니다.
+        // 탐색은 즉시 배정하고 영입은 대상 선택으로 전환합니다.
         private void SelectActivity(WICharacterActivityType activity)
         {
-            if (activity != WICharacterActivityType.Socialize && activity != WICharacterActivityType.Recruit)
+            if (activity != WICharacterActivityType.Recruit)
             {
                 Assign(activity, string.Empty);
                 return;
@@ -294,42 +271,11 @@ namespace ProjectWI.Administration
                 ShowError(error);
                 return;
             }
-            modal.SetTitle(string.Format(administrationController.GetAdministrationText(activity == WICharacterActivityType.Socialize ? "UI_ACTIVITY_SOCIAL_TARGET" : "UI_ACTIVITY_RECRUIT_TARGET"), selectedHeroName));
+            modal.SetTitle(string.Format(administrationController.GetAdministrationText("UI_ACTIVITY_RECRUIT_TARGET"), selectedHeroName));
             contextLabel.text = string.Format(administrationController.GetAdministrationText("UI_ACTIVITY_TARGET_HINT"), selectedHeroName);
             messageLabel.gameObject.SetActive(false);
             ResetCandidateViewOptions();
             RefreshCards();
-        }
-
-        // 선택 인물이 아군 경로로 이동할 수 있는 최종 목적지 카드 단계로 전환합니다.
-        private void SelectTransfer()
-        {
-            pageMode = PageMode.Transfer;
-            pageIndex = 0;
-            if (administrationController.TryGetUGUICharacterTransferTargets(selectedHeroId, out snapshot, out string error)
-                == false)
-            {
-                ShowError(error);
-                return;
-            }
-            modal.SetTitle("인물 이동");
-            contextLabel.text = "최종 목적지를 선택하십시오. 아군 성을 따라 매달 한 성씩 자동 이동합니다.";
-            messageLabel.gameObject.SetActive(false);
-            ResetCandidateViewOptions();
-            RefreshCards();
-        }
-
-        // 선택 인물의 최종 목적지까지 자동 경로 이동을 시작합니다.
-        private void StartTransfer(string targetCastleId)
-        {
-            if (administrationController.StartUGUICharacterTransfer(selectedHeroId, targetCastleId, out string message)
-                == false)
-            {
-                ShowError(message);
-                return;
-            }
-            modal.Hide();
-            administrationController.ShowUGUIMessage("인물 이동", message);
         }
 
         // 선택한 개인 활동을 기존 게임 상태에 배정합니다.

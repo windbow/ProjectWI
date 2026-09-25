@@ -208,28 +208,28 @@ namespace ProjectWI.Administration
             RaiseUGUIScreenRequest<WIAdministrationEventChoiceUGUIController, WIAdministrationReportActionType, string>(() => UGUIEventChoiceRequested, type, id);
         }
 
-        // QA에서 아발론 영지와 UGUI 중점 사업 모달을 바로 표시합니다.
+        // QA에서 림가르드 영지와 UGUI 중점 사업 모달을 바로 표시합니다.
         public void OpenFocusProjectUGUIForQA()
         {
             OpenCastlePreviewForQA();
             RaiseUGUIScreenRequest<WIAdministrationFocusProjectUGUIController>(() => UGUIFocusProjectRequested);
         }
 
-        // QA에서 아발론 영지와 UGUI 영웅 배치 모달을 바로 표시합니다.
+        // QA에서 림가르드 영지와 UGUI 영웅 배치 모달을 바로 표시합니다.
         public void OpenHeroAssignmentUGUIForQA()
         {
             OpenCastlePreviewForQA();
             RaiseUGUIScreenRequest<WIAdministrationHeroAssignmentUGUIController>(() => UGUIHeroAssignmentRequested);
         }
 
-        // QA에서 아발론 영지와 UGUI 인재 활동 모달을 바로 표시합니다.
+        // QA에서 림가르드 영지와 UGUI 인재 활동 모달을 바로 표시합니다.
         public void OpenCharacterActivityUGUIForQA()
         {
             OpenCastlePreviewForQA();
             OpenUGUICharacterActivity(false);
         }
 
-        // QA에서 아발론 영지의 특화 시설 선택 권한과 UGUI 모달을 바로 표시합니다.
+        // QA에서 림가르드 영지의 특화 시설 선택 권한과 UGUI 모달을 바로 표시합니다.
         public void OpenSpecialFacilityUGUIForQA()
         {
             OpenCastlePreviewForQA();
@@ -237,28 +237,28 @@ namespace ProjectWI.Administration
             RaiseUGUIScreenRequest<WIAdministrationSpecialFacilityUGUIController>(() => UGUISpecialFacilityRequested);
         }
 
-        // QA에서 아발론 영지의 기본 시설 UGUI를 바로 표시합니다.
+        // QA에서 림가르드 영지의 기본 시설 UGUI를 바로 표시합니다.
         public void OpenBasicFacilityUGUIForQA()
         {
             OpenCastlePreviewForQA();
             RaiseUGUIScreenRequest<WIAdministrationBasicFacilityUGUIController>(() => UGUIBasicFacilityRequested);
         }
 
-        // QA에서 아발론 영지의 영지관 위임 UGUI를 바로 표시합니다.
+        // QA에서 림가르드 영지의 영지관 위임 UGUI를 바로 표시합니다.
         public void OpenDelegationUGUIForQA()
         {
             OpenCastlePreviewForQA();
             RaiseUGUIScreenRequest<WIAdministrationDelegationUGUIController>(() => UGUIDelegationRequested);
         }
 
-        // QA에서 아발론 영지의 원정 UGUI를 바로 표시합니다.
+        // QA에서 림가르드 영지의 원정 UGUI를 바로 표시합니다.
         public void OpenMarchUGUIForQA()
         {
             OpenCastlePreviewForQA();
             RaiseUGUIScreenRequest<WIAdministrationMarchUGUIController>(() => UGUIMarchRequested);
         }
 
-        // QA에서 아발론 영지의 성 상세 기록 UGUI를 바로 표시합니다.
+        // QA에서 림가르드 영지의 성 상세 기록 UGUI를 바로 표시합니다.
         public void OpenCastleRecordUGUIForQA()
         {
             OpenCastlePreviewForQA();
@@ -285,9 +285,9 @@ namespace ProjectWI.Administration
                     ManaGained = 45,
                     InfluenceGained = 20
                 };
-                state.LastMonthlyReport.DelegationReports.Add("[위임 결과] 아발론 · 번영 사업 · 예상 +5 / 실제 +6 · 비용 100G");
+                state.LastMonthlyReport.DelegationReports.Add("[위임 결과] 림가르드 · 번영 사업 · 예상 +5 / 실제 +6 · 비용 100G");
                 state.LastMonthlyReport.AIReasonReports.Add("적대 진영은 접경 방어를 우선하고 전투단을 재편성했습니다.");
-                state.LastMonthlyReport.News.Add("아발론의 시장이 활기를 되찾아 주민들의 왕래가 늘었습니다.");
+                state.LastMonthlyReport.News.Add("림가르드의 시장이 활기를 되찾아 주민들의 왕래가 늘었습니다.");
                 state.LastMonthlyReport.News.Add("북부 국경에서 적 진영의 정찰 움직임이 보고되었습니다.");
             }
             RaiseUGUIScreenRequest<WIAdministrationMonthlyReportUGUIController>(() => UGUIMonthlyReportRequested);

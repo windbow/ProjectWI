@@ -49,13 +49,19 @@ namespace ProjectWI.Administration
                     character.StandingActivityTargetHeroId = string.Empty;
                     character.RepeatActivity = false;
                 }
+                // 폐지된 수동 활동은 해제하되 인재실 반복 지시의 자동 회복은 보존합니다.
                 if (character.Activity == WICharacterActivityType.Training ||
+                    character.Activity == WICharacterActivityType.Socialize ||
+                    (character.Activity == WICharacterActivityType.Rest &&
+                     WIAdministrationTurnSystem.IsTalentOfficeActivity(character.StandingActivity) == false) ||
                     (common == true && WIAdministrationTurnSystem.IsTalentOfficeActivity(character.Activity) == true))
                 {
                     character.Activity = WICharacterActivityType.None;
                     character.ActivityTargetHeroId = string.Empty;
                 }
                 if (character.StandingActivity == WICharacterActivityType.Training ||
+                    character.StandingActivity == WICharacterActivityType.Socialize ||
+                    character.StandingActivity == WICharacterActivityType.Rest ||
                     (common == true && WIAdministrationTurnSystem.IsTalentOfficeActivity(character.StandingActivity) == true))
                 {
                     character.StandingActivity = WICharacterActivityType.None;

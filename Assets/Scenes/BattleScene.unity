@@ -627,6 +627,7 @@ MonoBehaviour:
   visualEffectPrefab: {fileID: 7767501085337253556, guid: ddfa9f963b609b14f93396b8eeeacd8c, type: 3}
   projectilePrefab: {fileID: 3907996155978327848, guid: b9e84a5de982e344cba56ea4e58ddec8, type: 3}
   cameraController: {fileID: 304340219}
+  zoneMarkerPrefab: {fileID: 2662683821540559784, guid: bd082fe11624f9140bcfe64f34c37d46, type: 3}
 --- !u!4 &1251991837
 Transform:
   m_ObjectHideFlags: 0
