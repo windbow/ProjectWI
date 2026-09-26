@@ -29,7 +29,12 @@ namespace ProjectWI.Battle
                 Position = actor.Position,
                 TargetPosition = target.Position,
                 Damage = damage,
-                RemainingLifetime = config.ProjectileLifetime
+                RemainingLifetime = config.ProjectileLifetime,
+                IsArc = actor.Archetype == WIBattleArchetype.Archer,
+                SplashRadius = actor.Archetype == WIBattleArchetype.Archer
+                    ? config.VolleySplashRadius
+                    : actor.Archetype == WIBattleArchetype.Caster ? config.CasterSplashRadius : 0f,
+                TotalDistance = Mathf.Max(0.01f, Vector2.Distance(actor.Position, target.Position))
             });
             runtime.NextProjectileId += 1;
         }
@@ -41,6 +46,16 @@ namespace ProjectWI.Battle
             {
                 WIBattleProjectileState projectile = runtime.Projectiles[projectileIndex];
                 projectile.RemainingLifetime -= deltaTime;
+                if (projectile.IsArc == true)
+                {
+                    projectile.Position = Vector2.MoveTowards(projectile.Position, projectile.TargetPosition, config.ProjectileSpeed * deltaTime);
+                    if (projectile.Position == projectile.TargetPosition || projectile.RemainingLifetime <= 0f)
+                    {
+                        ApplySplashDamage(config, runtime, projectile.Side, projectile.TargetPosition, projectile.SplashRadius, projectile.Damage, null);
+                        runtime.Projectiles.RemoveAt(projectileIndex);
+                    }
+                    continue;
+                }
                 WIBattleCharacterState target = runtime.Characters.Find(item =>
                     item.HeroId == projectile.TargetHeroId && item.IsAlive);
                 if (target != null)
@@ -61,6 +76,11 @@ namespace ProjectWI.Battle
                     WIBattleCharacterState shooter = runtime.Characters.Find(item => item.HeroId == projectile.ShooterHeroId);
                     int damage = Mathf.RoundToInt(projectile.Damage * GetProjectileTerrainMultiplier(config, shooter, hit));
                     ApplyDamage(config, runtime, hit, damage, 1f);
+                    if (projectile.SplashRadius > 0f)
+                    {
+                        ApplySplashDamage(config, runtime, projectile.Side, hit.Position, projectile.SplashRadius,
+                            Mathf.RoundToInt(projectile.Damage * config.CasterSplashDamageRatio), hit);
+                    }
                     AddHitVisual(config, runtime, hit);
                     runtime.Projectiles.RemoveAt(projectileIndex);
                     continue;

@@ -35,6 +35,7 @@ namespace ProjectWI.Battle
             AdvanceProjectiles(config, runtime, deltaTime);
             PrepareEngagements(config, runtime, deltaTime);
             UpdateMorale(config, runtime, deltaTime);
+            UpdateSquadCohesion(config, runtime, deltaTime);
             foreach (WIBattleCharacterState actor in runtime.Characters)
             {
                 if (actor.IsAlive == false)
@@ -43,9 +44,10 @@ namespace ProjectWI.Battle
                 }
                 actor.CooldownRemaining = Mathf.Max(0f, actor.CooldownRemaining - deltaTime);
                 actor.SkillCooldownRemaining = Mathf.Max(0f, actor.SkillCooldownRemaining - deltaTime);
-                float previousX = actor.Position.x;
+                Vector2 previousPosition = actor.Position;
                 ActContinuous(config, runtime, actor, deltaTime);
-                UpdateFacing(actor, previousX);
+                UpdateFacing(actor, previousPosition.x);
+                TrackChargeDistance(actor, previousPosition);
             }
             ResolveCharacterCollisions(config, runtime);
             bool attackersAlive = false;

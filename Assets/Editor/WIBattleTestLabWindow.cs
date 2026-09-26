@@ -15,6 +15,8 @@ namespace ProjectWI.Editor
         private const string DatabasePath = "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset";
         private const string MainScenePath = "Assets/Scenes/MainScene.unity";
         private const string LaunchDataKey = "ProjectWI.BattleTestLab.LaunchData";
+        // 테스트 편성을 나누는 전투단 인원입니다.
+        private const int TestArmySize = 5;
 
         [Serializable]
         private class TestMember
@@ -44,7 +46,7 @@ namespace ProjectWI.Editor
             GetWindow<WIBattleTestLabWindow>("전투 테스트 랩").minSize = new Vector2(760f, 520f);
         }
 
-        // 아레스와 커먼급 29명 대 상대 영웅과 커먼급 29명의 전투 밀도 검증을 바로 시작합니다.
+        // 키리엔과 커먼급 29명 대 상대 영웅과 커먼급 29명의 전투 밀도 검증을 바로 시작합니다.
         [MenuItem("ProjectWI/Verification/Start 30v30 Battle Density Test")]
         public static void StartThirtyVsThirtyBattleDensityTest()
         {
@@ -56,33 +58,57 @@ namespace ProjectWI.Editor
                 return;
             }
 
-            List<WIHeroDefinition> heroes = battleDatabase.Heroes
-                .Where(item => item.Grade == WICharacterGrade.Hero)
-                .ToList();
-            List<WIHeroDefinition> commons = battleDatabase.Heroes
-                .Where(item => item.Grade == WICharacterGrade.Common)
-                .ToList();
-            if (heroes.Count < 2 || commons.Count < 58)
-            {
-                Debug.LogError("30대30 전투 밀도 검증에는 영웅 2명과 커먼급 58명이 필요합니다.");
-                return;
-            }
-
-            WIHeroDefinition allyHero = battleDatabase.GetHero("ares") ?? heroes[0];
-            WIHeroDefinition enemyHero = heroes.First(item => item.Id != allyHero.Id);
+            HashSet<string> used = new HashSet<string>();
             LaunchData data = new LaunchData();
-            data.allies.Add(CreateTestMember(battleDatabase, allyHero));
-            data.enemies.Add(CreateTestMember(battleDatabase, enemyHero));
-            for (int index = 0; index < 29; index++)
+            foreach (WIHeroClass[] army in MixedArmyCompositions)
             {
-                data.allies.Add(CreateTestMember(battleDatabase, commons[index]));
-                data.enemies.Add(CreateTestMember(battleDatabase, commons[index + 29]));
+                AddMixedArmy(battleDatabase, army, data.allies, used);
+                AddMixedArmy(battleDatabase, army, data.enemies, used);
+            }
+            if (data.allies.Count < 30 || data.enemies.Count < 30)
+            {
+                Debug.LogError("30대30 병과 혼합 검증에 필요한 인물이 부족합니다.");
+                return;
             }
 
             EditorPrefs.SetString(LaunchDataKey, JsonUtility.ToJson(data));
             EditorSceneManager.OpenScene(MainScenePath);
             EditorApplication.isPlaying = true;
-            Debug.Log("30대30 전투 밀도 검증을 예약했습니다. 양측은 영웅 1명과 커먼급 29명으로 구성됩니다.");
+            Debug.Log("30대30 병과 혼합 검증을 예약했습니다. 양측은 5명 전투단 6개(지휘·방진, 돌격, 궁병, 술사, 유격, 지휘·궁병)로 구성됩니다.");
+        }
+
+        // 30대30 검증용 전투단 6개의 직업 구성입니다. 첫 칸은 영웅 분대장, 나머지는 일반 인물입니다.
+        private static readonly WIHeroClass[][] MixedArmyCompositions =
+        {
+            new[] { WIHeroClass.Crusader, WIHeroClass.Guardian, WIHeroClass.Guardian, WIHeroClass.Priest, WIHeroClass.Archer },
+            new[] { WIHeroClass.SwordMaster, WIHeroClass.SwordMaster, WIHeroClass.SwordMaster, WIHeroClass.MagicSwordsman, WIHeroClass.MagicSwordsman },
+            new[] { WIHeroClass.Archer, WIHeroClass.Archer, WIHeroClass.Archer, WIHeroClass.Archer, WIHeroClass.Guardian },
+            new[] { WIHeroClass.Archmage, WIHeroClass.Warlock, WIHeroClass.Alchemist, WIHeroClass.Guardian, WIHeroClass.Guardian },
+            new[] { WIHeroClass.Assassin, WIHeroClass.Assassin, WIHeroClass.Assassin, WIHeroClass.Assassin, WIHeroClass.Druid },
+            new[] { WIHeroClass.Strategist, WIHeroClass.Guardian, WIHeroClass.Guardian, WIHeroClass.Archer, WIHeroClass.Archer }
+        };
+
+        // 직업 구성대로 영웅 1명과 일반 인물을 골라 5명 전투단 하나를 편성 목록에 추가합니다.
+        private static void AddMixedArmy(
+            WIAdministrationDatabaseSO battleDatabase,
+            WIHeroClass[] classes,
+            List<TestMember> members,
+            HashSet<string> used)
+        {
+            for (int index = 0; index < classes.Length; index += 1)
+            {
+                WICharacterGrade grade = index == 0 ? WICharacterGrade.Hero : WICharacterGrade.Common;
+                WIHeroDefinition character = battleDatabase.Heroes.FirstOrDefault(item =>
+                        item.Grade == grade && item.HeroClass == classes[index] && used.Contains(item.Id) == false)
+                    ?? battleDatabase.Heroes.FirstOrDefault(item =>
+                        item.Grade == WICharacterGrade.Common && item.HeroClass == classes[index] && used.Contains(item.Id) == false);
+                if (character == null)
+                {
+                    continue;
+                }
+                used.Add(character.Id);
+                members.Add(CreateTestMember(battleDatabase, character));
+            }
         }
 
         [MenuItem("ProjectWI/Verification/Battle Zoom/A Near")]
@@ -279,13 +305,14 @@ namespace ProjectWI.Editor
                 PlayerInvolved = true,
                 Status = WIBattleSessionStatus.Pending
             };
-            session.AttackerHeroIds.AddRange(data.allies.Select(item => new WIBattleParticipantState
+            // 실제 전투단 규모와 같이 5명씩 전투단을 나눠 분대 블록을 확인합니다.
+            session.AttackerHeroIds.AddRange(data.allies.Select((item, index) => new WIBattleParticipantState
             {
-                HeroId = item.heroId, ArmyId = "test_allies", Role = item.role
+                HeroId = item.heroId, ArmyId = "test_allies_" + index / TestArmySize, Role = item.role
             }));
-            session.DefenderHeroIds.AddRange(data.enemies.Select(item => new WIBattleParticipantState
+            session.DefenderHeroIds.AddRange(data.enemies.Select((item, index) => new WIBattleParticipantState
             {
-                HeroId = item.heroId, ArmyId = "test_enemies", Role = item.role
+                HeroId = item.heroId, ArmyId = "test_enemies_" + index / TestArmySize, Role = item.role
             }));
             bool started = WICampaignRuntimeService.Instance.StartTestBattle(session);
             EditorPrefs.DeleteKey(LaunchDataKey);

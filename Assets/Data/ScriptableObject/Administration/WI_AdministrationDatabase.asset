@@ -506,13 +506,13 @@ MonoBehaviour:
     korean: "\uD669\uD63C\uC758 \uADC0\uD658"
     english: Return of Twilight
   - uid: UI_SCENARIO_ARES_SUBTITLE
-    korean: "\uC544\uB808\uC2A4\uC758 \uB9BC\uAC00\uB974\uB4DC \uC7AC\uAC74"
-    english: Ares rebuilds Rimgard
+    korean: "\uD0A4\uB9AC\uC5D4\uC758 \uB9BC\uAC00\uB974\uB4DC \uC7AC\uAC74"
+    english: Kyrien rebuilds Rimgard
   - uid: UI_SCENARIO_ARES_STORY
-    korean: "\uBC1C\uB3C4\uB974\uC758 \uC7A5\uAD70\uC73C\uB85C \uC790\uB780 \uC544\uB808\uC2A4.\n\uC783\uC5B4\uBC84\uB9B0
+    korean: "\uBC1C\uB3C4\uB974\uC758 \uC7A5\uAD70\uC73C\uB85C \uC790\uB780 \uD0A4\uB9AC\uC5D4.\n\uC783\uC5B4\uBC84\uB9B0
       \uC774\uB984\uC744 \uB418\uCC3E\uACE0 \uB9BC\uAC00\uB974\uB4DC\uC758 \uC7AC\uAC74\uC744
       \uC2DC\uC791\uD569\uB2C8\uB2E4."
-    english: 'Raised as a general of Valdor, Ares reclaims his lost name
+    english: 'Raised as a general of Valdor, Kyrien reclaims his lost name
 
       and
       begins the restoration of Rimgard.'
@@ -520,8 +520,8 @@ MonoBehaviour:
     korean: "\uBC1C\uB3C4\uB974\uC758 \uBAA8\uB4E0 \uC131 \uC810\uB839"
     english: Capture all castles held by Valdor
   - uid: UI_SCENARIO_ARES_PROTAGONIST
-    korean: "\uC544\uB808\uC2A4"
-    english: Ares
+    korean: "\uD0A4\uB9AC\uC5D4"
+    english: Kyrien
   - uid: UI_SCENARIO_FREE_TITLE
     korean: "\uC790\uC720 \uC815\uBCF5"
     english: Free Conquest
@@ -690,9 +690,9 @@ MonoBehaviour:
       \uD074\uB9AD\uD558\uC138\uC694."
     english: "Nothing selected \xB7 Click near a character."
   - uid: UI_BATTLE_SELECT_INFO
-    korean: "[{0}] {1} \xB7 {2} \xB7 HP {3}/{4} \xB7 MP {5}/{6} \xB7 \uBD84\uB300
+    korean: "[{0}] {1} \xB7 {9} \xB7 HP {3}/{4} \xB7 MP {5}/{6} \xB7 \uBD84\uB300
       \uC0AC\uAE30 {7:0} \xB7 {8}"
-    english: "[{0}] {1} \xB7 {2} \xB7 HP {3}/{4} \xB7 MP {5}/{6} \xB7 Squad morale
+    english: "[{0}] {1} \xB7 {9} \xB7 HP {3}/{4} \xB7 MP {5}/{6} \xB7 Squad morale
       {7:0} \xB7 {8}"
   - uid: UI_BATTLE_SKILL_TOOLTIP
     korean: "{0}\n{1}\n\uB9C8\uB098 {2} \xB7 \uBC94\uC704 {3:0.#} \xB7 \uC7AC\uC0AC\uC6A9
@@ -807,6 +807,50 @@ MonoBehaviour:
   - uid: UI_BATTLE_CONTROL_NEED_SQUAD
     korean: "\uC9C1\uC811 \uC9C0\uD718\uD560 \uBD84\uB300\uB97C \uBA3C\uC800 \uC120\uD0DD\uD558\uC138\uC694."
     english: Select a squad to command directly first.
+  - uid: UI_CASTLE_SIZE_SMALL
+    korean: "\uC18C\uD615"
+    english: Small
+  - uid: UI_CASTLE_SIZE_MEDIUM
+    korean: "\uC911\uD615"
+    english: Medium
+  - uid: UI_CASTLE_SIZE_LARGE
+    korean: "\uB300\uD615"
+    english: Large
+  - uid: UI_ADMIN_FACILITY_SLOT_EMPTY
+    korean: "\uBBF8\uC9C0\uC815\n\uC2DC\uC124\uC744 \uC9C0\uC815\uD558\uC138\uC694"
+    english: 'Unassigned
+
+      Choose a facility'
+  - uid: UI_ADMIN_FACILITY_SLOT_LOCKED
+    korean: "\uC7A0\uAE40\n\uC131 \uD655\uC7A5 \uC2DC \uAC1C\uBC29"
+    english: 'Locked
+
+      Opens on expansion'
+  - uid: UI_BATTLE_ARCHETYPE_SHIELD
+    korean: "\uBC29\uC9C4 \xB7 \uBA48\uCD94\uBA74 \uC815\uBA74 \uBC29\uC5B4\xB7\uB3CC\uACA9
+      \uC800\uC9C0, \uCE21\uBA74 \uCDE8\uC57D"
+    english: "Shield \xB7 Braced front, stops charges, weak flanks"
+  - uid: UI_BATTLE_ARCHETYPE_CHARGER
+    korean: "\uB3CC\uACA9 \xB7 \uB2EC\uB824\uC640 \uCE58\uBA74 \uB3CC\uACA9 \uCDA9\uACA9"
+    english: "Charger \xB7 Running hits deliver a charge impact"
+  - uid: UI_BATTLE_ARCHETYPE_SKIRMISHER
+    korean: "\uC720\uACA9 \xB7 \uBE60\uB984, \uD6C4\uBC29 \uACF5\uACA9 \uAC15\uD654,
+      \uD6C4\uC5F4 \uB178\uB9BC"
+    english: "Skirmisher \xB7 Fast, deadly from behind, hunts the backline"
+  - uid: UI_BATTLE_ARCHETYPE_ARCHER
+    korean: "\uAD81\uBCD1 \xB7 \uBD84\uB300 \uC77C\uC81C \uC0AC\uACA9, \uCC29\uD0C4
+      \uBC94\uC704 \uD53C\uD574"
+    english: "Archer \xB7 Squad volleys with splash on impact"
+  - uid: UI_BATTLE_ARCHETYPE_CASTER
+    korean: "\uC220\uC0AC \xB7 \uB290\uB9AC\uACE0 \uAC15\uD55C \uB9C8\uBC95\uD0C4,
+      \uC8FC\uBCC0 \uD53C\uD574"
+    english: "Caster \xB7 Slow heavy bolts with splash"
+  - uid: UI_BATTLE_ARCHETYPE_SUPPORT
+    korean: "\uC9C0\uC6D0 \xB7 \uB2E4\uCE5C \uC544\uAD70 \uC790\uB3D9 \uCE58\uB8CC"
+    english: "Support \xB7 Heals wounded allies"
+  - uid: UI_BATTLE_ARCHETYPE_COMMANDER
+    korean: "\uC9C0\uD718 \xB7 \uC8FC\uBCC0 \uBD84\uB300 \uC0AC\uAE30 \uBCF4\uD638"
+    english: "Commander \xB7 Protects nearby squads' morale"
   factions:
   - id: rimgard
     displayName:
@@ -2759,8 +2803,8 @@ MonoBehaviour:
   - id: ares
     displayName:
       uid: CHARACTER_ARES
-      korean: "\uC544\uB808\uC2A4"
-      english: Ares
+      korean: "\uD0A4\uB9AC\uC5D4"
+      english: Kyrien
     race: 0
     heroClass: 0
     grade: 0
@@ -33668,9 +33712,9 @@ MonoBehaviour:
     level: 2
     context:
       uid: REL_START_RIMGARD
-      korean: "\uC544\uB808\uC2A4\uB294 \uC218\uB3C4 \uC7AC\uAC74\uC744 \uB9E1\uAE34
+      korean: "\uD0A4\uB9AC\uC5D4\uC740 \uC218\uB3C4 \uC7AC\uAC74\uC744 \uB9E1\uAE34
         \uC54C\uB374\uC758 \uC2E4\uBB34 \uB2A5\uB825\uC744 \uAE4A\uC774 \uC2E0\uB8B0\uD569\uB2C8\uB2E4."
-      english: Ares deeply trusts Alden with the capital's restoration.
+      english: Kyrien deeply trusts Alden with the capital's restoration.
   - factionId: valdor
     firstHeroId: elwyn
     secondHeroId: common_gareth
@@ -34068,14 +34112,14 @@ MonoBehaviour:
     variant: 0
     displayName:
       uid: VARIANT_ARES_MAIN_NAME
-      korean: "\uC544\uB808\uC2A4 \uBA54\uC778"
-      english: Ares Main
+      korean: "\uD0A4\uB9AC\uC5D4 \uBA54\uC778"
+      english: Kyrien Main
     description:
       uid: VARIANT_ARES_MAIN_DESC
-      korean: "\uCD5C\uBD81\uB2E8 \uD504\uB85C\uC2A4\uD2B8\uD63C\uC5D0\uC11C \uC544\uB808\uC2A4\uC640
+      korean: "\uCD5C\uBD81\uB2E8 \uD504\uB85C\uC2A4\uD2B8\uD63C\uC5D0\uC11C \uD0A4\uB9AC\uC5D4\uACFC
         \uC2DC\uC791\uD558\uC5EC \uBC1C\uB3C4\uB974 \uAD70\uC0AC\uC81C\uAD6D\uC744
         \uBB34\uB108\uB728\uB9BD\uB2C8\uB2E4."
-      english: Begin with Ares at the isolated northern Frosthorn and defeat the
+      english: Begin with Kyrien at the isolated northern Frosthorn and defeat the
         Valdor Military Empire.
     additionalPlayerCastleId: 
     relationshipFirstHeroId: 

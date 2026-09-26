@@ -73,6 +73,61 @@ namespace ProjectWI.Battle
         public bool RequiresTarget => skillType == WIBattleSkillType.AreaDamage;
     }
 
+    // 직업을 묶은 전투 병과입니다. 병과마다 고유 전투 규칙이 있습니다.
+    public enum WIBattleArchetype
+    {
+        // 방진: 멈춰 있으면 정면 피해 감소·돌격 무력화, 측면에 약함
+        Shield,
+        // 돌격: 달려와 치면 돌격 충격
+        Charger,
+        // 유격: 빠르고 후방 공격에 강하며 원거리·지원을 노림
+        Skirmisher,
+        // 궁병: 분대 일제 사격, 포물선 화살의 착탄 범위 피해
+        Archer,
+        // 술사: 느리고 강한 마법탄, 명중 지점 주변 피해
+        Caster,
+        // 지원: 다친 아군 자동 치료
+        Support,
+        // 지휘: 주변 아군 분대 사기 보호
+        Commander
+    }
+
+    // 직업별 전투 병과와 능력 배율입니다.
+    [Serializable]
+    public class WIBattleClassProfile
+    {
+        [SerializeField] private WIHeroClass heroClass;
+        [SerializeField] private WIBattleArchetype archetype;
+        [SerializeField, Min(0.1f)] private float healthMultiplier = 1f;
+        [SerializeField, Min(0.1f)] private float damageMultiplier = 1f;
+        [SerializeField, Min(0.1f)] private float moveSpeedMultiplier = 1f;
+        [SerializeField, Min(0.1f)] private float attackCooldownMultiplier = 1f;
+        [SerializeField, Min(0.1f)] private float attackRangeMultiplier = 1f;
+
+        public WIBattleClassProfile()
+        {
+        }
+
+        public WIBattleClassProfile(WIHeroClass heroClass, WIBattleArchetype archetype, float health, float damage, float speed, float cooldown, float range)
+        {
+            this.heroClass = heroClass;
+            this.archetype = archetype;
+            healthMultiplier = health;
+            damageMultiplier = damage;
+            moveSpeedMultiplier = speed;
+            attackCooldownMultiplier = cooldown;
+            attackRangeMultiplier = range;
+        }
+
+        public WIHeroClass HeroClass => heroClass;
+        public WIBattleArchetype Archetype => archetype;
+        public float HealthMultiplier => Mathf.Max(0.1f, healthMultiplier);
+        public float DamageMultiplier => Mathf.Max(0.1f, damageMultiplier);
+        public float MoveSpeedMultiplier => Mathf.Max(0.1f, moveSpeedMultiplier);
+        public float AttackCooldownMultiplier => Mathf.Max(0.1f, attackCooldownMultiplier);
+        public float AttackRangeMultiplier => Mathf.Max(0.1f, attackRangeMultiplier);
+    }
+
     // 전장 지형 구역 종류입니다.
     public enum WIBattleTerrainType
     {
@@ -137,8 +192,33 @@ namespace ProjectWI.Battle
         public float HitEffectDuration => Mathf.Max(0.01f, hitEffectDuration);
         [SerializeField] private Vector2 arenaSize = new Vector2(18f, 10f);
         [SerializeField] private Vector2 arenaBackgroundSize = new Vector2(57.024f, 32.076f);
-        [SerializeField] private float formationColumnSpacing = 1.4f;
-        [SerializeField] private float formationRowSpacing = 1.2f;
+        // 전장 프리팹 인스턴스에 적용하는 균일 배율입니다. 캐릭터 크기는 그대로 두고 맵을 넓힐 때 사용합니다.
+        [SerializeField, Min(0.1f)] private float arenaPrefabScale = 1f;
+        // 전장 중앙에서 각 진영 전위 열까지의 가로 거리이며 두 진영 시작 간격의 절반입니다.
+        [SerializeField, Min(0.5f)] private float formationFrontLineDistance = 6f;
+        // 한 분대의 최대 인원이며 전투단이 이보다 크면 여러 분대로 나눕니다.
+        [SerializeField, Range(2, 12)] private int squadMaxSize = 8;
+        // 분대 블록 한 줄(가로 열)에 서는 인원 수입니다.
+        [SerializeField, Range(1, 6)] private int squadBlockFiles = 3;
+        // 분대 블록 안 인물 간격입니다.
+        [SerializeField, Min(0.3f)] private float squadMemberSpacing = 0.85f;
+        // 같은 전열에 선 분대 블록 사이 간격입니다.
+        [SerializeField, Min(0f)] private float squadGap = 1.2f;
+        // 근접 전열과 원거리 후열 사이 간격입니다.
+        [SerializeField, Min(0f)] private float formationLineGap = 1.5f;
+        // 분대 결속: 교전 중 분대원이 블록 자리에서 벗어날 수 있는 최대 거리입니다.
+        [SerializeField, Min(0f)] private float formationEngageLeash = 1.2f;
+        // 분대 결속: 분대원 평균이 자리에서 이만큼 이상 벌어지면 기준점이 전진을 멈추고 기다립니다.
+        [SerializeField, Min(0.1f)] private float cohesionWaitDistance = 1.2f;
+        // 분대 결속: 뒤처진 분대원을 기다리는 최대 시간(초)입니다.
+        [SerializeField, Min(0f)] private float cohesionMaxWaitSeconds = 1.5f;
+        // 돌격 분대가 적과 이 거리 안에 들면 기준점 속도를 올려 돌진합니다.
+        [SerializeField, Min(0f)] private float chargeSprintDistance = 4f;
+        [SerializeField, Min(1f)] private float chargeSprintMultiplier = 1.35f;
+        // 줄이 칼같이 맞지 않도록 자리마다 주는 위치 흔들림 최대값입니다.
+        [SerializeField, Min(0f)] private float formationJitter = 0.12f;
+        // 인물마다 주는 이동 속도 편차 비율입니다.
+        [SerializeField, Range(0f, 0.3f)] private float moveSpeedVariance = 0.06f;
         // 연속 이동 모드의 고정 시뮬레이션 틱 간격(초)입니다.
         [SerializeField, Min(0.01f)] private float fixedTickSeconds = 0.05f;
         // 한 인물을 동시에 근접 공격할 수 있는 교전 슬롯 수입니다.
@@ -249,6 +329,88 @@ namespace ProjectWI.Battle
         [SerializeField, Range(0f, 1f)] private float sideMarkerAlpha = 0.75f;
         // 무너져 퇴각 중인 인물 이미지에 곱하는 색입니다.
         [SerializeField] private Color routingTint = new Color(0.6f, 0.6f, 0.6f, 0.85f);
+        [Header("Class Archetypes")]
+        // 직업별 병과와 능력 배율 목록입니다.
+        [SerializeField] private List<WIBattleClassProfile> classProfiles = new List<WIBattleClassProfile>
+        {
+            new WIBattleClassProfile(WIHeroClass.MagicSwordsman, WIBattleArchetype.Charger, 1.1f, 1.1f, 1.05f, 1f, 1f),
+            new WIBattleClassProfile(WIHeroClass.Guardian, WIBattleArchetype.Shield, 1.4f, 0.8f, 0.85f, 1f, 1f),
+            new WIBattleClassProfile(WIHeroClass.Crusader, WIBattleArchetype.Commander, 1.3f, 1f, 0.95f, 1f, 1f),
+            new WIBattleClassProfile(WIHeroClass.SwordMaster, WIBattleArchetype.Charger, 1f, 1.2f, 1.15f, 1f, 1f),
+            new WIBattleClassProfile(WIHeroClass.Archer, WIBattleArchetype.Archer, 0.85f, 1f, 1f, 1f, 1.15f),
+            new WIBattleClassProfile(WIHeroClass.Assassin, WIBattleArchetype.Skirmisher, 0.8f, 1.15f, 1.3f, 0.9f, 1f),
+            new WIBattleClassProfile(WIHeroClass.Archmage, WIBattleArchetype.Caster, 0.75f, 1.5f, 0.9f, 1.5f, 1f),
+            new WIBattleClassProfile(WIHeroClass.Priest, WIBattleArchetype.Support, 0.9f, 0.6f, 1f, 1f, 1f),
+            new WIBattleClassProfile(WIHeroClass.Druid, WIBattleArchetype.Support, 1f, 0.7f, 1f, 1f, 1f),
+            new WIBattleClassProfile(WIHeroClass.Strategist, WIBattleArchetype.Commander, 0.9f, 0.8f, 1f, 1f, 1f),
+            new WIBattleClassProfile(WIHeroClass.Alchemist, WIBattleArchetype.Caster, 0.9f, 1.2f, 1f, 1.3f, 1f),
+            new WIBattleClassProfile(WIHeroClass.Warlock, WIBattleArchetype.Caster, 0.8f, 1.4f, 0.95f, 1.4f, 1f)
+        };
+        // 돌격: 이만큼 달려온 뒤 첫 근접 타격이 돌격 충격이 됩니다.
+        [SerializeField, Min(0.5f)] private float chargeMinDistance = 2.5f;
+        [SerializeField, Min(1f)] private float chargeDamageMultiplier = 2f;
+        [SerializeField, Min(1f)] private float chargeKnockbackMultiplier = 3f;
+        [SerializeField, Min(0f)] private float chargeMoraleDamage = 4f;
+        // 방진: 멈춰 선 방진이 정면에서 받는 근접 피해 배율과 측면·후방 추가 피해 배율입니다.
+        [SerializeField, Range(0.1f, 1f)] private float braceFrontDamageMultiplier = 0.6f;
+        [SerializeField, Min(1f)] private float braceFlankExtraMultiplier = 1.25f;
+        // 유격: 후방 공격 피해 배율과 원거리·지원 표적 선호 정도(거리 할인)입니다.
+        [SerializeField, Min(1f)] private float skirmisherRearMultiplier = 2f;
+        [SerializeField, Min(0f)] private float skirmisherBacklinePreference = 3f;
+        // 궁병: 포물선 화살의 착탄 반경과 표시 높이입니다.
+        [SerializeField, Min(0f)] private float volleySplashRadius = 0.8f;
+        [SerializeField, Min(0f)] private float arrowArcHeight = 1.4f;
+        // 술사: 마법탄 명중 지점 주변 피해 반경과 주변 피해 배율입니다.
+        [SerializeField, Min(0f)] private float casterSplashRadius = 1f;
+        [SerializeField, Range(0f, 1f)] private float casterSplashDamageRatio = 0.5f;
+        // 지원: 치료량과 치료를 시작하는 아군 체력 비율입니다.
+        [SerializeField, Min(0)] private int supportHealPower = 12;
+        [SerializeField, Range(0.1f, 1f)] private float supportHealThreshold = 0.75f;
+        // 지휘: 사기 보호 반경, 추가 사기 회복, 사기 손실 배율입니다.
+        [SerializeField, Min(0f)] private float commandAuraRadius = 4f;
+        [SerializeField, Min(0f)] private float commandAuraMoraleRegen = 2f;
+        [SerializeField, Range(0.1f, 1f)] private float commandAuraLossMultiplier = 0.7f;
+        // 돌격 충격의 화면 흔들림 세기입니다.
+        [SerializeField, Range(0f, 1f)] private float shakeChargeImpact = 0.25f;
+
+        [Header("Game Feel")]
+        // 걸을 때 몸이 위아래로 튀는 높이와 초당 걸음 수, 좌우 기울기(도)입니다.
+        [SerializeField, Min(0f)] private float walkBobHeight = 0.06f;
+        [SerializeField, Min(0f)] private float walkBobFrequency = 3.2f;
+        [SerializeField, Min(0f)] private float walkTiltDegrees = 4f;
+        // 근접 공격 때 앞으로 내딛는 거리와 시간입니다.
+        [SerializeField, Min(0f)] private float attackLungeDistance = 0.14f;
+        [SerializeField, Min(0.01f)] private float attackLungeDuration = 0.16f;
+        // 피격 시 번쩍이는 색과 시간, 눌림 정도입니다.
+        [SerializeField] private Color hitFlashColor = new Color(1f, 0.35f, 0.3f, 1f);
+        [SerializeField, Min(0.01f)] private float hitFlashDuration = 0.12f;
+        [SerializeField, Range(0f, 0.5f)] private float hitSquashAmount = 0.14f;
+        // 전투 불능 시 넘어지며 사라지는 시간과 회전 각도입니다.
+        [SerializeField, Min(0.05f)] private float deathFallDuration = 0.55f;
+        [SerializeField] private float deathFallDegrees = 80f;
+        // 증원 등장 시 튀어나오는 시간입니다.
+        [SerializeField, Min(0.05f)] private float spawnPopDuration = 0.3f;
+        // 선택 분대 표시 맥동 속도와 크기입니다.
+        [SerializeField, Min(0f)] private float selectionPulseSpeed = 6f;
+        [SerializeField, Range(0f, 0.5f)] private float selectionPulseAmount = 0.1f;
+        // 화면 흔들림 최대 이동량과 초당 감쇠량입니다.
+        [SerializeField, Min(0f)] private float cameraShakeMaxOffset = 0.35f;
+        [SerializeField, Min(0.1f)] private float cameraShakeDecay = 1.8f;
+        // 사건별 화면 흔들림 세기(0~1)입니다.
+        [SerializeField, Range(0f, 1f)] private float shakeFirstClash = 0.5f;
+        [SerializeField, Range(0f, 1f)] private float shakeLeaderKill = 0.55f;
+        [SerializeField, Range(0f, 1f)] private float shakeSkillImpact = 0.4f;
+        [SerializeField, Range(0f, 1f)] private float shakeSquadRouted = 0.3f;
+        [SerializeField, Range(0f, 1f)] private float shakeKill = 0.06f;
+        [SerializeField, Range(0f, 1f)] private float shakeFlankHit = 0.04f;
+        // 사건별 히트 스톱(짧은 정지) 시간입니다.
+        [SerializeField, Min(0f)] private float hitStopFirstClash = 0.08f;
+        [SerializeField, Min(0f)] private float hitStopLeaderKill = 0.14f;
+        [SerializeField, Min(0f)] private float hitStopSkillImpact = 0.06f;
+        // 명령 지점에 퍼지는 원의 시간과 색입니다.
+        [SerializeField, Min(0.05f)] private float orderPingDuration = 0.45f;
+        [SerializeField] private Color orderPingMoveColor = new Color(0.4f, 0.95f, 1f, 0.8f);
+        [SerializeField] private Color orderPingAttackColor = new Color(1f, 0.35f, 0.25f, 0.85f);
         // 스킬 시전 가능 거리 미리보기 색입니다.
         [SerializeField] private Color skillRangePreviewColor = new Color(1f, 1f, 1f, 0.12f);
         // 스킬 효과 범위 미리보기 색입니다.
@@ -279,8 +441,20 @@ namespace ProjectWI.Battle
 
         public Vector2 ArenaSize => arenaSize;
         public Vector2 ArenaBackgroundSize => arenaBackgroundSize;
-        public float FormationColumnSpacing => formationColumnSpacing;
-        public float FormationRowSpacing => formationRowSpacing;
+        public float ArenaPrefabScale => Mathf.Max(0.1f, arenaPrefabScale);
+        public float FormationFrontLineDistance => Mathf.Max(0.5f, formationFrontLineDistance);
+        public int SquadMaxSize => Mathf.Clamp(squadMaxSize, 2, 12);
+        public int SquadBlockFiles => Mathf.Clamp(squadBlockFiles, 1, 6);
+        public float SquadMemberSpacing => Mathf.Max(0.3f, squadMemberSpacing);
+        public float SquadGap => Mathf.Max(0f, squadGap);
+        public float FormationLineGap => Mathf.Max(0f, formationLineGap);
+        public float FormationJitter => Mathf.Max(0f, formationJitter);
+        public float FormationEngageLeash => Mathf.Max(0f, formationEngageLeash);
+        public float CohesionWaitDistance => Mathf.Max(0.1f, cohesionWaitDistance);
+        public float CohesionMaxWaitSeconds => Mathf.Max(0f, cohesionMaxWaitSeconds);
+        public float ChargeSprintDistance => Mathf.Max(0f, chargeSprintDistance);
+        public float ChargeSprintMultiplier => Mathf.Max(1f, chargeSprintMultiplier);
+        public float MoveSpeedVariance => moveSpeedVariance;
         public float FixedTickSeconds => Mathf.Max(0.01f, fixedTickSeconds);
         public int MeleeSlotCount => Mathf.Clamp(meleeSlotCount, 1, 8);
         public float MeleeSlotDistanceRatio => meleeSlotDistanceRatio;
@@ -348,6 +522,74 @@ namespace ProjectWI.Battle
         public bool BattleSpriteFacesRight => battleSpriteFacesRight;
         public float SideMarkerAlpha => sideMarkerAlpha;
         public Color RoutingTint => routingTint;
+        public float ChargeMinDistance => Mathf.Max(0.5f, chargeMinDistance);
+        public float ChargeDamageMultiplier => Mathf.Max(1f, chargeDamageMultiplier);
+        public float ChargeKnockbackMultiplier => Mathf.Max(1f, chargeKnockbackMultiplier);
+        public float ChargeMoraleDamage => chargeMoraleDamage;
+        public float BraceFrontDamageMultiplier => braceFrontDamageMultiplier;
+        public float BraceFlankExtraMultiplier => Mathf.Max(1f, braceFlankExtraMultiplier);
+        public float SkirmisherRearMultiplier => Mathf.Max(1f, skirmisherRearMultiplier);
+        public float SkirmisherBacklinePreference => skirmisherBacklinePreference;
+        public float VolleySplashRadius => volleySplashRadius;
+        public float ArrowArcHeight => arrowArcHeight;
+        public float CasterSplashRadius => casterSplashRadius;
+        public float CasterSplashDamageRatio => casterSplashDamageRatio;
+        public int SupportHealPower => supportHealPower;
+        public float SupportHealThreshold => supportHealThreshold;
+        public float CommandAuraRadius => commandAuraRadius;
+        public float CommandAuraMoraleRegen => commandAuraMoraleRegen;
+        public float CommandAuraLossMultiplier => commandAuraLossMultiplier;
+
+        // 직업에 대응하는 병과 설정을 반환하며 없으면 null입니다.
+        public WIBattleClassProfile GetClassProfile(WIHeroClass heroClass)
+        {
+            return classProfiles.Find(item => item.HeroClass == heroClass);
+        }
+        public float WalkBobHeight => walkBobHeight;
+        public float WalkBobFrequency => walkBobFrequency;
+        public float WalkTiltDegrees => walkTiltDegrees;
+        public float AttackLungeDistance => attackLungeDistance;
+        public float AttackLungeDuration => Mathf.Max(0.01f, attackLungeDuration);
+        public Color HitFlashColor => hitFlashColor;
+        public float HitFlashDuration => Mathf.Max(0.01f, hitFlashDuration);
+        public float HitSquashAmount => hitSquashAmount;
+        public float DeathFallDuration => Mathf.Max(0.05f, deathFallDuration);
+        public float DeathFallDegrees => deathFallDegrees;
+        public float SpawnPopDuration => Mathf.Max(0.05f, spawnPopDuration);
+        public float SelectionPulseSpeed => selectionPulseSpeed;
+        public float SelectionPulseAmount => selectionPulseAmount;
+        public float CameraShakeMaxOffset => cameraShakeMaxOffset;
+        public float CameraShakeDecay => Mathf.Max(0.1f, cameraShakeDecay);
+        public float OrderPingDuration => Mathf.Max(0.05f, orderPingDuration);
+        public Color OrderPingMoveColor => orderPingMoveColor;
+        public Color OrderPingAttackColor => orderPingAttackColor;
+
+        // 연출 사건의 화면 흔들림 세기를 반환합니다.
+        public float GetShakeTrauma(WIBattleFeedbackType type)
+        {
+            switch (type)
+            {
+                case WIBattleFeedbackType.FirstClash: return shakeFirstClash;
+                case WIBattleFeedbackType.LeaderKill: return shakeLeaderKill;
+                case WIBattleFeedbackType.SkillImpact: return shakeSkillImpact;
+                case WIBattleFeedbackType.SquadRouted: return shakeSquadRouted;
+                case WIBattleFeedbackType.Kill: return shakeKill;
+                case WIBattleFeedbackType.ChargeImpact: return shakeChargeImpact;
+                default: return shakeFlankHit;
+            }
+        }
+
+        // 연출 사건의 히트 스톱 시간을 반환합니다.
+        public float GetHitStop(WIBattleFeedbackType type)
+        {
+            switch (type)
+            {
+                case WIBattleFeedbackType.FirstClash: return hitStopFirstClash;
+                case WIBattleFeedbackType.LeaderKill: return hitStopLeaderKill;
+                case WIBattleFeedbackType.SkillImpact: return hitStopSkillImpact;
+                default: return 0f;
+            }
+        }
         public Color SkillRangePreviewColor => skillRangePreviewColor;
         public Color SkillAreaPreviewColor => skillAreaPreviewColor;
         public bool ShowCharacterLabels => showCharacterLabels;

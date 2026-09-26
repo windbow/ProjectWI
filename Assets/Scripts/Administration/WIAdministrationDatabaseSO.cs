@@ -1122,6 +1122,20 @@ namespace ProjectWI.Administration
             return value == null ? uid : value.Get(useEnglish);
         }
 
+        // 성 규모 열거값을 UI_CASTLE_SIZE_* 문자열 UID의 표시명으로 바꿉니다.
+        public string GetCastleSizeName(WICastleSize size)
+        {
+            switch (size)
+            {
+                case WICastleSize.Large:
+                    return GetText("UI_CASTLE_SIZE_LARGE");
+                case WICastleSize.Medium:
+                    return GetText("UI_CASTLE_SIZE_MEDIUM");
+                default:
+                    return GetText("UI_CASTLE_SIZE_SMALL");
+            }
+        }
+
         // ID로 진영 데이터를 찾습니다.
         public WIFactionDefinition GetFaction(string id)
         {

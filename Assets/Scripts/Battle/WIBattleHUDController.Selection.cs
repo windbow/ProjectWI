@@ -47,6 +47,7 @@ namespace ProjectWI.Battle
                 return;
             }
             pointerStart = pointerEvent.position;
+            lastPointerPanelPosition = pointerEvent.position;
             pointerButton = pointerEvent.button;
             pointerDragging = false;
         }
@@ -54,7 +55,13 @@ namespace ProjectWI.Battle
         // 왼쪽 버튼으로 일정 거리 이상 끌면 범위 선택 사각형을 표시합니다.
         private void HandlePointerMove(PointerMoveEvent pointerEvent)
         {
+            Vector2 previousPanelPosition = lastPointerPanelPosition;
             lastPointerPanelPosition = pointerEvent.position;
+            if (pointerButton == 2)
+            {
+                battleController?.CameraController?.DragPan(PanelToScreen(previousPanelPosition), PanelToScreen(pointerEvent.position));
+                return;
+            }
             if (pointerButton != 0 || IsTargetingSkill == true)
             {
                 return;
@@ -81,6 +88,11 @@ namespace ProjectWI.Battle
         {
             int button = pointerButton;
             pointerButton = -1;
+            if (button == 2)
+            {
+                pointerEvent.StopPropagation();
+                return;
+            }
             if (button < 0 || battleController?.CameraController == null || battleController.Runtime == null)
             {
                 return;
@@ -150,6 +162,7 @@ namespace ProjectWI.Battle
                 if (HasSquadSelection == true)
                 {
                     battleController.DeploySquads(selectedSquadIds, worldPosition);
+                    battleController.ShowOrderPing(worldPosition, false);
                     commandFeedbackLabel.text = Text("UI_BATTLE_DEPLOY_MOVED", selectedSquadIds.Count);
                 }
                 return;
@@ -158,6 +171,7 @@ namespace ProjectWI.Battle
             if (IsControllingHero == true && clickedEnemy == false)
             {
                 battleController.OrderControlledHeroMove(worldPosition);
+                battleController.ShowOrderPing(worldPosition, false);
                 return;
             }
             if (HasSquadSelection == false)
@@ -168,10 +182,12 @@ namespace ProjectWI.Battle
             if (clicked != null && clicked.Side != playerSide)
             {
                 battleController.OrderSquadsAttack(selectedSquadIds, clicked.HeroId);
+                battleController.ShowOrderPing(clicked.Position, true);
                 commandFeedbackLabel.text = Text("UI_BATTLE_ORDER_ATTACK", clicked.DisplayName, selectedSquadIds.Count);
                 return;
             }
             battleController.OrderSquadsMove(selectedSquadIds, worldPosition);
+            battleController.ShowOrderPing(worldPosition, false);
             commandFeedbackLabel.text = Text("UI_BATTLE_ORDER_MOVE", selectedSquadIds.Count);
         }
 
@@ -299,7 +315,22 @@ namespace ProjectWI.Battle
             return Text("UI_BATTLE_SELECT_INFO",
                 Text(character.Grade == WICharacterGrade.Hero ? "UI_SELECTION_HERO" : "UI_SELECTION_COMMON"),
                 character.DisplayName, character.Role, character.Health, character.MaxHealth, character.Mana, character.MaxMana,
-                squad == null ? 0f : squad.Morale, GetTerrainName(character.Position));
+                squad == null ? 0f : squad.Morale, GetTerrainName(character.Position), GetArchetypeName(character.Archetype));
+        }
+
+        // 병과 이름과 한 줄 특징을 반환합니다.
+        private string GetArchetypeName(WIBattleArchetype archetype)
+        {
+            switch (archetype)
+            {
+                case WIBattleArchetype.Shield: return Text("UI_BATTLE_ARCHETYPE_SHIELD");
+                case WIBattleArchetype.Charger: return Text("UI_BATTLE_ARCHETYPE_CHARGER");
+                case WIBattleArchetype.Skirmisher: return Text("UI_BATTLE_ARCHETYPE_SKIRMISHER");
+                case WIBattleArchetype.Archer: return Text("UI_BATTLE_ARCHETYPE_ARCHER");
+                case WIBattleArchetype.Caster: return Text("UI_BATTLE_ARCHETYPE_CASTER");
+                case WIBattleArchetype.Support: return Text("UI_BATTLE_ARCHETYPE_SUPPORT");
+                default: return Text("UI_BATTLE_ARCHETYPE_COMMANDER");
+            }
         }
 
         // 패널 좌표를 카메라 변환에 사용할 화면 좌표(좌하단 원점)로 바꿉니다.

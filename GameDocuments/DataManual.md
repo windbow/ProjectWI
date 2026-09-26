@@ -9,7 +9,7 @@
 
 ## 실제 조작 검증 메모 (2026-09-20)
 
-- 기존 자동 저장에서 아레스 영지관 배정 → 새 전투단 대장 편성 → 카르디아 출정 → 월 진행·재불러오기를 실제 클릭으로 확인했습니다. 출정 뒤에도 영지관과 예상 성과 +8이 유지됩니다.
+- 기존 자동 저장에서 키리엔 영지관 배정 → 새 전투단 대장 편성 → 카르디아 출정 → 월 진행·재불러오기를 실제 클릭으로 확인했습니다. 출정 뒤에도 영지관과 예상 성과 +8이 유지됩니다.
 - 인재 활동의 개인 훈련 버튼은 숨겨지며 4월 월보에서 자동 훈련 13명 성장을 확인했습니다.
 - 위임·군사·월간 보고·사건 선택 화면은 처음 요청할 때도 한 번에 열립니다. 미결 사업 사건 또는 미결 전투가 있으면 후속 처리가 필요합니다. 월간 내정 최종 수치 상승은 이번 실조작 검증 범위에서 미확인입니다.
 
@@ -98,14 +98,14 @@
 
 현재 기획 기준은 `GameDesign.md`이며 전략 게임 데이터는 ScriptableObject에서 편집합니다. 방치형 던전 데이터는 사용하지 않습니다.
 
-- 아레스 메인의 자동 플레이 전투단 상한은 보유 성 1~3개 2개, 4~11개 3개, 12~23개 4개, 24개 이상 5개입니다. 성이 늘어날수록 영입한 일반 인물을 더 많은 원정대와 수비대로 운용하지만, 6개 이상은 부대 전투력 분산 때문에 현재 사용하지 않습니다.
+- 키리엔 메인의 자동 플레이 전투단 상한은 보유 성 1~3개 2개, 4~11개 3개, 12~23개 4개, 24개 이상 5개입니다. 성이 늘어날수록 영입한 일반 인물을 더 많은 원정대와 수비대로 운용하지만, 6개 이상은 부대 전투력 분산 때문에 현재 사용하지 않습니다.
 - 24성 이상에서는 발도르 멸망을 최종 캠페인으로 취급합니다. 발도르와 전쟁이 끝났다면 지역·점령 사건에서 영향력을 소비하지 않고 선전포고 비용 10을 먼저 모으며, 도달 가능한 발도르 접경을 우선합니다. 공세형이 완전 집결 상태로 36개월 동안 안전선 115%를 넘지 못하면 100% 전력 기준의 위험한 최종 공세를 허용합니다.
 - 자동 플레이의 동시 전쟁 2개 제한은 외교 목록의 전쟁 상태 전체가 아니라 현재 플레이어 영토와 실제로 맞닿고 전투단이 도달 가능한 전선만 셉니다. 제거된 세력이나 고립된 과거 전쟁 때문에 새 전선 개방이 막히지 않습니다.
 - 후반에도 전투단은 기본적으로 하나의 전략 집결지에 모여 합동 공격합니다. 병행 전선은 부대 이동·피로와 전력 분산으로 장기 결과를 악화시켜 현재 사용하지 않습니다.
-- 아레스 메인의 승리 조건은 발도르 보유 성이 0개가 되는 순간입니다. 다른 세력의 성을 모두 점령할 필요는 없습니다. 프리 시나리오는 기존처럼 한 세력의 전체 성 점령을 승리 조건으로 유지합니다.
+- 키리엔 메인의 승리 조건은 발도르 보유 성이 0개가 되는 순간입니다. 다른 세력의 성을 모두 점령할 필요는 없습니다. 프리 시나리오는 기존처럼 한 세력의 전체 성 점령을 승리 조건으로 유지합니다.
 
 - `ProjectWI > Tools > Campaign Auto Test Lab`의 `시작 시드`와 `반복 횟수`로 같은 조건을 최대 20회 반복할 수 있습니다. 결과 행은 평균과 최소~최대 범위를 짧게 표시하며 `상세` 버튼은 평균/중앙값/범위를 모두 표시합니다. 9조합 전체 비교에서 반복 5를 선택하면 총 45개 독립 캠페인을 실행하므로 시간이 오래 걸릴 수 있습니다.
-- 아레스 메인 공세형 자동 플레이가 원정 검토일에 3회 연속 공격 가능한 목표를 찾지 못하면 다른 전쟁 접경으로 목표를 회전합니다. 전쟁 중인 대안이 없고 플레이어의 활성 전쟁이 1개뿐이면 중립·우호 접경 중 공략 점수가 가장 낮은 진영에 선전포고하며 영향력 10을 실제 규칙대로 지불합니다. 불가침·동맹 관계는 자동으로 파기하지 않습니다.
+- 키리엔 메인 공세형 자동 플레이가 원정 검토일에 3회 연속 공격 가능한 목표를 찾지 못하면 다른 전쟁 접경으로 목표를 회전합니다. 전쟁 중인 대안이 없고 플레이어의 활성 전쟁이 1개뿐이면 중립·우호 접경 중 공략 점수가 가장 낮은 진영에 선전포고하며 영향력 10을 실제 규칙대로 지불합니다. 불가침·동맹 관계는 자동으로 파기하지 않습니다.
 
 - 자동 밸런스 반복 검증에서는 `WIAdministrationState.SimulationSeed`에 표본 번호를 지정합니다. 값 0은 실제 캠페인과 기존 저장의 기본값이며, 같은 시드·턴·전투 ID는 같은 전술 변동과 인물 운명 결과를 재현합니다.
 - 별도 수비 전투단이 없는 성도 주둔 인물 목록으로 패전 운명을 판정합니다. 여유 난이도는 사망 가중치가 항상 0이며, 표준·도전의 사망/포로/전향 가중치는 `difficultyDefinitions`에서 편집합니다.
@@ -117,7 +117,7 @@
 
 - 자동 캠페인의 월간 실행·내정 방침·영입 준비와 지표 집계는 `WICampaignAutoPlayer.cs`에서 편집합니다. 사업·관계·지역·점령·영입·유산 선택의 자동 해결과 정책별 점수는 `WICampaignAutoPlayer.Decisions.cs`, 전투단 생성·훈련·집결·아군 경로·공격 판정과 대기 전투 자동 해결은 `WICampaignAutoPlayer.Military.cs`에서 편집합니다. 실제 게임 규칙은 이 자동화 파일들에 복제하지 않고 `WIAdministrationTurnSystem`의 공개 API를 호출합니다.
 - 자동 캠페인의 균형·공세 정책은 최대 2개 전투단을 준비합니다. 첫 영토 확장만 같은 출발 성 전투단의 합산 전력이 목표 방어력의 80% 이상이면 원정을 허용하고, 이후에는 정책별 기존 안전선을 적용합니다. 정예 전투단에는 합동훈련을 반복 예약하지 않으며 평균 피로가 50을 넘으면 추가 훈련도 예약하지 않습니다.
-- 아레스 메인 자동 플레이는 4성부터 세 번째 전투단을 만들 수 있습니다. 손실 전투단은 현재 성에서 일반 등급 대기 인물을 우선 편입하고, 없으면 아군 영토 경로로 도달 가능한 가장 가까운 후방 성까지 이동해 일반 인물로 보충한 뒤 전략 목표의 집결지로 복귀합니다. 영웅 등급은 자동 보충 병사로 편입하지 않습니다.
+- 키리엔 메인 자동 플레이는 4성부터 세 번째 전투단을 만들 수 있습니다. 손실 전투단은 현재 성에서 일반 등급 대기 인물을 우선 편입하고, 없으면 아군 영토 경로로 도달 가능한 가장 가까운 후방 성까지 이동해 일반 인물로 보충한 뒤 전략 목표의 집결지로 복귀합니다. 영웅 등급은 자동 보충 병사로 편입하지 않습니다.
 - 유지 중인 전략 목표의 `AssemblyCastleId`는 목표와 인접한 아군 성 가운데 현재 전투단 전력이 가장 큰 성으로 매월 다시 계산합니다. 점령 변화나 패전 뒤 기존 집결지가 낡은 상태로 남지 않게 하며, 목표 성 자체의 선택 기준은 수비·반격 위험·경제 가치 점수를 유지합니다.
 - 외교 관계 변경, 동맹 원조, 포로 몸값·교환, 공동 공격과 외교 대기시간·월간 AI 관계 개선 코드는 `WIAdministrationTurnSystem.Diplomacy.cs`에서 편집합니다. 다른 도메인 계산은 이 파일에 추가하지 않습니다.
 - 자동 캠페인의 포로 대응은 `WICampaignAutoPlayer.Prisoners.cs`에서 편집합니다. 유효 영웅을 먼저 구조하고, 상대 포로가 있으면 일반 등급부터 맞교환합니다. 교환 상대가 없으면 영웅은 지불 가능한 몸값을 우선 지불하며 일반 등급은 권장 인원 부족과 정책별 비축선을 모두 만족할 때만 구조합니다.
@@ -206,7 +206,7 @@
 
 - 숨은 격자 이동은 2026-09-25에 제거했습니다. 캐릭터 밀도를 조절할 때 Sprite Scale을 변경하지 말고 `Formation Row Spacing`(현재 0.8)과 `Minimum Unit Spacing`(현재 0.75)을 조정합니다.
 
-- A 근거리 기준 아레스 전투 Sprite는 `Ares_Battle_1WU_A_OutlineBake_V1.png`입니다. 외곽선을 포함한 가시 실루엣 높이 256px, PPU 256, Transform Scale 1을 한 세트로 유지해야 정확히 1월드 유닛입니다. 파일에 투명 여백이나 외곽선을 추가하면 최종 가시 높이를 다시 256px로 정규화합니다.
+- A 근거리 기준 키리엔 전투 Sprite는 `Ares_Battle_1WU_A_OutlineBake_V1.png`입니다. 외곽선을 포함한 가시 실루엣 높이 256px, PPU 256, Transform Scale 1을 한 세트로 유지해야 정확히 1월드 유닛입니다. 파일에 투명 여백이나 외곽선을 추가하면 최종 가시 높이를 다시 256px로 정규화합니다.
 
 - 공용 캐릭터 접지 그림자는 `Assets/Art/Battle/Effects/WI_CharacterShadow_Oval_V1.png`입니다. 기본 크기는 256×128, 256 PPU이며 캐릭터 체형에 따라 Transform X Scale만 조정합니다. 강도를 높일 때 Sprite 자체를 중복 배치하지 말고 SpriteRenderer 색상 알파를 조정합니다.
 - 접지 그림자는 `WIBattleCharacter.prefab`의 미리 배치된 `GroundShadow` 자식에서 관리합니다. 런타임에 새 오브젝트를 만들지 않으며 `WIBattleCharacterView`가 본체의 Y 깊이 정렬보다 1 낮은 순서를 자동 적용합니다.
@@ -222,7 +222,7 @@
 - 씬: `Assets/Scenes/BattleScene.unity`
 - `Global Light 2D`는 중립 백색 전역광이며 현재 강도는 1입니다.
 - `Battle Lighting/Arena Key Light 2D`와 `Arena Fill Light 2D`는 향후 노멀맵 검증용으로 보존하지만 현재 비활성입니다.
-- 현재 지면은 Unlit 머티리얼을 사용하며 아레스와 환경물에는 전용 노멀맵이 없습니다.
+- 현재 지면은 Unlit 머티리얼을 사용하며 키리엔과 환경물에는 전용 노멀맵이 없습니다.
 - 화면 전체에 노란색이나 주황색 색조를 입히지 않으며, 그림자는 대형 장애물에 `ShadowCaster2D`를 별도로 배치하기 전까지 비활성 상태를 유지합니다.
 
 ## UGUI 캠페인 타이틀 편집
@@ -271,7 +271,7 @@
 - `CampaignEndings`: 점령 통치 이력으로 판정하는 화합·군정 통일 결말의 제목과 설명
 - `CampaignVariants`: 시작 영토 또는 핵심 관계만 변경하는 반복 플레이 시작 조건
 
-시작 변형은 `Classic`, `BorderGarrison`, `DividedCourt` 세 종류입니다. 국경 수비대는 `castle_01`을 림가르드 소유로 바꾸며, 분열된 궁정은 아레스·알덴의 친애를 갈등으로 덮어씁니다. 난이도와 시작 자원은 변형과 무관합니다.
+시작 변형은 `Classic`, `BorderGarrison`, `DividedCourt` 세 종류입니다. 국경 수비대는 `castle_01`을 림가르드 소유로 바꾸며, 분열된 궁정은 키리엔·알덴의 친애를 갈등으로 덮어씁니다. 난이도와 시작 자원은 변형과 무관합니다.
 
 캠페인 시작 화면은 940px 폭과 최소 650px 높이의 고정 패널을 사용합니다. 캠페인 소개는 제목 장식 아래에서 난이도 제목 바로 위에 배치하고, 난이도·시작 조건 카드의 설명은 여러 문장일 때 마침표 뒤에서 줄을 바꿉니다. 난이도 안내 문구는 하단 프레임 안쪽 여백을 확보합니다.
 
@@ -281,7 +281,7 @@
 
 지역 사건은 림가르드·발도르·아이언하트·실바니아·네크로폴리스의 대표 수도에 하나씩 있습니다. 플레이어가 해당 성을 소유하고 최소 턴을 넘기면 미발생 사건 한 건이 월간 보고에 등록되며, 완료 ID를 저장해 반복 발생을 막습니다. 자원 비용을 감당할 수 없는 선택지는 비활성화됩니다.
 
-새 캠페인은 5개 진영에 핵심 관계 한 쌍씩을 생성합니다. 아레스·알덴과 브롬·테인은 친애, 리리아·가레스·모리건·님·테론·베일은 갈등으로 시작합니다. 두 인물이 플레이어 소유의 같은 성에 있으면 관계 단계에 맞는 선택 사건 후보가 생성됩니다.
+새 캠페인은 5개 진영에 핵심 관계 한 쌍씩을 생성합니다. 키리엔·알덴과 브롬·테인은 친애, 리리아·가레스·모리건·님·테론·베일은 갈등으로 시작합니다. 두 인물이 플레이어 소유의 같은 성에 있으면 관계 단계에 맞는 선택 사건 후보가 생성됩니다.
 
 첫 목표 `rimgard_restore_capital`은 림가르드 성의 번영을 시작값 45에서 50 이상으로 높이는 조건입니다. 완료 시 금화 200, 마나 50, 영향력 20을 지급하며 완료 ID는 저장 데이터에 유지됩니다.
 
@@ -322,7 +322,7 @@ AI 성향은 부국, 개발, 수비, 공세와 모략입니다. 전선 판단에
 
 전투단은 병사가 아닌 `[영웅]`과 `[일반]` 인물로 구성합니다. 대장, 전위, 근접, 원거리, 마법과 지원 역할을 사용합니다. 이동, 숙련, 보급, 점령 불안, 후퇴와 재편성도 캠페인 상태에 저장합니다.
 
-전투 발생 시 `WIBattleSessionState`에 전장 성, 공격·수비 진영, 참가 전투단과 인물, 양측 전력 스냅샷을 저장합니다. 아레스 메인에서는 같은 출발 성에서 동일한 `StrategicTargetCastleId`로 동시에 도착한 전투단을 `AttackerArmyIds`에 묶어 공동 공격 전력을 합산합니다. 기존 저장의 주 공격군은 `AttackerArmyId`로 계속 읽을 수 있습니다. 전략 자동 판정과 실시간 전투는 동일한 `SubmitBattleResult()` API를 사용하며 완료된 세션에는 결과를 다시 제출할 수 없습니다.
+전투 발생 시 `WIBattleSessionState`에 전장 성, 공격·수비 진영, 참가 전투단과 인물, 양측 전력 스냅샷을 저장합니다. 키리엔 메인에서는 같은 출발 성에서 동일한 `StrategicTargetCastleId`로 동시에 도착한 전투단을 `AttackerArmyIds`에 묶어 공동 공격 전력을 합산합니다. 기존 저장의 주 공격군은 `AttackerArmyId`로 계속 읽을 수 있습니다. 전략 자동 판정과 실시간 전투는 동일한 `SubmitBattleResult()` API를 사용하며 완료된 세션에는 결과를 다시 제출할 수 없습니다.
 
 ## 5. 실시간 전투 설정
 
@@ -335,15 +335,22 @@ AI 성향은 부국, 개발, 수비, 공세와 모략입니다. 전선 판단에
 - 인물 최소 간격과 충돌 해소 강도
 - 근접 밀치기 거리와 위치 사수 밀치기 저항
 - 진형 이탈 후 복귀 속도
-- `Battle Sprite Faces Right`: 전투 캐릭터 원본 그림이 오른쪽을 보면 켭니다. 현재 아트(예: 아레스)는 왼쪽을 보므로 꺼져 있습니다. 전투 중 이미지는 이동 방향 또는 표적 쪽으로 자동 반전됩니다.
+- `Battle Sprite Faces Right`: 전투 캐릭터 원본 그림이 오른쪽을 보면 켭니다. 현재 아트(예: 키리엔)는 왼쪽을 보므로 꺼져 있습니다. 전투 중 이미지는 이동 방향 또는 표적 쪽으로 자동 반전됩니다.
 - 분대·측면: `Flank Damage Multiplier`(측면 근접 피해 1.25), `Rear Damage Multiplier`(후방 근접 피해 1.5), `Flank Front Dot`(정면 판정 기준 0.5), `Move Order Arrival Distance`(이동 명령 도착 판정 0.3). 분대는 전투 시작 시 전투단의 영웅마다 자동 편성됩니다.
 - 사기: `Morale Loss Per Ally Down`(10), `Morale Loss Leader Down`(35), `Morale Loss Side On Leader Down`(8), `Morale Loss Flank Hit`(1), `Morale Loss Rear Hit`(2.5), `Morale Regen Per Second`(1), `Rout Recovery Per Second`(4), `Rout Recover Threshold`(40). 사기 상한은 100 고정입니다.
 - 표시: `Side Marker Alpha`(진영 발밑 링 불투명도 0.95, 색은 진영 임시 색상), `Routing Tint`(퇴각 인물 색), `Skill Range Preview Color`·`Skill Area Preview Color`(스킬 지정 미리보기 색). 발밑 링 이미지는 `WIBattleCharacter.prefab`의 `SideMarker` 자식에서 교체합니다.
 - 영웅 스킬의 `Area Radius`: 범위 피해 스킬을 지정 위치에 쓸 때의 효과 반경이며 `Range`는 시전 가능 거리입니다. 위치를 지정하지 않고 호출하면(테스트 등) 기존처럼 시전자 주변 `Range` 반경에 적용됩니다.
 - 배치: `Use Deployment Phase`(배치 단계 사용), `Deployment Zone Depth Ratio`(자기 진영 가장자리에서 배치 가능한 전장 가로 비율 0.4), `Deployment Zone Color`.
+- 맵 크기: `Arena Prefab Scale`(1.35)은 전장 그림(프리팹) 배율, `Arena Size`(32×18)는 인물이 움직일 수 있는 논리 전장, `Arena Background Size`(48.6×27.34)는 카메라 이동 경계입니다. 전장 그림을 바꾸거나 배율을 바꾸면 세 값을 함께 맞추고, 논리 전장이 그림의 흙바닥 안에 들어오는지 확인합니다.
+- 카메라: `Camera Minimum/Middle/Maximum Zoom`(6/9/13.5, 최대는 전장 전체), `Camera Pan Speed`(10, 확대 배율에 비례해 빨라짐). 조작은 WASD·방향키, 가운데 버튼 드래그, 휠(커서 위치 기준 줌), Home입니다.
+- 시작 위치·진형: `Formation Front Line Distance`(11)는 전장 중앙에서 각 진영 전열 앞줄까지의 거리입니다. 분대는 전투단 단위이며 `Squad Max Size`(8)를 넘으면 나뉩니다. 분대 블록은 `Squad Block Files`(한 줄 인원 3), `Squad Member Spacing`(0.85), 블록 사이 `Squad Gap`(1.2), 전열·후열 사이 `Formation Line Gap`(1.5)로 조정합니다. `Formation Jitter`(0.12)는 자리 흔들림, `Move Speed Variance`(0.06)는 개인 이동 속도 편차입니다. 배치 구역 사각형 이미지는 `WIBattleZoneRectMarker.prefab`(Sprite `WI_ZoneRect_V1`)에서 교체하며 BattleScene `BattleRuntime`의 `Rect Zone Marker Prefab`에 연결되어 있어야 합니다.
 - 지형: `Terrain Zones`에 종류(HighGround·Forest·Narrow), 중심, 반경을 추가·편집합니다. 전장 아트의 언덕·숲·길 위치에 맞춰 조정하세요. 효과 수치는 `High Ground Range Multiplier`(1.25), `High Ground Damage Multiplier`(1.1), `Forest Projectile Damage Multiplier`(0.6), `Forest Move Speed Multiplier`(0.8), `Narrow Melee Slot Count`(2), 표시 색은 `High Ground/Forest/Narrow Zone Color`입니다.
 - 직접 지휘: `Follow Slack Distance`(1.2) 이상 영웅 곁 자리에서 벌어진 분대원은 교전을 끊고 따라갑니다.
 - 구역·스킬 범위 원 이미지는 `Assets/Prefabs/Battle/WIBattleZoneMarker.prefab`(Sprite `WI_ZoneCircle_V1`)에서 교체하며 BattleScene `BattleRuntime`의 `Zone Marker Prefab`에 연결되어 있어야 합니다.
+- 분대 결속: `Formation Engage Leash`(교전 중 블록 자리 이탈 허용 1.2), `Cohesion Wait Distance`(뒤처짐 기다림 기준 1.2), `Cohesion Max Wait Seconds`(최대 기다림 1.5초), `Charge Sprint Distance`(4)·`Charge Sprint Multiplier`(1.35, 돌격 분대 돌진). 결속 이동은 전진·집중·분산 명령에만 적용됩니다.
+- 병과(Class Archetypes 항목): `Class Profiles`에서 직업마다 병과(Shield·Charger·Skirmisher·Archer·Caster·Support·Commander)와 체력·피해·이동·공격 간격·사거리 배율을 정합니다. 병과 규칙 수치: 돌격 `Charge Min Distance`(2.5)·`Charge Damage Multiplier`(2)·`Charge Knockback Multiplier`(3)·`Charge Morale Damage`(4), 방진 `Brace Front Damage Multiplier`(0.6)·`Brace Flank Extra Multiplier`(1.25), 유격 `Skirmisher Rear Multiplier`(2)·`Skirmisher Backline Preference`(3), 궁병 `Volley Splash Radius`(0.8)·`Arrow Arc Height`(1.4), 술사 `Caster Splash Radius`(1)·`Caster Splash Damage Ratio`(0.5), 지원 `Support Heal Power`(12)·`Support Heal Threshold`(0.75), 지휘 `Command Aura Radius`(4)·`Command Aura Morale Regen`(2)·`Command Aura Loss Multiplier`(0.7), `Shake Charge Impact`(0.25). 원거리 여부는 기존처럼 전투단 역할(Role)이 정합니다.
+- 게임필(Game Feel 항목): `Walk Bob Height/Frequency`, `Walk Tilt Degrees`(걷기), `Attack Lunge Distance/Duration`(근접 내딛기), `Hit Flash Color/Duration`, `Hit Squash Amount`(피격), `Death Fall Duration/Degrees`(쓰러짐), `Spawn Pop Duration`(증원 등장), `Selection Pulse Speed/Amount`(선택 맥동), `Camera Shake Max Offset/Decay`와 사건별 `Shake*`(화면 흔들림), 사건별 `Hit Stop*`(짧은 정지), `Order Ping Duration/Move Color/Attack Color`(명령 지점 원). 0으로 두면 해당 연출이 꺼집니다.
+- 캐릭터 그림은 `WIBattleCharacter.prefab`의 `Body` 자식 SpriteRenderer에 있습니다. 루트에는 SpriteRenderer가 없어야 하며 `Body`가 없으면 오류를 기록합니다.
 - 이동·교전: `Fixed Tick Seconds`(고정 틱, 0.05), `Melee Slot Count`(한 인물을 동시에 근접 공격할 수 있는 수, 4), `Melee Slot Distance Ratio`(근접 사거리 대비 슬롯 거리, 0.8), `Melee Slot Angle Step`(슬롯 부채꼴 간격, 45°), `Retarget Interval`(표적 재평가 주기, 0.5초), `Full Slot Target Penalty`(슬롯이 가득 찬 적 회피 거리 가중, 3), `Ranged Preferred Range Ratio`(원거리 정지 사거리 비율, 0.85), `Ranged Retreat Distance`(재장전 중 후퇴 시작 거리, 1.6), `Engaged Collision Mass`(교전 중 인물의 충돌 질량 배수, 3)
 - 명령 설정: `Protect Threat Radius`(후열 보호가 위협으로 보는 원거리·지원 아군 주변 거리, 3), `Protect Guard Distance`(보호 대상 앞에 서는 거리, 1.2), `Spread Spacing Multiplier`(분산 시 아군 간격 배율, 2), `Rally Formation Scale`(집결 시 대장 주변 진형 축소 비율, 0.5), `Retreat Escape Margin`(후퇴 이탈 판정 가장자리 거리, 0.3)
 - `Hero Skills`(영웅 전용, 직업 공용 기술 없음): 영웅 ID, 표시명, 범위 피해·아군 회복·지휘 강화 유형, 마나 비용, 위력, 범위와 재사용 대기시간
@@ -467,7 +474,7 @@ AI 판단 근거는 최근 `WITurnSummary.AIReasonReports`에만 저장합니다
 
 `WICampaignAutoPlayer`는 재미 검증용 에디터 자동 실행기입니다. 성장형·균형형·공세형 정책으로 24·60·120개월을 진행하며 대기 전투와 사업·관계·지역·점령·영입·영웅 흔적 선택을 모두 해결합니다. 이 실행기는 전투 수, 승패, 원정, 소유권 변화, 최종 영토와 미해결 항목을 기록하지만 감정적 재미 점수를 판정하지 않습니다.
 
-UI 후속 작업은 `GameDocuments/UIHandoffReport.md`와 `GameDocuments/UIConcepts`의 전략 지도·영지 관리 시안 두 장을 기준으로 합니다. UI 계층은 UXML에 정적으로 유지하고 C#에서는 데이터와 Sprite만 바인딩합니다. 기존 생성 이미지는 삭제하지 않습니다.
+UI 후속 작업은 `GameDocuments/UIConcepts`의 시안을 기준으로 합니다. 전략 지도는 `ProjectWI_World_UI_Concept.png`, 영지 관리는 `ProjectWI_Castle_Administration_UI_Concept.png`, 목표 상세는 `Objective_UI_Concept_V1.png`, 턴 후속 안내는 `TurnFollowup_UI_Concept_V1.png`입니다. UI 계층은 UGUI 프리팹에 정적으로 유지하고 C#에서는 데이터와 Sprite만 바인딩합니다. 기존 생성 이미지와 시안은 삭제하지 않습니다.
 
 캠페인 난이도의 `AI Candidate Window`는 AI가 점수순 상위 몇 후보까지 검토하는지를 결정합니다. 여유는 3, 표준은 2, 도전은 1이며 자원·수입·비용 보너스는 제공하지 않습니다. 사업 담당자, 연구, 인접 공격 성, 첩보 대상이 공통 선택 함수를 사용하고 턴과 고정 소금값으로 항상 재현 가능한 결과를 냅니다. 도전은 항상 1순위, 표준과 여유는 각 후보 범위 안에서 상황에 따라 차순위를 선택할 수 있습니다.
 
@@ -537,7 +544,7 @@ UI 후속 작업은 `GameDocuments/UIHandoffReport.md`와 `GameDocuments/UIConce
 
 ## 25. 1200명 로스터와 전략 자동 검증
 
-`ProjectWI > Data > Seed Mass Character Roster (200 Heroes, 1000 Commons)`는 고정 시드로 영웅 200명과 일반 인물 1000명을 다시 생성합니다. 아레스·리리아 등 핵심 영웅 8명과 핵심 일반 인물 6명은 원본 능력치, 특기, 초상화와 액티브 스킬 자격을 덮어써 보존합니다. 각 시나리오에는 영웅 60명과 일반 90명만 시작 성에 배치하며 나머지 1050명은 탐색·영입 후보로 남깁니다.
+`ProjectWI > Data > Seed Mass Character Roster (200 Heroes, 1000 Commons)`는 고정 시드로 영웅 200명과 일반 인물 1000명을 다시 생성합니다. 키리엔·리리아 등 핵심 영웅 8명과 핵심 일반 인물 6명은 원본 능력치, 특기, 초상화와 액티브 스킬 자격을 덮어써 보존합니다. 각 시나리오에는 영웅 60명과 일반 90명만 시작 성에 배치하며 나머지 1050명은 탐색·영입 후보로 남깁니다.
 
 전략 데이터베이스의 `전략 전투 전력 균형`에서 `Castle Defense Power Percent`, `Castle Stability Power Percent`, `Garrison Hero Power Percent`를 편집합니다. 현재 값은 성 방어 300%, 질서 50%, 주둔 인물 무력 60%입니다. 성 자체 방어 비중을 높이고 주둔 인물 비중을 제한하여 전투단 원정 전후 방어력이 급격히 바뀌는 현상을 줄입니다. 전략 자동 판정은 동률일 때 수비 성공으로 처리합니다.
 
@@ -617,14 +624,14 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 턴 진행은 `WIAdministrationUIController.Turn.cs`의 `BeginTurn`에서 미결 전투를 검사한 뒤 `ExecuteUGUITurnRoutine`을 실행합니다. 처리 안내·월간 보고·캠페인 결과·첫해 튜토리얼은 `WIAdministrationMonthlyReportUGUI.prefab`과 `WIAdministrationTurnFollowupUGUI.prefab`만 사용합니다.
 - 행정 런타임 컨트롤러는 더 이상 UI Toolkit 네임스페이스나 `UIDocument`, `VisualElement`, 동적 `CreateModal`을 사용하지 않습니다. 월드·영지 전환은 완성 UGUI 프리팹의 활성 상태를 바꾸고 모든 표시 데이터는 기능별 UGUI 스냅샷을 통해 갱신합니다.
 - `Assets/UI/Administration`의 UXML/USS는 과거 시안 비교 및 문서용 레거시 에셋으로만 남아 있으며 MainScene과 `WIAdministrationUI.prefab` 런타임에는 연결되지 않습니다. 과거 지도 연결선을 그리던 `WIMapConnectionLayer` 런타임 스크립트는 제거했고 레거시 UXML의 같은 위치는 일반 `VisualElement`로 치환했습니다.
-- 아레스는 `Ares_Portrait_Face_V1.png` 얼굴 초상화와 `Ares_Battle_1WU_A_OutlineBake_V1.png` 전투용 투명 전신을 사용합니다. `Ares_Battle_FullBody_V1.png`는 파생 제작용 고해상도 원본으로만 보존하며 애니메이션은 아직 적용하지 않습니다.
+- 키리엔은 `Ares_Portrait_Face_V1.png` 얼굴 초상화와 `Ares_Battle_1WU_A_OutlineBake_V1.png` 전투용 투명 전신을 사용합니다. `Ares_Battle_FullBody_V1.png`는 파생 제작용 고해상도 원본으로만 보존하며 애니메이션은 아직 적용하지 않습니다.
 - 전투 카메라는 참가자 수와 초기 진형 범위를 계산해 이를 포함하는 A(6)·B(8)·C(10) 중 한 단계로 시작합니다. 마우스 휠 한 번마다 인접 단계로만 이동하며 `Home` 키는 자동 계산된 시작 단계로 복원합니다.
 - Unity Editor 상단 `ProjectWI`와 `WI` 메뉴의 전체 기능, 실행 조건과 데이터·Prefab 변경 주의사항은 `GameDocuments/UnityToolMenuManual.md`를 기준으로 확인합니다.
 - 전투 전장은 `WI_BattleConfig.arenaPrefab`에 연결된 `WIBattleCharacterScaleArenaV6.prefab`을 사용합니다. 프리팹이 없을 때만 `arenaBackground`의 `Battle_FortressField_V5_4K`를 폴백으로 표시합니다.
 - 전투 HUD 프레임은 `Assets/Art/UI/Battle`에 상단 상태바, 캐릭터 정보, 명령바, 스킬바의 투명 단일 Sprite로 분리되어 있습니다. 이미지에는 문구·수치·초상화·스킬 아이콘이 포함되지 않으므로 UGUI의 TMP, Image와 Fill 컴포넌트를 위에 배치해 사용합니다.
 - 전투 HUD는 `Assets/UI/Battle/WIBattleHUD.uxml`의 네 고정 컨테이너가 `Assets/Art/UI/Battle`의 상단 상태·캐릭터 정보·명령바·스킬바 이미지를 직접 참조합니다. 프레임 내부의 문구와 버튼은 기존 `WIBattleHUDController`가 갱신하며, 배경 이미지 자체에는 게임 데이터가 포함되지 않습니다.
-- 전투 캐릭터 Transform은 `WI_BattleConfig`의 `Battle Sprite Scale = 1`을 사용합니다. 화면상 전신 크기는 알파 실루엣 높이 256px와 `256 PPU` 조합으로 통일하며 현재 아레스는 정확히 1유닛 높이입니다. `Arena Background Size`는 이동·충돌 판정 영역을 바꾸지 않고 배경 프리팹의 카메라 이동 범위를 정하며 현재 축척 검증 전장 기준은 `36×20`입니다.
-- 현재 축척 검증 전장은 `Assets/Prefabs/Battle/WIBattleCharacterScaleArenaV6.prefab`입니다. 아레스 약 1유닛 높이와 36×20.25 배경을 사용하며 카메라 C 단계는 10입니다. 정적 성벽·야영지·망루·방책과 접지 그림자를 하나의 완성 그림에 포함하고, 중앙은 큰 양각형 무늬 없이 넓은 저대비 흙 색면으로 유지합니다. 기존 V1~V5는 비교용으로 보존합니다.
+- 전투 캐릭터 Transform은 `WI_BattleConfig`의 `Battle Sprite Scale = 1`을 사용합니다. 화면상 전신 크기는 알파 실루엣 높이 256px와 `256 PPU` 조합으로 통일하며 현재 키리엔은 정확히 1유닛 높이입니다. `Arena Background Size`는 이동·충돌 판정 영역을 바꾸지 않고 배경 프리팹의 카메라 이동 범위를 정하며 현재 축척 검증 전장 기준은 `36×20`입니다.
+- 현재 축척 검증 전장은 `Assets/Prefabs/Battle/WIBattleCharacterScaleArenaV6.prefab`입니다. 키리엔 약 1유닛 높이와 36×20.25 배경을 사용하며 카메라 C 단계는 10입니다. 정적 성벽·야영지·망루·방책과 접지 그림자를 하나의 완성 그림에 포함하고, 중앙은 큰 양각형 무늬 없이 넓은 저대비 흙 색면으로 유지합니다. 기존 V1~V5는 비교용으로 보존합니다.
 - V4의 좌우 천막은 `Tent_1_NeutralDay_V2`, `Tent_3_NeutralDay_V2`를 사용합니다. 원본 파일은 비교·복구용으로 유지하며 밝기 통일 시 프리팹 SpriteRenderer의 Color를 중복 적용하지 않습니다.
 - 천막 접지 그림자는 각 천막의 `GroundShadow` 자식에서 조정합니다. 기본 Sorting Order는 -105이고 지면 -110보다 앞, 천막 -99보다 뒤에 표시됩니다. 그림자 강도는 SpriteRenderer 알파, 크기와 폭은 자식 Transform Scale로 조정하며 실시간 ShadowCaster2D는 사용하지 않습니다.
 - 현재 배경 제작 원본은 `Assets/Art/Battle/GroundLayers/CharacterScaleArenaV6/Battle_CompleteArena_CharacterScale_V6_4K.png`입니다. 1유닛 캐릭터보다 훨씬 작은 표면 디테일과 넓은 회갈색 흙 색면을 사용하며 1920×1080 네 장으로 픽셀 무손실 분할했습니다. 106.6667 PPU, Mipmap 비활성, Bilinear, Clamp, 무압축을 사용합니다.
@@ -638,7 +645,7 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - `Battle_FortressField_V5_4K`는 `arenaPrefab`이 없을 때 사용하는 폴백 Sprite이므로 유지합니다.
 - 전투 카메라의 이동 경계는 `arenaBackgroundSize`를 사용합니다. 기본 줌에서는 큰 맵의 일부를 보며 WASD·방향키로 이동할 수 있고, 최대 줌아웃에서는 더 넓은 범위를 확인합니다. 실제 전투 판정 영역 `arenaSize`는 이번 단계에서 변경하지 않았습니다.
 - 과거 대형 청크 실험 원본과 조립 미리보기는 `Assets/TrashAsset/Art/Battle/Backgrounds` 아래에 보관합니다.
-- 아레스의 `Ares_Battle_FullBody_V1.png`는 고해상도 원본으로만 보존합니다. 실제 전투는 `Ares_Battle_1WU_A_OutlineBake_V1.png`를 Transform Scale 1, 256 PPU로 사용해 외곽선 포함 가시 높이 1유닛으로 표시합니다. Mipmap 활성, Bilinear, Alpha Is Transparency, 무압축으로 임포트하며 `WI/Battle/Configure Ares Battle Sprite Defaults` 메뉴로 동일 설정을 다시 적용할 수 있습니다. 다른 캐릭터의 변환 절차는 `BattleSceneAssetSettingsGuide.md` 3.2를 따릅니다.
+- 키리엔의 `Ares_Battle_FullBody_V1.png`는 고해상도 원본으로만 보존합니다. 실제 전투는 `Ares_Battle_1WU_A_OutlineBake_V1.png`를 Transform Scale 1, 256 PPU로 사용해 외곽선 포함 가시 높이 1유닛으로 표시합니다. Mipmap 활성, Bilinear, Alpha Is Transparency, 무압축으로 임포트하며 `WI/Battle/Configure Ares Battle Sprite Defaults` 메뉴로 동일 설정을 다시 적용할 수 있습니다. 다른 캐릭터의 변환 절차는 `BattleSceneAssetSettingsGuide.md` 3.2를 따릅니다.
 - 전장 전용 검토 후보 `Ares_Battle_Unit_V1.png`는 기존과 비슷한 약 7등신 비율을 유지한 256×384 투명 Sprite입니다. 실제 인물 높이 328px와 328 PPU를 사용하며, 검토 확정 전까지 `WIHeroDefinition.battleSprite`에는 연결하지 않습니다.
 - 현재 검증 데이터의 전체 캐릭터 1200명은 `Ares_Battle_1WU_A_OutlineBake_V1.png`를 공용 `battleSprite`로 사용합니다. 과거 일괄 배정·해제 테스트 메뉴는 데이터 훼손 위험을 줄이기 위해 제거했습니다.
 - 30대30 밀도 검증은 Unity 메뉴 `ProjectWI/Verification/Start 30v30 Battle Density Test`로 실행합니다. 캠페인 저장과 분리된 테스트 세션에 양측 영웅 1명·커먼급 29명을 자동 편성하고 MainScene에서 BattleScene으로 진입합니다.
@@ -670,15 +677,15 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - `WICampaignVariantDefinition.castlePlacements`: 시나리오 전용 성 소유권, 정규화 지도 좌표, 인접 성 목록을 편집합니다.
 - `playerStartingCastleId`: 기존 플레이어 시작 영웅을 모을 시나리오 시작 성 ID입니다.
 - `valdorAttackIntervalMonths`: 해당 시나리오에서 발도르가 공격 출정을 검토하는 월 간격입니다.
-- `aiPreservationFactionId`: 다른 AI의 침식으로부터 보존할 진영 ID입니다. 아레스 메인은 `valdor`를 사용하고 프리·예약 시나리오는 비워 둡니다.
-- `valdorAIPreservationCastleCount`: 보존 대상 진영에 허용하는 최소 잔존 성 수입니다. `0`이면 제한하지 않으며 아레스 메인은 `36`을 사용합니다. 필드 이름은 기존 데이터 호환을 위해 유지하지만 실제 대상 진영은 `aiPreservationFactionId`에서 결정합니다. 플레이어의 공격에는 적용되지 않습니다.
+- `aiPreservationFactionId`: 다른 AI의 침식으로부터 보존할 진영 ID입니다. 키리엔 메인은 `valdor`를 사용하고 프리·예약 시나리오는 비워 둡니다.
+- `valdorAIPreservationCastleCount`: 보존 대상 진영에 허용하는 최소 잔존 성 수입니다. `0`이면 제한하지 않으며 키리엔 메인은 `36`을 사용합니다. 필드 이름은 기존 데이터 호환을 위해 유지하지만 실제 대상 진영은 `aiPreservationFactionId`에서 결정합니다. 플레이어의 공격에는 적용되지 않습니다.
 - 전략 데이터베이스의 `Aggressive AI Attack Power Percent`와 `Standard AI Attack Power Percent`는 AI가 원정을 시작할 최소 예상 전력 비율입니다. 현재 공세 성향은 방어 전력의 90%, 나머지 성향은 105%를 요구합니다.
-- 아레스 메인은 프로스트혼 단독 시작, 프로스트혼-카르디아-룬포지/브론즈게이트 진출 연결, 발도르 24개월 공격 주기를 사용하며 프리 시나리오는 기본 마스터 배치를 사용합니다.
+- 키리엔 메인은 프로스트혼 단독 시작, 프로스트혼-카르디아-룬포지/브론즈게이트 진출 연결, 발도르 24개월 공격 주기를 사용하며 프리 시나리오는 기본 마스터 배치를 사용합니다.
 - `overrideInitialStats`: 시나리오 전용 첫 관문처럼 시작 성 수치를 별도로 지정할 때 사용합니다. 현재 카르디아만 방어 10·질서 20을 사용합니다.
 - `recruitableHeroIds`: 성에 귀속된 인재 탐색 풀입니다. 해당 성에 있는 인물이 탐색할 때 귀속 인재를 먼저 발견합니다.
 - 월드 UI는 `WIAdministrationWorldUGUI.prefab` 하나만 사용합니다. 성 소유 세력·좌표·연결은 프리팹이 아니라 선택한 시나리오의 `castlePlacements` 데이터와 성 마스터 데이터에서 결정합니다.
 - Unity Inspector에서 `WI_AdministrationDatabase`의 `Campaign Variants`를 펼쳐 대상 시나리오의 `Castle Placements` 항목을 편집합니다. `Castle Id`는 성 식별자, `Faction Id`는 초기 소유 세력, `Override Map Position`과 `Normalized Map Position`은 위치, `Override Connections`와 `Adjacent Castle Ids`는 연결을 뜻합니다.
-- 편집 경로는 Project 창의 `Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset` → Inspector의 `Campaign Variants` → `Ares Main` → `Castle Placements`입니다.
+- 편집 경로는 Project 창의 `Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset` → Inspector의 `Campaign Variants` → `Kyrien Main` → `Castle Placements`입니다.
 - 성 위치는 `Override Map Position`을 체크하고 `Normalized Map Position`을 수정합니다. X는 0이 왼쪽·1이 오른쪽이며, Y는 0이 위쪽·1이 아래쪽입니다.
 - 성 연결은 두 성 모두 `Override Connections`를 체크하고 서로의 `Castle Id`를 `Adjacent Castle Ids`에 추가합니다. 한쪽만 입력하면 표시나 이동 판정이 비대칭이 될 수 있습니다.
 - 초기 소유권은 해당 배치 행의 `Faction Id`를 `rimgard`, `valdor`, `ironheart`, `sylvanroad`, `necropolis` 중 하나로 입력합니다.
@@ -686,8 +693,8 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 # 시나리오 인물 배치와 AI 영입
 
 - `WI_AdministrationDatabase`의 `campaignVariants > characterPlacements`에서 시나리오별 시작 인물의 `castleId`, `heroId`, `governor`를 편집합니다.
-- `nonPlayerRecruitmentEnabled`가 꺼진 아레스 메인에서는 플레이어 외 세력이 영입하지 않습니다. 켜진 프리 시나리오에서는 비플레이어 세력도 미고용 재야 인재를 고용합니다.
-- `ProjectWI/Data/Build Scenario Character Placements` 메뉴는 현재 1200명 중 영웅 60명과 일반 90명, 총 150명을 각 시나리오 데이터에 다시 저장합니다. 아레스 메인의 프로스트혼은 영웅 2명과 일반 인물 2명, 총 4명으로 고정되고 카르디아는 추가 자동 배치에서 제외됩니다. 나머지 1050명은 재야 풀에 남습니다.
+- `nonPlayerRecruitmentEnabled`가 꺼진 키리엔 메인에서는 플레이어 외 세력이 영입하지 않습니다. 켜진 프리 시나리오에서는 비플레이어 세력도 미고용 재야 인재를 고용합니다.
+- `ProjectWI/Data/Build Scenario Character Placements` 메뉴는 현재 1200명 중 영웅 60명과 일반 90명, 총 150명을 각 시나리오 데이터에 다시 저장합니다. 키리엔 메인의 프로스트혼은 영웅 2명과 일반 인물 2명, 총 4명으로 고정되고 카르디아는 추가 자동 배치에서 제외됩니다. 나머지 1050명은 재야 풀에 남습니다.
 - 일반 등급은 영지관·성 사업·연구·탐색·영입·첩보를 담당할 수 없습니다. 승격 후 보유 특성으로 자격을 판정합니다. 교류·개인 훈련·개인 휴식·이동과 전투단 편성은 등급이나 업무 특성과 무관하며, 승격해도 새로운 업무 특성이 자동으로 생기지는 않습니다.
 # Campaign Auto Test Lab 상세 보기
 
@@ -718,7 +725,7 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 
 # 자동 플레이 다중 전선 집결
 
-- 아레스 메인의 자동 플레이는 4성부터 최대 3개 전투단을 운용합니다. 가장 약한 전투단을 제외한 원정 전력만으로 장기 목표의 안전선을 충족할 때에만 해당 전투단을 수비 예비대로 남깁니다.
+- 키리엔 메인의 자동 플레이는 4성부터 최대 3개 전투단을 운용합니다. 가장 약한 전투단을 제외한 원정 전력만으로 장기 목표의 안전선을 충족할 때에만 해당 전투단을 수비 예비대로 남깁니다.
 - 두 전투단만으로 안전선을 충족하지 못하면 예비대를 해제하고 세 전투단을 같은 목표의 집결 성으로 이동시킵니다.
 - 첫 확장 이후 공격 안전선은 내정형 140%, 균형형 120%, 공세형 115%입니다. 180개월부터 균형형·공세형은 장기 교착 해소를 위해 110%를 사용합니다.
 
@@ -732,7 +739,7 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 피로 70 이상인 대기 영웅은 개인 휴식을 우선하며 다른 영웅이 탐색·영입을 이어받습니다.
 - 자동 영입 목표 인원은 `12 + 플레이어 보유 성 수 × 4`입니다. 사망이나 영토 증가로 부족해지면 다시 충원합니다.
 - Campaign Auto Test Lab 상세에는 최근 판단 5건과 이유별 횟수, 휴식 횟수, 패전 회복 개월, 목표 변경, 공동 공격 전투 횟수, 최장 무원정, 최고 영웅 피로가 표시됩니다. 공동 공격 횟수는 CSV와 Markdown 내보내기에도 포함됩니다.
-- 아레스 메인 자동 플레이는 1~3성에서 전투단 2개, 4성부터 3개를 운용합니다. 가장 강한 전투단 하나는 적 전투단 전력이 큰 접경 성의 선제 수비대로 남고 나머지는 목표 성 앞에 집결합니다. 이동 중인 적이 아군 성을 목표로 하면 회복·원정보다 방어 증원을 우선합니다. `위협 대응 개월`과 `방어 증원 이동`은 Lab 상세와 내보내기에서 확인할 수 있습니다.
+- 키리엔 메인 자동 플레이는 1~3성에서 전투단 2개, 4성부터 3개를 운용합니다. 가장 강한 전투단 하나는 적 전투단 전력이 큰 접경 성의 선제 수비대로 남고 나머지는 목표 성 앞에 집결합니다. 이동 중인 적이 아군 성을 목표로 하면 회복·원정보다 방어 증원을 우선합니다. `위협 대응 개월`과 `방어 증원 이동`은 Lab 상세와 내보내기에서 확인할 수 있습니다.
 - 목표 성은 현재 수비 전력과 주변 반격 가능 전력을 비용으로, 번영·기술·성 규모를 가치로 계산해 가장 낮은 점수부터 선택합니다.
 - 같은 목표를 공격해 두 번 연속 패배하면 해당 성을 18개월 동안 피하고 다른 접경 목표를 검토합니다.
 - 회복 중인 전투단은 같은 성의 대기 일반 병사를 권장 규모까지 보충합니다. Lab에는 실제 보충 인원과 목표 포기 횟수가 표시됩니다.
@@ -801,12 +808,12 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - REPORT_UNOPPOSED_OCCUPATION: '무혈 점령 · {0}에 방어 병력이 없어 {1}이 전투 없이 점령했습니다.' 플레이어 관련 결과는 월간 보고 소식 맨 앞에 넣어 기존 두 개 소식 카드에서 확인할 수 있다. 새 UI 생성 없음.
 - 기존 저장의 빈 Pending 전투는 다음 전략 전투 처리 시 정리한다. 이미 진행 중인 실시간 전투를 중단하거나 저장 인물을 강제 재배치하지 않는다.
 - 검증: 접경 수비/무혈 점령 6개, 기존 UGUI 47개, 메인 발도르 초기 공격 주기 1개 총 54개 통과. 최종 추천 역할 적용 검사는 6개 재실행 통과. 컴파일 오류 없음. 프리 시나리오 검증 제외.
-- 첫 공격: 아레스·리리아·hero_009·hero_010 4명(추천 역할) 대 수비 3명, 전력230:228. 무조작 실시간 로직 30Hz에서 22.00초 Victory. 한 편성의 결과이며 모든 조합의 난이도 보장은 아니다.
+- 첫 공격: 키리엔·리리아·hero_009·hero_010 4명(추천 역할) 대 수비 3명, 전력230:228. 무조작 실시간 로직 30Hz에서 22.00초 Victory. 한 편성의 결과이며 모든 조합의 난이도 보장은 아니다.
 - 메인 대기 24개월: 수비 3명으로 시작, 7턴 4명, 8~18턴 6명, 19~25턴 2명. 종전 20명 집결과 달리 제한된 규모를 유지했다. 증거 Cardia-Defense-After.txt / Cardia-Reinforcement-After.txt. 실제 화면 클릭/시각 검증은 이번 검사에 포함하지 않았다.
 ## 2026-09-13 전투단 다중 선택 출정
 - 군사 화면의 전투단 상세 → 이동/원정 → 목표 성 → 출정 전투단 선택 → 하단 확정 순서로 연결했다. 같은 성의 출정 가능한 아군 전투단을 여러 개 선택하며 페이지 이동 후에도 선택을 유지한다. 최초 열었던 전투단은 기본 선택된다.
 - BeginArmyGroupMarch는 모든 전투단의 존재/작전 가능/동일 출발 성/소속/인접 목표/교전 관계/총 영향력을 변경 전에 확인한다. 실패 시 일부만 출발하거나 비용을 일부 차감하지 않는다. 적 성은 기존대로 전투단당 영향력20, 아군 성 이동은0이다. UI에는 선택 수와 총 비용을 표시한다.
-- 출정에 성공한 전투단의 StrategicTargetCastleId를 같은 목표로 설정한다. 아레스 메인의 기존 동일 출발 성·동일 목표·전투 생성 시 함께 도착한 전투단 합류 규칙을 사용한다. 나중에 도착하는 전투단이 이미 생성된 전투에 자동 합류하는 기능은 추가하지 않았다.
+- 출정에 성공한 전투단의 StrategicTargetCastleId를 같은 목표로 설정한다. 키리엔 메인의 기존 동일 출발 성·동일 목표·전투 생성 시 함께 도착한 전투단 합류 규칙을 사용한다. 나중에 도착하는 전투단이 이미 생성된 전투에 자동 합류하는 기능은 추가하지 않았다.
 - 군사 모달의 기존 카드6개와 페이지 이동2개를 모든 목록에 적용했다. 전투단 상세 인물이 많아 이동/원정 명령이 뒤에서 잘리던 문제와 전투단 목록8개 이후 접근 문제를 함께 해결했다. 신규 UI 동적 생성 없음.
 - 문구 UID: UI_GROUP_MARCH_TITLE / ROUTE / STATUS / CONFIRM / ARMY / INVALID. 기존 WI/UI/Clarify Activity Labels 메뉴로 데이터베이스 uiStrings에 저장했다. 전투단별 대장 통솔에 따른 인원 상한은 변경하지 않았다.
 - 검증: WIGroupMarchTests6개 + 수비/무혈6개 + 인물일괄2개 + UGUI47개 =61개 통과. 두 전투단6명의 실제 전투 런타임 생성, 승리 결과 제출 뒤 두 전투단 주둔, 총비용 부족/재편성/다른 출발 성/누락 식별자 시 전체 상태 무변경을 확인했다. 승리 결과 제출 검사는 이 편성의 실제 승률 검사가 아니다.
@@ -828,14 +835,14 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 
 ## 2026-09-21 초기 인물 축소
 - 각 시나리오의 시작 배치는 영웅 60명·일반 90명, 총 150명으로 축소했다. 전체 마스터 1200명은 유지하며 1050명은 재야 후보로 남는다.
-- 아레스 메인 프로스트혼은 ares, lyria, common_alden, common_sable 4명(영웅 2·일반 2)으로 시작한다. 다른 세력의 핵심 인물과 카르디아 수비 hero_072, common_049, common_048은 유지하고 나머지는 소유 성에 순환 분배한다.
+- 키리엔 메인 프로스트혼은 ares, lyria, common_alden, common_sable 4명(영웅 2·일반 2)으로 시작한다. 다른 세력의 핵심 인물과 카르디아 수비 hero_072, common_049, common_048은 유지하고 나머지는 소유 성에 순환 분배한다.
 - WICampaignCharacterPlacementSeeder와 실제 DB의 characterPlacements를 함께 갱신했다. 새 게임에 적용되며 기존 저장 인물을 소급 제거하지 않는다.
 - 초기 배치/재야 수량 검사 1개와 전투단 일괄 편성 검사 2개, 총 3개 통과. Unity 컴파일 오류 없음. 장기 난이도 및 실제 화면 플레이 검증은 수행하지 않았다.
 
 ## 2026-09-21 일반 인물 모병
 - 영웅은 인재실의 탐색·설득으로 영입한다. 일반은 이름·클래스·성장 이력을 유지하는 개별 실시간 전투 유닛이며 성의 모병으로 합류한다. 징병은 계획에 포함하지 않는다.
 - 경로: 군사 → 모병 · 일반 인물 충원 → 성 → 역할/합류 대상 선택 → 1명 또는 2명 모집. 전위·근접·원거리·마법·지원은 클래스의 RecommendedRole을 사용한다. 모집 명령은 금화를 즉시 지불하고 다음 월 처리에 합류한다.
-- 성 대기는 거주 공간을, 전투단은 통솔에 따른 빈자리를 사용한다. 처음 아레스 성의 거주 4칸이 찼다면 전투단을 편성한 뒤 모집하거나 합류 전투단을 선택한다. 영웅 담당자·추가 시설·인구 자원은 요구하지 않는다.
+- 성 대기는 거주 공간을, 전투단은 통솔에 따른 빈자리를 사용한다. 처음 키리엔 성의 거주 4칸이 찼다면 전투단을 편성한 뒤 모집하거나 합류 전투단을 선택한다. 영웅 담당자·추가 시설·인구 자원은 요구하지 않는다.
 - 자동 충원은 같은 화면에서 대상 전투단·전체 목표 인원·월 예산을 설정한 뒤 시작한다. 출정·재편성·전투·목표 달성·금화/후보/공간 부족에는 기다린다. 중지는 신규 예약만 막고 이미 예약한 건은 모집 취소로 환불한다.
 - 예약 이후 전투단이 떠나면 원래 성에 공간이 있을 때 대기한다. 성 소유권 변경·합류 공간 부족·전투 진입 시 예약을 취소하고 원래 세력에 환불한다. 원정 중 즉시 충원하지 않는다.
 - 신규 SO: Assets/Data/ScriptableObject/Administration/WI_MusterConfig.asset. DB의 musterConfig 참조에서 접근한다. goldPerCharacter=60, smallCastleMonthlyLimit=1, developedCastleMonthlyLimit=2, factionBaseCapacity=8, capacityPerCastle=4, factionMaximumCapacity=80, aiOrdersPerMonth=2, aiRearTarget=3, aiFrontTarget=6.
@@ -905,3 +912,18 @@ AI는 전투단을 생성한 뒤 성에 최소 한 명을 남기고 성향에 �
 - 효과 종료 후 오브젝트를 자동 삭제/비활성화하지 않는다(Stop Action None). 전투 연결 시 생성·재생·풀 반환 정책을 별도로 구현한다. 현재 전투/데이터베이스 연결과 사운드·피해 판정은 없다.
 - 지원 에셋: Assets/Art/Battle/Effects/Temporary의 메시 5개, WI_TempEffect_Unlit.mat, WITemporaryEffect.shader. 프리팹만 다른 프로젝트로 옮길 때는 의존 에셋도 함께 포함한다.
 - WI/Effects/Verify Temporary Battle Prefabs 메뉴는 독립 편집기 미리보기 씬에서 검증 이미지/기록을 갱신한다. 이미지의 열은 검격/화살/마법/피격, 행은 0.08/0.20/0.45초다.
+
+## 게임에 연결된 임시 전투 이펙트 (2026-09-25)
+- 이전 항목의 '게임 미연결/후속 작업' 상태를 대체한다. WI_BattleConfig의 전투 이펙트 항목에 프리팹 네 종류가 연결되어 자동 표시된다.
+- Slash Effect Scale 0.9, Projectile Effect Scale 0.8, Hit Effect Scale 0.7, Effect Height 0.45가 기본값이다. 검격 재생 시간은 0.285초, 피격은 0.32초다. 설정 변경은 피해량/사거리/공격 간격을 바꾸지 않는다.
+- 원거리 역할은 화살, 마법·지원 역할은 마법탄이다. 투사체 프리팹의 미리보기용 자체 이동은 런타임 인스턴스에서 비활성화되므로 원본 프리팹을 수정할 필요가 없다. 비행 중 외형은 유지하고 실제 충돌/수명 만료 시 풀로 반환한다.
+- WI/Effects/Connect Temporary Battle Effects는 네 기본 프리팹 참조를 다시 연결한다. 사용자 교체 프리팹을 쓰는 경우 재실행하지 않는다.
+- 테스트 랩에서 WI/Effects/Resume Test Battle For Verification은 백그라운드 실행을 허용하고 초기화된 전투의 배치를 완료한다. Capture Test Battle Effects는 배치를 완료하고 컨트롤러를 고정 간격으로 진행해 4종 화면을 캡처한 뒤 에디터를 일시정지한다. 실제 테스트 전투 상태를 진행하는 검증 메뉴다.
+
+## 전략·성 화면 시안 정합 (2026-09-26)
+- 전략 화면 좌측 성 패널은 `right_panel_frame`, 영웅 칸은 `strategy_hero_card_v1`, 우측 이번 달 패널은 `bg_type_d`, 목표 카드는 `right_objective_card`, 전투 알림은 `right_danger_row`를 사용한다. 2026-08-23에 범용 `bg_type_a/f`로 바뀌었던 것을 시안 전용 아트로 되돌렸다. 하단 명령 버튼의 `bg_type_e`는 유지한다.
+- 지도 성 마커는 56×56(기존 40×40)이며 성 중심에서 14만큼 위에 둔다. 선택 성은 1.35배, 이름표는 기본 14pt·선택 17pt이다.
+- 성 화면 수치 행과 명령 아이콘은 소형 `icon_castle_stat_*_v1`을 쓴다. 가로형 `castle_stat_*` 수치판을 아이콘 칸에 넣지 않는다. 훈련소·선술집 바로가기는 `icon_flat_military`, `icon_flat_heroes`를 쓴다.
+- 성 명령 6개(중점 사업·인사 배치·특화 시설·태수 위임·진격/출정·성 상세)는 명령 패널 안에서 높이 0.10, 간격 0.034로 균등 배치한다. 명령을 추가·제거하면 앵커도 다시 정렬한다.
+- 1920×1080 기준 글자 크기: 성 이름 30~32, 수치 행 19~20, 명령 22, 하단 제목 22, 보조 설명 15~17.
+- 특화 시설 칸은 성 규모와 관계없이 두 칸을 표시한다. 열린 빈 칸은 `UI_ADMIN_FACILITY_SLOT_EMPTY`, 잠긴 칸은 `UI_ADMIN_FACILITY_SLOT_LOCKED` 문구를 쓴다.

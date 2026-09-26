@@ -22,10 +22,22 @@ MonoBehaviour:
   effectHeight: 0.45
   slashEffectDuration: 0.285
   hitEffectDuration: 0.32
-  arenaSize: {x: 18, y: 10}
-  arenaBackgroundSize: {x: 36, y: 20.25}
-  formationColumnSpacing: 1.4
-  formationRowSpacing: 0.8
+  arenaSize: {x: 32, y: 18}
+  arenaBackgroundSize: {x: 48.6, y: 27.34}
+  arenaPrefabScale: 1.35
+  formationFrontLineDistance: 11
+  squadMaxSize: 8
+  squadBlockFiles: 3
+  squadMemberSpacing: 0.85
+  squadGap: 1.2
+  formationLineGap: 1.5
+  formationEngageLeash: 1.2
+  cohesionWaitDistance: 1.2
+  cohesionMaxWaitSeconds: 1.5
+  chargeSprintDistance: 4
+  chargeSprintMultiplier: 1.35
+  formationJitter: 0.12
+  moveSpeedVariance: 0.06
   fixedTickSeconds: 0.05
   meleeSlotCount: 4
   meleeSlotDistanceRatio: 0.8
@@ -53,18 +65,18 @@ MonoBehaviour:
   routRecoveryPerSecond: 4
   routRecoverThreshold: 40
   useDeploymentPhase: 1
-  deploymentZoneDepthRatio: 0.4
+  deploymentZoneDepthRatio: 0.3
   followSlackDistance: 1.2
   terrainZones:
   - terrainType: 0
-    center: {x: 0, y: 3.2}
-    radius: 1.8
+    center: {x: 0, y: 5.5}
+    radius: 2.5
   - terrainType: 1
-    center: {x: -2.5, y: -3}
-    radius: 1.8
+    center: {x: -6, y: -5.5}
+    radius: 2.5
   - terrainType: 2
-    center: {x: 3, y: -3}
-    radius: 1.5
+    center: {x: 6, y: -5.5}
+    radius: 2
   highGroundRangeMultiplier: 1.25
   highGroundDamageMultiplier: 1.1
   forestProjectileDamageMultiplier: 0.6
@@ -98,6 +110,136 @@ MonoBehaviour:
   battleSpriteFacesRight: 0
   sideMarkerAlpha: 0.95
   routingTint: {r: 0.6, g: 0.6, b: 0.6, a: 0.85}
+  classProfiles:
+  - heroClass: 0
+    archetype: 1
+    healthMultiplier: 1.1
+    damageMultiplier: 1.1
+    moveSpeedMultiplier: 1.05
+    attackCooldownMultiplier: 1
+    attackRangeMultiplier: 1
+  - heroClass: 1
+    archetype: 0
+    healthMultiplier: 1.4
+    damageMultiplier: 0.8
+    moveSpeedMultiplier: 0.85
+    attackCooldownMultiplier: 1
+    attackRangeMultiplier: 1
+  - heroClass: 2
+    archetype: 6
+    healthMultiplier: 1.3
+    damageMultiplier: 1
+    moveSpeedMultiplier: 0.95
+    attackCooldownMultiplier: 1
+    attackRangeMultiplier: 1
+  - heroClass: 3
+    archetype: 1
+    healthMultiplier: 1
+    damageMultiplier: 1.2
+    moveSpeedMultiplier: 1.15
+    attackCooldownMultiplier: 1
+    attackRangeMultiplier: 1
+  - heroClass: 4
+    archetype: 3
+    healthMultiplier: 0.85
+    damageMultiplier: 1
+    moveSpeedMultiplier: 1
+    attackCooldownMultiplier: 1
+    attackRangeMultiplier: 1.15
+  - heroClass: 5
+    archetype: 2
+    healthMultiplier: 0.8
+    damageMultiplier: 1.15
+    moveSpeedMultiplier: 1.3
+    attackCooldownMultiplier: 0.9
+    attackRangeMultiplier: 1
+  - heroClass: 6
+    archetype: 4
+    healthMultiplier: 0.75
+    damageMultiplier: 1.5
+    moveSpeedMultiplier: 0.9
+    attackCooldownMultiplier: 1.5
+    attackRangeMultiplier: 1
+  - heroClass: 7
+    archetype: 5
+    healthMultiplier: 0.9
+    damageMultiplier: 0.6
+    moveSpeedMultiplier: 1
+    attackCooldownMultiplier: 1
+    attackRangeMultiplier: 1
+  - heroClass: 8
+    archetype: 5
+    healthMultiplier: 1
+    damageMultiplier: 0.7
+    moveSpeedMultiplier: 1
+    attackCooldownMultiplier: 1
+    attackRangeMultiplier: 1
+  - heroClass: 9
+    archetype: 6
+    healthMultiplier: 0.9
+    damageMultiplier: 0.8
+    moveSpeedMultiplier: 1
+    attackCooldownMultiplier: 1
+    attackRangeMultiplier: 1
+  - heroClass: 10
+    archetype: 4
+    healthMultiplier: 0.9
+    damageMultiplier: 1.2
+    moveSpeedMultiplier: 1
+    attackCooldownMultiplier: 1.3
+    attackRangeMultiplier: 1
+  - heroClass: 11
+    archetype: 4
+    healthMultiplier: 0.8
+    damageMultiplier: 1.4
+    moveSpeedMultiplier: 0.95
+    attackCooldownMultiplier: 1.4
+    attackRangeMultiplier: 1
+  chargeMinDistance: 2.5
+  chargeDamageMultiplier: 2
+  chargeKnockbackMultiplier: 3
+  chargeMoraleDamage: 4
+  braceFrontDamageMultiplier: 0.6
+  braceFlankExtraMultiplier: 1.25
+  skirmisherRearMultiplier: 2
+  skirmisherBacklinePreference: 3
+  volleySplashRadius: 0.8
+  arrowArcHeight: 1.4
+  casterSplashRadius: 1
+  casterSplashDamageRatio: 0.5
+  supportHealPower: 12
+  supportHealThreshold: 0.75
+  commandAuraRadius: 4
+  commandAuraMoraleRegen: 2
+  commandAuraLossMultiplier: 0.7
+  shakeChargeImpact: 0.25
+  walkBobHeight: 0
+  walkBobFrequency: 3.2
+  walkTiltDegrees: 0
+  attackLungeDistance: 0.14
+  attackLungeDuration: 0.16
+  hitFlashColor: {r: 1, g: 0.35, b: 0.3, a: 1}
+  hitFlashDuration: 0.12
+  hitSquashAmount: 0.14
+  deathFallDuration: 0.55
+  deathFallDegrees: 80
+  spawnPopDuration: 0.3
+  selectionPulseSpeed: 6
+  selectionPulseAmount: 0.1
+  cameraShakeMaxOffset: 0.35
+  cameraShakeDecay: 1.8
+  shakeFirstClash: 0.5
+  shakeLeaderKill: 0.55
+  shakeSkillImpact: 0.4
+  shakeSquadRouted: 0.3
+  shakeKill: 0.06
+  shakeFlankHit: 0.04
+  hitStopFirstClash: 0.08
+  hitStopLeaderKill: 0.14
+  hitStopSkillImpact: 0.06
+  orderPingDuration: 0.45
+  orderPingMoveColor: {r: 0.4, g: 0.95, b: 1, a: 0.8}
+  orderPingAttackColor: {r: 1, g: 0.35, b: 0.25, a: 0.85}
   skillRangePreviewColor: {r: 1, g: 1, b: 1, a: 0.12}
   skillAreaPreviewColor: {r: 0.95, g: 0.3, b: 0.15, a: 0.35}
   showCharacterLabels: 0
@@ -111,10 +253,10 @@ MonoBehaviour:
   projectileFriendlyFireEnabled: 0
   projectileFriendlyFireSafeDistance: 0.8
   skillVisualDuration: 0.65
-  cameraPanSpeed: 7
+  cameraPanSpeed: 10
   cameraMinimumZoom: 6
-  cameraMiddleZoom: 8
-  cameraMaximumZoom: 10
+  cameraMiddleZoom: 9
+  cameraMaximumZoom: 13.5
   characterSelectionRadius: 0.8
   heroSkills:
   - heroId: ares

@@ -17,7 +17,8 @@ namespace ProjectWI.Battle
             WIBattleConfigSO config,
             WIBattleRuntimeState runtime,
             WIBattleCharacterState actor,
-            WIBattleCharacterState target)
+            WIBattleCharacterState target,
+            float multiplier = 1f)
         {
             if (actor.AttackRange > config.MeleeRange + 0.01f || target.IsAlive == false)
             {
@@ -28,10 +29,10 @@ namespace ProjectWI.Battle
             {
                 direction = actor.Side == WIBattleSide.Attacker ? Vector2.right : Vector2.left;
             }
-            float resistance = GetCommand(runtime, target) == WIBattleCommand.Hold
+            float resistance = GetCommand(runtime, target) == WIBattleCommand.Hold || IsBraced(target) == true
                 ? config.HoldKnockbackResistance
                 : 0f;
-            target.Position += direction.normalized * config.MeleeKnockbackDistance * (1f - resistance);
+            target.Position += direction.normalized * config.MeleeKnockbackDistance * multiplier * (1f - resistance);
             ClampToArena(config, target);
         }
 

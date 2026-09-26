@@ -119,6 +119,10 @@ namespace ProjectWI.Battle
                     continue;
                 }
                 float score = Vector2.Distance(candidate.Position, actor.Position);
+                if (actor.Archetype == WIBattleArchetype.Skirmisher && UsesProjectile(candidate) == true)
+                {
+                    score -= config.SkirmisherBacklinePreference;
+                }
                 bool holdsSlot = candidate == current && actor.EngagementSlot >= 0;
                 if (melee == true && holdsSlot == false &&
                     slotClaimsByTarget.TryGetValue(candidate.HeroId, out int claims) == true &&
@@ -237,6 +241,10 @@ namespace ProjectWI.Battle
                 MoveRetreating(config, actor, deltaTime);
                 return;
             }
+            if (TryHealAlly(config, runtime, actor) == true)
+            {
+                return;
+            }
             if (command == WIBattleCommand.Rally && TryMoveToRallyPoint(config, runtime, actor, deltaTime) == true)
             {
                 return;
@@ -250,6 +258,10 @@ namespace ProjectWI.Battle
             {
                 actor.Position = Vector2.MoveTowards(actor.Position, actor.FormationPosition, actor.MoveSpeed * GetMoveSpeedMultiplier(config, actor) * deltaTime);
                 ClampToArena(config, actor);
+                return;
+            }
+            if (TryActInFormation(config, runtime, actor, command, deltaTime) == true)
+            {
                 return;
             }
             WIBattleCharacterState target = null;
@@ -491,7 +503,7 @@ namespace ProjectWI.Battle
             }
         }
 
-        // 명령 보정을 적용해 근접 즉시 피해 또는 원거리 발사체 공격을 수행합니다.
+        // 명령·병과 보정을 적용해 근접 즉시 피해 또는 원거리 발사체 공격을 수행합니다.
         private static void PerformAttack(
             WIBattleConfigSO config,
             WIBattleRuntimeState runtime,
@@ -503,24 +515,37 @@ namespace ProjectWI.Battle
             {
                 damage = Mathf.RoundToInt(damage * config.FocusDamageMultiplier);
             }
-            float flankMultiplier = UsesProjectile(actor) == false ? GetFlankMultiplier(config, actor, target) : 1f;
-            damage = Mathf.RoundToInt(damage * flankMultiplier);
             if (GetCommand(runtime, target) == WIBattleCommand.Hold)
             {
                 damage = Mathf.RoundToInt(damage * (1f - config.HoldDamageReduction));
             }
+            actor.CooldownRemaining = GetAttackInterval(config, actor);
             if (UsesProjectile(actor) == true)
             {
                 LaunchProjectile(config, runtime, actor, target, Mathf.Max(1, damage));
+                if (actor.Archetype == WIBattleArchetype.Archer)
+                {
+                    FireVolley(config, runtime, actor, target, Mathf.Max(1, damage));
+                }
+                return;
             }
-            else
+            float classMultiplier = GetMeleeClassMultiplier(config, actor, target, out float flankMultiplier, out bool isCharge);
+            damage = Mathf.RoundToInt(damage * classMultiplier);
+            AddMeleeAttackVisual(config, runtime, actor, target);
+            if (runtime.FirstClashDone == false)
             {
-                AddMeleeAttackVisual(config, runtime, actor, target);
-                ApplyDamage(config, runtime, target, damage, flankMultiplier);
-                AddHitVisual(config, runtime, target);
-                ApplyMeleeKnockback(config, runtime, actor, target);
+                runtime.FirstClashDone = true;
+                AddFeedback(runtime, WIBattleFeedbackType.FirstClash, target.Position, target.Side);
             }
-            actor.CooldownRemaining = config.AttackCooldown;
+            ApplyDamage(config, runtime, target, damage, flankMultiplier);
+            AddHitVisual(config, runtime, target);
+            if (isCharge == true)
+            {
+                ApplyMoraleLoss(config, runtime, target, config.ChargeMoraleDamage);
+                AddFeedback(runtime, WIBattleFeedbackType.ChargeImpact, target.Position, target.Side);
+            }
+            ApplyMeleeKnockback(config, runtime, actor, target, isCharge == true ? config.ChargeKnockbackMultiplier : 1f);
+            actor.ChargeDistance = 0f;
         }
 
         // 공격자가 대상의 정면·측면·후방 중 어디에 있는지에 따라 근접 피해 배율을 반환합니다.

@@ -74,7 +74,7 @@ namespace ProjectWI.Administration
                 ? database.GetText("UI_ADMIN_BASIC_OPERATION")
                 : manager.DisplayName.Get(database.UseEnglish);
             string resultText = project.ProjectType == WICastleProjectType.Expansion
-                ? $"{castleState.CastleSize} 규모 확장 완료 · 특화 시설 선택 가능"
+                ? $"{database.GetCastleSizeName(castleState.CastleSize)} 규모 확장 완료 · 특화 시설 선택 가능"
                 : $"{project.ProjectType} +{gain}";
             WIFactionDefinition faction = database.GetFaction(castleState.FactionId);
             if (faction != null && faction.PlayerFaction)

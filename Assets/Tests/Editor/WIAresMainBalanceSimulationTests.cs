@@ -13,13 +13,13 @@ namespace ProjectWI.Tests.Editor
         private const string DatabasePath =
             "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset";
 
-        // 현재 아레스 메인을 난이도·정책 9개 조합으로 240개월 실행해 Lab과 같은 전체 표본을 출력합니다.
+        // 현재 키리엔 메인을 난이도·정책 9개 조합으로 240개월 실행해 Lab과 같은 전체 표본을 출력합니다.
         [Test]
         public void AresMain_240MonthsFullMatrixProducesReport()
         {
             WIAdministrationDatabaseSO database =
                 AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            StringBuilder report = new StringBuilder("아레스 메인 240개월 전체 매트릭스\n");
+            StringBuilder report = new StringBuilder("키리엔 메인 240개월 전체 매트릭스\n");
             int relaxedDeaths = 0;
             int standardDeaths = 0;
             int hardDeaths = 0;
@@ -57,13 +57,13 @@ namespace ProjectWI.Tests.Editor
             Assert.Greater(hardDeaths, 0, "도전 난이도의 장기 전투에서는 사망 판정 경로가 실제로 실행되어야 합니다.");
         }
 
-        // 표준 난이도 아레스 메인을 정책별 240개월 실행해 고용 수치가 단일 캠페인 기준인지 확인합니다.
+        // 표준 난이도 키리엔 메인을 정책별 240개월 실행해 고용 수치가 단일 캠페인 기준인지 확인합니다.
         [Test]
         public void AresMain_240MonthsReportsRecruitmentPerIndependentRun()
         {
             WIAdministrationDatabaseSO database =
                 AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
-            StringBuilder report = new StringBuilder("아레스 메인 표준 240개월\n");
+            StringBuilder report = new StringBuilder("키리엔 메인 표준 240개월\n");
             foreach (WIAutoPlayerPolicy policy in System.Enum.GetValues(typeof(WIAutoPlayerPolicy)))
             {
                 WIAdministrationState state = WIAdministrationState.Create(
@@ -131,7 +131,7 @@ namespace ProjectWI.Tests.Editor
             RunStandardFiveSeedStatistics(WIAutoPlayerPolicy.Aggressive);
         }
 
-        // 공세형 아레스 메인이 720개월 동안 다수 표본에서 발도르 멸망에 도달하는지 5시드로 확인합니다.
+        // 공세형 키리엔 메인이 720개월 동안 다수 표본에서 발도르 멸망에 도달하는지 5시드로 확인합니다.
         [Test]
         public void AresMain_Standard720AggressiveFiveSeedsMostlyDefeatValdor()
         {
@@ -159,7 +159,7 @@ namespace ProjectWI.Tests.Editor
                 $"완료개월 {statistics.CompletionMonths} · 발도르 잔여성 {statistics.ValdorCastles} · " +
                 $"플레이어성 {statistics.FinalCastles} · " + string.Join(" / ", samples.Select(item =>
                     $"시드{item.Seed}:{item.Metrics.CampaignResult}:{item.Metrics.MonthsSimulated}개월:" +
-                    $"발도르{item.Metrics.FinalValdorCastleCount}:아레스{item.Metrics.FinalPlayerCastleCount}:" +
+                    $"발도르{item.Metrics.FinalValdorCastleCount}:키리엔{item.Metrics.FinalPlayerCastleCount}:" +
                     $"군단{item.Metrics.FinalOperationalArmyCount}:병력{item.Metrics.FinalArmyMemberCount}:" +
                     $"이동{item.Metrics.FinalMovingArmyCount}:대기{item.Metrics.FinalAwaitingBattleArmyCount}:재편{item.Metrics.FinalReorganizingArmyCount}:" +
                     $"이동월{item.Metrics.MovingArmyMonths}/{item.Metrics.LongestMovingArmyMonths}:" +
@@ -172,12 +172,12 @@ namespace ProjectWI.Tests.Editor
                     $"집결{item.Metrics.FinalStrategicAssemblyPower}/{item.Metrics.FinalStrategicRequiredPower}"));
             Debug.Log(report);
             Assert.GreaterOrEqual(victoryCount, 3,
-                $"공세형 아레스 메인은 720개월 안에 과반 표본에서 발도르를 멸망시켜야 합니다. {report}");
+                $"공세형 키리엔 메인은 720개월 안에 과반 표본에서 발도르를 멸망시켜야 합니다. {report}");
             Assert.LessOrEqual(statistics.ValdorCastles.Median, 0f,
                 $"720개월 발도르 잔여 성 중앙값은 0이어야 합니다. {report}");
         }
 
-        // 아레스 메인의 정책별 장기 진행을 반복 실행하고 밸런스 검토용 원시 지표를 출력합니다.
+        // 키리엔 메인의 정책별 장기 진행을 반복 실행하고 밸런스 검토용 원시 지표를 출력합니다.
         [Test]
         public void AresMain_PoliciesProduceBalanceReport()
         {
@@ -256,10 +256,10 @@ namespace ProjectWI.Tests.Editor
             Debug.Log($"카르디아 1년 진단 · 성 {metrics.FinalPlayerCastleCount} · " +
                 $"원정 {metrics.MarchesStarted} · 전투 {sessions}");
             Assert.AreEqual("rimgard", state.GetCastle("castle_04").FactionId,
-                "공세형 아레스는 첫해 안에 카르디아를 점령해야 합니다.");
+                "공세형 키리엔은 첫해 안에 카르디아를 점령해야 합니다.");
         }
 
-        // 아레스 영웅 2명·일반 2명과 축소된 전체 초기 배치 및 재야 인원을 검증합니다.
+        // 키리엔 영웅 2명·일반 2명과 축소된 전체 초기 배치 및 재야 인원을 검증합니다.
         [Test]
         public void ScenarioCharacterPlacements_AssignReducedRosterAndKeepAresNarrativePartySmall()
         {
@@ -285,7 +285,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(2, state.GetCastle("castle_28").HeroIds.Count(heroId =>
                 state.GetCharacter(heroId).BaseGrade == WICharacterGrade.Hero));
             Assert.AreEqual(150, state.Characters.Count(character => character.Recruited));
-            Debug.Log("아레스 메인 시작 인물 · " + string.Join(", ", state.Factions.Select(faction =>
+            Debug.Log("키리엔 메인 시작 인물 · " + string.Join(", ", state.Factions.Select(faction =>
                 faction.FactionId + ":" + state.Castles.Where(castle => castle.FactionId == faction.FactionId)
                     .Sum(castle => castle.HeroIds.Count))));
         }

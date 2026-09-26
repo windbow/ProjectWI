@@ -10,7 +10,7 @@
 
 - WIAdministrationUIController.UGUIScreenRequests는 Action 스냅샷 대신 Func<Action> 및 Func<Action<TFirst,TSecond>>로 이벤트를 조회합니다. EnsureScreen이 프리팹 생성·OnEnable 구독을 마친 뒤 최신 이벤트를 가져오므로 첫 메뉴 클릭과 첫 월간 보고가 누락되지 않습니다.
 - 모든 RaiseUGUIScreenRequest 호출부는 이벤트 조회 람다를 전달합니다. WIUGUIMigrationTests의 LazyScreenReceivesFirstRequest 2개 케이스는 실제 지연 인스턴스의 OnEnable 구독과 최초 이벤트·인자 전달을 검사합니다. 관련 UGUI·내정 병행 검사 58/58 통과.
-- Computer Use로 기존 저장 로드, 영지관 아레스 편성·출정·월 진행, 재불러오기, 개인 훈련 버튼 숨김과 자동 훈련 월보를 확인했습니다. 내정 최종 월간 상승 수치와 전투 결과는 실조작 검증하지 않았습니다.
+- Computer Use로 기존 저장 로드, 영지관 키리엔 편성·출정·월 진행, 재불러오기, 개인 훈련 버튼 숨김과 자동 훈련 월보를 확인했습니다. 내정 최종 월간 상승 수치와 전투 결과는 실조작 검증하지 않았습니다.
 
 ## 공통 인물 선택 행 구현 (2026-09-20)
 
@@ -32,6 +32,10 @@
 - 배치 단계: `WIBattleRuntimeState.IsDeploying`이 참이면 `Step`이 시간을 진행하지 않습니다. `WIBattleRuntimeController.Initialize`가 `UseDeploymentPhase`로 설정하고 `StartBattle`이 해제합니다. `WIBattleSimulation.DeploySquads`는 모양을 유지해 `GetDeploymentRangeX` 구역 안으로 위치·진형 위치를 즉시 옮깁니다.
 - 지형: `WIBattleSimulation.Terrain.cs`가 구역 판정(`IsInTerrain`, `TryGetTerrainAt`)과 효과(`GetEffectiveAttackRange`, `GetMoveSpeedMultiplier`, `GetMeleeSlotCountFor`, `GetProjectileTerrainMultiplier`)를 제공합니다. 교전 슬롯 수는 목표별로 계산하고, 투사체 피해는 명중 시 발사자·피격자 위치 지형으로 보정합니다.
 - 직접 지휘: 명령 `Follow`, 인물 `FollowOffset`, 런타임 `ControlledHeroId`. `StartHeroControl`이 분대원 상대 위치를 저장하고 분대에 `Follow`를 지정, `OrderControlledHeroMove`가 영웅 `FormationPosition`을 바꾸며 `StopHeroControl`이 현 위치 `Hold`로 전환합니다. HUD는 `WIBattleHUDController.Deployment.cs`(배치·지휘·지형 이름)로 분리했습니다.
+- 분대 블록 진형: `WIBattleRuntimeBuilder`는 인물 추가 → `WIBattleSimulation.AssignSquads(config, runtime)`(진영+전투단별, 최대 인원 분할) → `LayoutSquads`(근접/원거리 블록 분류, `PlaceLine`으로 전열 배치, `PlaceBlock`으로 분대장 앞줄 중앙 블록) 순으로 진형을 만듭니다. 흔들림·속도 편차는 `Hash01(인물 ID, 소금값)`으로 결정적입니다. 증원은 `AppendReinforcements`가 새 분대만 가장자리 쪽에 배치합니다.
+- 분대 결속: `WIBattleSimulation.Cohesion.cs`. 매 틱 `UpdateSquadCohesion`이 분대별 생존 인원의 `BlockIndex`를 다시 매기고(앞줄 결원 보충), 선두(`BlockIndex` 0)의 실제 위치로 `WIBattleSquadState.Anchor`를 계산하며, 주력 병종 기준 교전 여부(`Engaged`)와 전진 계획(`AnchorGoal`·`AnchorSpeed`·`AnchorMoving`·`WaitTime`)을 정합니다. `TryActInFormation`이 선두 전진, 블록 자리 추종(`GetBlockSlot` = 기준점 + 블록 오프셋 + `BlockJitter`), 묶인 거리 안 교전을 처리합니다. `UsesCohesion`은 전진·집중·분산만 참입니다. 배치로 옮긴 분대는 `CohesionActive`를 해제해 다음 틱에 다시 계산합니다.
+- 병과: `WIBattleArchetype`, `WIBattleClassProfile`(WIBattleConfigSO). 빌더가 직업 설정으로 체력·피해·속도·`AttackInterval`·사거리와 `Archetype`을 정합니다. `WIBattleSimulation.Classes.cs`: 돌격 거리 누적(`TrackChargeDistance`, 멈추면 0), 방진 태세(`IsBraced`), 근접 병과 배율(`GetMeleeClassMultiplier`), 지원 치료(`TryHealAlly`), 궁병 일제 사격(`FireVolley`), 지휘 사기 보호(`UpdateCommandAuras`), 범위 피해(`ApplySplashDamage`). 투사체는 `IsArc`(비행 중 무충돌, 착탄 범위 피해)·`SplashRadius`·`TotalDistance`를 가지며 `WIBattleEffectPresenter`가 포물선 높이를 표시합니다. 사건 `ChargeImpact`가 추가되었습니다.
+- 게임필: 시뮬레이션은 `WIBattleRuntimeState.FeedbackEvents`(`WIBattleFeedbackType`: FlankHit·Kill·LeaderKill·SquadRouted·SkillImpact·FirstClash)만 기록하고, `WIBattleRuntimeController.ConsumeFeedbackEvents`가 프레임마다 카메라 `AddTrauma`와 히트 스톱으로 바꾼 뒤 비웁니다(소비되지 않으면 128개에서 잘림). 히트 스톱·일시정지 중에는 `RefreshViews(0)`으로 연출도 멈춥니다. `WIBattleCharacterView.Refresh(alpha, deltaTime)`가 체력 감소·공격 대기시간 재설정·위치 변화를 감지해 `Body`에 걷기·내딛기·피격·쓰러짐·등장 연출을 적용합니다. 카메라는 `basePosition`(이동·경계 제한)과 흔들림 오프셋을 분리했습니다. 명령 지점 원은 `ShowOrderPing`이 구역 표시 프리팹 6개를 돌려 씁니다.
 - 방향 반전: `WIBattleCharacterState.FacingRight`를 `WIBattleSimulation.UpdateFacing`이 매 틱 갱신합니다(가로 이동 > 0.02면 이동 방향, 아니면 표적과 가로 거리 > 0.05일 때 표적 쪽). `WIBattleCharacterView.Refresh`가 `flipX = FacingRight != BattleSpriteFacesRight`로 적용합니다.
 - 격자 모드 제거: `Step`은 항상 연속 이동·교전 슬롯으로 진행하며 `Advance`는 항상 고정 틱을 사용합니다. 후퇴는 모든 전투에서 진영 끝 이탈 방식입니다.
 - HUD 문구: `WIBattleHUDController.Text(uid, args)`가 `WIBattleRuntimeController.Database.GetText`로 `UI_BATTLE_*` 문구를 조회해 `string.Format`으로 채웁니다. 명령 버튼 이름표와 기본 안내는 런타임이 준비된 첫 프레임에 한 번 교체합니다. 등급 표시는 기존 `UI_SELECTION_HERO`/`UI_SELECTION_COMMON`을 재사용합니다. UID 목록은 `Assets/Editor/WIBattleHUDStringsUtility.cs`(메뉴 `WI/UI/Apply Battle HUD Strings`)가 기록하며, 테스트 `BattleHUD_AllStringUidsExistInDatabase`가 코드에서 참조하는 UID 누락을 검사합니다.
@@ -94,8 +98,8 @@
 
 - `WICampaignAutoPlayer.RecordArmyStateDurations`는 매월 플레이어 전투단의 상태를 전투 대기→이동→재편 우선순위로 하나만 분류해 중복 없이 누적합니다. `MovingArmyMonths`, `AwaitingBattleArmyMonths`, `ReorganizingArmyMonths`는 총 부대·월이며 각 `Longest...ArmyMonths`는 단일 전투단의 최장 연속 체류입니다.
 - 전투단 체류 지표는 `WICampaignAutoTestLabWindow` 상세와 CSV·Markdown 내보내기에 포함됩니다. 종료 시점 상태 필드와 달리 캠페인 전 기간의 병목을 찾기 위한 진단 데이터입니다.
-- `WICampaignResultSystem.Evaluate`는 아레스 메인에서 `valdor` 보유 성이 없으면 승리로 판정하고, 프리 시나리오는 기존 전체 성 점령 판정을 사용합니다.
-- `WICampaignAutoPlayer.EnsurePlayerArmies`는 아레스 메인의 보유 성 구간에 따라 전투단 상한을 2/3/4/5개로 확장합니다. `IsFinalValdorCampaign`은 24성 이상에서 발도르 접경 목표·전쟁 재개·영향력 비축·장기 교착 결전을 활성화합니다.
+- `WICampaignResultSystem.Evaluate`는 키리엔 메인에서 `valdor` 보유 성이 없으면 승리로 판정하고, 프리 시나리오는 기존 전체 성 점령 판정을 사용합니다.
+- `WICampaignAutoPlayer.EnsurePlayerArmies`는 키리엔 메인의 보유 성 구간에 따라 전투단 상한을 2/3/4/5개로 확장합니다. `IsFinalValdorCampaign`은 24성 이상에서 발도르 접경 목표·전쟁 재개·영향력 비축·장기 교착 결전을 활성화합니다.
 - `IsStrategicTargetReachable`은 목표에 인접한 아군 집결지까지 작전 가능한 전투단이 아군 영토 경로로 도달 가능한지 검사합니다. `CanAutoAttack`과 `GetRequiredAttackPower`의 선택적 비율 덮어쓰기는 최종 공세의 100% 전력선에만 사용합니다.
 - `HasAlternativeStrategicTarget`과 `TryOpenAlternativeFront`도 `IsStrategicTargetReachable`을 공유합니다. `TryOpenAlternativeFront`의 동시 전쟁 수는 실제 도달 가능한 접경을 가진 상대만 포함합니다.
 - `WIAutoCampaignMetrics`의 `FinalPlayerArmyCount`부터 `FinalAtWarWithValdor`까지의 종료 진단 필드는 전투단 구성, 피로, 유휴 보충 인원, 발도르 접경, 무원정, 목표 집결 전력과 외교 자원을 Lab 상세에 표시합니다.
@@ -120,8 +124,8 @@
 - `Assets/Editor/WICastleMapPlacementWindow.cs`: `ProjectWI > Tools > Castle Map Placement` 메뉴에서 여는 성 좌표 전용 EditorWindow입니다. 월드맵 Sprite, `castles[].normalizedMapPosition`, 인접 성 ID를 읽어 편집용 미리보기를 만들며 저장 전에는 ScriptableObject나 프리팹을 변경하지 않습니다.
 - 저장 시 마스터 성 좌표를 갱신하고 선택 옵션에 따라 기존 `campaignVariants[].castlePlacements[]` 중 `overrideMapPosition=true`인 항목만 동기화합니다. Undo 기록과 `AssetDatabase.SaveAssets`는 사용자가 `좌표 저장`을 누른 경우에만 수행합니다.
 
-- 60개 성 좌표는 `WICastleDefinition.normalizedMapPosition`에 저장되며, 아레스 메인의 명시적 재배치 성은 `campaignVariants[0].castlePlacements`의 위치 덮어쓰기를 사용합니다. 자동 V2 재배치 좌표는 철회하고 Git 기준 기존 좌표로 복원한 상태입니다.
-- `CampaignVariants_UseScenarioCastlePlacementData`는 아레스 메인의 위치 덮어쓰기 값을 ScriptableObject와 런타임 상태 사이에서 비교합니다. `CastleMapPositions_AreNormalizedAndDistinct`는 수동 마스터 배치의 정규화 범위와 완전 중복만 검사합니다.
+- 60개 성 좌표는 `WICastleDefinition.normalizedMapPosition`에 저장되며, 키리엔 메인의 명시적 재배치 성은 `campaignVariants[0].castlePlacements`의 위치 덮어쓰기를 사용합니다. 자동 V2 재배치 좌표는 철회하고 Git 기준 기존 좌표로 복원한 상태입니다.
+- `CampaignVariants_UseScenarioCastlePlacementData`는 키리엔 메인의 위치 덮어쓰기 값을 ScriptableObject와 런타임 상태 사이에서 비교합니다. `CastleMapPositions_AreNormalizedAndDistinct`는 수동 마스터 배치의 정규화 범위와 완전 중복만 검사합니다.
 
 - `Assets/Art/Maps/ProjectWI_GlobalMap_Concept_V2.png`: 월드 UI 컨셉 기반의 16:9 글로벌맵이며 `WI_AdministrationDatabase.globalMapImage`에 연결됩니다.
 
@@ -176,14 +180,14 @@
 - `WICampaignVariantDefinition.castlePlacements`가 선택 시나리오의 성 소유 세력·정규화 좌표·인접 성을 덮어씁니다.
 - 런타임의 `WICastleRuntimeState`에 확정된 배치를 저장하고, `WIAdministrationWorldSnapshot.MapNodes`와 `MapConnections`를 통해 공용 프리팹에 표시합니다.
 - 프리 시나리오처럼 덮어쓰기가 없는 항목은 `WICastleDefinition`의 기본 소유 세력·좌표·연결을 유지합니다.
-- 아레스 메인의 `aiPreservationFactionId=valdor`, `valdorAIPreservationCastleCount=36`은 제3세력 AI의 발도르 침식만 제한하는 시나리오 데이터입니다. 림가르드의 정복 진행과 발도르 자체 경제·방어 수치에는 보너스를 주지 않습니다.
+- 키리엔 메인의 `aiPreservationFactionId=valdor`, `valdorAIPreservationCastleCount=36`은 제3세력 AI의 발도르 침식만 제한하는 시나리오 데이터입니다. 림가르드의 정복 진행과 발도르 자체 경제·방어 수치에는 보너스를 주지 않습니다.
 - `WIAdministrationTurnSystem.Pipeline.cs`는 월간 처리를 준비, 성별 처리, 후속 시스템, 턴 완료의 네 단계로 조율합니다. 개별 경제·인물·군사·AI 계산은 `WIAdministrationTurnSystem`의 도메인 함수가 담당합니다.
 - `WICampaignAutoPlayer.cs`는 자동 캠페인 월간 실행, 내정 방침·영입 준비와 결과 지표 집계를 담당합니다. `WICampaignAutoPlayer.Decisions.cs`는 사업·관계·지역·점령·영입·유산 선택 해결, 정책별 선택 점수와 미결 선택 집계를 담당합니다.
 - `WICampaignAutoPlayer.Military.cs`는 자동 플레이어의 전투단 생성·훈련·집결, 아군 영토 경로 탐색, 공격 가능 판정과 플레이어 참가 대기 전투 자동 해결을 담당합니다. 실제 군사 상태 변경은 `WIAdministrationTurnSystem` 공개 API에 위임합니다.
 - 균형·공세 자동 정책은 최대 2개 전투단을 운용하며 같은 출발 성의 전력을 합산합니다. 첫 확장에는 목표 방어력 대비 80% 기준을 사용하고, 영토 확장 뒤에는 균형 125%·공세 115% 기준을 사용합니다. 정예 또는 평균 피로 50 초과 전투단에는 합동훈련을 예약하지 않습니다.
 - `WIAdministrationTurnSystem.Diplomacy.cs`는 플레이어 외교 명령 API인 관계 개선, 협정, 전쟁, 원조, 포로 협상과 공동 공격 판정 및 외교 대기시간·월간 AI 관계 개선을 담당합니다. 기존 정적 공개 API를 유지하는 partial이며 상태 데이터는 복제하지 않습니다.
 - `WIAdministrationTurnSystem.Military.cs`는 전략 계층의 전투단 생성·편성·해산, 이동·훈련, 보급과 행군 피로를 담당합니다.
-- `WIAdministrationTurnSystem.Military.Sessions.cs`는 전략 전투 판정, 단일·공동 공격 전투 세션 생성, 실시간 전투 전환·결과 제출과 전투단 전투력·성 방어력 계산을 담당합니다. 아레스 메인의 동일 집결지·동일 전략 목표 공격군은 `AttackerArmyIds`로 합산하고 기존 `AttackerArmyId`는 주 공격군 및 구버전 저장 호환 필드로 유지합니다. `WIBattleSimulation`의 프레임 단위 실시간 전투 계산과는 분리됩니다.
+- `WIAdministrationTurnSystem.Military.Sessions.cs`는 전략 전투 판정, 단일·공동 공격 전투 세션 생성, 실시간 전투 전환·결과 제출과 전투단 전투력·성 방어력 계산을 담당합니다. 키리엔 메인의 동일 집결지·동일 전략 목표 공격군은 `AttackerArmyIds`로 합산하고 기존 `AttackerArmyId`는 주 공격군 및 구버전 저장 호환 필드로 유지합니다. `WIBattleSimulation`의 프레임 단위 실시간 전투 계산과는 분리됩니다.
 - `WIAdministrationTurnSystem.Military.Results.cs`는 전략 전투 결과에 따른 패배 후퇴·재편성, 전투 관계 변화와 성 점령·점령지 안정을 담당합니다.
 - `WIAdministrationTurnSystem.Military.Characters.cs`는 패배 인물의 사망·포로·전향·후퇴 판정, 등급별 사망 처리와 커먼 인물 재야 귀환, 포로 기간 만료와 원소속 귀환을 담당합니다.
 - `WIAdministrationTurnSystem.Characters.Tavern.cs`는 선술집 의뢰 완료·보충, 의뢰 표시명·적성 능력치 계산과 의뢰별 성 상태·인재 발견·방첩 효과를 담당합니다.
@@ -202,7 +206,7 @@
 - `WIAdministrationTurnSystem.Factions.cs`는 영토가 사라진 진영을 한 번만 멸망 처리하고 진행 연구, 소속 전투단과 전투 세션, 첩보 임무, 포로·인물 상태, 공동 공격·원조 대기 상태를 정리하며 진영별 멸망 서사를 월보에 기록합니다.
 - `WIAdministrationTurnSystem`은 본체를 포함한 기능별 소스 파일 21개로 구성되며, 모든 조건·반복문의 실행문은 중괄호 블록으로 유지합니다.
 - `WIAdministrationDatabaseSO`의 `AggressiveAIAttackPowerPercent=90`, `StandardAIAttackPowerPercent=105`는 AI 성향별 원정 최소 전력 비율입니다.
-- 아레스 메인의 현재 북부 진출로는 `castle_28 ↔ castle_04`, `castle_04 ↔ castle_33`, `castle_04 ↔ castle_34`입니다. 연결은 양쪽 성의 `AdjacentCastleIds`에 서로를 기록합니다.
+- 키리엔 메인의 현재 북부 진출로는 `castle_28 ↔ castle_04`, `castle_04 ↔ castle_33`, `castle_04 ↔ castle_34`입니다. 연결은 양쪽 성의 `AdjacentCastleIds`에 서로를 기록합니다.
 
 ## 성 내정 공용 모달 셸
 
@@ -245,7 +249,7 @@
 - `WIBattleCharacterState.GridColumn/GridRow`: 현재 점유 셀입니다. `GridDestinationColumn/GridDestinationRow`와 `HasGridDestination`은 이동 중 목적지 셀을 예약해 다른 캐릭터가 같은 셀을 선택하지 못하게 합니다.
 - 근접 공격 접근은 목표 주변 여덟 셀 중 빈 셀을 사용하며 실제 명중은 기존 월드 거리 판정입니다. 투사체와 광역 스킬도 월드 좌표 판정을 유지합니다.
 
-- `Assets/Art/Characters/Ares/Ares_Battle_1WU_A_OutlineBake_V1.png`: 현재 A 근거리 줌 기준 전투용 아레스 Sprite입니다. 외곽 실루엣에 `#10141A` 3단계 그라데이션 선을 직접 베이크했으며 최종 190×256px, 256 PPU와 Scale 1에서 외곽선 포함 높이가 정확히 1월드 유닛입니다. Bilinear, Mipmap 활성, 무압축으로 임포트하며 현재 1200명 밀도 테스트의 공용 Sprite입니다.
+- `Assets/Art/Characters/Ares/Ares_Battle_1WU_A_OutlineBake_V1.png`: 현재 A 근거리 줌 기준 전투용 키리엔 Sprite입니다. 외곽 실루엣에 `#10141A` 3단계 그라데이션 선을 직접 베이크했으며 최종 190×256px, 256 PPU와 Scale 1에서 외곽선 포함 높이가 정확히 1월드 유닛입니다. Bilinear, Mipmap 활성, 무압축으로 임포트하며 현재 1200명 밀도 테스트의 공용 Sprite입니다.
 
 ## 1유닛 캐릭터 축척 기준 완성형 전장 V6
 
@@ -330,7 +334,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - 월드 프리팹의 `commandButtons`와 `commandActions`는 하단 전역 명령 7개를 일대일로 보관합니다. 상단 월보·의회·연구·설정 입력은 공용 `WIAdministrationTopHUDUGUIController`가 소유하며 월드 명령 배열에 포함하지 않습니다.
 - `WIAdministrationEndTurnUGUIController`는 공용 다음 턴 프리팹의 클릭 이벤트, 활성 상태와 표시 문구를 담당합니다. 월드·영지 컨트롤러는 각각의 스냅샷에서 `CanEndTurn`과 `EndTurnText`를 전달하며 미결 플레이어 전투가 있으면 두 화면에서 동일하게 버튼을 비활성화합니다.
 - Unity Editor 플레이 모드에서는 `WIUIScreenManager`가 매번 새로 생성되는 23개 화면 Clone의 루트만 `SceneVisibilityManager.DisablePicking(screen, false)`로 피킹 차단합니다. 자식 UI는 피킹 가능하므로 Scene View에서 실제 패널·버튼을 직접 선택할 수 있으며 Player 빌드에는 이 처리가 포함되지 않습니다.
-- `WIHeroDefinition.battleSprite`는 인물별 선택 전투 전신 Sprite입니다. 현재 밀도 테스트에서는 `Assets/Art/Characters/Ares/Ares_Battle_1WU_A_OutlineBake_V1.png`가 공용 연결되며 `WIBattleCharacterView`는 값이 있으면 흰색 원본 Sprite를, 없으면 기존 진영색 플레이스홀더를 표시합니다. 아레스 UI 초상화는 고해상도 원본에서 얼굴 중심으로 추출한 `Ares_Portrait_Face_V1.png`를 사용합니다.
+- `WIHeroDefinition.battleSprite`는 인물별 선택 전투 전신 Sprite입니다. 현재 밀도 테스트에서는 `Assets/Art/Characters/Ares/Ares_Battle_1WU_A_OutlineBake_V1.png`가 공용 연결되며 `WIBattleCharacterView`는 값이 있으면 흰색 원본 Sprite를, 없으면 기존 진영색 플레이스홀더를 표시합니다. 키리엔 UI 초상화는 고해상도 원본에서 얼굴 중심으로 추출한 `Ares_Portrait_Face_V1.png`를 사용합니다.
 - `WIBattleCameraController.FrameCombatants`는 전체 참가자의 초기 좌표 범위와 2~60명 밀도를 함께 계산해 직교 카메라 시작 크기를 결정합니다. `WI_BattleConfig.cameraMaximumZoom`은 12이며 60명 전투는 최대 줌아웃을 사용합니다.
   - `Views/WIAdministrationHud.uxml`: 상단 HUD
   - `Views/WIAdministrationWorldView.uxml`: 전략 지도와 전역 명령
@@ -480,9 +484,10 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 
 ## 7. UI 후속 작업 문서
 
-- `GameDocuments/UIHandoffReport.md`: 전략 지도·영지 관리 목표 시안, 현재 UXML/USS 구조, 재사용 에셋, 후속 수정 순서와 완료 기준
-- `GameDocuments/UIConcepts/ProjectWI_Strategy_UI_Concept_V1.png`: 전략 지도 목표 시안
-- `GameDocuments/UIConcepts/ProjectWI_Castle_Administration_UI_Concept_V1.png`: 영지 관리 목표 시안
+- `GameDocuments/UIConcepts/ProjectWI_World_UI_Concept.png`: 전략 지도 목표 시안
+- `GameDocuments/UIConcepts/ProjectWI_Castle_Administration_UI_Concept.png`: 영지 관리 목표 시안
+- `GameDocuments/UIConcepts/Objective_UI_Concept_V1.png`: 목표 상세 팝업 시안(`WIAdministrationObjectiveUGUI`)
+- `GameDocuments/UIConcepts/TurnFollowup_UI_Concept_V1.png`: 턴 후속 안내 팝업 시안(`WIAdministrationTurnFollowupUGUI`)
 # UGUI 표시 데이터
 
 - 월드 UGUI는 기존 `WIAdministrationDatabaseSO`, `WIAdministrationState`, `WICampaignObjectiveSystem`, `WIAdministrationTurnSystem`의 데이터를 읽기 전용 `WIAdministrationWorldSnapshot`으로 변환하여 표시합니다.
@@ -537,7 +542,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - `Ares_Battle_FullBody_V1`: 보존하는 고해상도 원본입니다. 전투에서는 이 파일을 직접 사용하지 않고 여기서 파생한 `Ares_Battle_1WU_A_OutlineBake_V1`을 사용합니다.
 - `Ares_Battle_1WU_A_OutlineBake_V1`: 바깥 실루엣 외곽선을 포함해 190×256px로 정규화한 현재 전투용 Sprite입니다. Transform Scale 1, 256 PPU에서 약 0.742×1월드 단위로 표시하며 Mipmap 활성, Bilinear·무압축·Alpha Is Transparency를 사용합니다.
 - `WIHeroDefinition.battleSprite`: 현재 30명 이상 전투 배치 R&D를 위해 전체 1200명이 `Ares_Battle_1WU_A_OutlineBake_V1`을 임시 공유합니다. 이는 개별 캐릭터 이미지가 준비되기 전의 테스트 데이터입니다.
-- `WIBattleTestLabWindow.StartThirtyVsThirtyBattleDensityTest`: 아레스와 커먼급 29명을 아군에, 별도 영웅과 중복 없는 커먼급 29명을 적군에 배정해 기존 테스트 세션 경로를 실행합니다. 검증 캡처는 `Assets/Screenshots/Battle_30v30_Density_FirstAttempt.png`와 `Battle_30v30_Density_ZoomOut_NoHUD.png`입니다.
+- `WIBattleTestLabWindow.StartThirtyVsThirtyBattleDensityTest`: 키리엔과 커먼급 29명을 아군에, 별도 영웅과 중복 없는 커먼급 29명을 적군에 배정해 기존 테스트 세션 경로를 실행합니다. 검증 캡처는 `Assets/Screenshots/Battle_30v30_Density_FirstAttempt.png`와 `Battle_30v30_Density_ZoomOut_NoHUD.png`입니다.
 - `Battle_Ground_NeutralDay_V2_4K`: `GroundExperiment_V2`에 보존된 4096×4096 실험용 중립 지면 Sprite입니다. 확대 상태의 지면 세부 검증을 위한 단일 화면 후보이며 현재 `WI_BattleConfig`와 전장 Prefab에서는 참조하지 않습니다. 반복 경계가 검증되지 않았으므로 타일 데이터로 취급하지 않습니다.
 - `button_normal`: 공통 일반 UGUI 버튼 Sprite입니다. Single Sprite Border는 `{left: 28, bottom: 28, right: 28, top: 28}`이며 연결 Image는 Sliced를 사용합니다.
 - `button_primary`: 공통 주요 UGUI 버튼 Sprite입니다. Border는 `{left: 28, bottom: 24, right: 28, top: 24}`이며 연결 Image는 Sliced를 사용합니다.
@@ -571,7 +576,7 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - `WICampaignVariantDefinition.nonPlayerRecruitmentEnabled`: 해당 시나리오에서 비플레이어 세력의 재야 인재 고용 허용 여부입니다.
 - `WICampaignVariantDefinition.characterPlacements`: 런타임 생성이 아닌 ScriptableObject 저장형 시작 인물 배치 목록입니다.
 - 현재 캐릭터 마스터는 태생 영웅 200명과 일반 1000명, 총 1200명이며 시나리오별 시작 배치는 영웅 60명과 일반 90명, 총 150명입니다. 시작 시 재야 풀은 영웅 140명과 일반 910명, 총 1050명입니다.
-- 아레스 메인 `castle_28`에는 태생 영웅 2명과 일반 인물 2명, 총 4명이 배치됩니다.
+- 키리엔 메인 `castle_28`에는 태생 영웅 2명과 일반 인물 2명, 총 4명이 배치됩니다.
 - 자동 플레이어의 목표 고용 인원은 `14 + (보유 성 수 - 1) × 8`이며 6성 기준 54명입니다. 목표를 채운 뒤에는 불필요한 무한 영입을 중단합니다.
 - 내정 가능 판정은 태생 영웅 또는 승격 영웅입니다. 일반 등급은 내정·연구·영입·첩보 담당에서 제외되며 전투단 편성·군사 행동·합동훈련·자동 개인 훈련과 회복을 적용합니다.
 # Campaign Auto Test Lab 상세 데이터
@@ -674,12 +679,12 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - REPORT_UNOPPOSED_OCCUPATION: '무혈 점령 · {0}에 방어 병력이 없어 {1}이 전투 없이 점령했습니다.' 플레이어 관련 결과는 월간 보고 소식 맨 앞에 넣어 기존 두 개 소식 카드에서 확인할 수 있다. 새 UI 생성 없음.
 - 기존 저장의 빈 Pending 전투는 다음 전략 전투 처리 시 정리한다. 이미 진행 중인 실시간 전투를 중단하거나 저장 인물을 강제 재배치하지 않는다.
 - 검증: 접경 수비/무혈 점령 6개, 기존 UGUI 47개, 메인 발도르 초기 공격 주기 1개 총 54개 통과. 최종 추천 역할 적용 검사는 6개 재실행 통과. 컴파일 오류 없음. 프리 시나리오 검증 제외.
-- 첫 공격: 아레스·리리아·hero_009·hero_010 4명(추천 역할) 대 수비 3명, 전력230:228. 무조작 실시간 로직 30Hz에서 22.00초 Victory. 한 편성의 결과이며 모든 조합의 난이도 보장은 아니다.
+- 첫 공격: 키리엔·리리아·hero_009·hero_010 4명(추천 역할) 대 수비 3명, 전력230:228. 무조작 실시간 로직 30Hz에서 22.00초 Victory. 한 편성의 결과이며 모든 조합의 난이도 보장은 아니다.
 - 메인 대기 24개월: 수비 3명으로 시작, 7턴 4명, 8~18턴 6명, 19~25턴 2명. 종전 20명 집결과 달리 제한된 규모를 유지했다. 증거 Cardia-Defense-After.txt / Cardia-Reinforcement-After.txt. 실제 화면 클릭/시각 검증은 이번 검사에 포함하지 않았다.
 ## 2026-09-13 전투단 다중 선택 출정
 - 군사 화면의 전투단 상세 → 이동/원정 → 목표 성 → 출정 전투단 선택 → 하단 확정 순서로 연결했다. 같은 성의 출정 가능한 아군 전투단을 여러 개 선택하며 페이지 이동 후에도 선택을 유지한다. 최초 열었던 전투단은 기본 선택된다.
 - BeginArmyGroupMarch는 모든 전투단의 존재/작전 가능/동일 출발 성/소속/인접 목표/교전 관계/총 영향력을 변경 전에 확인한다. 실패 시 일부만 출발하거나 비용을 일부 차감하지 않는다. 적 성은 기존대로 전투단당 영향력20, 아군 성 이동은0이다. UI에는 선택 수와 총 비용을 표시한다.
-- 출정에 성공한 전투단의 StrategicTargetCastleId를 같은 목표로 설정한다. 아레스 메인의 기존 동일 출발 성·동일 목표·전투 생성 시 함께 도착한 전투단 합류 규칙을 사용한다. 나중에 도착하는 전투단이 이미 생성된 전투에 자동 합류하는 기능은 추가하지 않았다.
+- 출정에 성공한 전투단의 StrategicTargetCastleId를 같은 목표로 설정한다. 키리엔 메인의 기존 동일 출발 성·동일 목표·전투 생성 시 함께 도착한 전투단 합류 규칙을 사용한다. 나중에 도착하는 전투단이 이미 생성된 전투에 자동 합류하는 기능은 추가하지 않았다.
 - 군사 모달의 기존 카드6개와 페이지 이동2개를 모든 목록에 적용했다. 전투단 상세 인물이 많아 이동/원정 명령이 뒤에서 잘리던 문제와 전투단 목록8개 이후 접근 문제를 함께 해결했다. 신규 UI 동적 생성 없음.
 - 문구 UID: UI_GROUP_MARCH_TITLE / ROUTE / STATUS / CONFIRM / ARMY / INVALID. 기존 WI/UI/Clarify Activity Labels 메뉴로 데이터베이스 uiStrings에 저장했다. 전투단별 대장 통솔에 따른 인원 상한은 변경하지 않았다.
 - 검증: WIGroupMarchTests6개 + 수비/무혈6개 + 인물일괄2개 + UGUI47개 =61개 통과. 두 전투단6명의 실제 전투 런타임 생성, 승리 결과 제출 뒤 두 전투단 주둔, 총비용 부족/재편성/다른 출발 성/누락 식별자 시 전체 상태 무변경을 확인했다. 승리 결과 제출 검사는 이 편성의 실제 승률 검사가 아니다.
@@ -701,14 +706,14 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 
 ## 2026-09-21 초기 인물 축소
 - 각 시나리오의 시작 배치는 영웅 60명·일반 90명, 총 150명으로 축소했다. 전체 마스터 1200명은 유지하며 1050명은 재야 후보로 남는다.
-- 아레스 메인 프로스트혼은 ares, lyria, common_alden, common_sable 4명(영웅 2·일반 2)으로 시작한다. 다른 세력의 핵심 인물과 카르디아 수비 hero_072, common_049, common_048은 유지하고 나머지는 소유 성에 순환 분배한다.
+- 키리엔 메인 프로스트혼은 ares, lyria, common_alden, common_sable 4명(영웅 2·일반 2)으로 시작한다. 다른 세력의 핵심 인물과 카르디아 수비 hero_072, common_049, common_048은 유지하고 나머지는 소유 성에 순환 분배한다.
 - WICampaignCharacterPlacementSeeder와 실제 DB의 characterPlacements를 함께 갱신했다. 새 게임에 적용되며 기존 저장 인물을 소급 제거하지 않는다.
 - 초기 배치/재야 수량 검사 1개와 전투단 일괄 편성 검사 2개, 총 3개 통과. Unity 컴파일 오류 없음. 장기 난이도 및 실제 화면 플레이 검증은 수행하지 않았다.
 
 ## 2026-09-21 일반 인물 모병
 - 영웅은 인재실의 탐색·설득으로 영입한다. 일반은 이름·클래스·성장 이력을 유지하는 개별 실시간 전투 유닛이며 성의 모병으로 합류한다. 징병은 계획에 포함하지 않는다.
 - 경로: 군사 → 모병 · 일반 인물 충원 → 성 → 역할/합류 대상 선택 → 1명 또는 2명 모집. 전위·근접·원거리·마법·지원은 클래스의 RecommendedRole을 사용한다. 모집 명령은 금화를 즉시 지불하고 다음 월 처리에 합류한다.
-- 성 대기는 거주 공간을, 전투단은 통솔에 따른 빈자리를 사용한다. 처음 아레스 성의 거주 4칸이 찼다면 전투단을 편성한 뒤 모집하거나 합류 전투단을 선택한다. 영웅 담당자·추가 시설·인구 자원은 요구하지 않는다.
+- 성 대기는 거주 공간을, 전투단은 통솔에 따른 빈자리를 사용한다. 처음 키리엔 성의 거주 4칸이 찼다면 전투단을 편성한 뒤 모집하거나 합류 전투단을 선택한다. 영웅 담당자·추가 시설·인구 자원은 요구하지 않는다.
 - 자동 충원은 같은 화면에서 대상 전투단·전체 목표 인원·월 예산을 설정한 뒤 시작한다. 출정·재편성·전투·목표 달성·금화/후보/공간 부족에는 기다린다. 중지는 신규 예약만 막고 이미 예약한 건은 모집 취소로 환불한다.
 - 예약 이후 전투단이 떠나면 원래 성에 공간이 있을 때 대기한다. 성 소유권 변경·합류 공간 부족·전투 진입 시 예약을 취소하고 원래 세력에 환불한다. 원정 중 즉시 충원하지 않는다.
 - 신규 SO: Assets/Data/ScriptableObject/Administration/WI_MusterConfig.asset. DB의 musterConfig 참조에서 접근한다. goldPerCharacter=60, smallCastleMonthlyLimit=1, developedCastleMonthlyLimit=2, factionBaseCapacity=8, capacityPerCastle=4, factionMaximumCapacity=80, aiOrdersPerMonth=2, aiRearTarget=3, aiFrontTarget=6.
@@ -770,3 +775,16 @@ Unity Editor 전용 `ProjectWI`·`WI` 메뉴 구조와 각 기능 설명은 `Gam
 - WITemporaryBattleEffectsBuilder는 Assets/Editor 전용이다. Create는 기존 4종 프리팹이 있으면 덮어쓰기를 거절하며, Apply Temporary Effect Visuals는 임시 효과의 머티리얼/화살 메시/정점 색상/렌더러 설정을 기본값으로 복원한다. 수동 편집 후에는 복원 메뉴를 실행하지 않는다. Verify는 임시 PreviewScene을 만들고 finally에서 정리하며 기존 게임 씬을 저장하지 않는다.
 - 검증은 실제 파티클 수로 표시/소멸을 검사한다. 편집기 Simulate 이후 IsAlive는 파티클 수가 0이어도 일시정지된 시스템을 활성 상태로 보고할 수 있어 종료 기준으로 사용하지 않는다.
 - 런타임 코드, SO 마스터, 저장 구조, 문자열 UID 및 기존 전투 이벤트 변경 없음. 생성·회수·목표 추적·명중 이벤트 연결은 후속 작업이다.
+
+## 전투 이펙트 연결 구조 (2026-09-25)
+- WIBattleConfigSO: slashEffectPrefab/arrowEffectPrefab/magicEffectPrefab/hitEffectPrefab 및 종류별 크기·표시 높이·단발 재생 시간. 기존 SO에 참조를 저장했다.
+- WIBattleProjectileState.ShooterRole은 발사 당시 역할을 보존한다. WIBattleVisualEffectType.Hit은 enum 끝에 추가했으며 실제 피해 경로에서 AddHitVisual로 예약한다.
+- WIBattleRuntimeController는 일반 공격의 기존 사각형 표시 대신 WIBattleEffectPresenter를 호출한다. 기존 스킬 범위 SpriteRenderer 표시는 유지한다. 표시기는 종류별 Stack 풀, 투사체 ID별 활성 목록, 단발 ID 중복 방지로 구성한다. UI 오브젝트나 컴포넌트의 런타임 조립 없음.
+- 투사체는 프리팹 내 Velocity over Lifetime을 끄고 0.08초 파티클 표본을 유지한 채 전투 보간 좌표/방향에 배치한다. 단발은 재생 시간에 따라 ParticleSystem.Simulate로 진행한다. 정렬은 캐릭터와 같은 Y 기준으로 계산한다. 전술 일시정지 시 호출을 멈춰 파티클도 정지한다.
+- WIBattleEffectTests는 실제 연결 프리팹을 이용한 역할별 외형, 긴 비행 표시, 이동 중복 방지, 풀 재사용, 마지막 일격 소멸, 명중/만료 피격 판정을 검사한다. 플레이 화면 증거는 BattleEffects-Integration.txt에 기록한다.
+
+## 전략·성 화면 시안 정합 (2026-09-26)
+- 문자열 UID 추가: `UI_CASTLE_SIZE_SMALL`·`UI_CASTLE_SIZE_MEDIUM`·`UI_CASTLE_SIZE_LARGE`(성 규모 표시명), `UI_ADMIN_FACILITY_SLOT_EMPTY`(미지정 특화 시설 칸), `UI_ADMIN_FACILITY_SLOT_LOCKED`(성 규모상 아직 없는 칸).
+- `WIAdministrationDatabaseSO.GetCastleSizeName(WICastleSize)`가 성 규모 열거값을 위 UID 표시명으로 바꾼다. 전략 화면 성 부제, 성 화면 정보줄, 성 기록, 확장 완료 문구가 사용한다.
+- `WIAdministrationSlotSnapshot.Unlocked`: 특화 시설 칸이 성 규모상 열려 있는지 나타낸다. 성 화면은 두 칸을 항상 표시하고 잠긴 칸은 버튼을 비활성화한다.
+- 신규 아이콘 `Assets/Resources/UI/Generated/icon_castle_stat_{prosperity,technology,stability,defense}_v1.png`(128×128, 투명 배경): 기존 가로형 수치판 `castle_stat_*.png`에서 아이콘 부분만 잘라 낸 것이다. 성 화면 번영·기술·질서·방어 행, 중점 사업 명령, 성관·시장 바로가기에 사용한다.

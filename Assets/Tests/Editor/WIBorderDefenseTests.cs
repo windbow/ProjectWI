@@ -17,7 +17,7 @@ namespace ProjectWI.Tests.Editor
             return AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>("Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset");
         }
 
-        // 첫 공략은 수비 인물이 있는 실제 전투이며 아레스 초기 네 명으로 끝까지 진행 가능한지 확인합니다.
+        // 첫 공략은 수비 인물이 있는 실제 전투이며 키리엔 초기 네 명으로 끝까지 진행 가능한지 확인합니다.
         [Test]
         public void FirstAttackHasDefendersAndPlayableBattle()
         {

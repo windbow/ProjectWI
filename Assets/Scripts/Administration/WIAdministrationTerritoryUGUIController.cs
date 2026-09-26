@@ -141,7 +141,8 @@ namespace ProjectWI.Administration
             for (int index = 0; index < facilitySlotButtons.Length; index += 1)
             {
                 facilitySlotButtons[index].interactable = snapshot.Manageable &&
-                    index < snapshot.FacilitySlots.Count && snapshot.FacilitySlots[index].Visible;
+                    index < snapshot.FacilitySlots.Count && snapshot.FacilitySlots[index].Visible
+                    && snapshot.FacilitySlots[index].Unlocked;
             }
 
             for (int index = 0; index < commandButtons.Length; index += 1)

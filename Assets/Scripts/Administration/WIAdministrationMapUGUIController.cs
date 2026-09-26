@@ -96,9 +96,9 @@ namespace ProjectWI.Administration
                     : ResolveMarker(node.FactionId);
                 castleMarkers[index].color = node.Selected ? selectedColor : normalColor;
                 castleMarkers[index].rectTransform.localScale = node.Selected
-                    ? new Vector3(1.65f, 1.65f, 1f)
+                    ? new Vector3(1.35f, 1.35f, 1f)
                     : Vector3.one;
-                castleLabels[index].fontSize = node.Selected ? 15f : 12f;
+                castleLabels[index].fontSize = node.Selected ? 17f : 14f;
                 castleLabels[index].color = node.Selected
                     ? new Color32(255, 255, 255, 255)
                     : new Color32(232, 236, 238, 255);
@@ -132,13 +132,13 @@ namespace ProjectWI.Administration
                 TMP_Text label = castleLabels[index];
                 RectTransform rect = label.rectTransform;
                 Vector2 origin = map.InverseTransformPoint(castleButtons[index].transform.position);
-                Vector2 size = new Vector2(Mathf.Clamp(label.GetPreferredValues(label.text).x + 8f, 42f, 120f), 22f);
-                Vector2 best = origin + new Vector2(0f, -24f);
+                Vector2 size = new Vector2(Mathf.Clamp(label.GetPreferredValues(label.text).x + 8f, 48f, 140f), 26f);
+                Vector2 best = origin + new Vector2(0f, -28f);
                 float bestScore = float.MaxValue;
                 for (int candidate = 0; candidate < 65; candidate += 1)
                 {
                     float angle = candidate == 0 ? -Mathf.PI * .5f : (candidate - 1) % 8 * Mathf.PI * .25f;
-                    float radius = candidate == 0 ? 24f : 36f + (candidate - 1) / 8 * 12f;
+                    float radius = candidate == 0 ? 28f : 42f + (candidate - 1) / 8 * 12f;
                     Vector2 center = origin + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * radius;
                     center.x = Mathf.Clamp(center.x, map.rect.xMin + size.x * .5f, map.rect.xMax - size.x * .5f);
                     center.y = Mathf.Clamp(center.y, map.rect.yMin + size.y * .5f, map.rect.yMax - size.y * .5f);

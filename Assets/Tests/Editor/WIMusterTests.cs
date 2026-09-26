@@ -16,7 +16,7 @@ namespace ProjectWI.Tests.Editor
         private WICastleRuntimeState castle;
         private WIArmyState army;
 
-        // 아레스 시작 인원은 그대로 두고 모병을 받을 전투단만 편성합니다.
+        // 키리엔 시작 인원은 그대로 두고 모병을 받을 전투단만 편성합니다.
         [SetUp]
         public void SetUp()
         {

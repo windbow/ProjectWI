@@ -285,7 +285,7 @@ namespace ProjectWI.Battle
         // 마우스 휠을 전투 카메라 확대·축소에 전달합니다.
         private void HandleMouseWheel(WheelEvent wheelEvent)
         {
-            battleController?.CameraController?.Zoom(Mathf.Sign(wheelEvent.delta.y));
+            battleController?.CameraController?.Zoom(Mathf.Sign(wheelEvent.delta.y), PanelToScreen(wheelEvent.mousePosition));
             wheelEvent.StopPropagation();
         }
 

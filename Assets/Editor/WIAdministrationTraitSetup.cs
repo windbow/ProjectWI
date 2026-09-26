@@ -151,7 +151,7 @@ namespace ProjectWI.EditorTools
             AddText(serialized, "UI_ADMIN_COMBAT_TRAINING", "주둔 전투단과 구성원 경험 증가", "Train the stationed battle groups and their members");
             AddText(serialized, "UI_ADMIN_COMBAT_RECOVERY", "주둔 인물 피로·부상 회복", "Recover stationed characters' fatigue and injuries");
             serialized.ApplyModifiedProperties();
-            // 아레스 시작 성의 내정을 특성 보유 일반 인물에게 넘겨 주인공을 출전 가능하게 합니다.
+            // 키리엔 시작 성의 내정을 특성 보유 일반 인물에게 넘겨 주인공을 출전 가능하게 합니다.
             serialized.Update();
             SerializedProperty variants = serialized.FindProperty("campaignVariants");
             for (int index = 0; index < variants.arraySize; index += 1)

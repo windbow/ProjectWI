@@ -78,7 +78,7 @@ namespace ProjectWI.Administration
                 Influence = $"영향력  {FormatHudNumber(state.Influence, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.InfluenceGained, database.UseEnglish)}/월)</color></size>",
                 CastleTitle = definition?.DisplayName.Get(database.UseEnglish) ?? selectedCastle.CastleId,
                 CastleInfo = detailed
-                    ? $"{ownerName} · {selectedCastle.CastleSize} · {definition?.TerrainTrait.Get(database.UseEnglish)} · 인물 {WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, selectedCastle).Count}/{selectedCastle.GetHeroSlotCount()}"
+                    ? $"{ownerName} · {database.GetCastleSizeName(selectedCastle.CastleSize)} · {definition?.TerrainTrait.Get(database.UseEnglish)} · 인물 {WIAdministrationTurnSystem.GetCastleResidentHeroIds(state, selectedCastle).Count}/{selectedCastle.GetHeroSlotCount()}"
                     : $"{ownerName} 소유 · 상세 정보 미확보",
                 CastleImage = definition?.CastleImage,
                 GovernorPortrait = governor?.Portrait,
@@ -121,19 +121,25 @@ namespace ProjectWI.Administration
 
             for (int index = 0; index < 2; index += 1)
             {
-                bool visible = detailed && index < selectedCastle.GetSpecialFacilitySlotCount();
-                bool occupied = visible && index < selectedCastle.SpecialFacilityIds.Count;
+                // 시안처럼 두 칸을 항상 보여 주고, 규모상 아직 없는 칸은 잠김 상태로 표시합니다.
+                bool visible = detailed;
+                bool unlocked = visible && index < selectedCastle.GetSpecialFacilitySlotCount();
+                bool occupied = unlocked && index < selectedCastle.SpecialFacilityIds.Count;
                 WISpecialFacilityDefinition facility = occupied
                     ? database.GetSpecialFacility(selectedCastle.SpecialFacilityIds[index])
                     : null;
+                string emptyCaption = unlocked
+                    ? database.GetText("UI_ADMIN_FACILITY_SLOT_EMPTY")
+                    : database.GetText("UI_ADMIN_FACILITY_SLOT_LOCKED");
                 snapshot.FacilitySlots.Add(new WIAdministrationSlotSnapshot
                 {
                     Visible = visible,
                     Occupied = occupied,
+                    Unlocked = unlocked,
                     ContentId = occupied ? selectedCastle.SpecialFacilityIds[index] : string.Empty,
                     Caption = occupied
                         ? facility == null ? selectedCastle.SpecialFacilityIds[index] : facility.DisplayName.Get(database.UseEnglish)
-                        : "확장 완료 시 선택",
+                        : emptyCaption,
                     Image = facility?.Icon
                 });
             }

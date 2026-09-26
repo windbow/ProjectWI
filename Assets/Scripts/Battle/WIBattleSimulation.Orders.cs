@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ProjectWI.Administration;
 using UnityEngine;
 
@@ -6,8 +7,9 @@ namespace ProjectWI.Battle
 {
     public static partial class WIBattleSimulation
     {
-        // 분대가 없는 인물을 전투단별로 모아 영웅마다 분대를 만들고 나머지 인물을 번갈아 배정합니다.
-        public static void AssignSquads(WIBattleRuntimeState runtime)
+        // 분대가 없는 인물을 진영·전투단별로 모아 전투단 하나를 분대 하나로 만들고, 최대 인원을 넘으면 나눕니다.
+        // 분대장은 대장, 영웅, 첫 인물 순으로 정합니다.
+        public static void AssignSquads(WIBattleConfigSO config, WIBattleRuntimeState runtime)
         {
             Dictionary<string, List<WIBattleCharacterState>> groups = new Dictionary<string, List<WIBattleCharacterState>>();
             List<string> groupOrder = new List<string>();
@@ -29,12 +31,11 @@ namespace ProjectWI.Battle
             foreach (string key in groupOrder)
             {
                 List<WIBattleCharacterState> group = groups[key];
-                List<WIBattleCharacterState> leaders = group.FindAll(item => item.Grade == WICharacterGrade.Hero);
-                if (leaders.Count == 0)
-                {
-                    WIBattleCharacterState commander = group.Find(item => item.Role == WIUnitRole.Commander) ?? group[0];
-                    leaders.Add(commander);
-                }
+                int squadCount = Mathf.CeilToInt(group.Count / (float)config.SquadMaxSize);
+                List<WIBattleCharacterState> leaders = group
+                    .OrderBy(item => GetLeaderPriority(item))
+                    .ThenBy(item => item.HeroId, System.StringComparer.Ordinal)
+                    .Take(squadCount).ToList();
                 List<WIBattleSquadState> squads = new List<WIBattleSquadState>();
                 foreach (WIBattleCharacterState leader in leaders)
                 {
@@ -59,6 +60,14 @@ namespace ProjectWI.Battle
                     next += 1;
                 }
             }
+        }
+
+        // 분대장 선정 우선순위(대장 0, 영웅 1, 나머지 2)를 반환합니다.
+        private static int GetLeaderPriority(WIBattleCharacterState character)
+        {
+            if (character.Role == WIUnitRole.Commander) return 0;
+            if (character.Grade == WICharacterGrade.Hero) return 1;
+            return 2;
         }
 
         // 진영 공통 명령을 바꾸고 해당 진영 분대들의 전용 명령을 해제합니다.
@@ -190,6 +199,11 @@ namespace ProjectWI.Battle
                 character.Position = placed;
                 character.FormationPosition = placed;
                 character.HasPreviousPosition = false;
+                WIBattleSquadState squad = FindSquad(runtime, character.SquadId);
+                if (squad != null)
+                {
+                    squad.CohesionActive = false;
+                }
             }
         }
 

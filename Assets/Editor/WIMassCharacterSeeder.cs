@@ -120,8 +120,8 @@ namespace ProjectWI.Editor
 
             // 1. 영웅 200명을 생성하고 기존 핵심 영웅 ID를 보존합니다.
             string[] startingHeroIds = { "ares", "lyria", "elwyn", "selene", "brom", "morrigan", "kael", "theron" };
-            string[] startingHeroNamesKR = { "아레스", "리리아", "엘윈", "셀레네", "브롬", "모리건", "케일", "테론" };
-            string[] startingHeroNamesEN = { "Ares", "Lyria", "Elwyn", "Selene", "Brom", "Morrigan", "Kael", "Theron" };
+            string[] startingHeroNamesKR = { "키리엔", "리리아", "엘윈", "셀레네", "브롬", "모리건", "케일", "테론" };
+            string[] startingHeroNamesEN = { "Kyrien", "Lyria", "Elwyn", "Selene", "Brom", "Morrigan", "Kael", "Theron" };
 
             int heroIdIndex = 1;
             for (int raceIdx = 0; raceIdx < 7; raceIdx++)

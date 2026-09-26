@@ -116,7 +116,7 @@ namespace ProjectWI.Tests.Editor
             Assert.IsFalse(WIAdministrationTurnSystem.CanPerformCharacterActivity(state, administrator, WICharacterActivityType.Rest));
         }
 
-        // 아레스가 영지관과 전투단 대장을 겸임하면서 성의 내정을 유지합니다.
+        // 키리엔이 영지관과 전투단 대장을 겸임하면서 성의 내정을 유지합니다.
         [Test]
         public void AresCanFight_WhileCommonGovernorRunsHome()
         {

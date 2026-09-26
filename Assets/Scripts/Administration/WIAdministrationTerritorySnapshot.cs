@@ -34,6 +34,8 @@ namespace ProjectWI.Administration
     {
         public bool Visible;
         public bool Occupied;
+        // 성 규모상 사용할 수 있는 칸인지 나타냅니다. 잠긴 칸은 표시만 하고 선택할 수 없습니다.
+        public bool Unlocked = true;
         public string ContentId;
         public string Caption;
         public Sprite Image;

@@ -96,7 +96,7 @@ namespace ProjectWI.EditorTools
                 var detailSubtitle = Text("DetailSubtitle", page, 630, 423, 1200, 38, 25, database.GetText("UI_SCENARIO_ARES_SUBTITLE"));
                 var story = Text("Story", page, 630, 471, 1200, 83, 24, database.GetText("UI_SCENARIO_ARES_STORY"));
                 var faction = Info(page, "Faction", 626, "UI_SCENARIO_FACTION", "림가르드", "Assets/Art/Factions/Emblem_Avalon_V1.png");
-                var protagonist = Info(page, "Protagonist", 1044, "UI_SCENARIO_PROTAGONIST", "아레스", "Assets/Art/Characters/Ares/Ares_Portrait_Face_V1.png");
+                var protagonist = Info(page, "Protagonist", 1044, "UI_SCENARIO_PROTAGONIST", "키리엔", "Assets/Art/Characters/Ares/Ares_Portrait_Face_V1.png");
                 var castle = Info(page, "Castle", 1462, "UI_SCENARIO_CASTLE", "프로스트혼", "Assets/Art/Castles/Castle_Avalon_V1.png");
                 Frame("ObjectivePanel", page, 626, 692, 1236, 78);
                 Fixed("ObjectiveHeading", page, 650, 710, 180, 40, 26, "UI_SCENARIO_OBJECTIVE");
@@ -194,10 +194,10 @@ namespace ProjectWI.EditorTools
                 {"CASTLE", "시작 거점", "Starting Castle"},
                 {"OBJECTIVE", "승리 목표", "Victory Goal"},
                 {"ARES_TITLE", "황혼의 귀환", "Return of Twilight"},
-                {"ARES_SUBTITLE", "아레스의 림가르드 재건", "Ares rebuilds Rimgard"},
-                {"ARES_STORY", "발도르의 장군으로 자란 아레스.\n잃어버린 이름을 되찾고 림가르드의 재건을 시작합니다.", "Raised as a general of Valdor, Ares reclaims his lost name\nand begins the restoration of Rimgard."},
+                {"ARES_SUBTITLE", "키리엔의 림가르드 재건", "Kyrien rebuilds Rimgard"},
+                {"ARES_STORY", "발도르의 장군으로 자란 키리엔.\n잃어버린 이름을 되찾고 림가르드의 재건을 시작합니다.", "Raised as a general of Valdor, Kyrien reclaims his lost name\nand begins the restoration of Rimgard."},
                 {"ARES_OBJECTIVE", "발도르의 모든 성 점령", "Capture all castles held by Valdor"},
-                {"ARES_PROTAGONIST", "아레스", "Ares"},
+                {"ARES_PROTAGONIST", "키리엔", "Kyrien"},
                 {"FREE_TITLE", "자유 정복", "Free Conquest"},
                 {"FREE_SUBTITLE", "나만의 대륙 통일", "Unite the continent your way"},
                 {"FREE_STORY", "각 세력이 기본 성 배치에서 시작합니다.\n림가르드의 영지를 넓히고 대륙 통일을 이루세요.", "Each faction begins with its standard territories.\nExpand Rimgard and unite the continent."},

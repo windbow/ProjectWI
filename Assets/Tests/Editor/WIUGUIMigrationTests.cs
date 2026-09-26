@@ -83,7 +83,7 @@ namespace ProjectWI.Tests.Editor
         private const string AdministrationRuntimePrefabPath = "Assets/Prefabs/Administration/WIAdministrationUI.prefab";
         private const string AdministrationDatabasePath = "Assets/Data/ScriptableObject/Administration/WI_AdministrationDatabase.asset";
 
-        // 아레스의 얼굴 초상화와 전투 전신 Sprite가 올바른 원본 에셋을 사용하는지 확인합니다.
+        // 키리엔의 얼굴 초상화와 전투 전신 Sprite가 올바른 원본 에셋을 사용하는지 확인합니다.
         [Test]
         public void AresUsesFacePortraitAndBattleSprite()
         {
@@ -99,7 +99,7 @@ namespace ProjectWI.Tests.Editor
             Assert.That(ares.BattleSprite.texture.format, Is.Not.EqualTo(TextureFormat.RGB24));
         }
 
-        // 전투 인원 밀도 테스트를 위해 전체 캐릭터가 아레스 전투 Sprite를 공유하는지 확인합니다.
+        // 전투 인원 밀도 테스트를 위해 전체 캐릭터가 키리엔 전투 Sprite를 공유하는지 확인합니다.
         [Test]
         public void AllCharactersUseAresBattleSpriteForBattleDensityTest()
         {

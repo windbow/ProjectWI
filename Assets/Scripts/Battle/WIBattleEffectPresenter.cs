@@ -118,7 +118,15 @@ namespace ProjectWI.Battle
                     Vector2 position = projectile.HasPreviousPosition == true
                         ? Vector2.Lerp(projectile.PreviousPosition, projectile.Position, runtime.InterpolationAlpha)
                         : projectile.Position;
-                    Place(instance, position, projectile.TargetPosition - position, config.ProjectileEffectScale);
+                    Vector2 heading = projectile.TargetPosition - position;
+                    if (projectile.IsArc == true && projectile.TotalDistance > 0f)
+                    {
+                        float progress = Mathf.Clamp01(1f - Vector2.Distance(position, projectile.TargetPosition) / projectile.TotalDistance);
+                        float height = config.ArrowArcHeight * Mathf.Min(1f, projectile.TotalDistance / 6f);
+                        position += Vector2.up * Mathf.Sin(progress * Mathf.PI) * height;
+                        heading += Vector2.up * Mathf.Cos(progress * Mathf.PI) * height * 2f;
+                    }
+                    Place(instance, position, heading, config.ProjectileEffectScale);
                 }
             }
             removals.Clear();
@@ -198,6 +206,10 @@ namespace ProjectWI.Battle
         // 잔여 파티클을 지운 후 다음 공격에서 같은 인스턴스를 재사용합니다.
         private void Release(WIInstance instance)
         {
+            if (instance.Object == null)
+            {
+                return;
+            }
             instance.Root.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             instance.Object.SetActive(false);
             pools[instance.Kind].Push(instance);

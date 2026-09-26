@@ -177,7 +177,7 @@ namespace ProjectWI.Administration
             return true;
         }
 
-        // 기본 전투단 둘을 운용하고 아레스 메인은 영토 성장에 따라 수비대와 원정대를 단계적으로 늘립니다.
+        // 기본 전투단 둘을 운용하고 키리엔 메인은 영토 성장에 따라 수비대와 원정대를 단계적으로 늘립니다.
         private static void EnsurePlayerArmies(
             WIAdministrationDatabaseSO database,
             WIAdministrationState state,
@@ -471,7 +471,7 @@ namespace ProjectWI.Administration
             WIAutoPlayerPolicy policy,
             WIAutoStrategicPlan plan)
         {
-            // 프리 시나리오는 기존 통합 운용을 유지하고 아레스 메인은 수비대와 원정대를 분리합니다.
+            // 프리 시나리오는 기존 통합 운용을 유지하고 키리엔 메인은 수비대와 원정대를 분리합니다.
             if (state.CampaignVariant != WICampaignVariant.AresMain)
             {
                 ConsolidateArmiesAtSameCastle(database, state);
@@ -570,7 +570,7 @@ namespace ProjectWI.Administration
                 assemblyIds.Any(id => GetFriendlyPathDistance(state, army.CurrentCastleId, id) < int.MaxValue));
         }
 
-        // 아레스 메인에서 충분한 기반을 확보한 뒤 발도르 멸망에 전력을 집중할 단계인지 확인합니다.
+        // 키리엔 메인에서 충분한 기반을 확보한 뒤 발도르 멸망에 전력을 집중할 단계인지 확인합니다.
         private static bool IsFinalValdorCampaign(WIAdministrationState state)
         {
             return state.CampaignVariant == WICampaignVariant.AresMain &&

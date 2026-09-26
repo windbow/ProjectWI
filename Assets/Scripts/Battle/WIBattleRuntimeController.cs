@@ -19,6 +19,8 @@ namespace ProjectWI.Battle
         [SerializeField] private WIBattleCameraController cameraController;
         // 지형 구역·배치 구역·스킬 범위 미리보기에 쓰는 흰색 원 프리팹입니다.
         [SerializeField] private SpriteRenderer zoneMarkerPrefab;
+        // 배치 구역처럼 사각형 영역 표시에 쓰는 흰색 사각형 프리팹입니다.
+        [SerializeField] private SpriteRenderer rectZoneMarkerPrefab;
 
         private WIBattleRuntimeState runtime;
         private readonly List<WIBattleCharacterView> views = new List<WIBattleCharacterView>();
@@ -35,6 +37,15 @@ namespace ProjectWI.Battle
         private SpriteRenderer skillAreaPreview;
         // 배치 단계 동안 표시하는 플레이어 배치 가능 구역입니다.
         private SpriteRenderer deploymentZoneMarker;
+
+        // 결정적 순간에 전투를 아주 잠깐 멈추는 히트 스톱 남은 시간입니다.
+        private float hitStopRemaining;
+        // 명령 지점에 퍼지는 원 표시와 각 원의 경과 시간·색입니다.
+        private readonly List<SpriteRenderer> orderPings = new List<SpriteRenderer>();
+        private readonly List<float> orderPingElapsed = new List<float>();
+        private readonly List<Color> orderPingColors = new List<Color>();
+        private int nextOrderPing;
+        private const int OrderPingPoolSize = 6;
 
         // 전술 일시정지 중이면 시뮬레이션을 멈추고 표시만 갱신합니다.
         public bool IsPaused { get; set; }
@@ -102,30 +113,44 @@ namespace ProjectWI.Battle
         // 프레임 시간만큼 표적 탐색, 이동, 공격과 승패 판정을 진행합니다.
         public void SimulateStep(float deltaTime)
         {
+            RefreshOrderPings(Time.unscaledDeltaTime);
             if (runtime == null || runtime.Finished == true)
             {
                 if (runtime != null)
                 {
+                    RefreshViews(deltaTime);
                     effectPresenter?.Refresh(runtime, deltaTime);
                 }
                 return;
             }
             if (IsPaused == true)
             {
-                RefreshViews();
+                RefreshViews(0f);
+                return;
+            }
+            if (hitStopRemaining > 0f)
+            {
+                hitStopRemaining -= Time.unscaledDeltaTime;
+                RefreshViews(0f);
                 return;
             }
             WIBattleOutcome outcome = WIBattleSimulation.Advance(config, runtime, deltaTime);
             reinforcements?.Advance(config, runtime);
+            ConsumeFeedbackEvents();
+            bool spawnedDuringBattle = views.Count > 0;
             while (views.Count < runtime.Characters.Count)
             {
                 WIBattleCharacterState character = runtime.Characters[views.Count];
                 WIBattleCharacterView view = Instantiate(characterPrefab, characterRoot == null ? transform : characterRoot);
                 view.Bind(character, config, battleDatabase.GetHero(character.HeroId)?.BattleSprite);
                 view.SetFarOutlineEnabled(cameraController == null || cameraController.CurrentZoomLevel == WIBattleZoomLevel.C);
+                if (spawnedDuringBattle == true)
+                {
+                    view.PlaySpawn();
+                }
                 views.Add(view);
             }
-            RefreshViews();
+            RefreshViews(deltaTime);
             RefreshVisualEffects();
             effectPresenter?.Refresh(runtime, deltaTime);
             if (outcome != WIBattleOutcome.None)
@@ -184,7 +209,7 @@ namespace ProjectWI.Battle
             }
             if (runtime != null)
             {
-                RefreshViews();
+                RefreshViews(0f);
             }
         }
 
@@ -251,10 +276,80 @@ namespace ProjectWI.Battle
             skillAreaPreview.name = "SkillAreaPreview";
             skillAreaPreview.sortingOrder = 1601;
             HideSkillPreview();
-            deploymentZoneMarker = Instantiate(zoneMarkerPrefab, parent);
+            if (rectZoneMarkerPrefab == null)
+            {
+                Debug.LogError("사각형 구역 표시 프리팹(rectZoneMarkerPrefab)이 BattleRuntime에 연결되지 않았습니다.", this);
+                return;
+            }
+            deploymentZoneMarker = Instantiate(rectZoneMarkerPrefab, parent);
             deploymentZoneMarker.name = "DeploymentZone";
             deploymentZoneMarker.color = config.DeploymentZoneColor;
             deploymentZoneMarker.gameObject.SetActive(false);
+        }
+
+        // 시뮬레이션이 남긴 연출 사건을 화면 흔들림·히트 스톱으로 바꾸고 목록을 비웁니다.
+        private void ConsumeFeedbackEvents()
+        {
+            foreach (WIBattleFeedbackEvent feedback in runtime.FeedbackEvents)
+            {
+                cameraController?.AddTrauma(config.GetShakeTrauma(feedback.Type));
+                hitStopRemaining = Mathf.Max(hitStopRemaining, config.GetHitStop(feedback.Type));
+            }
+            runtime.FeedbackEvents.Clear();
+        }
+
+        // 이동·공격 명령 지점에 퍼지며 사라지는 원을 표시합니다.
+        public void ShowOrderPing(Vector2 position, bool attack)
+        {
+            if (orderPings.Count == 0 && zoneMarkerPrefab != null)
+            {
+                Transform parent = visualEffectRoot == null ? transform : visualEffectRoot;
+                for (int index = 0; index < OrderPingPoolSize; index += 1)
+                {
+                    SpriteRenderer ping = Instantiate(zoneMarkerPrefab, parent);
+                    ping.name = "OrderPing";
+                    ping.sortingOrder = 1590;
+                    ping.gameObject.SetActive(false);
+                    orderPings.Add(ping);
+                    orderPingElapsed.Add(float.MaxValue);
+                    orderPingColors.Add(Color.white);
+                }
+            }
+            if (orderPings.Count == 0)
+            {
+                return;
+            }
+            int slot = nextOrderPing;
+            nextOrderPing = (nextOrderPing + 1) % orderPings.Count;
+            orderPings[slot].transform.position = position;
+            orderPings[slot].gameObject.SetActive(true);
+            orderPingElapsed[slot] = 0f;
+            orderPingColors[slot] = attack == true ? config.OrderPingAttackColor : config.OrderPingMoveColor;
+        }
+
+        // 명령 지점 원을 넓히며 흐리게 하고 끝나면 숨깁니다.
+        private void RefreshOrderPings(float deltaTime)
+        {
+            for (int index = 0; index < orderPings.Count; index += 1)
+            {
+                if (orderPingElapsed[index] == float.MaxValue)
+                {
+                    continue;
+                }
+                orderPingElapsed[index] += deltaTime;
+                float progress = orderPingElapsed[index] / config.OrderPingDuration;
+                if (progress >= 1f)
+                {
+                    orderPingElapsed[index] = float.MaxValue;
+                    orderPings[index].gameObject.SetActive(false);
+                    continue;
+                }
+                float eased = 1f - (1f - progress) * (1f - progress);
+                orderPings[index].transform.localScale = Vector3.one * Mathf.Lerp(0.25f, 1.4f, eased);
+                Color color = orderPingColors[index];
+                color.a *= 1f - progress;
+                orderPings[index].color = color;
+            }
         }
 
         // 플레이어 진영의 배치 구역 표시를 켜거나 끕니다.
@@ -285,7 +380,7 @@ namespace ProjectWI.Battle
                 return;
             }
             WIBattleSimulation.DeploySquads(config, runtime, squadIds, destination);
-            RefreshViews();
+            RefreshViews(0f);
         }
 
         // 배치 단계를 끝내고 전투를 시작합니다.
@@ -333,11 +428,11 @@ namespace ProjectWI.Battle
         }
 
         // 런타임 위치와 생존 상태를 캐릭터 표시 오브젝트에 반영합니다.
-        private void RefreshViews()
+        private void RefreshViews(float deltaTime)
         {
             foreach (WIBattleCharacterView view in views)
             {
-                view.Refresh(runtime.InterpolationAlpha);
+                view.Refresh(runtime.InterpolationAlpha, deltaTime);
                 bool focused = runtime.AttackerFocusHeroId == view.HeroId || runtime.DefenderFocusHeroId == view.HeroId;
                 view.SetFocused(focused);
                 view.SetSelected(selectedHeroId == view.HeroId || selectedSquadIds.Contains(view.SquadId) == true);
@@ -352,7 +447,7 @@ namespace ProjectWI.Battle
                 .OrderBy(item => Vector2.SqrMagnitude(item.Position - worldPosition))
                 .FirstOrDefault();
             selectedHeroId = selected?.HeroId ?? string.Empty;
-            RefreshViews();
+            RefreshViews(0f);
             return selected;
         }
 
@@ -375,6 +470,7 @@ namespace ProjectWI.Battle
             Transform parent = arenaRoot == null ? transform : arenaRoot;
             GameObject arenaPrefabInstance = Instantiate(config.ArenaPrefab, parent);
             arenaPrefabInstance.name = config.ArenaPrefab.name;
+            arenaPrefabInstance.transform.localScale = Vector3.one * config.ArenaPrefabScale;
         }
 
         // 전투 효과와 투사체 프리팹을 재사용할 표시 오브젝트 풀을 준비합니다.

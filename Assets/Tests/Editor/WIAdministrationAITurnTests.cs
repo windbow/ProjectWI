@@ -208,7 +208,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(WICampaignResult.Victory, state.CampaignResult);
         }
 
-        // 아레스 메인은 다른 진영 성이 남아 있어도 발도르가 멸망하면 승리하는지 검증합니다.
+        // 키리엔 메인은 다른 진영 성이 남아 있어도 발도르가 멸망하면 승리하는지 검증합니다.
         [Test]
         public void CampaignResult_AresMainValdorEliminationTriggersVictory()
         {
@@ -3039,29 +3039,38 @@ namespace ProjectWI.Tests.Editor
             Assert.IsTrue(defender.FacingRight);
         }
 
-        // 영웅마다 분대가 만들어지고 일반 인물이 분대에 배정되는지 검증합니다.
+        // 전투단 하나가 분대 하나가 되고, 최대 인원을 넘는 전투단은 나뉘며 분대가 블록으로 서는지 검증합니다.
         [Test]
-        public void BattleSquads_AssignedPerHeroWithCommons()
+        public void BattleSquads_OneSquadPerArmyAndBlockFormation()
         {
             WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
             WIBattleConfigSO config = CreateBattleConfigCopy();
-            List<WIHeroDefinition> commons = database.Heroes.Where(item => item.Grade == WICharacterGrade.Common).Take(4).ToList();
+            List<WIHeroDefinition> commons = database.Heroes.Where(item => item.Grade == WICharacterGrade.Common).Take(14).ToList();
             WIBattleSessionState session = new WIBattleSessionState { SessionId = "squad_test" };
             session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = "ares", ArmyId = "a", Role = WIUnitRole.Commander });
             session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = "lyria", ArmyId = "a", Role = WIUnitRole.Melee });
-            foreach (WIHeroDefinition common in commons)
+            for (int index = 0; index < 3; index += 1)
             {
-                session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = common.Id, ArmyId = "a", Role = WIUnitRole.Melee });
+                session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = commons[index].Id, ArmyId = "a", Role = WIUnitRole.Melee });
+            }
+            for (int index = 3; index < commons.Count; index += 1)
+            {
+                session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = commons[index].Id, ArmyId = "b", Role = WIUnitRole.Melee });
             }
             session.DefenderHeroIds.Add(new WIBattleParticipantState { HeroId = "brom", ArmyId = "d", Role = WIUnitRole.Melee });
 
             WIBattleRuntimeState runtime = WIBattleRuntimeBuilder.Build(config, database, session);
 
             List<WIBattleSquadState> attackerSquads = runtime.Squads.Where(item => item.Side == WIBattleSide.Attacker).ToList();
-            Assert.AreEqual(2, attackerSquads.Count);
-            Assert.IsTrue(runtime.Characters.All(item => item.SquadId > 0));
-            Assert.IsTrue(attackerSquads.All(squad => runtime.Characters.Count(item => item.SquadId == squad.SquadId) == 3));
+            Assert.AreEqual(1 + Mathf.CeilToInt(11f / config.SquadMaxSize), attackerSquads.Count);
+            Assert.AreEqual("ares", attackerSquads[0].LeaderHeroId);
+            Assert.IsTrue(attackerSquads.All(squad => runtime.Characters.Count(item => item.SquadId == squad.SquadId) <= config.SquadMaxSize));
+            WIBattleCharacterState leader = runtime.Characters.Single(item => item.HeroId == "ares");
+            List<WIBattleCharacterState> squadMembers = runtime.Characters.Where(item => item.SquadId == leader.SquadId).ToList();
+            Assert.IsTrue(squadMembers.All(item => Vector2.Distance(item.Position, leader.Position) < config.SquadMemberSpacing * 3f));
+            Assert.IsTrue(squadMembers.All(item => item.Position.x <= leader.Position.x + config.FormationJitter * 2f + 0.01f));
         }
+
 
         // 분대 전용 명령이 진영 명령보다 우선하고 진영 명령을 다시 내리면 해제되는지 검증합니다.
         [Test]
@@ -3214,6 +3223,130 @@ namespace ProjectWI.Tests.Editor
 
             WIBattleSimulation.StopHeroControl(runtime);
             Assert.IsTrue(string.IsNullOrEmpty(runtime.ControlledHeroId));
+        }
+
+        // 돌격 충격, 방진 정면 방어·측면 취약, 유격 후방 강화가 근접 피해 배율에 반영되는지 검증합니다.
+        [Test]
+        public void BattleClasses_ChargeBraceAndSkirmisherMultipliers()
+        {
+            WIBattleConfigSO config = CreateBattleConfigCopy();
+            WIBattleCharacterState target = new WIBattleCharacterState { Position = Vector2.zero, FacingRight = true, Archetype = WIBattleArchetype.Charger };
+            WIBattleCharacterState charger = new WIBattleCharacterState { Position = Vector2.right, Archetype = WIBattleArchetype.Charger, ChargeDistance = config.ChargeMinDistance + 1f };
+
+            float charge = WIBattleSimulation.GetMeleeClassMultiplier(config, charger, target, out _, out bool isCharge);
+            Assert.IsTrue(isCharge);
+            Assert.AreEqual(config.ChargeDamageMultiplier, charge, 0.001f);
+
+            WIBattleCharacterState shield = new WIBattleCharacterState { Position = Vector2.zero, FacingRight = true, Archetype = WIBattleArchetype.Shield, ChargeDistance = 0f };
+            float braced = WIBattleSimulation.GetMeleeClassMultiplier(config, charger, shield, out _, out bool bracedCharge);
+            Assert.IsFalse(bracedCharge);
+            Assert.AreEqual(config.BraceFrontDamageMultiplier, braced, 0.001f);
+
+            WIBattleCharacterState flanker = new WIBattleCharacterState { Position = Vector2.up, Archetype = WIBattleArchetype.Skirmisher };
+            float flank = WIBattleSimulation.GetMeleeClassMultiplier(config, flanker, shield, out _, out _);
+            Assert.AreEqual(config.FlankDamageMultiplier * config.BraceFlankExtraMultiplier, flank, 0.001f);
+
+            WIBattleCharacterState rearAttacker = new WIBattleCharacterState { Position = Vector2.left, Archetype = WIBattleArchetype.Skirmisher };
+            float rear = WIBattleSimulation.GetMeleeClassMultiplier(config, rearAttacker, target, out _, out _);
+            Assert.AreEqual(config.SkirmisherRearMultiplier, rear, 0.001f);
+        }
+
+        // 직업 설정이 병과와 능력 배율로 전투 인물에 적용되고, 궁병 화살은 포물선·착탄 범위 피해를 가지는지 검증합니다.
+        [Test]
+        public void BattleClasses_ProfilesAndArcherVolleySplash()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIBattleConfigSO config = CreateBattleConfigCopy();
+            WIHeroDefinition archerHero = database.Heroes.First(item => item.Grade == WICharacterGrade.Common && item.HeroClass == WIHeroClass.Archer);
+            WIHeroDefinition archerTwo = database.Heroes.Where(item => item.Grade == WICharacterGrade.Common && item.HeroClass == WIHeroClass.Archer).Skip(1).First();
+            List<WIHeroDefinition> victims = database.Heroes.Where(item => item.Grade == WICharacterGrade.Common && item.HeroClass == WIHeroClass.Guardian).Take(2).ToList();
+            WIBattleSessionState session = new WIBattleSessionState { SessionId = "volley_test" };
+            session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = archerHero.Id, ArmyId = "a", Role = WIUnitRole.Ranged });
+            session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = archerTwo.Id, ArmyId = "a", Role = WIUnitRole.Ranged });
+            session.DefenderHeroIds.Add(new WIBattleParticipantState { HeroId = victims[0].Id, ArmyId = "d", Role = WIUnitRole.Vanguard });
+            session.DefenderHeroIds.Add(new WIBattleParticipantState { HeroId = victims[1].Id, ArmyId = "d", Role = WIUnitRole.Vanguard });
+            WIBattleRuntimeState runtime = WIBattleRuntimeBuilder.Build(config, database, session);
+            WIBattleCharacterState archer = runtime.Characters.Single(item => item.HeroId == archerHero.Id);
+            WIBattleCharacterState second = runtime.Characters.Single(item => item.HeroId == archerTwo.Id);
+            WIBattleCharacterState first = runtime.Characters.Single(item => item.HeroId == victims[0].Id);
+            WIBattleCharacterState near = runtime.Characters.Single(item => item.HeroId == victims[1].Id);
+            Assert.AreEqual(WIBattleArchetype.Archer, archer.Archetype);
+            Assert.AreEqual(WIBattleArchetype.Shield, first.Archetype);
+            Assert.Greater(archer.AttackRange, config.RangedRange);
+            archer.Position = new Vector2(-3f, 0f);
+            second.Position = new Vector2(-3f, 1f);
+            first.Position = new Vector2(1f, 0f);
+            near.Position = new Vector2(1f, 0.5f);
+            first.FormationPosition = first.Position;
+            near.FormationPosition = near.Position;
+            int nearHealth = near.Health;
+            runtime.DefenderCommand = WIBattleCommand.Hold;
+
+            WIBattleSimulation.Step(config, runtime, 0.05f);
+            Assert.GreaterOrEqual(runtime.Projectiles.Count(item => item.IsArc == true), 2);
+            for (int index = 0; index < 40; index += 1)
+            {
+                WIBattleSimulation.Step(config, runtime, 0.05f);
+            }
+            Assert.Less(near.Health, nearHealth);
+        }
+
+        // 지원 병과가 사거리 안의 다친 아군을 치료하는지 검증합니다.
+        [Test]
+        public void BattleClasses_SupportHealsWoundedAlly()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIBattleConfigSO config = CreateBattleConfigCopy();
+            WIHeroDefinition priest = database.Heroes.First(item => item.Grade == WICharacterGrade.Common && item.HeroClass == WIHeroClass.Priest);
+            WIBattleSessionState session = new WIBattleSessionState { SessionId = "heal_test" };
+            session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = "ares", ArmyId = "a", Role = WIUnitRole.Commander });
+            session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = priest.Id, ArmyId = "a", Role = WIUnitRole.Support });
+            session.DefenderHeroIds.Add(new WIBattleParticipantState { HeroId = "brom", ArmyId = "d", Role = WIUnitRole.Melee });
+            WIBattleRuntimeState runtime = WIBattleRuntimeBuilder.Build(config, database, session);
+            WIBattleCharacterState wounded = runtime.Characters.Single(item => item.HeroId == "ares");
+            WIBattleCharacterState healer = runtime.Characters.Single(item => item.HeroId == priest.Id);
+            healer.Position = wounded.Position + Vector2.left;
+            wounded.Health = wounded.MaxHealth / 3;
+            int before = wounded.Health;
+
+            WIBattleSimulation.Step(config, runtime, 0.05f);
+
+            Assert.AreEqual(WIBattleArchetype.Support, healer.Archetype);
+            Assert.Greater(wounded.Health, before);
+        }
+
+        // 전진 중 분대가 블록 모양을 유지하며 함께 움직이고, 앞줄이 쓰러지면 뒤 인물이 앞 자리를 채우는지 검증합니다.
+        [Test]
+        public void BattleCohesion_SquadMarchesAsBlockAndRefillsFront()
+        {
+            WIAdministrationDatabaseSO database = AssetDatabase.LoadAssetAtPath<WIAdministrationDatabaseSO>(DatabasePath);
+            WIBattleConfigSO config = CreateBattleConfigCopy();
+            List<WIHeroDefinition> commons = database.Heroes.Where(item => item.Grade == WICharacterGrade.Common && item.HeroClass == WIHeroClass.Guardian).Take(5).ToList();
+            WIBattleSessionState session = new WIBattleSessionState { SessionId = "cohesion_test" };
+            foreach (WIHeroDefinition common in commons)
+            {
+                session.AttackerHeroIds.Add(new WIBattleParticipantState { HeroId = common.Id, ArmyId = "a", Role = WIUnitRole.Vanguard });
+            }
+            session.DefenderHeroIds.Add(new WIBattleParticipantState { HeroId = "brom", ArmyId = "d", Role = WIUnitRole.Melee });
+            WIBattleRuntimeState runtime = WIBattleRuntimeBuilder.Build(config, database, session);
+            runtime.DefenderCommand = WIBattleCommand.Hold;
+            List<WIBattleCharacterState> squad = runtime.Characters.Where(item => item.Side == WIBattleSide.Attacker).ToList();
+            float startX = squad.Average(item => item.Position.x);
+
+            for (int index = 0; index < 40; index += 1)
+            {
+                WIBattleSimulation.Step(config, runtime, 0.05f);
+            }
+
+            Assert.Greater(squad.Average(item => item.Position.x), startX + 3f);
+            Vector2 center = new Vector2(squad.Average(item => item.Position.x), squad.Average(item => item.Position.y));
+            Assert.IsTrue(squad.All(item => Vector2.Distance(item.Position, center) < config.SquadMemberSpacing * 2.5f));
+
+            WIBattleCharacterState front = squad.Single(item => item.BlockIndex == 0);
+            WIBattleCharacterState second = squad.Single(item => item.BlockIndex == 1);
+            front.Health = 0;
+            WIBattleSimulation.Step(config, runtime, 0.05f);
+            Assert.AreEqual(0, second.BlockIndex);
         }
 
         // 분산 명령이 같은 진영 인물 간격을 최소 간격보다 넓히는지 검증합니다.
@@ -4056,7 +4189,7 @@ namespace ProjectWI.Tests.Editor
             Assert.AreEqual(105, database.StandardAIAttackPowerPercent);
         }
 
-        // 아레스 메인은 프로스트혼 단독 시작과 전용 북부 연결을 사용하고 프리 시나리오는 기본 배치를 유지하는지 검증합니다.
+        // 키리엔 메인은 프로스트혼 단독 시작과 전용 북부 연결을 사용하고 프리 시나리오는 기본 배치를 유지하는지 검증합니다.
         [Test]
         public void CampaignVariants_UseScenarioCastlePlacementData()
         {
@@ -4120,7 +4253,7 @@ namespace ProjectWI.Tests.Editor
             }
         }
 
-        // 아레스 메인의 발도르는 첫 11개월 동안 공격 출정을 예약하지 않는지 검증합니다.
+        // 키리엔 메인의 발도르는 첫 11개월 동안 공격 출정을 예약하지 않는지 검증합니다.
         [Test]
         public void AresMain_ValdorRarelyAttacksBeforeTwelfthMonth()
         {
@@ -4407,7 +4540,9 @@ namespace ProjectWI.Tests.Editor
             Assert.NotNull(prefab.transform.Find("HealthBackground")?.GetComponent<SpriteRenderer>());
             Assert.NotNull(prefab.transform.Find("HealthBackground/HealthFill")?.GetComponent<SpriteRenderer>());
             Assert.NotNull(prefab.transform.Find("CharacterLabel")?.GetComponent<TextMesh>());
-            Assert.NotNull(prefab.GetComponent<SpriteRenderer>()?.sprite);
+            Assert.IsNull(prefab.GetComponent<SpriteRenderer>());
+            Assert.NotNull(prefab.transform.Find("Body")?.GetComponent<SpriteRenderer>()?.sprite);
+            Assert.NotNull(prefab.transform.Find("SideMarker")?.GetComponent<SpriteRenderer>()?.sprite);
             Assert.NotNull(prefab.transform.Find("FocusTargetMarker")?.GetComponent<SpriteRenderer>()?.sprite);
             Assert.NotNull(prefab.transform.Find("SelectionMarker")?.GetComponent<SpriteRenderer>()?.sprite);
             Assert.NotNull(prefab.transform.Find("HealthBackground")?.GetComponent<SpriteRenderer>()?.sprite);

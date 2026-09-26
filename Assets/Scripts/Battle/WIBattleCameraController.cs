@@ -16,6 +16,10 @@ namespace ProjectWI.Battle
         private WIBattleZoomLevel framedZoomLevel = WIBattleZoomLevel.C;
         private WIBattleZoomLevel currentZoomLevel = WIBattleZoomLevel.C;
         private readonly HashSet<KeyCode> heldKeys = new HashSet<KeyCode>();
+        // 흔들림을 뺀 카메라 기준 위치입니다. 이동·경계 제한은 이 값에만 적용합니다.
+        private Vector2 basePosition;
+        // 누적된 화면 흔들림 세기(0~1)이며 시간이 지나면 줄어듭니다.
+        private float trauma;
 
         public WIBattleZoomLevel CurrentZoomLevel => currentZoomLevel;
         public event Action<WIBattleZoomLevel> ZoomLevelChanged;
@@ -76,6 +80,26 @@ namespace ProjectWI.Battle
             SetZoomLevel((WIBattleZoomLevel)nextIndex);
         }
 
+        // 커서 아래 전장 지점이 화면에서 제자리에 머물도록 줌 단계를 바꿉니다.
+        public void Zoom(float wheelDelta, Vector2 screenPosition)
+        {
+            if (battleCamera == null || config == null) return;
+            Vector2 before = ScreenToBattlePosition(screenPosition);
+            Zoom(wheelDelta);
+            Vector2 after = ScreenToBattlePosition(screenPosition);
+            Vector2 clamped = GetClampedPosition(basePosition + before - after);
+            basePosition = clamped;
+        }
+
+        // 가운데 버튼 드래그처럼 화면 좌표 이동량만큼 카메라를 반대로 옮겨 전장을 끌어당깁니다.
+        public void DragPan(Vector2 previousScreenPosition, Vector2 currentScreenPosition)
+        {
+            if (battleCamera == null || config == null) return;
+            Vector2 delta = ScreenToBattlePosition(previousScreenPosition) - ScreenToBattlePosition(currentScreenPosition);
+            Vector2 clamped = GetClampedPosition(basePosition + delta);
+            basePosition = clamped;
+        }
+
         // 지정한 A/B/C 줌 단계로 즉시 이동하고 단계 변경을 알립니다.
         public void SetZoomLevel(WIBattleZoomLevel zoomLevel)
         {
@@ -92,7 +116,7 @@ namespace ProjectWI.Battle
             if (battleCamera == null || config == null) return;
             currentZoomLevel = framedZoomLevel;
             battleCamera.orthographicSize = framedOrthographicSize;
-            transform.position = new Vector3(0f, 0f, -10f);
+            basePosition = Vector2.zero;
             ClampToArena();
             ZoomLevelChanged?.Invoke(currentZoomLevel);
         }
@@ -134,7 +158,13 @@ namespace ProjectWI.Battle
                 Mathf.Clamp(requestedPosition.y, -limitY, limitY));
         }
 
-        // 누르고 있는 WASD·방향키를 조합해 매 프레임 카메라를 이동합니다.
+        // 화면 흔들림 세기를 더합니다. 세기의 제곱에 비례해 흔들려 큰 사건일수록 강하게 느껴집니다.
+        public void AddTrauma(float amount)
+        {
+            trauma = Mathf.Clamp01(trauma + amount);
+        }
+
+        // 누르고 있는 WASD·방향키로 기준 위치를 옮기고, 흔들림을 더해 실제 카메라 위치를 정합니다.
         private void Update()
         {
             if (config == null) return;
@@ -143,17 +173,26 @@ namespace ProjectWI.Battle
             if (heldKeys.Contains(KeyCode.D) || heldKeys.Contains(KeyCode.RightArrow)) direction.x += 1f;
             if (heldKeys.Contains(KeyCode.S) || heldKeys.Contains(KeyCode.DownArrow)) direction.y -= 1f;
             if (heldKeys.Contains(KeyCode.W) || heldKeys.Contains(KeyCode.UpArrow)) direction.y += 1f;
-            if (direction.sqrMagnitude <= 0f) return;
-            Vector2 next = (Vector2)transform.position + direction.normalized * config.CameraPanSpeed * Time.unscaledDeltaTime;
-            Vector2 clamped = GetClampedPosition(next);
-            transform.position = new Vector3(clamped.x, clamped.y, -10f);
+            if (direction.sqrMagnitude > 0f)
+            {
+                float zoomScale = battleCamera.orthographicSize / Mathf.Max(0.1f, config.CameraMiddleZoom);
+                Vector2 next = basePosition + direction.normalized * config.CameraPanSpeed * zoomScale * Time.unscaledDeltaTime;
+                basePosition = GetClampedPosition(next);
+            }
+            trauma = Mathf.Max(0f, trauma - config.CameraShakeDecay * Time.unscaledDeltaTime);
+            float shake = trauma * trauma * config.CameraShakeMaxOffset;
+            float time = Time.unscaledTime * 25f;
+            Vector2 offset = new Vector2(
+                (Mathf.PerlinNoise(time, 0.3f) * 2f - 1f) * shake,
+                (Mathf.PerlinNoise(0.7f, time) * 2f - 1f) * shake);
+            transform.position = new Vector3(basePosition.x + offset.x, basePosition.y + offset.y, -10f);
         }
 
         // 현재 카메라 좌표를 전장 경계 안으로 즉시 보정합니다.
         private void ClampToArena()
         {
-            Vector2 clamped = GetClampedPosition(transform.position);
-            transform.position = new Vector3(clamped.x, clamped.y, -10f);
+            Vector2 clamped = GetClampedPosition(basePosition);
+            basePosition = clamped;
         }
     }
 }

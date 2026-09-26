@@ -22,29 +22,35 @@ namespace ProjectWI.Battle
             {
                 return;
             }
+            if (flankMultiplier > 1f)
+            {
+                AddFeedback(runtime, WIBattleFeedbackType.FlankHit, target.Position, target.Side);
+            }
             if (flankMultiplier >= config.RearDamageMultiplier && config.RearDamageMultiplier > 1f)
             {
-                ChangeMorale(squad, -config.MoraleLossRearHit);
+                ChangeMorale(squad, -config.MoraleLossRearHit * GetMoraleLossScale(config, squad));
             }
             else if (flankMultiplier > 1f)
             {
-                ChangeMorale(squad, -config.MoraleLossFlankHit);
+                ChangeMorale(squad, -config.MoraleLossFlankHit * GetMoraleLossScale(config, squad));
             }
             if (wasAlive == false || target.IsAlive == true)
             {
                 return;
             }
-            ChangeMorale(squad, -config.MoraleLossPerAllyDown);
+            ChangeMorale(squad, -config.MoraleLossPerAllyDown * GetMoraleLossScale(config, squad));
             if (squad.LeaderHeroId != target.HeroId)
             {
+                AddFeedback(runtime, WIBattleFeedbackType.Kill, target.Position, target.Side);
                 return;
             }
-            ChangeMorale(squad, -config.MoraleLossLeaderDown);
+            AddFeedback(runtime, WIBattleFeedbackType.LeaderKill, target.Position, target.Side);
+            ChangeMorale(squad, -config.MoraleLossLeaderDown * GetMoraleLossScale(config, squad));
             foreach (WIBattleSquadState other in runtime.Squads)
             {
                 if (other != squad && other.Side == squad.Side)
                 {
-                    ChangeMorale(other, -config.MoraleLossSideOnLeaderDown);
+                    ChangeMorale(other, -config.MoraleLossSideOnLeaderDown * GetMoraleLossScale(config, other));
                 }
             }
         }
@@ -52,6 +58,7 @@ namespace ProjectWI.Battle
         // 분대 사기를 회복시키고 0이 된 분대는 무너뜨리며, 무너진 분대는 분대장이 살아 있으면 기준 사기에서 복귀시킵니다.
         private static void UpdateMorale(WIBattleConfigSO config, WIBattleRuntimeState runtime, float deltaTime)
         {
+            UpdateCommandAuras(config, runtime);
             foreach (WIBattleSquadState squad in runtime.Squads)
             {
                 if (squad.IsRouting == true)
@@ -66,16 +73,47 @@ namespace ProjectWI.Battle
                 else if (squad.Morale <= 0f)
                 {
                     squad.IsRouting = true;
+                    if (charactersById.TryGetValue(squad.LeaderHeroId ?? string.Empty, out WIBattleCharacterState leader) == true)
+                    {
+                        AddFeedback(runtime, WIBattleFeedbackType.SquadRouted, leader.Position, squad.Side);
+                    }
                 }
                 else
                 {
-                    ChangeMorale(squad, config.MoraleRegenPerSecond * deltaTime);
+                    float regen = config.MoraleRegenPerSecond + (squad.InCommandAura == true ? config.CommandAuraMoraleRegen : 0f);
+                    ChangeMorale(squad, regen * deltaTime);
                 }
             }
             foreach (WIBattleCharacterState character in runtime.Characters)
             {
                 WIBattleSquadState squad = FindSquad(runtime, character.SquadId);
                 character.IsRouting = squad != null && squad.IsRouting == true;
+            }
+        }
+
+        // 표시 계층용 연출 사건을 기록하며 소비되지 않을 때를 대비해 개수를 제한합니다.
+        private static void AddFeedback(WIBattleRuntimeState runtime, WIBattleFeedbackType type, Vector2 position, WIBattleSide side)
+        {
+            if (runtime.FeedbackEvents.Count >= 128)
+            {
+                runtime.FeedbackEvents.RemoveRange(0, 64);
+            }
+            runtime.FeedbackEvents.Add(new WIBattleFeedbackEvent { Type = type, Position = position, Side = side });
+        }
+
+        // 지휘 병과 보호 범위 안 분대는 사기 손실이 줄어드는 배율을 반환합니다.
+        private static float GetMoraleLossScale(WIBattleConfigSO config, WIBattleSquadState squad)
+        {
+            return squad.InCommandAura == true ? config.CommandAuraLossMultiplier : 1f;
+        }
+
+        // 인물이 속한 분대의 사기를 깎습니다(지휘 보호 반영).
+        private static void ApplyMoraleLoss(WIBattleConfigSO config, WIBattleRuntimeState runtime, WIBattleCharacterState target, float amount)
+        {
+            WIBattleSquadState squad = FindSquad(runtime, target.SquadId);
+            if (squad != null)
+            {
+                ChangeMorale(squad, -amount * GetMoraleLossScale(config, squad));
             }
         }
 

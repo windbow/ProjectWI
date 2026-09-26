@@ -60,6 +60,7 @@ namespace ProjectWI.Battle
                     AddHitVisual(config, runtime, enemy);
                 }
                 AddSkillVisual(config, runtime, caster, skill, WIBattleVisualEffectType.SkillDamage, center, radius);
+                AddFeedback(runtime, WIBattleFeedbackType.SkillImpact, center, caster.Side);
             }
             return true;
         }

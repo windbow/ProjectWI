@@ -29,7 +29,7 @@ namespace ProjectWI.Administration
             }
             else
             {
-                body.AppendLine($"규모 · {selectedCastle.CastleSize}");
+                body.AppendLine($"규모 · {database.GetCastleSizeName(selectedCastle.CastleSize)}");
                 body.AppendLine($"지형 · {castle.TerrainTrait.Get(database.UseEnglish)}");
                 body.AppendLine($"특산 · {castle.Specialty.Get(database.UseEnglish)}");
                 body.AppendLine($"전문 분야 효과 · {GetSpecialtyEffectDescription(castle)}");

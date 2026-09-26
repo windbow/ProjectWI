@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace ProjectWI.Battle
 {
-    [RequireComponent(typeof(SpriteRenderer))]
     public class WIBattleCharacterView : MonoBehaviour
     {
         private const int CharacterSortingBase = 1000;
@@ -26,6 +25,25 @@ namespace ProjectWI.Battle
         private GameObject healthBackground;
         private GameObject characterLabelObject;
         private TextMesh characterLabel;
+        // 걷기·공격·피격·쓰러짐 연출을 적용하는 인물 그림 자식입니다. 발밑 표시와 체력 바는 움직이지 않습니다.
+        private Transform bodyTransform;
+        // 연출 수치를 읽는 전투 설정입니다.
+        private WIBattleConfigSO feelConfig;
+        // 직전 표시 프레임의 체력·공격 대기시간·위치입니다. 변화로 피격·공격·이동을 감지합니다.
+        private int lastHealth;
+        private float lastCooldown;
+        private Vector2 lastDisplayPosition;
+        // 진행 중인 연출의 남은 시간입니다.
+        private float flashRemaining;
+        private float lungeRemaining;
+        private float deathElapsed;
+        private float spawnElapsed = float.MaxValue;
+        // 걸음 위상과 이동 중 가중치(0~1)입니다.
+        private float walkPhase;
+        private float walkWeight;
+        // 선택 표시 맥동 시간과 원래 크기입니다.
+        private float pulseTime;
+        private Vector3 selectionMarkerBaseScale = Vector3.one;
 
         public string HeroId => state?.HeroId;
         // 표시 중인 인물의 분대 번호입니다.
@@ -35,7 +53,14 @@ namespace ProjectWI.Battle
         public void Bind(WIBattleCharacterState characterState, WIBattleConfigSO config, Sprite battleSprite)
         {
             state = characterState;
-            spriteRenderer = GetComponent<SpriteRenderer>();
+            feelConfig = config;
+            bodyTransform = transform.Find("Body");
+            spriteRenderer = bodyTransform == null ? null : bodyTransform.GetComponent<SpriteRenderer>();
+            if (spriteRenderer == null)
+            {
+                Debug.LogError("전투 캐릭터 프리팹에 Body 자식 SpriteRenderer가 없습니다.", this);
+                return;
+            }
             BindGroundShadow();
             spriteFacesRight = config.BattleSpriteFacesRight;
             defaultMaterial = config.CharacterDefaultMaterial;
@@ -71,7 +96,16 @@ namespace ProjectWI.Battle
                 ? Vector3.one * config.PlaceholderCharacterSize
                 : Vector3.one * config.BattleSpriteScale;
             BindPrefabVisuals(config);
-            Refresh();
+            lastHealth = state.Health;
+            lastCooldown = state.CooldownRemaining;
+            lastDisplayPosition = state.Position;
+            Refresh(1f, 0f);
+        }
+
+        // 전투 중 합류한 인물이 튀어나오듯 등장하도록 등장 연출을 시작합니다.
+        public void PlaySpawn()
+        {
+            spawnElapsed = 0f;
         }
 
         // 프리팹에 미리 배치된 공용 접지 그림자를 찾아 캐릭터 깊이 정렬과 연결합니다.
@@ -106,6 +140,10 @@ namespace ProjectWI.Battle
         {
             focusMarker = BindMarker("FocusTargetMarker", new Color(1f, 0.82f, 0.12f, 0.32f), 9);
             selectionMarker = BindMarker("SelectionMarker", new Color(0.15f, 0.95f, 0.95f, 0.26f), 8);
+            if (selectionMarker != null)
+            {
+                selectionMarkerBaseScale = selectionMarker.transform.localScale;
+            }
             BindHealthBar(config.ShowCharacterHealthBars);
             BindCharacterLabel(config.ShowCharacterLabels);
         }
@@ -194,17 +232,17 @@ namespace ProjectWI.Battle
             }
         }
 
-        // 틱 사이 보간 비율을 적용한 런타임 좌표와 생존 상태를 Transform과 렌더러에 반영합니다.
-        public void Refresh(float interpolationAlpha = 1f)
+        // 틱 사이 보간 비율을 적용한 런타임 좌표와 생존 상태를 반영하고, deltaTime만큼 연출을 진행합니다.
+        // 히트 스톱 중에는 deltaTime 0을 받아 연출도 멈춥니다.
+        public void Refresh(float interpolationAlpha = 1f, float deltaTime = 0f)
         {
-            if (state == null)
+            if (state == null || spriteRenderer == null)
             {
                 return;
             }
             Vector2 displayPosition = state.GetDisplayPosition(interpolationAlpha);
             transform.position = new Vector3(displayPosition.x, displayPosition.y, 0f);
             spriteRenderer.flipX = state.FacingRight != spriteFacesRight;
-            spriteRenderer.color = state.IsRouting == true ? baseColor * routingTint : baseColor;
             spriteRenderer.sortingOrder = CharacterSortingBase - Mathf.RoundToInt(displayPosition.y * CharacterSortingPrecision);
             if (groundShadowRenderer != null)
             {
@@ -219,7 +257,147 @@ namespace ProjectWI.Battle
                 float ratio = state.MaxHealth <= 0 ? 0f : Mathf.Clamp01((float)state.Health / state.MaxHealth);
                 healthFill.localScale = new Vector3(ratio, 1f, 1f);
             }
-            gameObject.SetActive(state.IsAlive);
+            DetectFeelTriggers(displayPosition, deltaTime);
+            if (state.IsAlive == false)
+            {
+                AnimateDefeat(deltaTime);
+                return;
+            }
+            AnimateBody(deltaTime);
+        }
+
+        // 체력 감소·공격 대기시간 재설정·위치 변화를 감지해 피격·공격·걷기 연출을 시작합니다.
+        private void DetectFeelTriggers(Vector2 displayPosition, float deltaTime)
+        {
+            if (state.Health < lastHealth)
+            {
+                flashRemaining = feelConfig.HitFlashDuration;
+            }
+            if (state.CooldownRemaining > lastCooldown + 0.2f && UsesMeleeLunge() == true)
+            {
+                lungeRemaining = feelConfig.AttackLungeDuration;
+            }
+            if (deltaTime > 0f)
+            {
+                float speed = Vector2.Distance(displayPosition, lastDisplayPosition) / deltaTime;
+                float targetWeight = speed > 0.2f ? 1f : 0f;
+                walkWeight = Mathf.MoveTowards(walkWeight, targetWeight, deltaTime * 6f);
+                walkPhase += deltaTime * feelConfig.WalkBobFrequency * Mathf.PI * Mathf.Clamp(speed / 2.5f, 0.6f, 1.6f);
+            }
+            lastHealth = state.Health;
+            lastCooldown = state.CooldownRemaining;
+            lastDisplayPosition = displayPosition;
+        }
+
+        // 걷기 흔들림·기울기, 공격 내딛기, 피격 번쩍임·눌림, 등장 튀어나옴을 몸 그림에 적용합니다.
+        private void AnimateBody(float deltaTime)
+        {
+            flashRemaining = Mathf.Max(0f, flashRemaining - deltaTime);
+            lungeRemaining = Mathf.Max(0f, lungeRemaining - deltaTime);
+            if (spawnElapsed < float.MaxValue)
+            {
+                spawnElapsed += deltaTime;
+            }
+            pulseTime += deltaTime;
+
+            float facing = state.FacingRight == true ? 1f : -1f;
+            float bob = Mathf.Abs(Mathf.Sin(walkPhase)) * feelConfig.WalkBobHeight * walkWeight;
+            float tilt = Mathf.Sin(walkPhase) * feelConfig.WalkTiltDegrees * walkWeight;
+            float lungeProgress = 1f - lungeRemaining / feelConfig.AttackLungeDuration;
+            float lunge = lungeRemaining > 0f ? Mathf.Sin(lungeProgress * Mathf.PI) * feelConfig.AttackLungeDistance : 0f;
+            Vector3 rootScale = transform.localScale;
+            float scaleX = Mathf.Max(0.01f, rootScale.x);
+            float scaleY = Mathf.Max(0.01f, rootScale.y);
+            bodyTransform.localPosition = new Vector3(facing * lunge / scaleX, bob / scaleY, 0f);
+            bodyTransform.localRotation = Quaternion.Euler(0f, 0f, -tilt * facing);
+
+            float flashT = flashRemaining / feelConfig.HitFlashDuration;
+            float squash = feelConfig.HitSquashAmount * flashT;
+            float pop = 1f;
+            if (spawnElapsed < feelConfig.SpawnPopDuration)
+            {
+                pop = EaseOutBack(spawnElapsed / feelConfig.SpawnPopDuration);
+            }
+            bodyTransform.localScale = new Vector3((1f + squash) * pop, (1f - squash) * pop, 1f);
+
+            Color color = state.IsRouting == true ? baseColor * routingTint : baseColor;
+            spriteRenderer.color = Color.Lerp(color, feelConfig.HitFlashColor * color, flashT);
+
+            if (selectionMarker != null && selectionMarker.activeSelf == true)
+            {
+                float pulse = 1f + Mathf.Sin(pulseTime * feelConfig.SelectionPulseSpeed) * feelConfig.SelectionPulseAmount;
+                selectionMarker.transform.localScale = selectionMarkerBaseScale * pulse;
+            }
+            gameObject.SetActive(true);
+        }
+
+        // 쓰러진 인물은 뒤로 넘어지며 흐려지고, 전장을 벗어난 인물은 흐려지며 사라집니다. 끝나면 비활성화합니다.
+        private void AnimateDefeat(float deltaTime)
+        {
+            deathElapsed += deltaTime;
+            float progress = Mathf.Clamp01(deathElapsed / feelConfig.DeathFallDuration);
+            SetOverlaysHidden();
+            if (state.Escaped == false)
+            {
+                float facing = state.FacingRight == true ? 1f : -1f;
+                float fall = EaseOutQuad(Mathf.Clamp01(progress * 1.6f));
+                bodyTransform.localRotation = Quaternion.Euler(0f, 0f, fall * feelConfig.DeathFallDegrees * facing);
+            }
+            Color color = spriteRenderer.color;
+            color.a = 1f - EaseOutQuad(progress);
+            spriteRenderer.color = color;
+            if (progress >= 1f)
+            {
+                gameObject.SetActive(false);
+            }
+        }
+
+        // 쓰러짐 연출 중 발밑 표시·체력 바·마커를 숨깁니다.
+        private void SetOverlaysHidden()
+        {
+            if (sideMarkerRenderer != null)
+            {
+                sideMarkerRenderer.enabled = false;
+            }
+            if (groundShadowRenderer != null)
+            {
+                groundShadowRenderer.enabled = false;
+            }
+            if (healthBackground != null)
+            {
+                healthBackground.SetActive(false);
+            }
+            if (focusMarker != null)
+            {
+                focusMarker.SetActive(false);
+            }
+            if (selectionMarker != null)
+            {
+                selectionMarker.SetActive(false);
+            }
+        }
+
+        // 근접 역할처럼 공격 때 앞으로 내딛는 인물인지 반환합니다.
+        private bool UsesMeleeLunge()
+        {
+            return state.Role != ProjectWI.Administration.WIUnitRole.Ranged &&
+                state.Role != ProjectWI.Administration.WIUnitRole.Magic &&
+                state.Role != ProjectWI.Administration.WIUnitRole.Support;
+        }
+
+        // 끝에서 살짝 넘쳤다 돌아오는 튀어나옴 곡선입니다.
+        private static float EaseOutBack(float t)
+        {
+            const float c1 = 1.70158f;
+            const float c3 = c1 + 1f;
+            float x = t - 1f;
+            return 1f + c3 * x * x * x + c1 * x * x;
+        }
+
+        // 빠르게 시작해 천천히 끝나는 곡선입니다.
+        private static float EaseOutQuad(float t)
+        {
+            return 1f - (1f - t) * (1f - t);
         }
     }
 }

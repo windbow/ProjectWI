@@ -42,7 +42,7 @@ namespace ProjectWI.Administration
                 Mana = $"마나  {FormatHudNumber(state.ManaCrystal, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.ManaGained, database.UseEnglish)}/월)</color></size>",
                 Influence = $"영향력  {FormatHudNumber(state.Influence, database.UseEnglish)}  <size=75%><color=#AEB4B8>(+{FormatHudNumber(forecast.InfluenceGained, database.UseEnglish)}/월)</color></size>",
                 CastleName = castleDefinition?.DisplayName.Get(database.UseEnglish) ?? castle?.CastleId ?? string.Empty,
-                CastleOwner = castle == null ? string.Empty : $"{castle.CastleSize} · {castleOwner?.DisplayName.Get(database.UseEnglish) ?? castle.FactionId}",
+                CastleOwner = castle == null ? string.Empty : $"{database.GetCastleSizeName(castle.CastleSize)} · {castleOwner?.DisplayName.Get(database.UseEnglish) ?? castle.FactionId}",
                 CastleStats = castle == null ? string.Empty : $"번영 {castle.Prosperity}  ·  기술 {castle.Technology}\n질서 {castle.Stability}  ·  방어 {castle.Defense}",
                 CastleHeroes = castle == null ? string.Empty : $"주둔 영웅 {castle.HeroIds.Count}명  ·  주둔 전투단 {armyCount}개",
                 MapImage = database.GlobalMapImage,
